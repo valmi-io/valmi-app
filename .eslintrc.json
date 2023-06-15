@@ -1,0 +1,33 @@
+{
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "extends": ["next/core-web-vitals", "plugin:prettier/recommended"],
+  "rules": {
+    "prettier/prettier": "off",
+    "@next/next/no-img-element": "off",
+    "jsx-a11y/alt-text": "off",
+    "react/display-name": "off",
+    "eslint-disable-next-line": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-max-props-per-line": [
+      1,
+      {
+        "maximum": 2,
+        "when": "multiline"
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "off",
+    // Example: Disabling "@typescript-eslint/no-unused-vars" rule
+    // to allow unused variables in TypeScript code
+    "no-console": "off",
+    // Example: Disabling the "no-console" rule to allow console.log statements
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unknown-exports": "off",
+    "@typescript-eslint/no-unknown-imports": "off"
+  }
+}

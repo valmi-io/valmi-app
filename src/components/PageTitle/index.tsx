@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Friday, April 28th 2023, 5:13:16 pm
+ * Author: Nagendra S @ valmi.io
+ */
+
+import { FC } from 'react';
+import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
+import { Typography, Button, Grid, CircularProgress } from '@mui/material';
+
+interface PageTitleProps {
+  title: string;
+  buttonTitle?: string;
+  displayButton?: boolean;
+  disabled?: boolean;
+  isFetching?: boolean;
+  displayStartIcon?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const PageTitle: FC<PageTitleProps> = ({
+  title = '',
+  buttonTitle = '',
+  displayButton = true,
+  onClick,
+  isFetching = false,
+  displayStartIcon = true,
+  disabled = false,
+  ...rest
+}) => {
+  let endIcon = null;
+  let startIcon = null;
+  startIcon = displayStartIcon && <AddTwoToneIcon fontSize="small" />;
+  endIcon = isFetching && (
+    <CircularProgress
+      size={16}
+      sx={{ color: (theme) => theme.colors.alpha.white[100] }}
+    />
+  );
+
+  return (
+    <Grid
+      container
+      justifyContent="space-between"
+      alignItems="center"
+      {...rest}
+    >
+      <Grid item>
+        <Typography variant="h4" component="h4">
+          {title}
+        </Typography>
+      </Grid>
+      {displayButton && (
+        <Grid item>
+          <Button
+            endIcon={endIcon}
+            startIcon={startIcon}
+            disabled={disabled}
+            sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+            variant="contained"
+            onClick={onClick}
+          >
+            {buttonTitle.toUpperCase()}
+          </Button>
+        </Grid>
+      )}
+    </Grid>
+  );
+};
+
+export default PageTitle;

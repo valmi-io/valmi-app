@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="87.937 422.745 153.191 152.11" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.4972, 0, 0, 1.4972, 164.392197, 499.010101)" id="g-2">
+    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill-rule: nonzero; opacity: 1; fill: rgb(25, 188, 155);" transform=" translate(-652, -96)" d="M 652 46 c 27.6 0 50 22.4 50 50 s -22.4 50 -50 50 s -50 -22.4 -50 -50 S 624.4 46 652 46 z" stroke-linecap="round"/>
+  </g>
+  <g transform="matrix(0.9273, 0, 0, 0.9273, 164.859894, 499.540192)" id="g-4">
+    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill-rule: nonzero; opacity: 1; fill: rgb(52, 73, 94);" transform=" translate(-652, -96)" d="M 652 46 c 27.6 0 50 22.4 50 50 s -22.4 50 -50 50 s -50 -22.4 -50 -50 S 624.4 46 652 46 z" stroke-linecap="round"/>
+  </g>
+  <g transform="matrix(0.5954, 0, 0, 0.5954, 207.240799, 460.69101)" id="g-8">
+    <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; is-custom-font: none; font-file-url: none; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1;" transform=" translate(-652, -96)" d="M 652 46 c 27.6 0 50 22.4 50 50 s -22.4 50 -50 50 s -50 -22.4 -50 -50 S 624.4 46 652 46 z" stroke-linecap="round"/>
+  </g>
+</svg>
