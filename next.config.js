@@ -10,6 +10,8 @@ module.exports = {
   },
   env: {
     API_URL: process.env.API_URL,
-    WEB_URL: process.env.WEB_URL
+    WEB_URL: process.env.WEB_URL,
+    POSTHOG_KEY: process.env.POSTHOG_KEY,
+    POSTHOG_HOST: process.env.POSTHOG_HOST
   }
 };

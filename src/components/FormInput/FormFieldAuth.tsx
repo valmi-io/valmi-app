@@ -5,22 +5,29 @@
  */
 
 import { CheckOutlined } from '@mui/icons-material';
-import { Box, InputLabel, styled } from '@mui/material';
-import { getOauthImage } from '../../content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { Box, IconButton, InputLabel, styled } from '@mui/material';
+import {
+  getOauthColorCode,
+  getOauthImage,
+  getOauthLoginText
+} from '../../content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import { capitalizeFirstLetter } from '../../utils/lib';
 import { ErrorStatusText } from '../Error';
 import ImageComponent, { ImageSize } from '../ImageComponent';
+import FontAwesomeIcon from '../Icon/FontAwesomeIcon';
+import Image from 'next/image';
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,
-  padding: theme.spacing(1),
+  //padding: theme.spacing(1),
   display: 'flex',
   width: '100%',
   alignItems: 'center',
   justifyContent: 'space-between',
   cursor: 'pointer',
   margin: theme.spacing(1),
-  backgroundColor: theme.palette.primary.main,
+  //backgroundColor: '#5890FF',
+  // backgroundColor: theme.palette.primary.main,
   color: theme.palette.success.contrastText
 }));
 
@@ -45,40 +52,64 @@ const FormFieldAuth = (props: any) => {
     <>
       <Label>{label}</Label>
       <Item
-        sx={{
-          borderRadius: 1
-        }}
-        onClick={() =>
-          onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })
+        sx={
+          {
+            // borderRadius: 1
+            // backgroundColor: 'orange'
+            // backgroundColor: getOauthColorCode({
+            //   oAuth: getOAuthProvider(oAuthProvider)
+            // })
+          }
         }
       >
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <ImageComponent
-            size={ImageSize.medium}
-            alt="oauth icon"
-            style={{
-              marginRight: 20
-            }}
-            src={getOauthImage({
+            //padding: 1,
+            // borderRadius: 1,
+            height: 50,
+            //justifyContent: 'center',
+            backgroundColor: getOauthColorCode({
               oAuth: getOAuthProvider(oAuthProvider)
-            })}
-          />
-          {`Sign in with ${capitalizeFirstLetter(
-            getOAuthProvider(oAuthProvider)
-          )}`}
+            }),
+            width: '100%'
+          }}
+          onClick={() =>
+            onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })
+          }
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              height: '100%',
+              width: 50,
+              backgroundColor: 'white',
+              border: '1px solid #4285F4',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 3
+            }}
+          >
+            <ImageComponent
+              size={ImageSize.medium}
+              alt="oauth icon"
+              src={getOauthImage({
+                oAuth: getOAuthProvider(oAuthProvider)
+              })}
+            />
+          </Box>
+          {getOauthLoginText({
+            oAuth: getOAuthProvider(oAuthProvider)
+          })}
         </Box>
         {hasOAuthAuthorized && (
-          <Box sx={{ display: 'flex' }}>
-            <CheckOutlined />
-          </Box>
+          <IconButton color={'primary'}>
+            <FontAwesomeIcon className={`fas fa-check-circle`} />
+          </IconButton>
         )}
       </Item>
+
       <ErrorStatusText sx={{ ml: 1, fontSize: 14 }} variant="body1">
         {oauth_error}
       </ErrorStatusText>

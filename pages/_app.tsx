@@ -26,6 +26,9 @@ import { AppDispatch, AppState, wrapper } from 'src/store/store';
 import { useDispatch, useStore } from 'react-redux';
 import { setAppState } from '../src/store/reducers/appFlow';
 
+import posthog from 'posthog-js';
+import { PostHogProvider } from 'posthog-js/react';
+
 const clientSideEmotionCache = createEmotionCache();
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -36,6 +39,17 @@ type AppPropsWithLayout = AppProps & {
   emotionCache?: EmotionCache;
   Component: NextPageWithLayout;
 };
+
+// Check that PostHog is client-side (used to handle Next.js SSR)
+if (typeof window !== 'undefined') {
+  posthog.init(process.env.POSTHOG_KEY, {
+    api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
+    // Enable debug mode in development
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === 'development') posthog.debug();
+    }
+  });
+}
 
 const MyApp: FC<AppPropsWithLayout> = ({
   Component,
@@ -56,15 +70,22 @@ const MyApp: FC<AppPropsWithLayout> = ({
       }
     };
 
+    // Track page views
+    const handleRouteComplete = () => {
+      posthog?.capture('$pageview');
+      NProgress.done();
+    };
+    router.events.on('routeChangeComplete', handleRouteComplete);
+
     router.events.on('routeChangeStart', handleRouteChange);
-    router.events.on('routeChangeComplete', () => NProgress.done());
+    router.events.on('routeChangeComplete', handleRouteComplete);
     router.events.on('routeChangeError', () => NProgress.done());
 
     // If the component is unmounted, unsubscribe
     // from the event with the `off` method:
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
-      router.events.off('routeChangeComplete', () => NProgress.done());
+      router.events.off('routeChangeComplete', handleRouteComplete);
       router.events.off('routeChangeError', () => NProgress.done());
     };
   }, []);
@@ -87,7 +108,6 @@ const MyApp: FC<AppPropsWithLayout> = ({
         })
       );
     }
-    // }
   }, [router.pathname]);
 
   return (
@@ -103,7 +123,9 @@ const MyApp: FC<AppPropsWithLayout> = ({
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <CssBaseline />
-              {getLayout(<Component {...pageProps} />)}
+              <PostHogProvider client={posthog}>
+                {getLayout(<Component {...pageProps} />)}
+              </PostHogProvider>
             </LocalizationProvider>
           </ThemeProviderWrapper>
         </SidebarProvider>

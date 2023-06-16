@@ -41,6 +41,21 @@ export const convertUTCDateToLocalDate = (date) => {
   return newDate;
 };
 
+export const getTimeDifference = (fromDate, toDate) => {
+  const runAt = new Date(fromDate);
+  const currentDate = new Date(toDate);
+
+  // Calculate the time difference in milliseconds
+  const timeDiff = currentDate.getTime() - runAt.getTime();
+
+  // Convert time difference to hours, minutes, and seconds
+  const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
+  const seconds = Math.floor((timeDiff / 1000) % 60);
+
+  return `${hours} hrs ${minutes} min ${seconds} s`;
+};
+
 export const isObject = (value) => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };

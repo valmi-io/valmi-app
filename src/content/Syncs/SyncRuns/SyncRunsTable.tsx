@@ -6,6 +6,7 @@
  */
 
 import {
+  Box,
   Chip,
   Icon,
   IconButton,
@@ -37,6 +38,7 @@ import AlertComponent from '../../../components/Alert';
 import {
   capitalizeFirstLetter,
   convertUTCDateToLocalDate,
+  getTimeDifference,
   splitNumberByCommas
 } from '../../../utils/lib';
 import appIcons, { AppIconARROW_RIGHT } from '../../../utils/icon-utils';
@@ -62,7 +64,7 @@ const syncRunColumns: TableColumnProps[] = [
   {
     id: '4',
     label: 'Started_at',
-    minWidth: TABLE_COLUMN_SIZES[2],
+    minWidth: TABLE_COLUMN_SIZES[3],
     icon: appIcons.STARTED_AT
   },
   {
@@ -213,14 +215,28 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   const displayRunStartedAt = (syncRun) => {
     const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
 
-    return (
+    const runStartedAtDisplay =
       runStartedAt.toDateString() +
       ' ' +
       runStartedAt.getHours().toString().padStart(2, '0') +
       ':' +
-      runStartedAt.getMinutes().toString().padStart(2, '0')
-    );
+      runStartedAt.getMinutes().toString().padStart(2, '0');
+
+    return <>{runStartedAtDisplay}</>;
   };
+
+  {
+    /** Sync run time */
+  }
+  const displayRunTime = (syncRun) => {
+    const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
+    // TODO: replace runEndAt with syncRun.run_end
+    const runEndAt = new Date();
+
+    const runTime = getTimeDifference(runStartedAt, runEndAt);
+    return `Took ${runTime}`;
+  };
+
   {
     /** Sync Run Error */
   }
@@ -265,7 +281,12 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
                     <TableCell>
                       {displayConnectionMetrics(syncRun, 'dest')}
                     </TableCell>
-                    <TableCell>{displayRunStartedAt(syncRun)}</TableCell>
+                    <TableCell>
+                      <Stack spacing={0.5} display="flex">
+                        <Box>{displayRunStartedAt(syncRun)}</Box>
+                        <Box>{displayRunTime(syncRun)}</Box>
+                      </Stack>
+                    </TableCell>
                     <TableCell>{displayRunStatus(syncRun)}</TableCell>
                   </TableRow>
                 );

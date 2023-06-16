@@ -143,3 +143,33 @@ export const getOauthImage = ({ oAuth }: any) => {
       return '';
   }
 };
+
+export const getOauthColorCode = ({ oAuth }: any) => {
+  switch (oAuth) {
+    case 'facebook':
+      return '#5890FF';
+    case 'google':
+      return '#4285F4';
+    case 'slack':
+      return '#4A154B';
+    case 'hubspot':
+      return '#5890FF';
+    default:
+      return '';
+  }
+};
+
+export const getOauthLoginText = ({ oAuth }: any) => {
+  switch (oAuth) {
+    case 'facebook':
+      return 'Login with Facebook';
+    case 'google':
+      return 'Sign in with Google';
+    case 'slack':
+      return 'Sign in with Slack';
+    case 'hubspot':
+      return 'Sign in with Hubspot';
+    default:
+      return '';
+  }
+};
