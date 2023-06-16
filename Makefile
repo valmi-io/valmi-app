@@ -1,14 +1,4 @@
 
-version_file := .version
-
-# Check if the 'VALMI_APP_VERSION' environment variable is set.
-ifeq ($(VALMI_APP_VERSION),)
-    $(info The 'VALMI_APP_VERSION' environment variable is not set. Reading it from '$(version_file)')
-    version := $(shell cat $(version_file))
-else
-		version := $(VALMI_APP_VERSION)
-endif
-
 DOCKER = docker
 BUILDX = $(DOCKER) buildx
 BUILDER_NAME=valmi-docker-builder
