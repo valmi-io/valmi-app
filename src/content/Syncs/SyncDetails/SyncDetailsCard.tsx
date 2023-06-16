@@ -27,8 +27,6 @@ const SyncDetailsCard = ({
   handleEditSync,
   isPublicSync = false
 }: SyncDetailsCardProps) => {
-  console.log('Sync details card:-', syncData);
-
   const {
     name: syncName = '',
     schedule: { run_interval = 0 } = {},

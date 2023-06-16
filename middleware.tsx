@@ -17,9 +17,7 @@ export function middleware(request: NextRequest) {
   }
   const pathName = request.nextUrl.pathname;
 
-  if (isPublicSync(pathName)) {
-    console.log('allowing user to navigate to sync run');
-  } else {
+  if (!isPublicSync(pathName)) {
     if (bearerToken) {
       // user is authenticated.
       if (publicRoutes.includes(pathName) || isUserActivateRoute(pathName)) {

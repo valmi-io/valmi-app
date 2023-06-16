@@ -13,7 +13,8 @@ import {
   IconButton,
   Tooltip,
   styled,
-  Typography
+  Typography,
+  Button
 } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -21,6 +22,9 @@ import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
 
 import HeaderUserbox from './Userbox';
 import IconBreadcrumbs from '../../../components/Breadcrumb';
+import { useRouter } from 'next/router';
+import { getRouterPathname, isPublicSync } from '../../../utils/routes';
+import Link from 'next/link';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -42,6 +46,10 @@ const HeaderWrapper = styled(Box)(
 );
 
 function Header() {
+  const router = useRouter();
+  const query = router.query;
+  const url = router.pathname;
+
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
   return (
@@ -50,7 +58,32 @@ function Header() {
         <IconBreadcrumbs />
       </Box>
       <Box display="flex" alignItems="center">
-        <HeaderUserbox />
+        {isPublicSync(getRouterPathname(query, url)) ? (
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <iframe
+              src="https://ghbtns.com/github-btn.html?user=valmi-io&repo=valmi-activation&type=star&count=true&size=large"
+              frameborder="0"
+              width="180"
+              height="30"
+              title="GitHub"
+              style={{
+                alignSelf: 'center'
+              }}
+            />
+
+            <Link href="/signup" passHref>
+              <Button variant="contained">Sign up</Button>
+            </Link>
+          </Box>
+        ) : (
+          <HeaderUserbox />
+        )}
         <Box
           component="span"
           sx={{
