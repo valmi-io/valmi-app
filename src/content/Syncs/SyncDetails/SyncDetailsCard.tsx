@@ -18,13 +18,17 @@ type SyncDetailsCardProps = {
   syncData: any;
   handleSyncSwitch: (event: any, checked: boolean, data: any) => void;
   handleEditSync: (data: any) => void;
+  isPublicSync?: boolean;
 };
 
 const SyncDetailsCard = ({
   syncData,
   handleSyncSwitch,
-  handleEditSync
+  handleEditSync,
+  isPublicSync = false
 }: SyncDetailsCardProps) => {
+  console.log('Sync details card:-', syncData);
+
   const {
     name: syncName = '',
     schedule: { run_interval = 0 } = {},
@@ -50,27 +54,31 @@ const SyncDetailsCard = ({
         <Stack spacing={0.5} direction="row" alignItems="center">
           {appIcons.NAME}
 
-          <Typography variant="body2">{`${syncName}`}</Typography>
+          <Typography variant="body2">
+            {isPublicSync ? 'public_sync' : `${syncName}`}
+          </Typography>
         </Stack>
-        <Stack
-          spacing={0.5}
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Chip
-            color={status === 'active' ? 'secondary' : 'warning'}
-            label={status}
-          />
+        {!isPublicSync && (
+          <Stack
+            spacing={0.5}
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Chip
+              color={status === 'active' ? 'secondary' : 'warning'}
+              label={status}
+            />
 
-          <Switch
-            size="medium"
-            checked={status === 'active' ? true : false}
-            onChange={(event, checked) => {
-              handleSyncSwitch(event, checked, syncData);
-            }}
-          />
-        </Stack>
+            <Switch
+              size="medium"
+              checked={status === 'active' ? true : false}
+              onChange={(event, checked) => {
+                handleSyncSwitch(event, checked, syncData);
+              }}
+            />
+          </Stack>
+        )}
       </Stack>
 
       <Box
@@ -88,16 +96,20 @@ const SyncDetailsCard = ({
         >
           <Stack display="flex" direction="row" alignItems="center" spacing={3}>
             <ConnectionCard
-              connectionType={sourceConnectionType}
-              connectionTitle={sourceName}
+              connectionType={
+                isPublicSync ? 'SRC_POSTGRES' : sourceConnectionType
+              }
+              connectionTitle={isPublicSync ? 'Postgres' : sourceName}
             />
 
             {/* right arrow icon */}
             {appIcons.ARROW_RIGHT}
 
             <ConnectionCard
-              connectionType={destinationConnectionType}
-              connectionTitle={destinationName}
+              connectionType={
+                isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType
+              }
+              connectionTitle={isPublicSync ? 'Webhook' : destinationName}
             />
           </Stack>
           {/** Schedule */}
@@ -106,23 +118,25 @@ const SyncDetailsCard = ({
           <Stack spacing={0.5} direction="row">
             {appIcons.SCHEDULE}
             <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
-              run_interval
+              isPublicSync ? '900000' : run_interval
             )}`}</Typography>
           </Stack>
 
-          <Stack spacing={0.5} direction="row">
-            {appIcons.EDIT}
-            <Typography
-              onClick={() => handleEditSync(syncData)}
-              variant="body2"
-              sx={{
-                color: (theme) => theme.colors.primary.main,
-                cursor: 'pointer'
-              }}
-            >
-              {'SYNC'}
-            </Typography>
-          </Stack>
+          {!isPublicSync && (
+            <Stack spacing={0.5} direction="row">
+              {appIcons.EDIT}
+              <Typography
+                onClick={() => handleEditSync(syncData)}
+                variant="body2"
+                sx={{
+                  color: (theme) => theme.colors.primary.main,
+                  cursor: 'pointer'
+                }}
+              >
+                {'SYNC'}
+              </Typography>
+            </Stack>
+          )}
         </Stack>
       </Box>
     </StackLayout>

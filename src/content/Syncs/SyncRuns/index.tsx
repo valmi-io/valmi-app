@@ -39,6 +39,7 @@ import {
 } from './SyncRunsUtils';
 import AlertComponent from '../../../components/Alert';
 import PopoverComponent from '../../../components/Popover';
+import { getRouterPathname, isPublicSync } from '../../../utils/routes';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
@@ -54,6 +55,9 @@ const StartSyncOptionsBox = styled(Box)(({ theme }) => ({
 
 const SyncRuns = ({ syncId, workspaceId }: any) => {
   const router = useRouter();
+
+  const url = router.pathname;
+  const query = router.query;
 
   // Sync runs query
   const [getSyncRuns, { data, isLoading, isError, error }] =
@@ -98,10 +102,17 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
 
   useEffect(() => {
     if (!router.isReady) return;
+
     const fetchSyncRuns = () => {
+      const publicWorkspaceId = process.env.PUBLIC_WORKSPACE;
+      const publicSyncId = process.env.PUBLIC_SYNC;
+
+      // extracting workspace id and syncid from router.pathname
+      const pathname = getRouterPathname(query, url);
+
       let syncPayload = {
-        syncId: syncId,
-        workspaceId: workspaceId,
+        syncId: isPublicSync(pathname) ? publicSyncId : syncId,
+        workspaceId: isPublicSync(pathname) ? publicWorkspaceId : workspaceId,
         before: lastSync,
         limit: 25
       };
@@ -335,7 +346,9 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     <>
       <PageTitle
         title={'Run History'}
-        displayButton={true}
+        displayButton={
+          isPublicSync(getRouterPathname(query, url)) ? false : true
+        }
         buttonTitle={getPageButtonTitle(syncRuns, isQueryPending)}
         disabled={isQueryPending}
         onClick={toggleSyncRun}

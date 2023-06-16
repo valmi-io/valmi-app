@@ -12,6 +12,8 @@ module.exports = {
     API_URL: process.env.API_URL,
     WEB_URL: process.env.WEB_URL,
     POSTHOG_KEY: process.env.POSTHOG_KEY,
-    POSTHOG_HOST: process.env.POSTHOG_HOST
+    POSTHOG_HOST: process.env.POSTHOG_HOST,
+    PUBLIC_WORKSPACE: process.env.PUBLIC_WORKSPACE,
+    PUBLIC_SYNC: process.env.PUBLIC_SYNC
   }
 };

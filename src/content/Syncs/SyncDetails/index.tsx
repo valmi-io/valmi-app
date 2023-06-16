@@ -23,9 +23,14 @@ import { SkeletonContainer } from '../../../components/Layouts/Layouts';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFlowState } from '../../../store/reducers/syncFlow';
 import { RootState } from '../../../store/reducers';
+import { getRouterPathname, isPublicSync } from '../../../utils/routes';
 
 const SyncDetails = ({ syncId, workspaceId }: any) => {
   const router = useRouter();
+
+  const url = router.pathname;
+  const query = router.query;
+
   const dispatch = useDispatch();
 
   const [displayError, setDisplayError] = useState(null);
@@ -40,21 +45,26 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   useEffect(() => {
     if (updateSyncData) {
+      if (!isPublicSync(getRouterPathname(query, url))) {
+        const payload = {
+          syncId: syncId,
+          workspaceId: workspaceId
+        };
+        getSyncDetails(payload);
+      }
+    }
+  }, [updateSyncData]);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (!isPublicSync(getRouterPathname(query, url))) {
       const payload = {
         syncId: syncId,
         workspaceId: workspaceId
       };
       getSyncDetails(payload);
     }
-  }, [updateSyncData]);
-
-  useEffect(() => {
-    if (!router.isReady) return;
-    const payload = {
-      syncId: syncId,
-      workspaceId: workspaceId
-    };
-    getSyncDetails(payload);
   }, [router.isReady]);
 
   useEffect(() => {
@@ -120,12 +130,25 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
           <SkeletonLoader />
         </SkeletonContainer>
       )}
-      {!isError && !isFetching && syncDetails && (
+
+      {isPublicSync(getRouterPathname(query, url)) ? (
         <SyncDetailsCard
           syncData={syncDetails}
           handleSyncSwitch={handleSyncSwitch}
           handleEditSync={handleEditSync}
+          isPublicSync={isPublicSync(getRouterPathname(query, url))}
         />
+      ) : (
+        !isError &&
+        !isFetching &&
+        syncDetails && (
+          <SyncDetailsCard
+            syncData={syncDetails}
+            handleSyncSwitch={handleSyncSwitch}
+            handleEditSync={handleEditSync}
+            isPublicSync={false}
+          />
+        )
       )}
     </Card>
   );

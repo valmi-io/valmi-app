@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { publicRoutes } from './src/utils/routes';
+import { isPublicSync, publicRoutes } from './src/utils/routes';
 
 export function middleware(request: NextRequest) {
   let cookie = request.cookies.get('AUTH')?.value;
@@ -16,17 +16,22 @@ export function middleware(request: NextRequest) {
     bearerToken = (cookie as { token?: string })?.token || '';
   }
   const pathName = request.nextUrl.pathname;
-  if (bearerToken) {
-    // user is authenticated.
-    if (publicRoutes.includes(pathName) || isUserActivateRoute(pathName)) {
-      return NextResponse.rewrite(new URL('/', request.url));
-    }
+
+  if (isPublicSync(pathName)) {
+    console.log('allowing user to navigate to sync run');
   } else {
-    // user is not authenticated
-    // checking if pathname is a protected route.
-    if (!publicRoutes.includes(pathName)) {
-      if (!isUserActivateRoute(pathName)) {
-        return NextResponse.rewrite(new URL('/login', request.url));
+    if (bearerToken) {
+      // user is authenticated.
+      if (publicRoutes.includes(pathName) || isUserActivateRoute(pathName)) {
+        return NextResponse.rewrite(new URL('/', request.url));
+      }
+    } else {
+      // user is not authenticated
+      // checking if pathname is a protected route.
+      if (!publicRoutes.includes(pathName)) {
+        if (!isUserActivateRoute(pathName)) {
+          return NextResponse.rewrite(new URL('/login', request.url));
+        }
       }
     }
   }
