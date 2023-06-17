@@ -1,6 +1,6 @@
 
 DOCKER = docker
-BUILDX = $(DOCKER) buildx build
+BUILDX = $(DOCKER) buildx
 PLATFORMS = linux/amd64,linux/arm64
 BUILDX_ARGS = --platform ${PLATFORMS} --allow security.insecure --no-cache --push
 BUILDER_NAME = valmi-docker-builder
@@ -14,7 +14,7 @@ setup-buildx:
 	$(BUILDX) use $(BUILDER_NAME)
 
 build-and-push:
-	$(BUILDX) $(BUILDX_ARGS) \
+	$(BUILDX) build $(BUILDX_ARGS) \
 		-t valmiio/valmi-app:${version} \
 		-t valmiio/valmi-app:stable \
 		-t valmiio/valmi-app:latest \
