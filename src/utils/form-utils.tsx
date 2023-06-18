@@ -70,7 +70,7 @@ export const getInputField = (
     case 'email':
     case 'array':
     case 'select':
-    case 'file':
+    case 'object':
       return (
         <FormFieldText
           field={field}
@@ -81,7 +81,7 @@ export const getInputField = (
           values={enumValue}
           required={required}
           disabled={disabled}
-          mulitline={fieldType === 'file' ? true : false}
+          mulitline={fieldType === 'object' ? true : false}
           error={error}
           value={value}
           onChange={(event) => field.onChange(event.target.value)}
@@ -105,7 +105,6 @@ export const getInputField = (
       );
 
     case 'password':
-      // case 'file':
       return (
         <FormFieldPassword
           field={field}
@@ -115,7 +114,6 @@ export const getInputField = (
           disabled={disabled}
           error={error}
           value={value}
-          //mulitline={fieldType === 'file' ? true : false}
           onChange={(event) => field.onChange(event.target.value)}
         />
       );

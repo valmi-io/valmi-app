@@ -7,9 +7,12 @@
 import { FC } from 'react';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { Typography, Button, Grid, CircularProgress } from '@mui/material';
+import Link from 'next/link';
 
 interface PageTitleProps {
   title: string;
+  linkurl?: string;
+  link?: boolean;
   buttonTitle?: string;
   displayButton?: boolean;
   disabled?: boolean;
@@ -20,6 +23,8 @@ interface PageTitleProps {
 
 const PageTitle: FC<PageTitleProps> = ({
   title = '',
+  linkurl = '/',
+  link = false,
   buttonTitle = '',
   displayButton = true,
   onClick,
@@ -52,16 +57,27 @@ const PageTitle: FC<PageTitleProps> = ({
       </Grid>
       {displayButton && (
         <Grid item>
-          <Button
-            endIcon={endIcon}
-            startIcon={startIcon}
-            disabled={disabled}
-            sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
-            variant="contained"
-            onClick={onClick}
-          >
-            {buttonTitle.toUpperCase()}
-          </Button>
+          {link ? (
+            <Link href={linkurl} target="_blank" passHref>
+              <Button
+                sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+                variant="contained"
+              >
+                {buttonTitle.toUpperCase()}
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              endIcon={endIcon}
+              startIcon={startIcon}
+              disabled={disabled}
+              sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+              variant="contained"
+              onClick={onClick}
+            >
+              {buttonTitle.toUpperCase()}
+            </Button>
+          )}
         </Grid>
       )}
     </Grid>

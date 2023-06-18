@@ -25,9 +25,9 @@ const staggeredBaseQueryWithBailOut = retry(
       }
     })(args, api, extraOptions);
 
-    // bail out of re-tries immediately if unauthorized,
+    // bail out of re-tries immediately if unauthorized or if errors are from client side,
     // because we know successive re-retries would be redundant
-    if (result.error?.status === 401) {
+    if (result.error?.status < 500) {
       retry.fail(result.error);
     }
 

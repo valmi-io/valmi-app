@@ -4,36 +4,31 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { CheckOutlined } from '@mui/icons-material';
-import { Box, IconButton, InputLabel, styled } from '@mui/material';
+import { Box, IconButton, InputLabel, Typography, styled } from '@mui/material';
 import {
   getOauthColorCode,
   getOauthImage,
   getOauthLoginText
 } from '../../content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-import { capitalizeFirstLetter } from '../../utils/lib';
 import { ErrorStatusText } from '../Error';
 import ImageComponent, { ImageSize } from '../ImageComponent';
 import FontAwesomeIcon from '../Icon/FontAwesomeIcon';
-import Image from 'next/image';
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,
-  //padding: theme.spacing(1),
+
   display: 'flex',
   width: '100%',
   alignItems: 'center',
   justifyContent: 'space-between',
   cursor: 'pointer',
-  margin: theme.spacing(1),
-  //backgroundColor: '#5890FF',
-  // backgroundColor: theme.palette.primary.main,
   color: theme.palette.success.contrastText
 }));
 
 const Label = styled(InputLabel)(({ theme }) => ({
   ...theme.typography.body2,
-  margin: theme.spacing(1)
+  marginTop: theme.spacing(1),
+  marginBottom: theme.spacing(1)
 }));
 
 const getOAuthProvider = (oAuthProvider: any) => {
@@ -48,60 +43,79 @@ const FormFieldAuth = (props: any) => {
     hasOAuthAuthorized,
     oauth_error = ''
   } = props;
+
   return (
     <>
       <Label>{label}</Label>
-      <Item
-        sx={
-          {
-            // borderRadius: 1
-            // backgroundColor: 'orange'
-            // backgroundColor: getOauthColorCode({
-            //   oAuth: getOAuthProvider(oAuthProvider)
-            // })
-          }
-        }
-      >
+      <Item>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            //padding: 1,
-            // borderRadius: 1,
+            padding: getOAuthProvider(oAuthProvider) !== 'google' ? 1 : 0,
+            borderRadius:
+              getOAuthProvider(oAuthProvider) !== 'google' ? 0.5 : 0,
             height: 50,
-            //justifyContent: 'center',
             backgroundColor: getOauthColorCode({
               oAuth: getOAuthProvider(oAuthProvider)
             }),
+            boxShadow:
+              getOAuthProvider(oAuthProvider) === 'hubspot'
+                ? '0px 0px 3px rgba(0, 0, 0, 0.4)'
+                : 0,
             width: '100%'
           }}
           onClick={() =>
             onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })
           }
         >
-          <Box
-            sx={{
-              display: 'flex',
-              height: '100%',
-              width: 50,
-              backgroundColor: 'white',
-              border: '1px solid #4285F4',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 3
-            }}
-          >
+          {getOAuthProvider(oAuthProvider) === 'google' ? (
+            <Box
+              sx={{
+                display: 'flex',
+                height: '100%',
+                width: 50,
+                backgroundColor: '#fff',
+                border: '1px solid #4285F4',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 3
+              }}
+            >
+              {' '}
+              <ImageComponent
+                size={ImageSize.medium}
+                alt="oauth icon"
+                src={getOauthImage({
+                  oAuth: getOAuthProvider(oAuthProvider)
+                })}
+              />{' '}
+            </Box>
+          ) : (
             <ImageComponent
               size={ImageSize.medium}
               alt="oauth icon"
+              style={{ marginRight: 10 }}
               src={getOauthImage({
                 oAuth: getOAuthProvider(oAuthProvider)
               })}
             />
-          </Box>
-          {getOauthLoginText({
-            oAuth: getOAuthProvider(oAuthProvider)
-          })}
+          )}
+
+          <Typography
+            variant="body1"
+            sx={{
+              color:
+                getOAuthProvider(oAuthProvider) === 'hubspot'
+                  ? 'black'
+                  : 'white'
+            }}
+          >
+            {' '}
+            {getOauthLoginText({
+              oAuth: getOAuthProvider(oAuthProvider)
+            })}
+          </Typography>
         </Box>
         {hasOAuthAuthorized && (
           <IconButton color={'primary'}>

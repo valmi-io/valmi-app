@@ -289,7 +289,11 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
           </Button>
           <Button color="primary" fullWidth onClick={stopSyncRun}>
             <Typography variant="body1">
-              {getPageButtonTitle(syncRuns, isQueryPending)}
+              {getPageButtonTitle(
+                isPublicSync(getRouterPathname(query, url)),
+                syncRuns,
+                isQueryPending
+              )}
             </Typography>
           </Button>
         </Box>
@@ -318,7 +322,11 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={startSyncRun}>
             <Typography variant="body1">
-              {getPageButtonTitle(syncRuns, isQueryPending)}
+              {getPageButtonTitle(
+                isPublicSync(getRouterPathname(query, url)),
+                syncRuns,
+                isQueryPending
+              )}
             </Typography>
           </Button>
         </Box>
@@ -346,12 +354,16 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     <>
       <PageTitle
         title={'Run History'}
-        displayButton={
-          isPublicSync(getRouterPathname(query, url)) ? false : true
-        }
-        buttonTitle={getPageButtonTitle(syncRuns, isQueryPending)}
+        displayButton={true}
+        buttonTitle={getPageButtonTitle(
+          isPublicSync(getRouterPathname(query, url)),
+          syncRuns,
+          isQueryPending
+        )}
         disabled={isQueryPending}
         onClick={toggleSyncRun}
+        link={isPublicSync(getRouterPathname(query, url)) ? true : false}
+        linkurl={'http://citus.mywavia.com:3001/'}
         isFetching={isQueryPending}
         displayStartIcon={false}
       />

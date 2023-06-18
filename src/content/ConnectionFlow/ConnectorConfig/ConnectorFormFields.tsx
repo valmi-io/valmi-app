@@ -41,8 +41,12 @@ const ConnectorFormFields = ({
     <Box
       component="form"
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+
         '& .MuiTextField-root': {
-          m: 1,
+          my: 1,
           width: '100%'
         }
       }}

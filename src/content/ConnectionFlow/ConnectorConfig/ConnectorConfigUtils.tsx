@@ -30,15 +30,14 @@ export const processFields = (data: any) => {
         const isOAuth =
           label.startsWith('Authentication') &&
           Object.keys(authSpecification).length > 0;
-        const isServiceObject = label.startsWith('Service');
+
         const oAuthProvider = !authProvider.trim() ? 'provider' : authProvider;
         const isRequired = required.includes(key);
         const fieldType = getFieldType({
           hasOAuth: isOAuth,
           enumFlag,
           isSecretKey,
-          type,
-          isServiceObject
+          type
         });
 
         return createNewField({
@@ -103,13 +102,7 @@ export const hasAuthorizedOAuth = (oAuthParams: any) => {
   return Object.keys(oAuthParams).length > 0 ? true : false;
 };
 
-const getFieldType = ({
-  hasOAuth,
-  enumFlag,
-  isSecretKey,
-  type,
-  isServiceObject
-}: any) => {
+const getFieldType = ({ hasOAuth, enumFlag, isSecretKey, type }: any) => {
   switch (true) {
     case hasOAuth:
       return 'auth';
@@ -117,8 +110,7 @@ const getFieldType = ({
       return 'select';
     case isSecretKey:
       return 'password';
-    case isServiceObject:
-      return 'file';
+
     default:
       return type;
   }
@@ -153,7 +145,7 @@ export const getOauthColorCode = ({ oAuth }: any) => {
     case 'slack':
       return '#4A154B';
     case 'hubspot':
-      return '#5890FF';
+      return '#fff';
     default:
       return '';
   }

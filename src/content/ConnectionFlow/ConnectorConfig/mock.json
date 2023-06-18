@@ -10,7 +10,7 @@
       "properties": {
         "service_account": {
           "title": "Service account",
-          "type": "string",
+          "type": "object",
           "description": "The Service Account of your android application.",
           "airbyte_secret": false
         }

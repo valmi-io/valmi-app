@@ -231,7 +231,10 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   const displayRunTime = (syncRun) => {
     const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
     // TODO: replace runEndAt with syncRun.run_end
-    const runEndAt = new Date();
+    let runEndAt = new Date();
+    if (syncRun.run_end_at) {
+      runEndAt = convertUTCDateToLocalDate(new Date(syncRun.run_end_at));
+    }
 
     const runTime = getTimeDifference(runStartedAt, runEndAt);
     return `Took ${runTime}`;

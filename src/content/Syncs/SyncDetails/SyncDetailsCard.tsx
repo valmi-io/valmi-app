@@ -56,18 +56,24 @@ const SyncDetailsCard = ({
             {isPublicSync ? 'public_sync' : `${syncName}`}
           </Typography>
         </Stack>
-        {!isPublicSync && (
-          <Stack
-            spacing={0.5}
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Chip
-              color={status === 'active' ? 'secondary' : 'warning'}
-              label={status}
-            />
 
+        <Stack
+          spacing={0.5}
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Chip
+            color={
+              !isPublicSync
+                ? status === 'active'
+                  ? 'secondary'
+                  : 'warning'
+                : 'secondary'
+            }
+            label={isPublicSync ? 'active' : status}
+          />
+          {!isPublicSync && (
             <Switch
               size="medium"
               checked={status === 'active' ? true : false}
@@ -75,8 +81,8 @@ const SyncDetailsCard = ({
                 handleSyncSwitch(event, checked, syncData);
               }}
             />
-          </Stack>
-        )}
+          )}
+        </Stack>
       </Stack>
 
       <Box
@@ -97,7 +103,9 @@ const SyncDetailsCard = ({
               connectionType={
                 isPublicSync ? 'SRC_POSTGRES' : sourceConnectionType
               }
-              connectionTitle={isPublicSync ? 'Postgres' : sourceName}
+              connectionTitle={
+                isPublicSync ? '"dvdrental"."public"."one_m_data"' : sourceName
+              }
             />
 
             {/* right arrow icon */}
@@ -107,7 +115,9 @@ const SyncDetailsCard = ({
               connectionType={
                 isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType
               }
-              connectionTitle={isPublicSync ? 'Webhook' : destinationName}
+              connectionTitle={
+                isPublicSync ? 'http://citus.mywavia.com:3001' : destinationName
+              }
             />
           </Stack>
           {/** Schedule */}

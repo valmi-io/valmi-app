@@ -11,7 +11,7 @@ const constants = {
   },
   metadata: {
     APP_NAME: 'valmi.io',
-    APP_DESCRIPTION: 'valmi.io Collaborative CDP',
+    APP_DESCRIPTION: 'valmi.io Open source Reverse-ETL',
     FB_APP_ID: '',
     IMG_SHARE: process.env.WEB_URL + '/icons/512x512.png',
     KEY_WORDS: '',
