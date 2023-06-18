@@ -22,7 +22,5 @@
 <a href="https://github.com/valmi-io/valmi-app-backend/blob/main/LICENSE.md" target="_blank">
     <img src="https://img.shields.io/static/v1?label=license&message=ELv2&color=white" alt="License">
 </a>
-</p>
-  ![Netlify Status](https://api.netlify.com/api/v1/badges/30514069-032a-4aff-9a04-6b34305d971c/deploy-status)
-
+</p> 
 
