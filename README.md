@@ -23,7 +23,5 @@
     <img src="https://img.shields.io/static/v1?label=license&message=ELv2&color=white" alt="License">
 </a>
 </p>
-
-<p>
-  [![Netlify Status](https://api.netlify.com/api/v1/badges/30514069-032a-4aff-9a04-6b34305d971c/deploy-status)](https://app.netlify.com/sites/helpful-selkie-b287c1/deploys)
-</p>
+ 
+  [![Netlify Status](https://api.netlify.com/api/v1/badges/30514069-032a-4aff-9a04-6b34305d971c/deploy-status)](https://app.netlify.com/sites/helpful-selkie-b287c1/deploys) 
