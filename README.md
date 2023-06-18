@@ -22,5 +22,5 @@
 <a href="https://github.com/valmi-io/valmi-app-backend/blob/main/LICENSE.md" target="_blank">
     <img src="https://img.shields.io/static/v1?label=license&message=ELv2&color=white" alt="License">
 </a>
-</p>
+</p> 
 
