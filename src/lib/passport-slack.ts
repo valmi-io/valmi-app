@@ -27,7 +27,7 @@ passport.use(
         'channels:read',
         'channels:join'
       ], // default,
-      callbackURL: 'https://localhost/api/oauth2/redirect/slack'
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack`
     },
     async (accessToken, params, profile, cb: any) => {
       try {

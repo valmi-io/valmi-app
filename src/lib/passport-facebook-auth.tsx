@@ -14,7 +14,7 @@ passport.use(
       clientSecret: process.env.AUTH_FACEBOOK_CLIENT_SECRET as string,
       authType: 'reauthenticate',
       profileFields: ['id', 'displayName', 'photos', 'email'],
-      callbackURL: 'https://localhost/api/oauth2/redirect/facebook'
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/facebook`
     },
     async (_accessToken, _refreshToken, profile: any, cb: any) => {
       try {
