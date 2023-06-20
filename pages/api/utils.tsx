@@ -27,7 +27,7 @@ export const configureCredentials = (data: any) => {
 };
 
 export const getBaseUrl = () => {
-  return process.env[`API_URL`];
+  return process.env[`SERVER_SIDE_API_URL`];
 };
 
 export function parseCookies(req: any) {

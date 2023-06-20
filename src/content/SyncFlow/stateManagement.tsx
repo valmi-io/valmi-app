@@ -10,6 +10,19 @@ import { MappingState } from './Mapping/MappingState';
 import { ConnectionSelectionState } from './Warehouse/ConnectionSelectionState';
 import { DiscoverState } from './Warehouse/DiscoverState';
 import { getSchedule, getSyncName } from './Schedule/scheduleManagement';
+import {
+  getDestinationIdKey,
+  getSelectedDestinationMode,
+  getSelectedSourceMode,
+  getSourceIdKey,
+  getStep,
+  getTemplateMapping,
+  hasTemplateFields,
+  isDestinationIdMappingRequired,
+  isLastFieldMappedEmpty,
+  isMappingStep,
+  isThereAStepAhead
+} from './Mapping/mappingManagement';
 
 export function initialiseFlowState(dispatch, flowState, isEditableFlow) {
   const warehouseSteps = [
@@ -46,7 +59,19 @@ export function initialiseFlowState(dispatch, flowState, isEditableFlow) {
 }
 
 export const setCurrentStepInFlow = (dispatch, currentStep, flowState) => {
-  dispatch(setFlowState({ ...flowState, currentStep: currentStep }));
+  console.log('Set current step in flow state: ', flowState);
+  let stepsCopy = getStepsInSyncFlow(flowState);
+
+  // if the current step is mapping step, add new field to the sync flow state.
+  if (isMappingStep(flowState)) {
+    // add a new step.
+    if (!isThereAStepAhead(flowState, getStep(flowState))) {
+      stepsCopy = [...stepsCopy, [{}]];
+    }
+  }
+  dispatch(
+    setFlowState({ ...flowState, currentStep: currentStep, steps: stepsCopy })
+  );
 };
 
 export const getStepsInSyncFlow = (flowState) => {
@@ -71,13 +96,74 @@ export const setVarsinSubStep = (flowState, step, subStep, vars) => {
 };
 
 export const enableNext = (flowState) => {
-  //TODO: check edit flow currentStep conditions
+  // sync flow state
+  const { currentStep = 0, steps = [] } = flowState || {};
+
+  // checking if sync flow state has steps of length > 0
+
+  if (steps.length > 0) {
+    if (
+      currentStep < steps.length - 1 ||
+      (isMappingStep(flowState) && isMappingStepInSyncFlow(flowState)) ||
+      isLastStepInSyncFlow(flowState)
+    )
+      return true;
+  }
+  return false;
+};
+
+export const isMappingStepInSyncFlow = (flowState) => {
+  const { destinationCatalog = {} } = flowState || {};
+
+  // check if source sync mode is selected.
+  const hasSourceMode = getSelectedSourceMode(flowState) !== '' ? true : false;
+
+  // check if destination sync mode is selected.
+  const hasDestinationMode =
+    getSelectedDestinationMode(flowState) !== '' ? true : false;
+
+  // check if source id key is selected.
+  const hasSourceIdKey = getSourceIdKey(flowState) !== '' ? true : false;
+
+  // check if destination id key is selected if needed.
+  let hasDestinationIdKey = true;
+
+  if (isDestinationIdMappingRequired(flowState, destinationCatalog)) {
+    hasDestinationIdKey = getDestinationIdKey(flowState) !== '' ? true : false;
+  }
+
+  // check if there are any custom fields left unmapped.
+  const isCustomFieldsUnMapped = !isLastFieldMappedEmpty(flowState);
+
+  // check if selected destination mode has template_fields.
+
+  let isTemplateFieldsMapped = true;
+
+  if (hasTemplateFields(flowState, destinationCatalog)) {
+    // getting template mapping fields.
+    const mappedTemplateFields = getTemplateMapping(flowState);
+
+    // checking if template_fields are mapped
+    for (let i = 0; i < mappedTemplateFields.length; i++) {
+      if (mappedTemplateFields[i].value === '') {
+        isTemplateFieldsMapped = false;
+        break;
+      }
+    }
+  }
+
   if (
-    flowState.currentStep < flowState.steps?.length - 1 ||
-    isLastStepInSyncFlow(flowState)
-  )
+    hasSourceMode &&
+    hasDestinationMode &&
+    hasSourceIdKey &&
+    hasDestinationIdKey &&
+    isCustomFieldsUnMapped &&
+    isTemplateFieldsMapped
+  ) {
     return true;
-  else return false;
+  }
+
+  return false;
 };
 
 export const getScheduleStep = (flowState) => {

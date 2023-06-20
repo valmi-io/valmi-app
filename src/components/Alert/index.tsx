@@ -30,7 +30,7 @@ const AlertComponent = ({
         {displayButton && (
           <Stack>
             <Typography variant="body2" color="text.error">
-              If user is not activated.{' '}
+              If user is not activated,{' '}
               <span
                 onClick={onButtonClick}
                 style={{ textDecoration: 'underline', cursor: 'pointer' }}

@@ -137,11 +137,10 @@ const SyncDetailsCard = ({
                 onClick={() => handleEditSync(syncData)}
                 variant="body2"
                 sx={{
-                  color: (theme) => theme.colors.primary.main,
                   cursor: 'pointer'
                 }}
               >
-                {'SYNC'}
+                {'Edit'}
               </Typography>
             </Stack>
           )}

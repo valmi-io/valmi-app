@@ -31,8 +31,10 @@ import Mapping from '@/content/SyncFlow/Mapping';
 import Schedule from '@/content/SyncFlow/Schedule';
 import {
   enableNext,
+  getStepsInSyncFlow,
   initialiseFlowState,
   isLastStepInSyncFlow,
+  isMappingStepInSyncFlow,
   setCurrentStepInFlow
 } from '@/content/SyncFlow/stateManagement';
 import {
@@ -48,6 +50,12 @@ import {
   hasErrorsInData
 } from '../../../../../src/components/Error/ErrorUtils';
 import AlertComponent from '../../../../../src/components/Alert';
+import {
+  getStep,
+  isMappingStep,
+  isThereAStepAhead
+} from '../../../../../src/content/SyncFlow/Mapping/mappingManagement';
+import { setFlowState } from '../../../../../src/store/reducers/syncFlow';
 
 const InstructionsLayout = styled(Box)(({ theme }) => ({
   width: '40%',
@@ -122,7 +130,18 @@ const SyncFlow = () => {
       syncQueryHandler(syncQuery, generateSyncPayload(flowState, workspaceId));
       return;
     }
+
     setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+
+    // if (!isMappingStep(flowState)) {
+    //   console.log('error occurred here');
+    //   setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+    // }
+
+    // if (isMappingStepInSyncFlow(flowState)) {
+    //   console.log('this is mapping step:-');
+    //   setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+    // }
   };
 
   const syncQueryHandler = async (syncQuery: any, payload: any) => {

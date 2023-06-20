@@ -8,7 +8,7 @@
 import { checkIfPropExistsInObject } from '../../../utils/lib';
 import { getStepsInSyncFlow } from '../stateManagement';
 
-const getStep = (flowState) => {
+export const getStep = (flowState) => {
   return flowState.hasOwnProperty('isEditableFlow') && flowState.isEditableFlow
     ? 0
     : 2;
@@ -64,13 +64,13 @@ export const hasFreeFormFields = (flowState, destinationCatalog) => {
   return selectedMode?.allow_freeform_fields || false;
 };
 
-export const hasMandatoryFeilds = (flowState, destinationCatalog) => {
+export const hasMandatoryFields = (flowState, destinationCatalog) => {
   const selectedMode =
     destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
   return selectedMode?.mandatory_fields || false;
 };
 
-export const hasTemplatedFields = () => {
+export const hasTemplateFields = (flowState, destinationCatalog) => {
   const selectedMode =
     destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
   return selectedMode?.template_fields || false;
@@ -208,14 +208,6 @@ export const saveSourceIdKey = (flowState, destinationCatalog, sourceIdKey) => {
 
   stepsCopy[getStep(flowState)][idMappingStep]['sourceIdKey'] = sourceIdKey;
 
-  // TODO: handle this better
-  if (!isDestinationIdMappingRequired(flowState, destinationCatalog)) {
-    // Enabling Next button
-    if (!isThereAStepAhead(flowState, getStep(flowState))) {
-      stepsCopy = [...stepsCopy, [{}]];
-    }
-  }
-
   return { ...flowState, steps: stepsCopy };
 };
 
@@ -263,15 +255,10 @@ export const saveDestinationIdKey = (flowState, destinationIdKey) => {
   stepsCopy[getStep(flowState)][idMappingStep]['destinationIdKey'] =
     destinationIdKey;
 
-  // Enabling Next button.
-  // check if there is a next step.
-  if (!isThereAStepAhead(flowState, getStep(flowState))) {
-    stepsCopy = [...stepsCopy, [{}]];
-  }
   return { ...flowState, steps: stepsCopy };
 };
 
-const isThereAStepAhead = (flowState, currentStep) => {
+export const isThereAStepAhead = (flowState, currentStep) => {
   return currentStep < flowState.steps.length - 1;
 };
 
@@ -297,6 +284,13 @@ export const getRemainingDestinationFields = (
     selectedFieldCatalog =
       destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
   }
+
+  // check if destination catalog has mandatory fields.
+  if (hasMandatoryFields(flowState, destinationCatalog)) {
+    selectedFieldCatalog =
+      destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+  }
+
   if (
     selectedFieldCatalog &&
     selectedFieldCatalog.json_schema.hasOwnProperty('properties')
@@ -371,14 +365,17 @@ export const enableCustomMappingItem = (flowState, itemType) => {
   const { destinationCatalog = {} } = flowState;
 
   if (itemType === 'dropdown') {
-    return true;
-    return false && isLastFieldMappedEmpty(flowState);
-    // const remainingDestinationFields = getRemainingDestinationFields(
-    //   flowState,
-    //   destinationCatalog,
-    //   getMapping(flowState),
-    //   mapObj.destinationField
-    // )
+    const remainingDestinationFields = getRemainingDestinationFields(
+      flowState,
+      destinationCatalog,
+      getMapping(flowState),
+      ''
+    );
+
+    return (
+      remainingDestinationFields.length > 0 &&
+      !isLastFieldMappedEmpty(flowState)
+    );
   } else if (itemType === 'free') {
     return (
       hasFreeFormFields(flowState, destinationCatalog) &&

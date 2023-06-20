@@ -60,6 +60,7 @@ export const generateSyncPayload = (flowState, workspaceId) => {
         sourceCatalog: flowState.sourceCatalog,
         destinationCatalog: flowState.destinationCatalog
       },
+      // destination_catalog: generateDestinationPayload(flowState)
       syncName: getSyncName(flowState),
       workspaceId: workspaceId
     };
