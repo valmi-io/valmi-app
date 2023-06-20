@@ -127,7 +127,7 @@ const Mapping = () => {
             }}
           >
             {getDestinationModes(flowState, destinationCatalog).map(
-              (option, index) => {
+              (option: any, index: any) => {
                 return (
                   <MenuItem key={'_valkey' + index} value={option}>
                     {option}
