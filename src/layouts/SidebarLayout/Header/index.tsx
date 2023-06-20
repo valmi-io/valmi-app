@@ -7,15 +7,7 @@
 
 import { useContext } from 'react';
 
-import {
-  Box,
-  alpha,
-  IconButton,
-  Tooltip,
-  styled,
-  Typography,
-  Button
-} from '@mui/material';
+import { Box, alpha, IconButton, Tooltip, styled, Button } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
@@ -68,7 +60,7 @@ function Header() {
           >
             <iframe
               src="https://ghbtns.com/github-btn.html?user=valmi-io&repo=valmi-activation&type=star&count=true&size=large"
-              frameborder="0"
+              frameBorder="0"
               width="180"
               height="30"
               title="GitHub"
@@ -77,8 +69,13 @@ function Header() {
               }}
             />
 
-            <Link href="/signup" passHref>
-              <Button variant="contained">Sign up</Button>
+            <Link href="/signup" passHref style={{ textDecoration: 'none' }}>
+              <Button
+                sx={{ fontWeight: 'bold', fontSize: 14 }}
+                variant="contained"
+              >
+                Sign up
+              </Button>
             </Link>
           </Box>
         ) : (

@@ -46,22 +46,34 @@ const PageTitle: FC<PageTitleProps> = ({
   return (
     <Grid
       container
-      justifyContent="space-between"
-      alignItems="center"
+      sx={{
+        justifyContent: link ? 'flex-start' : 'space-between',
+        alignItems: 'center'
+      }}
       {...rest}
     >
       <Grid item>
-        <Typography variant="h4" component="h4">
+        <Typography variant="h4" component="h4" sx={{ mr: link ? 2 : 0 }}>
           {title}
         </Typography>
       </Grid>
       {displayButton && (
         <Grid item>
           {link ? (
-            <Link href={linkurl} target="_blank" passHref>
+            <Link
+              href={linkurl}
+              target="_blank"
+              passHref
+              style={{ textDecoration: 'none' }}
+            >
               <Button
-                sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+                sx={{
+                  fontWeight: 'bold',
+                  fontSize: 14,
+                  color: 'black'
+                }}
                 variant="contained"
+                color="warning"
               >
                 {buttonTitle.toUpperCase()}
               </Button>

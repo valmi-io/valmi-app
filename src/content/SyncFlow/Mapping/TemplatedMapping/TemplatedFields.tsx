@@ -4,10 +4,10 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, styled } from '@mui/material';
+import { Box, Stack, styled } from '@mui/material';
 import FormFieldText from '../../../../components/FormInput/FormFieldText';
 
-const Layout = styled(Box)(({ theme }) => ({
+const Layout = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2
 }));
 
@@ -15,7 +15,7 @@ const TemplatedFields = (props: any) => {
   const { mapping, mappingUpdated } = props;
 
   return (
-    <Layout>
+    <Layout spacing={2}>
       {mapping.map((mapObj: any, index: any) => {
         return (
           <FormFieldText
