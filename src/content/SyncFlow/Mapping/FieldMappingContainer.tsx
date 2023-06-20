@@ -19,7 +19,7 @@ import { setFlowState } from '../../../store/reducers/syncFlow';
 import {
   addNewItemToMap,
   deleteItemFromMap,
-  enableMappingItems,
+  enableCustomMappingItem,
   getMapping,
   updateItemInMap
 } from './mappingManagement';
@@ -67,7 +67,7 @@ const FieldMappingContainer = () => {
         }}
       >
         <Button
-          disabled={enableMappingItems(flowState, itemType)}
+          disabled={!enableCustomMappingItem(flowState, itemType)}
           color="primary"
           sx={{ backgroundColor: 'transparent' }}
           startIcon={<AddTwoToneIcon fontSize="small" />}

@@ -31,14 +31,66 @@ export const getMappingStates = () => {
   });
 };
 
+export const getFullRefreshCompatibleModes = () => {
+  return ['upsert', 'mirror', 'append', 'create'];
+};
+
+export const getIncrementalCompatibleModes = () => {
+  return ['upsert', 'append', 'update'];
+};
+
 export const isMappingStep = (flowState) => {
   let stepsCopy = getStepsInSyncFlow(flowState);
   const subStepsCopy = stepsCopy[flowState.currentStep][0];
   return subStepsCopy.state === 'mappingState' ? true : false;
 };
 
-export const getSourceModes = (sourceCatalog, destinationCatalog) => {
-  return sourceCatalog.supported_sync_modes;
+export const hasSupportedWarehouseModes = (flowState) => {
+  const selectedWarehouseMode =
+    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+  return selectedWarehouseMode?.supported_sync_modes?.length > 0 || false;
+};
+
+export const hasSupportedDestinationIds = (flowState, destinationCatalog) => {
+  const selectedMode =
+    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+  return selectedMode?.supported_destination_ids?.length > 0 || false;
+};
+
+export const hasFreeFormFields = (flowState, destinationCatalog) => {
+  const selectedMode =
+    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+
+  return selectedMode?.allow_freeform_fields || false;
+};
+
+export const hasMandatoryFeilds = (flowState, destinationCatalog) => {
+  const selectedMode =
+    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+  return selectedMode?.mandatory_fields || false;
+};
+
+export const hasTemplatedFields = () => {
+  const selectedMode =
+    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+  return selectedMode?.template_fields || false;
+};
+
+export const getSourceModes = (sourceCatalog) => {
+  return sourceCatalog?.supported_sync_modes || [];
+};
+
+export const saveSelectedSourceMode = (flowState, sourceMode) => {
+  const stepsCopy = getStepsInSyncFlow(flowState);
+
+  stepsCopy[getStep(flowState)][sourceModeStep]['sourceMode'] = sourceMode;
+
+  // reset selected destination mode if exists
+  if (getSelectedDestinationMode(flowState) !== '') {
+    stepsCopy[getStep(flowState)][destinationModeStep]['destinationMode'] = '';
+  }
+
+  return { ...flowState, steps: stepsCopy };
 };
 
 export const getSelectedSourceMode = (flowState) => {
@@ -51,26 +103,7 @@ export const getSelectedSourceMode = (flowState) => {
   return '';
 };
 
-export const saveSelectedSourceMode = (flowState, sourceMode) => {
-  const stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
-
-  stepsCopy[getStep(flowState)][sourceModeStep]['sourceMode'] = sourceMode;
-  return { ...flowState, steps: stepsCopy };
-};
-
-export const getFullRefreshCompatibleModes = () => {
-  return ['upsert', 'mirror', 'append', 'create'];
-};
-
-export const getIncrementalCompatibleModes = () => {
-  return ['upsert', 'append', 'update'];
-};
-
-const getCompatibleModes = (sourceMode, destinationModes) => {
+const getDestinationCompatibleModes = (sourceMode, destinationModes) => {
   let compatibleModes = [];
   const modes = new Set(destinationModes);
   if (sourceMode === 'full_refresh') {
@@ -98,30 +131,12 @@ export const getDestinationModes = (flowState, destinationCatalog) => {
     destinationModes = destinationCatalog.supported_destination_sync_modes;
   }
 
-  const compatibleModes = getCompatibleModes(
+  const compatibleModes = getDestinationCompatibleModes(
     getSelectedSourceMode(flowState),
     destinationModes
   );
 
   return compatibleModes;
-};
-
-export const showCustomMappings = (flowState, destinationCatalog) => {
-  return true;
-  //TODO: Handle this better
-  if (
-    checkIfPropExistsInObject(
-      destinationCatalog.field_catalog,
-      getSelectedDestinationMode(flowState)
-    )
-  ) {
-    const selectedMode =
-      destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
-
-    return selectedMode?.allow_freeform_fields || false;
-  }
-
-  return false;
 };
 
 export const getSelectedDestinationMode = (flowState) => {
@@ -130,7 +145,6 @@ export const getSelectedDestinationMode = (flowState) => {
       'destinationMode'
     )
   )
-    //TODO: check if destination mode exists, but has empty value.
     return flowState.steps[getStep(flowState)][destinationModeStep][
       'destinationMode'
     ];
@@ -138,11 +152,7 @@ export const getSelectedDestinationMode = (flowState) => {
 };
 
 export const saveDestinationMode = (flowState, destinationMode) => {
-  const stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
+  const stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[getStep(flowState)][destinationModeStep]['destinationMode'] =
     destinationMode;
@@ -160,9 +170,26 @@ export const saveDestinationMode = (flowState, destinationMode) => {
   return { ...flowState, steps: stepsCopy };
 };
 
-export const getSourceFields = (sourceCatalog) => {
-  //const sourceFields = Object.keys(sourceCatalog.json_schema.properties);
+export const showCustomMappings = (flowState, destinationCatalog) => {
+  const selectedDestinationMode = getSelectedDestinationMode(flowState);
 
+  if (
+    checkIfPropExistsInObject(
+      destinationCatalog.field_catalog,
+      selectedDestinationMode
+    ) &&
+    selectedDestinationMode !== ''
+  ) {
+    return (
+      hasFreeFormFields(flowState, destinationCatalog) ||
+      hasSupportedDestinationIds(flowState, destinationCatalog)
+    );
+  }
+
+  return false;
+};
+
+export const getSourceFields = (sourceCatalog) => {
   return Object.keys(sourceCatalog.json_schema.properties);
 };
 
@@ -177,13 +204,11 @@ export const getSourceIdKey = (flowState) => {
 };
 
 export const saveSourceIdKey = (flowState, destinationCatalog, sourceIdKey) => {
-  let stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
+  let stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[getStep(flowState)][idMappingStep]['sourceIdKey'] = sourceIdKey;
+
+  // TODO: handle this better
   if (!isDestinationIdMappingRequired(flowState, destinationCatalog)) {
     // Enabling Next button
     if (!isThereAStepAhead(flowState, getStep(flowState))) {
@@ -204,9 +229,7 @@ export const isDestinationIdMappingRequired = (
       getSelectedDestinationMode(flowState)
     )
   ) {
-    const selectedMode =
-      destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
-    return selectedMode?.supported_destination_ids?.length > 0 || false;
+    return hasSupportedDestinationIds(flowState, destinationCatalog);
   }
 
   return false;
@@ -235,11 +258,7 @@ export const getDestinationIdKey = (flowState) => {
 };
 
 export const saveDestinationIdKey = (flowState, destinationIdKey) => {
-  let stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
+  let stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[getStep(flowState)][idMappingStep]['destinationIdKey'] =
     destinationIdKey;
@@ -308,11 +327,7 @@ export const getRemainingDestinationFields = (
 };
 
 export const saveMapping = (flowState, mapping) => {
-  const stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
+  const stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[getStep(flowState)][fieldMappingStep]['fieldMappingKey'] = mapping;
   return { ...flowState, steps: stepsCopy };
@@ -352,11 +367,28 @@ export const updateItemInMap = (flowState, index, mapObj) => {
   return saveMapping(flowState, mappingArr);
 };
 
-export const enableMappingItems = (flowState, itemType) => {
-  return isLastFieldMappedIsEmpty(flowState) ? true : false;
+export const enableCustomMappingItem = (flowState, itemType) => {
+  const { destinationCatalog = {} } = flowState;
+
+  if (itemType === 'dropdown') {
+    return true;
+    return false && isLastFieldMappedEmpty(flowState);
+    // const remainingDestinationFields = getRemainingDestinationFields(
+    //   flowState,
+    //   destinationCatalog,
+    //   getMapping(flowState),
+    //   mapObj.destinationField
+    // )
+  } else if (itemType === 'free') {
+    return (
+      hasFreeFormFields(flowState, destinationCatalog) &&
+      !isLastFieldMappedEmpty(flowState)
+    );
+  }
+  return false;
 };
 
-export const isLastFieldMappedIsEmpty = (flowState) => {
+export const isLastFieldMappedEmpty = (flowState) => {
   const mappingArr = getMapping(flowState);
   if (mappingArr.length < 1) return false;
   const lastMappedObj = mappingArr.slice(-1)[0];
@@ -449,11 +481,7 @@ export const getTemplateMapping = (flowState) => {
 };
 
 export const saveTemplateMapping = (flowState, mapping) => {
-  const stepsCopy = flowState.steps.map((x) =>
-    x.map((y) => {
-      return { ...y };
-    })
-  );
+  const stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[getStep(flowState)][templateMappingStep]['templateMappingKey'] =
     mapping;

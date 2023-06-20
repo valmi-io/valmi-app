@@ -106,15 +106,13 @@ const Mapping = () => {
               );
             }}
           >
-            {getSourceModes(sourceCatalog, destinationCatalog).map(
-              (option: any, index: any) => {
-                return (
-                  <MenuItem key={'_valkey' + index} value={option}>
-                    {option}
-                  </MenuItem>
-                );
-              }
-            )}
+            {getSourceModes(sourceCatalog).map((option: any, index: any) => {
+              return (
+                <MenuItem key={'_valkey' + index} value={option}>
+                  {option}
+                </MenuItem>
+              );
+            })}
           </SelectDropdown>
         </BoxLayout>
 
@@ -153,12 +151,18 @@ const Mapping = () => {
       </BoxLayout>
 
       {/** Display Custom field mapping when selected destination sync mode has allow_freeform_fields = true */}
-      {getSelectedDestinationMode(flowState) !== '' &&
+      {/* {getSelectedDestinationMode(flowState) !== '' &&
         showCustomMappings(flowState, destinationCatalog) && (
           <BoxLayout>
             <FieldMappingContainer />
           </BoxLayout>
-        )}
+        )} */}
+
+      {showCustomMappings(flowState, destinationCatalog) && (
+        <BoxLayout>
+          <FieldMappingContainer />
+        </BoxLayout>
+      )}
 
       {/** Display Templated field mapping when selected destination sync mode has templated_fields  */}
       {getSelectedDestinationMode(flowState) !== '' &&
