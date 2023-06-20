@@ -127,21 +127,20 @@ const SyncFlow = () => {
       if (isEditableFlow) {
         syncQuery = updateSyncQuery;
       }
+
       syncQueryHandler(syncQuery, generateSyncPayload(flowState, workspaceId));
       return;
     }
 
-    setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+    if (!isMappingStep(flowState)) {
+      setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+      return;
+    }
 
-    // if (!isMappingStep(flowState)) {
-    //   console.log('error occurred here');
-    //   setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
-    // }
-
-    // if (isMappingStepInSyncFlow(flowState)) {
-    //   console.log('this is mapping step:-');
-    //   setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
-    // }
+    if (isMappingStepInSyncFlow(flowState)) {
+      setCurrentStepInFlow(dispatch, currentStep + 1, flowState);
+    }
+    return;
   };
 
   const syncQueryHandler = async (syncQuery: any, payload: any) => {

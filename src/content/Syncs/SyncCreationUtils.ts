@@ -24,7 +24,7 @@ export const generateSyncPayload = (flowState, workspaceId) => {
   if (!isEditableFlow) {
     payload = {
       src: generateSourcePayload(flowState),
-      dest: generateDestinationPayload(flowState),
+      dest: generateDestinationPayload(flowState, isEditableFlow),
       schedule: {
         run_interval:
           getSchedule(flowState).value *
@@ -60,7 +60,10 @@ export const generateSyncPayload = (flowState, workspaceId) => {
         sourceCatalog: flowState.sourceCatalog,
         destinationCatalog: flowState.destinationCatalog
       },
-      // destination_catalog: generateDestinationPayload(flowState)
+      destination_catalog: generateDestinationPayload(
+        flowState,
+        isEditableFlow
+      ),
       syncName: getSyncName(flowState),
       workspaceId: workspaceId
     };
@@ -116,11 +119,12 @@ export const generateSourcePayload = (flowState) => {
   return sourcePayload;
 };
 
-export const generateDestinationPayload = (flowState) => {
-  const { destinationCatalog } = flowState;
+export const generateDestinationPayload = (flowState, isEditableFlow) => {
+  const { destinationCatalog = {}, extra = null } = flowState || {};
 
-  const { id: destinationId, name: destinationName } =
-    flowState.destinationCredentialId;
+  const { id: destinationId, name: destinationName } = isEditableFlow
+    ? extra
+    : flowState.destinationCredentialId;
 
   // let sprucedMapping = {};
   let sprucedMapping = [];
@@ -135,7 +139,6 @@ export const generateDestinationPayload = (flowState) => {
         stream: mapElement.sourceField,
         sink: mapElement.destinationField
       });
-    //sprucedMapping[mapElement.sourceField] = mapElement.destinationField;
   });
 
   let template_fields = {};

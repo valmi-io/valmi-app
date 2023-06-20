@@ -67,7 +67,8 @@ const FieldMapping = (props: any) => {
                 {key}
               </MenuItem>
             ))}
-            displayDeleteIcon={true}
+            disabledRight={mapObj.required ? mapObj.required : false}
+            displayDeleteIcon={mapObj.required ? !mapObj.required : true}
             onDeleteIconClick={() => mappingDeleted(index)}
           />
         );

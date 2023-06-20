@@ -64,9 +64,9 @@ export const hasFreeFormFields = (flowState, destinationCatalog) => {
   return selectedMode?.allow_freeform_fields || false;
 };
 
-export const hasMandatoryFields = (flowState, destinationCatalog) => {
-  const selectedMode =
-    destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
+export const hasMandatoryFields = (flowState, destinationMode) => {
+  const { destinationCatalog = {} } = flowState || {};
+  const selectedMode = destinationCatalog.field_catalog[destinationMode];
   return selectedMode?.mandatory_fields || false;
 };
 
@@ -104,19 +104,20 @@ export const getSelectedSourceMode = (flowState) => {
 };
 
 const getDestinationCompatibleModes = (sourceMode, destinationModes) => {
-  let compatibleModes = [];
-  const modes = new Set(destinationModes);
-  if (sourceMode === 'full_refresh') {
-    compatibleModes = getFullRefreshCompatibleModes().filter((item) =>
-      modes.has(item)
-    );
-  } else if (sourceMode === 'incremental') {
-    compatibleModes = getIncrementalCompatibleModes().filter((item) =>
-      modes.has(item)
-    );
-  }
+  return destinationModes;
+  // let compatibleModes = [];
+  // const modes = new Set(destinationModes);
+  // if (sourceMode === 'full_refresh') {
+  //   compatibleModes = getFullRefreshCompatibleModes().filter((item) =>
+  //     modes.has(item)
+  //   );
+  // } else if (sourceMode === 'incremental') {
+  //   compatibleModes = getIncrementalCompatibleModes().filter((item) =>
+  //     modes.has(item)
+  //   );
+  // }
 
-  return compatibleModes;
+  //return modes;
 };
 
 export const getDestinationModes = (flowState, destinationCatalog) => {
@@ -157,14 +158,48 @@ export const saveDestinationMode = (flowState, destinationMode) => {
   stepsCopy[getStep(flowState)][destinationModeStep]['destinationMode'] =
     destinationMode;
 
+  // checking if destination mode has template_fields
   if (showTemplatedMappings(flowState, destinationMode)) {
     const template_fields = getTemplatedMappingFields(
       flowState,
       destinationMode
     );
 
+    // updating template_fields to sync flow state
     stepsCopy[getStep(flowState)][templateMappingStep]['templateMappingKey'] =
       template_fields;
+  }
+
+  // checking if destination mode has mandatory_fields
+  if (hasMandatoryFields(flowState, destinationMode)) {
+    // mandatory_fields
+    const mandatory_fields = hasMandatoryFields(flowState, destinationMode);
+    let mappingArr = [...getMapping(flowState)];
+
+    // available source fields
+    const { sourceCatalog = {} } = flowState || {};
+
+    let sourceFields = getSourceFields(sourceCatalog);
+
+    // creating a mapped mandatory field
+    for (let i = 0; i < mandatory_fields.length; i++) {
+      let sourceField = '';
+      if (sourceFields.length > 0) {
+        sourceField = sourceFields.includes(sourceFields[i])
+          ? sourceFields[i]
+          : sourceField[0];
+      }
+      mappingArr.push({
+        sourceField: sourceField,
+        destinationField: mandatory_fields[i],
+        destinationFieldType: 'dropdown',
+        required: true
+      });
+    }
+
+    // updating fieldMapping to sync flow state
+    stepsCopy[getStep(flowState)][fieldMappingStep]['fieldMappingKey'] =
+      mappingArr;
   }
 
   return { ...flowState, steps: stepsCopy };
@@ -286,7 +321,7 @@ export const getRemainingDestinationFields = (
   }
 
   // check if destination catalog has mandatory fields.
-  if (hasMandatoryFields(flowState, destinationCatalog)) {
+  if (hasMandatoryFields(flowState, getSelectedDestinationMode(flowState))) {
     selectedFieldCatalog =
       destinationCatalog.field_catalog[getSelectedDestinationMode(flowState)];
   }

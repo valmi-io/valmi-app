@@ -119,12 +119,14 @@ const DualSelectDropdown = (props: DualSelectDropdownProps) => {
           />
         )}
       </BoxLayout>
-      <Tooltip
-        title={'This field will be created in destination'}
-        placement="top-start"
-      >
-        <InfoIcon style={{ marginLeft: 2, marginRight: 2 }} />
-      </Tooltip>
+      {fieldType === 'free' && (
+        <Tooltip
+          title={'This field will be created in destination'}
+          placement="top-start"
+        >
+          <InfoIcon style={{ marginLeft: 2, marginRight: 2 }} />
+        </Tooltip>
+      )}
 
       {displayDeleteIcon && (
         <IconButton color="inherit" onClick={onDeleteIconClick}>

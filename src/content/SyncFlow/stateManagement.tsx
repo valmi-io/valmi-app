@@ -59,7 +59,6 @@ export function initialiseFlowState(dispatch, flowState, isEditableFlow) {
 }
 
 export const setCurrentStepInFlow = (dispatch, currentStep, flowState) => {
-  console.log('Set current step in flow state: ', flowState);
   let stepsCopy = getStepsInSyncFlow(flowState);
 
   // if the current step is mapping step, add new field to the sync flow state.
