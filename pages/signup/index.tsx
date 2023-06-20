@@ -54,6 +54,8 @@ const SignupPage: NextPageWithLayout = () => {
 
   const [userData, setUserData] = useState(null);
 
+  const [userEmail, setUserEmail] = useState('');
+
   const { control, handleSubmit } = useForm({
     defaultValues: {},
     resolver: yupResolver(signupValidationSchema)
@@ -84,12 +86,14 @@ const SignupPage: NextPageWithLayout = () => {
       email: values['email'],
       password: values['password']
     };
+    setUserEmail(values['email']);
     signupHandler(payload);
   };
 
   const signupHandler = async (payload: any) => {
     try {
       const data: any = await signupUser(payload).unwrap();
+
       let isErrorAlert = false;
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -112,7 +116,8 @@ const SignupPage: NextPageWithLayout = () => {
             loginFlowState: {
               isLoggedIn: isLoggedIn,
               userEmail: email,
-              emailSentDialog: emailSentDialog
+              emailSentDialog: emailSentDialog,
+              resendActivationLink: false
             }
           })
         );
@@ -154,6 +159,21 @@ const SignupPage: NextPageWithLayout = () => {
     );
   };
 
+  const resendActivationLinkHandler = () => {
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: {
+          isLoggedIn: false,
+          userEmail: userEmail,
+          emailSentDialog: false,
+          resendActivationLink: true
+        }
+      })
+    );
+    router.push('/activate');
+  };
+
   return (
     <>
       <Head title="Signup" />
@@ -161,6 +181,12 @@ const SignupPage: NextPageWithLayout = () => {
         open={alertDialog}
         onClose={handleClose}
         message={alertMessage}
+        displayButton={
+          alertMessage === 'user with this email address already exists.'
+            ? true
+            : false
+        }
+        onButtonClick={resendActivationLinkHandler}
         isError={isErrorAlert}
       />
       <AuthenticationLayout

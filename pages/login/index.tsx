@@ -17,7 +17,7 @@ import authStorage from '../../src/utils/auth-storage';
 import { useRouter } from 'next/router';
 import { CircularProgress, Stack, Typography } from '@mui/material';
 import { AppDispatch } from '../../src/store/store';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../../src/store/reducers/user';
 import { initialiseAppState } from '../../src/utils/login-utils';
 import AuthenticationLayout from '../../src/content/Authentication/AuthenticationLayout';
@@ -36,11 +36,15 @@ import {
 } from '../../src/components/Error/ErrorUtils';
 import Link from 'next/link';
 import { signOutUser } from '../../src/utils/lib';
+import { setAppState } from '../../src/store/reducers/appFlow';
+import { RootState } from '../../src/store/reducers';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
+
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   // sign in query
   const [loginAndFetchWorkSpaces, { isFetching }] =
@@ -52,6 +56,8 @@ const Login: NextPageWithLayout = () => {
   const [isErrorAlert, setIsErrorAlert] = useState(false);
 
   const [loginData, setLoginData] = useState(null);
+
+  const [userEmail, setUserEmail] = useState('');
 
   const { control, handleSubmit } = useForm({
     defaultValues: {},
@@ -81,12 +87,14 @@ const Login: NextPageWithLayout = () => {
       email: values['email'],
       password: values['password']
     };
+    setUserEmail(values['email']);
     loginHandler(payload);
   };
 
   const loginHandler = async (payload: any) => {
     try {
       const data: any = await loginAndFetchWorkSpaces(payload).unwrap();
+
       let isErrorAlert = false;
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -139,6 +147,21 @@ const Login: NextPageWithLayout = () => {
     );
   };
 
+  const resendActivationLinkHandler = () => {
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: {
+          isLoggedIn: false,
+          userEmail: userEmail,
+          emailSentDialog: false,
+          resendActivationLink: true
+        }
+      })
+    );
+    router.push('/activate');
+  };
+
   return (
     <>
       <Head title="Login" />
@@ -146,6 +169,8 @@ const Login: NextPageWithLayout = () => {
         open={alertDialog}
         onClose={handleClose}
         message={alertMessage}
+        displayButton={alertMessage === 'Unauthorized' ? true : false}
+        onButtonClick={resendActivationLinkHandler}
         isError={isErrorAlert}
       />
       <AuthenticationLayout

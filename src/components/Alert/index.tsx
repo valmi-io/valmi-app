@@ -4,12 +4,14 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, Snackbar, Stack, Typography } from '@mui/material';
 
 export interface AlertComponentProps {
   open: boolean;
   onClose: () => void;
   message: string;
+  displayButton?: boolean;
+  onButtonClick?: () => void;
   isError?: boolean;
 }
 
@@ -17,8 +19,32 @@ const AlertComponent = ({
   open,
   onClose,
   message,
+  displayButton = false,
+  onButtonClick,
   isError
 }: AlertComponentProps) => {
+  const displayAlertMessage = () => {
+    return (
+      <>
+        {message}
+        {displayButton && (
+          <Stack>
+            <Typography variant="body2" color="text.error">
+              If user is not activated.{' '}
+              <span
+                onClick={onButtonClick}
+                style={{ textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                resend activation link
+              </span>
+              <span>{'.'}</span>
+            </Typography>
+          </Stack>
+        )}
+      </>
+    );
+  };
+
   return (
     <Snackbar
       anchorOrigin={{
@@ -28,13 +54,21 @@ const AlertComponent = ({
       open={open}
       autoHideDuration={null}
       onClose={onClose}
+      sx={{
+        alignItems: 'center'
+      }}
     >
       <Alert
         onClose={onClose}
         severity={isError ? 'error' : 'success'}
-        sx={{ width: '100%' }}
+        sx={{
+          display: 'flex',
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
       >
-        {message}
+        {displayAlertMessage()}
       </Alert>
     </Snackbar>
   );

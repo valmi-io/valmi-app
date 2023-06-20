@@ -72,20 +72,45 @@ export const apiSlice = createApi({
         };
       }
     }),
+    resendActivationToken: builder.query({
+      // The URL for the request is '/api/v1/users/resend_activation/'
+      query: (arg) => {
+        return {
+          url: '/users/resend_activation/',
+          method: 'POST',
+          body: arg
+        };
+      }
+    }),
     loginAndFetchWorkSpaces: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const user = await baseQuery({
           url: '/token/login',
           method: 'POST',
-          body: arg
+          body: arg,
+          prepareHeaders: (headers) => {
+            headers.set('Content-Type', 'multipart/form-data');
+            return headers;
+          }
         });
         if (user.error) return { error: user.error };
         const token = user.data.auth_token;
+
+        // storing auth token in cookie.
         AuthStorage.value = {
           token: token
         };
+
         const result = await baseQuery('/spaces/');
-        return result.data ? { data: result.data } : { error: result.error };
+
+        if (result.error) {
+          if (result.error?.data?.detail === 'Unauthorized') {
+            // destroy auth token
+            AuthStorage.destroy();
+          }
+          return { error: result.error };
+        }
+        return result.data && { data: result.data };
       }
     }),
 
@@ -293,6 +318,7 @@ export const {
   useFetchConnectorsQuery,
   useLazySignupUserQuery,
   useLazyActivateUserQuery,
+  useLazyResendActivationTokenQuery,
   useLazyDiscoverConnectorQuery,
   useFetchCredentialsQuery,
   useLazyFetchCredentialsQuery,
