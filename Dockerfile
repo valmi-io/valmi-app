@@ -4,10 +4,8 @@ FROM node:18-alpine
 # Set the working directory to /app
 WORKDIR /app
 
-RUN npm install  --force -g yarn
-
 # Copy the package.json and yarn.lock files to the container
-COPY package.json ./
+COPY package.json yarn.lock ./
 
 # Install the application dependencies using Yarn
 RUN yarn install

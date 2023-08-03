@@ -45,8 +45,8 @@ out
 .idea/
 
 dist
-yarn.lock
-package-lock.json
+# yarn.lock
+# package-lock.json
 
 # maybe some logs
 /log
