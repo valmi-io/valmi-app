@@ -4,8 +4,7 @@ FROM node:18-alpine
 # Set the working directory to /app
 WORKDIR /app
 
-# Install the Yarn package manager
-RUN curl -o- -L https://yarnpkg.com/install.sh | bash
+RUN npm install  --force -g yarn
 
 # Copy the package.json and yarn.lock files to the container
 COPY package.json ./
