@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json yarn.lock./
+COPY package.json yarn.lock ./
 
 # install dependencies
 RUN yarn install --frozen-lockfile --network-timeout 600000
