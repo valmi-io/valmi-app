@@ -31,7 +31,8 @@ import {
   getConnectionStatus,
   getErrorInSyncRun,
   getIcon,
-  getRunStatus
+  getRunStatus,
+  isSyncRunning
 } from './SyncRunsUtils';
 import { useState } from 'react';
 import AlertComponent from '../../../components/Alert';
@@ -118,7 +119,11 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
       <>
         <Tooltip title={tooltipTitle}>
           <IconButton
-            color={status === 'failed' ? 'error' : 'primary'}
+            color={
+              status === 'failed' || status === 'terminated'
+                ? 'error'
+                : 'primary'
+            }
             onClick={onClick}
           >
             {getIcon(status)}
@@ -129,8 +134,9 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   };
 
   const displayConnectionMetrics = (syncRun, connection) => {
-    // check the connection status
+    // check the syncRun status
     let connectionStatus = getConnectionStatus(syncRun, connection);
+
     if (connectionStatus === 'scheduled' || connectionStatus === 'running') {
       if (connection === 'dest') {
         connectionStatus = 'Delivering...';
@@ -150,7 +156,9 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
           </Typography>
 
           {connectionStatus === 'failed' &&
-            getStatusIconComponent(connectionStatus, '', () => {})}
+            getStatusIconComponent(connectionStatus, '', () =>
+              displayError(syncRun, connection)
+            )}
 
           {connectionStatus === 'success' &&
             getStatusIconComponent(connectionStatus, '', () => {})}
@@ -201,7 +209,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
           }
         />
 
-        {status === 'failed' &&
+        {(status === 'failed' || status === 'terminated') &&
           getStatusIconComponent(status, 'Show Error', () =>
             displayError(syncRun)
           )}
@@ -228,13 +236,17 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   {
     /** Sync run time */
   }
+
   const displayRunTime = (syncRun) => {
     const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
-    // TODO: replace runEndAt with syncRun.run_end
-    let runEndAt = new Date();
+
+    let runEndAt = null;
+
     if (syncRun.run_end_at) {
       runEndAt = convertUTCDateToLocalDate(new Date(syncRun.run_end_at));
-    }
+    } else if (isSyncRunning(syncRun)) {
+      runEndAt = new Date();
+    } else return null;
 
     const runTime = getTimeDifference(runStartedAt, runEndAt);
     return `Took ${runTime}`;
@@ -243,8 +255,8 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   {
     /** Sync Run Error */
   }
-  const displayError = (syncRun) => {
-    const syncErrorMessage = getErrorInSyncRun(syncRun);
+  const displayError = (syncRun, connection = '') => {
+    const syncErrorMessage = getErrorInSyncRun(syncRun, connection);
     setSyncErrorMessage(syncErrorMessage);
     showErrorDialog(true);
   };
