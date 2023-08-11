@@ -15,6 +15,7 @@ export const stringAvatar = (name: string) => {
 
 export const capitalizeFirstLetter = (str) => {
   return (
+    typeof str !== 'object' &&
     str !== '' &&
     str &&
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()

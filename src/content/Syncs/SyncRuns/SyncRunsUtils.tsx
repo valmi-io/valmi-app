@@ -47,11 +47,19 @@ export const getErrorInSyncRun = (syncRun, connection) => {
 };
 
 export const getConnectionStatus = (syncRun, connection) => {
-  let connectionStatus = syncRun.status ? syncRun.status : 'status';
-  if (!syncRun.extra || !syncRun.extra[connection]) {
-    return connectionStatus;
+  let connectionStatus = syncRun.status || 'status';
+  // check if run_manager exists in syncRun object
+  if (checkIfRunManagerExists(syncRun)) {
+    const runManagerStatus =
+      syncRun.extra.run_manager.status.status || connectionStatus;
+
+    // check if connection object exists in syncRun object
+    // if exists, return connection object status, otherwise return run_manager status
+    connectionStatus =
+      syncRun.extra[connection]?.status?.status || runManagerStatus;
   }
-  return syncRun.extra[connection].status?.status || connectionStatus;
+
+  return connectionStatus;
 };
 
 export const checkIfRunManagerExists = (syncRun) => {

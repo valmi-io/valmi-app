@@ -134,7 +134,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   };
 
   const displayConnectionMetrics = (syncRun, connection) => {
-    // check the syncRun status
+    // get connection status
     let connectionStatus = getConnectionStatus(syncRun, connection);
 
     if (connectionStatus === 'scheduled' || connectionStatus === 'running') {
@@ -209,7 +209,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
           }
         />
 
-        {(status === 'failed' || status === 'terminated') &&
+        {status === 'failed' &&
           getStatusIconComponent(status, 'Show Error', () =>
             displayError(syncRun)
           )}
