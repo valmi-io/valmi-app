@@ -5,6 +5,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import sha256 from 'crypto-js/sha256';
+
 import { HOUR, MIN } from '../content/SyncFlow/Schedule/scheduleManagement';
 
 export const stringAvatar = (name: string) => {
@@ -81,4 +83,9 @@ export const signOutUser = (authStorage, dispatch, router) => {
 
 export const splitNumberByCommas = (number) => {
   return number.toLocaleString();
+};
+
+export const generateObjectHash = (obj) => {
+  const jsonString = JSON.stringify(obj);
+  return sha256(jsonString).toString();
 };

@@ -25,6 +25,9 @@ const constants = {
     CONFIGURE_CONNECTOR_TITLE: 'Configure',
     TEST_CONNECTOR_TITLE: 'Test',
     SELECT_CONNECTOR_LAYOUT_TITLE: 'Select connector'
+  },
+  docs: {
+    syncs: 'https://docs.valmi.io/concepts/syncs'
   }
 };
 

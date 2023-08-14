@@ -31,7 +31,6 @@ import Mapping from '@/content/SyncFlow/Mapping';
 import Schedule from '@/content/SyncFlow/Schedule';
 import {
   enableNext,
-  getStepsInSyncFlow,
   initialiseFlowState,
   isLastStepInSyncFlow,
   isMappingStepInSyncFlow,
@@ -50,12 +49,8 @@ import {
   hasErrorsInData
 } from '../../../../../src/components/Error/ErrorUtils';
 import AlertComponent from '../../../../../src/components/Alert';
-import {
-  getStep,
-  isMappingStep,
-  isThereAStepAhead
-} from '../../../../../src/content/SyncFlow/Mapping/mappingManagement';
-import { setFlowState } from '../../../../../src/store/reducers/syncFlow';
+import { isMappingStep } from '../../../../../src/content/SyncFlow/Mapping/mappingManagement';
+import constants from '../../../../../src/constants';
 
 const InstructionsLayout = styled(Box)(({ theme }) => ({
   width: '40%',
@@ -127,7 +122,7 @@ const SyncFlow = () => {
       if (isEditableFlow) {
         syncQuery = updateSyncQuery;
       }
-
+      const syncPayload = generateSyncPayload(flowState, workspaceId);
       syncQueryHandler(syncQuery, generateSyncPayload(flowState, workspaceId));
       return;
     }
@@ -181,7 +176,7 @@ const SyncFlow = () => {
   };
 
   const displayInstructions = () => {
-    const documentationUrl = 'https://docs.valmi.io/concepts/syncs';
+    const documentationUrl = constants.docs.syncs;
     const title = 'Sync Documentation';
     const linkText = 'sync';
     return (

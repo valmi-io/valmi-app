@@ -5,6 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { generateObjectHash } from '../../utils/lib';
 import {
   getDestinationIdKey,
   getMapping,
@@ -21,22 +22,23 @@ import { getSchedule } from '../SyncFlow/Schedule/scheduleManagement';
 export const generateSyncPayload = (flowState, workspaceId) => {
   const { isEditableFlow = false, extra = null } = flowState;
   let payload = {};
+  let runInterval = getRunInterval(flowState);
+  let uiState = generateUIState(flowState);
+  let syncName = getSyncName(flowState);
+  let destinationPayload = generateDestinationPayload(
+    flowState,
+    isEditableFlow
+  );
+
   if (!isEditableFlow) {
     payload = {
       src: generateSourcePayload(flowState),
-      dest: generateDestinationPayload(flowState, isEditableFlow),
+      dest: destinationPayload,
       schedule: {
-        run_interval:
-          getSchedule(flowState).value *
-          (getSchedule(flowState).type == HOUR ? 3600 : 60) *
-          1000 // inteval in milliseconds.
+        run_interval: runInterval
       },
-      uiState: {
-        steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
-        sourceCatalog: flowState.sourceCatalog,
-        destinationCatalog: flowState.destinationCatalog
-      },
-      syncName: getSyncName(flowState),
+      uiState: uiState,
+      syncName: syncName,
       workspaceId: workspaceId
     };
   } else {
@@ -50,25 +52,90 @@ export const generateSyncPayload = (flowState, workspaceId) => {
       sourceId: sourceId,
       destinationId: destinationId,
       schedule: {
-        run_interval:
-          getSchedule(flowState).value *
-          (getSchedule(flowState).type == HOUR ? 3600 : 60) *
-          1000 // inteval in milliseconds.
+        run_interval: runInterval
       },
-      uiState: {
-        steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
-        sourceCatalog: flowState.sourceCatalog,
-        destinationCatalog: flowState.destinationCatalog
-      },
-      destination_catalog: generateDestinationPayload(
-        flowState,
-        isEditableFlow
-      ),
-      syncName: getSyncName(flowState),
+      uiState: uiState,
+      destination_catalog: destinationPayload,
+      syncName: syncName,
       workspaceId: workspaceId
     };
   }
+
   return payload;
+};
+
+// this is an optional state and can be extended
+const generateUIState = (flowState) => {
+  return {
+    steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
+    sourceCatalog: flowState.sourceCatalog,
+    destinationCatalog: flowState.destinationCatalog,
+    mapHash: generateObjectHash(generateFieldsMapping(flowState, {}, true))
+  };
+};
+
+const getRunInterval = (flowState) => {
+  const runInterval =
+    getSchedule(flowState).value *
+    (getSchedule(flowState).type == HOUR ? 3600 : 60) *
+    1000; // inteval in milliseconds.
+  return runInterval;
+};
+
+const isElementFieldsMapped = (element) => {
+  if (
+    element.destinationField !== null &&
+    element.destinationField.trim() !== '' &&
+    element.sourceField !== null &&
+    element.sourceField.trim() !== ''
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const generateFieldsMapping = (
+  flowState,
+  unknownType,
+  isDestinationPayload
+) => {
+  const mapping = getMapping(flowState);
+
+  let fieldsMapped = {};
+
+  if (isDestinationPayload) {
+    fieldsMapped = [];
+  }
+
+  mapping.forEach((element) => {
+    if (isElementFieldsMapped(element)) {
+      if (!isDestinationPayload) {
+        fieldsMapped[element.sourceField] = unknownType;
+      } else {
+        fieldsMapped.push({
+          stream: element.sourceField,
+          sink: element.destinationField
+        });
+      }
+    }
+  });
+
+  return fieldsMapped;
+};
+
+const generateTemplateFieldsMapping = (flowState) => {
+  const mapping = getTemplateMapping(flowState);
+
+  let templateFields = {};
+
+  mapping.forEach((element) => {
+    templateFields = {
+      ...templateFields,
+      [element.name]: element.value
+    };
+  });
+
+  return templateFields;
 };
 
 export const generateSourcePayload = (flowState) => {
@@ -76,23 +143,17 @@ export const generateSourcePayload = (flowState) => {
 
   const { id: credential_id, name: sourceName } = flowState.sourceCredentialId;
 
-  // Generate Source props
-  const mapping = getMapping(flowState);
-
   let sourceProps = {};
   const unknownType = {
     type: 'NOT_FILLED'
   };
+
   sourceProps[getSourceIdKey(flowState)] = unknownType;
-  mapping.forEach((mapElement) => {
-    if (
-      mapElement.destinationField !== null &&
-      mapElement.destinationField.trim() !== '' &&
-      mapElement.sourceField !== null &&
-      mapElement.sourceField.trim() !== ''
-    )
-      sourceProps[mapElement.sourceField] = unknownType;
-  });
+
+  sourceProps = {
+    ...sourceProps,
+    ...generateFieldsMapping(flowState, unknownType, false)
+  };
 
   const sourcePayload = {
     catalog: {
@@ -123,39 +184,21 @@ export const generateDestinationPayload = (flowState, isEditableFlow) => {
   const { destinationCatalog = {}, extra = null } = flowState || {};
 
   const { id: destinationId, name: destinationName } = isEditableFlow
-    ? extra
+    ? extra?.destination || {}
     : flowState.destinationCredentialId;
 
-  // let sprucedMapping = {};
-  let sprucedMapping = [];
-  getMapping(flowState).forEach((mapElement) => {
-    if (
-      mapElement.destinationField !== null &&
-      mapElement.destinationField.trim() !== '' &&
-      mapElement.sourceField !== null &&
-      mapElement.sourceField.trim() !== ''
-    )
-      sprucedMapping.push({
-        stream: mapElement.sourceField,
-        sink: mapElement.destinationField
-      });
-  });
+  // fields mapping
+  let sprucedMapping = generateFieldsMapping(flowState, {}, true);
 
-  let template_fields = {};
-
-  getTemplateMapping(flowState).forEach((mapElement) => {
-    template_fields = {
-      ...template_fields,
-      [mapElement.name]: mapElement.value
-    };
-  });
+  // template fields mapping
+  let templateFields = generateTemplateFieldsMapping(flowState);
 
   const destinationPayload = {
     catalog: {
       sinks: [
         {
           mapping: sprucedMapping,
-          template_fields: template_fields,
+          template_fields: templateFields,
           destination_sync_mode: getSelectedDestinationMode(flowState),
           destination_id: getDestinationIdKey(flowState),
           sink: destinationCatalog

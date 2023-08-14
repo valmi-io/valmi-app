@@ -20,5 +20,6 @@
   "typescript.preferences.quoteStyle": "single",
 
   "psi-header.changes-tracking": {},
-  "psi-header.templates": []
+  "psi-header.templates": [],
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

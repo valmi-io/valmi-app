@@ -84,7 +84,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
     syncData: any
   ) => {
     event.stopPropagation();
-    // TODO: handle toggle sync
+
     const payload = {
       config: {
         sync_id: syncData.id
