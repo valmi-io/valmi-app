@@ -40,6 +40,7 @@ import {
 import AlertComponent from '../../../components/Alert';
 import PopoverComponent from '../../../components/Popover';
 import { getRouterPathname, isPublicSync } from '../../../utils/routes';
+import { sendErrorToBugsnag } from '../../../lib/bugsnag';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
@@ -131,6 +132,10 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
         setSyncRunsFetchError(true);
+
+        // send error to bugsnag
+        sendErrorToBugsnag(traceError);
+
         setDisplayError(traceError);
       } else {
         setSyncRunsFetchError(false);
@@ -142,6 +147,8 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   useEffect(() => {
     // syncRuns Error handling
     if (isError) {
+      // send error to bugsnag
+      sendErrorToBugsnag(error);
       setSyncRunsFetchError(true);
     }
   }, [isError]);
@@ -363,7 +370,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
         disabled={isQueryPending}
         onClick={toggleSyncRun}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        linkurl={'http://citus.mywavia.com:3001/'}
+        linkurl={process.env.PUBLIC_SYNC_URL}
         isFetching={isQueryPending}
         displayStartIcon={false}
       />

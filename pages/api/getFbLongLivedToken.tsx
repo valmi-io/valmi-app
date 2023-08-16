@@ -8,6 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types';
 import axios from 'axios';
 
 import { configureCredentials } from './utils';
+import { sendErrorToBugsnag } from '../../src/lib/bugsnag';
 
 const getFbLongLivedToken = async (
   req: NextApiRequest,
@@ -35,6 +36,8 @@ const getFbLongLivedToken = async (
     // Handle the response data as needed
     res.status(200).json(data);
   } catch (error: any) {
+    // send error to bugsnag
+    sendErrorToBugsnag(error.message);
     // Handle any error that occurred during the request
     res.status(500).json({ error: error.message });
   }

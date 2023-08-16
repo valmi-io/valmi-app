@@ -14,6 +14,12 @@ module.exports = {
     POSTHOG_KEY: process.env.POSTHOG_KEY,
     POSTHOG_HOST: process.env.POSTHOG_HOST,
     PUBLIC_WORKSPACE: process.env.PUBLIC_WORKSPACE,
-    PUBLIC_SYNC: process.env.PUBLIC_SYNC
+    PUBLIC_SYNC: process.env.PUBLIC_SYNC,
+    PUBLIC_SYNC_URL: process.env.PUBLIC_SYNC_URL,
+    BUGSNAG_KEY: process.env.BUGSNAG_KEY,
+    BUGSNAG_TRACING: process.env.BUGSNAG_TRACING,
+    BUGSNAG_APP_TYPE: process.env.BUGSNAG_APP_TYPE,
+    BUGSNAG_APP_VERSION: process.env.BUGSNAG_APP_VERSION,
+    BUGSNAG_AUTO_DETECT_ERRORS: process.env.BUGSNAG_AUTO_DETECT_ERRORS
   }
 };

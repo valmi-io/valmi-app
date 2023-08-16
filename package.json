@@ -5,6 +5,8 @@
   "author": "Nagendra Sankoju <nag@valmi.io>",
   "private": false,
   "dependencies": {
+    "@bugsnag/js": "^7.21.0",
+    "@bugsnag/plugin-react": "^7.19.0",
     "@emotion/cache": "11.7.1",
     "@emotion/react": "11.9.0",
     "@emotion/server": "11.4.0",

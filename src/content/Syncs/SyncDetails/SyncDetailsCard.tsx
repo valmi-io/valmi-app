@@ -116,7 +116,7 @@ const SyncDetailsCard = ({
                 isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType
               }
               connectionTitle={
-                isPublicSync ? 'http://citus.mywavia.com:3001' : destinationName
+                isPublicSync ? process.env.PUBLIC_SYNC_URL : destinationName
               }
             />
           </Stack>

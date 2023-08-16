@@ -6,7 +6,7 @@
  */
 
 import { FC, ReactElement, ReactNode, useEffect } from 'react';
-
+import React from 'react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -29,6 +29,12 @@ import { setAppState } from '../src/store/reducers/appFlow';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
+import {
+  initializeBugsnag,
+  isBugsnagClientInitialized,
+  traceBugsnag
+} from '../src/lib/bugsnag';
+
 const clientSideEmotionCache = createEmotionCache();
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -49,6 +55,11 @@ if (typeof window !== 'undefined') {
       if (process.env.NODE_ENV === 'development') posthog.debug();
     }
   });
+}
+
+// Bugsnag configuration
+if (!isBugsnagClientInitialized()) {
+  initializeBugsnag();
 }
 
 const MyApp: FC<AppPropsWithLayout> = ({
@@ -73,6 +84,7 @@ const MyApp: FC<AppPropsWithLayout> = ({
     // Track page views
     const handleRouteComplete = () => {
       posthog?.capture('$pageview');
+
       NProgress.done();
     };
     router.events.on('routeChangeComplete', handleRouteComplete);

@@ -10,6 +10,8 @@ import { Grid } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
+import Bugsnag from '@bugsnag/js';
+
 import { NextPageWithLayout } from '../../../_app';
 
 import SidebarLayout from '@/layouts/SidebarLayout';

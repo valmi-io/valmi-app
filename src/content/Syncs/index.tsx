@@ -24,6 +24,8 @@ import { SkeletonContainer } from '../../components/Layouts/Layouts';
 import ListEmptyComponent from '../../components/ListEmptyComponent';
 import ErrorContainer from '../../components/Error/ErrorContainer';
 
+import { sendErrorToBugsnag } from '../../lib/bugsnag';
+
 const Syncs = () => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -43,12 +45,22 @@ const Syncs = () => {
     if (data) {
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
+        // sending error to Bugsnag
+        sendErrorToBugsnag(traceError);
+
         setDisplayError(traceError);
       } else {
         setSyncsData(data);
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    if (isError) {
+      // sending error to Bugsnag
+      sendErrorToBugsnag(error);
+    }
+  }, [isError]);
 
   const displayContent = () => {
     if (syncsData.length > 0) {
