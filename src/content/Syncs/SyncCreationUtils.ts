@@ -21,57 +21,33 @@ import { getSchedule } from '../SyncFlow/Schedule/scheduleManagement';
 
 export const generateSyncPayload = (flowState, workspaceId) => {
   const { isEditableFlow = false, extra = null } = flowState;
-  let payload = {};
-  let runInterval = getRunInterval(flowState);
-  let uiState = generateUIState(flowState);
-  let syncName = getSyncName(flowState);
-  let destinationPayload = generateDestinationPayload(
-    flowState,
-    isEditableFlow
-  );
 
-  if (!isEditableFlow) {
-    payload = {
-      src: generateSourcePayload(flowState),
-      dest: destinationPayload,
-      schedule: {
-        run_interval: runInterval
-      },
-      uiState: uiState,
-      syncName: syncName,
-      workspaceId: workspaceId
-    };
-  } else {
-    const {
-      syncId = '',
-      source: { id: sourceId = '' } = {},
-      destination: { id: destinationId = '' } = {}
-    } = extra || {};
-    payload = {
-      syncId: syncId,
-      sourceId: sourceId,
-      destinationId: destinationId,
-      schedule: {
-        run_interval: runInterval
-      },
-      uiState: uiState,
-      destination_catalog: destinationPayload,
-      syncName: syncName,
-      workspaceId: workspaceId
-    };
+  let syncPayload = {};
+
+  syncPayload['src'] = generateSourcePayload(flowState, isEditableFlow);
+  syncPayload['dest'] = generateDestinationPayload(flowState, isEditableFlow);
+  syncPayload['schedule'] = { run_interval: getRunInterval(flowState) };
+  syncPayload['uiState'] = generateUIState(flowState);
+  syncPayload['syncName'] = getSyncName(flowState);
+  syncPayload['workspaceId'] = workspaceId;
+
+  if (isEditableFlow) {
+    const { syncId = '' } = extra || {};
+    syncPayload['syncId'] = syncId;
   }
 
-  return payload;
+  return syncPayload;
 };
 
 // this is an optional state and can be extended
 const generateUIState = (flowState) => {
-  return {
+  let uiState = {
     steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
     sourceCatalog: flowState.sourceCatalog,
     destinationCatalog: flowState.destinationCatalog,
     mapHash: generateObjectHash(generateFieldsMapping(flowState, {}, true))
   };
+  return uiState;
 };
 
 const getRunInterval = (flowState) => {
@@ -138,10 +114,15 @@ const generateTemplateFieldsMapping = (flowState) => {
   return templateFields;
 };
 
-export const generateSourcePayload = (flowState) => {
-  const { json_schema, name, supported_sync_modes } = flowState.sourceCatalog;
+export const generateSourcePayload = (flowState, isEditableFlow) => {
+  const {
+    sourceCatalog: { json_schema, name, supported_sync_modes } = {},
+    extra = null
+  } = flowState || {};
 
-  const { id: credential_id, name: sourceName } = flowState.sourceCredentialId;
+  const { id: credentialId, name: credentialName } = isEditableFlow
+    ? extra?.source.credential || {}
+    : flowState.sourceConfig;
 
   let sourceProps = {};
   const unknownType = {
@@ -173,8 +154,8 @@ export const generateSourcePayload = (flowState) => {
         }
       ]
     },
-    credential_id,
-    name: sourceName
+    credential_id: credentialId,
+    name: credentialName
   };
 
   return sourcePayload;
@@ -183,9 +164,9 @@ export const generateSourcePayload = (flowState) => {
 export const generateDestinationPayload = (flowState, isEditableFlow) => {
   const { destinationCatalog = {}, extra = null } = flowState || {};
 
-  const { id: destinationId, name: destinationName } = isEditableFlow
-    ? extra?.destination || {}
-    : flowState.destinationCredentialId;
+  const { id: credentialId, name: credentialName } = isEditableFlow
+    ? extra?.destination.credential || {}
+    : flowState.destinationConfig;
 
   // fields mapping
   let sprucedMapping = generateFieldsMapping(flowState, {}, true);
@@ -205,8 +186,8 @@ export const generateDestinationPayload = (flowState, isEditableFlow) => {
         }
       ]
     },
-    credential_id: destinationId,
-    name: destinationName
+    credential_id: credentialId,
+    name: credentialName
   };
 
   return destinationPayload;

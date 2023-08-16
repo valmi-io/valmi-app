@@ -218,15 +218,33 @@ export const apiSlice = createApi({
     updateSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const {
-          syncId,
-          sourceId,
-          destinationId,
+          src,
+          dest,
           schedule,
           uiState,
           syncName,
+          syncId = '',
           workspaceId
         } = arg;
 
+        const sourceRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/sources/create`,
+          method: 'POST',
+          body: src
+        });
+
+        if (sourceRes.error) return { error: sourceRes.error };
+
+        const { id: sourceId } = sourceRes.data;
+        const destRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/destinations/create`,
+          method: 'POST',
+          body: dest
+        });
+
+        if (destRes.error) return { error: destRes.error };
+
+        const { id: destinationId } = destRes.data;
         const syncPayload = {
           id: syncId,
           name: syncName,
@@ -235,7 +253,6 @@ export const apiSlice = createApi({
           ui_state: uiState,
           schedule
         };
-
         const result = await baseQuery({
           url: `/workspaces/${workspaceId}/syncs/update`,
           method: 'POST',

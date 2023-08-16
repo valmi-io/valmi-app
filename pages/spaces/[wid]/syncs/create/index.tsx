@@ -122,8 +122,10 @@ const SyncFlow = () => {
       if (isEditableFlow) {
         syncQuery = updateSyncQuery;
       }
+
       const syncPayload = generateSyncPayload(flowState, workspaceId);
-      syncQueryHandler(syncQuery, generateSyncPayload(flowState, workspaceId));
+
+      syncQueryHandler(syncQuery, syncPayload);
       return;
     }
 
