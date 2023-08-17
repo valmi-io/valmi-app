@@ -100,8 +100,7 @@ const Warehouse = () => {
             ...updatedFlowState,
             destinationCatalog: result
           };
-          // TODO: the below code is commented out to handle next button disabled property.
-          // nextSectionSteps = [getMappingStates(), [{}]];
+
           nextSectionSteps = [getMappingStates()];
         }
         //Otherwise move to next section

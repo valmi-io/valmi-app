@@ -116,8 +116,9 @@ const SyncFlow = () => {
 
   const handleNext = () => {
     if (currentStep === syncFlowSteps.length - 1) {
-      //create or update sync
       setIsFetchingQuery(true);
+
+      //create or update sync
       let syncQuery = createSyncQuery;
       if (isEditableFlow) {
         syncQuery = updateSyncQuery;

@@ -5,7 +5,6 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { generateObjectHash } from '../../utils/lib';
 import {
   getDestinationIdKey,
   getMapping,
@@ -18,6 +17,8 @@ import {
 } from '../SyncFlow/Mapping/mappingManagement';
 import { HOUR, getSyncName } from '../SyncFlow/Schedule/scheduleManagement';
 import { getSchedule } from '../SyncFlow/Schedule/scheduleManagement';
+
+import sha256 from 'crypto-js/sha256';
 
 export const generateSyncPayload = (flowState, workspaceId) => {
   const { isEditableFlow = false, extra = null } = flowState;
@@ -45,8 +46,20 @@ const generateUIState = (flowState) => {
     steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
     sourceCatalog: flowState.sourceCatalog,
     destinationCatalog: flowState.destinationCatalog,
-    mapHash: generateObjectHash(generateFieldsMapping(flowState, {}, true))
+    originalMappingHash: generateMappingHash(
+      generateFieldsMapping(flowState, {}, true)
+    )
   };
+
+  // Storing existing destination mapping fields in uiState
+  // for comparing changes in mapping fields
+  if (flowState.isEditableFlow) {
+    uiState['destinationMapping'] = flowState.extra?.destination || {};
+    const existingMappingArr =
+      flowState.extra?.destination?.catalog.sinks[0].mapping;
+    uiState['modifiedMappingHash'] = generateMappingHash(existingMappingArr);
+  }
+
   return uiState;
 };
 
@@ -85,13 +98,13 @@ const generateFieldsMapping = (
 
   mapping.forEach((element) => {
     if (isElementFieldsMapped(element)) {
-      if (!isDestinationPayload) {
-        fieldsMapped[element.sourceField] = unknownType;
-      } else {
+      if (isDestinationPayload) {
         fieldsMapped.push({
           stream: element.sourceField,
           sink: element.destinationField
         });
+      } else {
+        fieldsMapped[element.sourceField] = unknownType;
       }
     }
   });
@@ -191,4 +204,26 @@ export const generateDestinationPayload = (flowState, isEditableFlow) => {
   };
 
   return destinationPayload;
+};
+
+const transformMappingArr = (mappingArr) => {
+  let transformedArr = [];
+
+  for (let i = 0; i < mappingArr.length; i++) {
+    const obj = {
+      sink: mappingArr[i].sink,
+      stream: mappingArr[i].stream
+    };
+    transformedArr.push(obj);
+  }
+
+  return transformedArr;
+};
+
+const generateMappingHash = (mappingArr) => {
+  const sortedJson = JSON.stringify(
+    transformMappingArr(mappingArr).sort((a, b) => a.sink.localeCompare(b.sink))
+  );
+
+  return sha256(sortedJson).toString();
 };

@@ -5,8 +5,6 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import sha256 from 'crypto-js/sha256';
-
 import { HOUR, MIN } from '../content/SyncFlow/Schedule/scheduleManagement';
 
 export const stringAvatar = (name: string) => {
@@ -85,7 +83,16 @@ export const splitNumberByCommas = (number) => {
   return number.toLocaleString();
 };
 
-export const generateObjectHash = (obj) => {
-  const jsonString = JSON.stringify(obj);
-  return sha256(jsonString).toString();
+const transformMappingArr = (mappingArr) => {
+  let transformedArr = [];
+
+  for (let i = 0; i < mappingArr.length; i++) {
+    const obj = {
+      sink: mappingArr[i].sink,
+      stream: mappingArr[i].stream
+    };
+    transformedArr.push(obj);
+  }
+
+  return transformedArr;
 };
