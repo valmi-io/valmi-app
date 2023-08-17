@@ -45,20 +45,8 @@ const generateUIState = (flowState) => {
   let uiState = {
     steps: flowState.steps.slice(flowState.isEditableFlow ? 0 : 2),
     sourceCatalog: flowState.sourceCatalog,
-    destinationCatalog: flowState.destinationCatalog,
-    originalMappingHash: generateMappingHash(
-      generateFieldsMapping(flowState, {}, true)
-    )
+    destinationCatalog: flowState.destinationCatalog
   };
-
-  // Storing existing destination mapping fields in uiState
-  // for comparing changes in mapping fields
-  if (flowState.isEditableFlow) {
-    uiState['destinationMapping'] = flowState.extra?.destination || {};
-    const existingMappingArr =
-      flowState.extra?.destination?.catalog.sinks[0].mapping;
-    uiState['modifiedMappingHash'] = generateMappingHash(existingMappingArr);
-  }
 
   return uiState;
 };
@@ -156,6 +144,9 @@ export const generateSourcePayload = (flowState, isEditableFlow) => {
           sync_mode: getSelectedSourceMode(flowState),
           destination_sync_mode: getSelectedDestinationMode(flowState),
           id_key: getSourceIdKey(flowState),
+          mapping_hash: generateMappingHash(
+            generateFieldsMapping(flowState, {}, true)
+          ),
           stream: {
             name,
             supported_sync_modes,
@@ -194,6 +185,9 @@ export const generateDestinationPayload = (flowState, isEditableFlow) => {
           mapping: sprucedMapping,
           template_fields: templateFields,
           destination_sync_mode: getSelectedDestinationMode(flowState),
+          mapping_hash: generateMappingHash(
+            generateFieldsMapping(flowState, {}, true)
+          ),
           destination_id: getDestinationIdKey(flowState),
           sink: destinationCatalog
         }
