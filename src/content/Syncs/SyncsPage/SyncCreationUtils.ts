@@ -9,14 +9,16 @@ import {
   getDestinationIdKey,
   getMapping,
   getSourceIdKey,
-  getTemplateMapping
-} from '../SyncFlow/Mapping/mappingManagement';
-import {
+  getTemplateMapping,
   getSelectedDestinationMode,
   getSelectedSourceMode
-} from '../SyncFlow/Mapping/mappingManagement';
-import { HOUR, getSyncName } from '../SyncFlow/Schedule/scheduleManagement';
-import { getSchedule } from '../SyncFlow/Schedule/scheduleManagement';
+} from '../../SyncFlow/Mapping/mappingManagement';
+
+import {
+  HOUR,
+  getSyncName,
+  getSchedule
+} from '../../SyncFlow/Schedule/scheduleManagement';
 
 import sha256 from 'crypto-js/sha256';
 

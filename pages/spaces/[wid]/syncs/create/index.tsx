@@ -40,7 +40,7 @@ import {
   useLazyAddSyncQuery,
   useLazyUpdateSyncQuery
 } from '@/store/api/apiSlice';
-import { generateSyncPayload } from '@/content/Syncs/SyncCreationUtils';
+import { generateSyncPayload } from '@/content/Syncs/SyncsPage/SyncCreationUtils';
 import PageLayout from '@/layouts/PageLayout';
 import Instructions from '../../../../../src/components/Instructions';
 import {
