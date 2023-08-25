@@ -61,6 +61,10 @@ export const isObject = (value) => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
+export const isObjectEmpty = (obj: Record<string, any>): boolean => {
+  return Object.keys(obj).length === 0;
+};
+
 export const connectorTypes = {
   SRC: 'SRC',
   DEST: 'DEST',
@@ -81,18 +85,4 @@ export const signOutUser = (authStorage, dispatch, router) => {
 
 export const splitNumberByCommas = (number) => {
   return number.toLocaleString();
-};
-
-const transformMappingArr = (mappingArr) => {
-  let transformedArr = [];
-
-  for (let i = 0; i < mappingArr.length; i++) {
-    const obj = {
-      sink: mappingArr[i].sink,
-      stream: mappingArr[i].stream
-    };
-    transformedArr.push(obj);
-  }
-
-  return transformedArr;
 };

@@ -24,16 +24,15 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import { useRouter } from 'next/router';
-
-import { RootState } from '../../store/reducers';
+import { RootState } from '../../../store/reducers';
+import { TABLE_COLUMN_SIZES } from '../../../utils/table-utils';
+import appIcons from '../../../utils/icon-utils';
+import { convertDurationToMinutesOrHours } from '../../../utils/lib';
 import {
   TableCellComponent,
   TableCellWithImage
-} from '../../components/Table/TableCellComponent';
-import { TABLE_COLUMN_SIZES, TableColumnProps } from '../../utils/table-utils';
-import { ImageSize } from '../../components/ImageComponent';
-import { convertDurationToMinutesOrHours } from '../../utils/lib';
-import appIcons from '../../utils/icon-utils';
+} from '../../../components/Table/TableCellComponent';
+import { ImageSize } from '../../../components/ImageComponent';
 
 const syncsColumns: TableColumnProps[] = [
   {
@@ -108,8 +107,8 @@ const SyncsTable = ({ syncs }) => {
     });
   };
 
-  const navigateToSyncRuns = (record) => {
-    router.push(`/spaces/${workspaceId}/syncs/${record.id}/runs`);
+  const navigateToSyncRuns = (sync) => {
+    router.push(`/spaces/${workspaceId}/syncs/${sync.id}/runs`);
   };
 
   const getConnectorName = (sync, connectionType) => {

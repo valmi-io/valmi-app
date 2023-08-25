@@ -31,5 +31,7 @@ export const traceBugsnag = () => {
 };
 
 export const sendErrorToBugsnag = (error: any) => {
-  Bugsnag.notify(error);
+  if (isBugsnagClientInitialized()) {
+    Bugsnag.notify(error);
+  }
 };

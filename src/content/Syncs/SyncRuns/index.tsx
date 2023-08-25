@@ -5,15 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Box,
-  Button,
-  Card,
-  Divider,
-  Switch,
-  Typography,
-  styled
-} from '@mui/material';
+import { Card, styled } from '@mui/material';
 import {
   useLazyAbortSyncRunByIdQuery,
   useLazyCreateNewSyncRunQuery,
@@ -32,6 +24,8 @@ import { SkeletonContainer } from '../../../components/Layouts/Layouts';
 import ListEmptyComponent from '../../../components/ListEmptyComponent';
 import ErrorContainer from '../../../components/Error/ErrorContainer';
 import {
+  generateStartSyncPayload,
+  generateStopSyncPayload,
   getCurrentSyncRun,
   getPageButtonTitle,
   hasRunningSyncs,
@@ -41,17 +35,11 @@ import AlertComponent from '../../../components/Alert';
 import PopoverComponent from '../../../components/Popover';
 import { getRouterPathname, isPublicSync } from '../../../utils/routes';
 import { sendErrorToBugsnag } from '../../../lib/bugsnag';
+import StartSyncPopoverComponent from './StartSyncPopoverComponent';
+import StopSyncPopoverComponent from './StopSyncPopoverComponent';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
-}));
-
-const StartSyncOptionsBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: theme.colors.alpha.black[5],
-  padding: theme.spacing(2)
 }));
 
 const SyncRuns = ({ syncId, workspaceId }: any) => {
@@ -70,16 +58,17 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   // Sync run abort query
   const [abortSyncRunQuery] = useLazyAbortSyncRunByIdQuery();
 
-  // states
+  // sync run states
   const [lastSync, setLastSync] = useState(new Date().toISOString());
 
-  const [displayError, setDisplayError] = useState(null);
+  const [traceError, setTraceError] = useState<any>(null);
   const [syncRuns, setSyncRuns] = useState([]);
 
   const [isQueryPending, setIsQueryPending] = useState(false);
   const [syncRunsFetchError, setSyncRunsFetchError] = useState(false);
 
   // alert dialog states
+
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
@@ -127,7 +116,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   }, [lastSync, syncId, router.isReady]);
 
   useEffect(() => {
-    // syncRuns data
+    // syncRuns callback data
     if (data) {
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -136,7 +125,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
         // send error to bugsnag
         sendErrorToBugsnag(traceError);
 
-        setDisplayError(traceError);
+        setTraceError(traceError);
       } else {
         setSyncRunsFetchError(false);
         setSyncRuns(data);
@@ -153,12 +142,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     }
   }, [isError]);
 
-  // sync run on Click handler
-  const toggleSyncRun = (event: React.MouseEvent<HTMLButtonElement>) => {
-    openPopover(event);
-  };
-
-  // stop sync run handler
+  // sync run stop handler
   const stopSyncRun = () => {
     closePopover();
 
@@ -169,11 +153,8 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     const syncId = currentSyncRun.sync_id;
     const runId = currentSyncRun.run_id;
 
-    const payload = {
-      workspaceId: workspaceId,
-      syncId: syncId,
-      runId: runId
-    };
+    // generate stop sync run payload
+    const payload = generateStopSyncPayload(workspaceId, syncId, runId);
 
     // query to stop the sync
     const query = abortSyncRunQuery;
@@ -201,24 +182,21 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     );
   };
 
-  // start sync run handler
+  // sync run start handler
   const startSyncRun = () => {
     // close popover
     closePopover();
 
     setIsQueryPending(true);
-    const payload = {
-      workspaceId: workspaceId,
-      syncId: syncId,
-      config: {
-        full_refresh: fullRefresh
-      }
-    };
+
+    // generate start sync run payload
+    const payload = generateStartSyncPayload(workspaceId, syncId, fullRefresh);
 
     // query to start the sync
     const query = createNewSyncRunQuery;
 
     let isErrorAlert = false;
+
     syncRunNetworkHandler(
       query,
       payload,
@@ -253,7 +231,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // popover onCloseHandler
+  // Popover close handler
   const closePopover = (): void => {
     setAnchorEl(null);
   };
@@ -265,8 +243,8 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     setAlertMessage(message);
   };
 
-  // alert dialog onCloseHandler
-  const handleClose = () => {
+  // close Alert Dialog
+  const closeAlertDialog = () => {
     setAlertMessage('');
     showAlertDialog(false);
   };
@@ -280,80 +258,43 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     setFullRefresh(val);
   };
 
-  const displayStopSyncPopoverContent = () => {
-    return (
-      <>
-        <Box sx={{ padding: (theme) => theme.spacing(3) }}>
-          <Typography variant="body1">
-            This sync is currently in progress. Do you want to stop it?
-          </Typography>
-        </Box>
-        <Divider />
-
-        <Box sx={{ m: 1, display: 'flex' }}>
-          <Button color="primary" fullWidth onClick={closePopover}>
-            <Typography variant="body1">NO</Typography>
-          </Button>
-          <Button color="primary" fullWidth onClick={stopSyncRun}>
-            <Typography variant="body1">
-              {getPageButtonTitle(
-                isPublicSync(getRouterPathname(query, url)),
-                syncRuns,
-                isQueryPending
-              )}
-            </Typography>
-          </Button>
-        </Box>
-      </>
-    );
-  };
-
-  const displayStartSyncPopoverContent = () => {
-    return (
-      <>
-        <StartSyncOptionsBox>
-          <Box>
-            <Switch
-              disabled={false}
-              size="medium"
-              checked={fullRefresh}
-              onChange={(event, checked) => {
-                handleSwitchOnChange(event, checked);
-              }}
-            />
-          </Box>
-          <Typography variant="body2">full_refresh</Typography>
-        </StartSyncOptionsBox>
-        <Divider />
-
-        <Box sx={{ m: 1 }}>
-          <Button color="primary" fullWidth onClick={startSyncRun}>
-            <Typography variant="body1">
-              {getPageButtonTitle(
-                isPublicSync(getRouterPathname(query, url)),
-                syncRuns,
-                isQueryPending
-              )}
-            </Typography>
-          </Button>
-        </Box>
-      </>
-    );
-  };
-
   // Popover content
-  const displayPopoverContent = () => {
-    return hasRunningSyncs(syncRuns)
-      ? displayStopSyncPopoverContent()
-      : displayStartSyncPopoverContent();
+  const displayPopoverComponent = () => {
+    if (hasRunningSyncs(syncRuns)) {
+      return (
+        <StopSyncPopoverComponent
+          closePopover={closePopover}
+          isQueryPending={isQueryPending}
+          query={query}
+          stopSyncRun={stopSyncRun}
+          syncRuns={syncRuns}
+          url={url}
+        />
+      );
+    }
+
+    return (
+      <StartSyncPopoverComponent
+        fullRefresh={fullRefresh}
+        handleSwitchOnChange={(event, checked) =>
+          handleSwitchOnChange(event, checked)
+        }
+        isQueryPending={isQueryPending}
+        query={query}
+        url={url}
+        startSyncRun={startSyncRun}
+        syncRuns={syncRuns}
+      />
+    );
   };
 
   // Page content
   const displayContent = () => {
     if (syncRuns.length > 0) {
-      return <SyncRunsTable syncRunsData={syncRuns} />;
+      // Display Syncruns table
+      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} />;
     }
-    // empty component
+    // Display empty component
     return <ListEmptyComponent description={'No runs found in this sync'} />;
   };
 
@@ -368,38 +309,43 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
           isQueryPending
         )}
         disabled={isQueryPending}
-        onClick={toggleSyncRun}
+        onClick={openPopover}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
         linkurl={process.env.PUBLIC_SYNC_URL}
         isFetching={isQueryPending}
         displayStartIcon={false}
       />
+
       <AlertComponent
         open={alertDialog}
-        onClose={handleClose}
+        onClose={closeAlertDialog}
         message={alertMessage}
         isError={isErrorAlert}
       />
 
-      {/** Start Sync - Options */}
+      {/** Start Sync - Popover components */}
 
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} handleClose={closePopover}>
-          {displayPopoverContent()}
+          {displayPopoverComponent()}
         </PopoverComponent>
       )}
 
       <CustomizedCard variant="outlined">
-        {/** Displaying Errors */}
+        {/** Display Errors */}
         {isError && <ErrorContainer error={error} />}
-        {/** Displaying Trace Error */}
-        {displayError && <ErrorStatusText>{displayError}</ErrorStatusText>}
 
+        {/** Display Trace Error */}
+        {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+        {/** Display Skeleton */}
         {isLoading && (
           <SkeletonContainer>
             <SkeletonLoader />
           </SkeletonContainer>
         )}
+
+        {/** Display Content */}
         {!isError && !isLoading && displayContent()}
       </CustomizedCard>
     </>

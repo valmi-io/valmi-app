@@ -33,7 +33,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   const dispatch = useDispatch();
 
-  const [displayError, setDisplayError] = useState(null);
+  const [traceError, setTraceError] = useState<any>(null);
   const [syncDetails, setSyncDetails] = useState(null);
 
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
@@ -71,7 +71,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
     if (data) {
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
-        setDisplayError(traceError);
+        setTraceError(traceError);
       } else {
         setSyncDetails(data);
       }
@@ -120,10 +120,11 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   return (
     <Card variant="outlined">
-      {/** Displaying Errors */}
+      {/** Display Errors */}
       {isError && <ErrorComponent error={error} />}
-      {/** Displaying Trace Error */}
-      {displayError && <ErrorStatusText>{displayError}</ErrorStatusText>}
+
+      {/** Display Trace Error */}
+      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
       {isFetching && (
         <SkeletonContainer>

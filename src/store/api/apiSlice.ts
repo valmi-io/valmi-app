@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Wednesday, May 31st 2023, 5:40:42 pm
@@ -52,6 +53,7 @@ export const apiSlice = createApi({
         url: '/spaces/'
       })
     }),
+
     signupUser: builder.query({
       // The URL for the request is '/api/v1/users/'
       query: (arg) => {
@@ -62,6 +64,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     activateUser: builder.query({
       // The URL for the request is '/api/v1/users/activation/'
       query: (arg) => {
@@ -72,6 +75,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     resendActivationToken: builder.query({
       // The URL for the request is '/api/v1/users/resend_activation/'
       query: (arg) => {
@@ -82,6 +86,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     loginAndFetchWorkSpaces: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const user = await baseQuery({
@@ -122,6 +127,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     fetchConnectors: builder.query({
       // The URL for the request is '/api/v1/connectors'
       query: () => {
@@ -261,6 +267,7 @@ export const apiSlice = createApi({
         return result.data ? { data: result.data } : { error: result.error };
       }
     }),
+
     fetchSyncs: builder.query({
       // The URL for the request is '/api/v1/syncs'
       query: (arg) => {
@@ -270,6 +277,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     toggleSync: builder.query({
       query: (arg) => {
         const { workspaceId, enable, config } = arg;
@@ -285,6 +293,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     getSyncById: builder.query({
       query: (arg) => {
         const { workspaceId, syncId } = arg;
@@ -293,6 +302,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     getSyncRunsById: builder.query({
       query: (arg) => {
         const { workspaceId, syncId, before, limit } = arg;
@@ -303,6 +313,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     createNewSyncRun: builder.query({
       query: (arg) => {
         const { workspaceId, syncId, config } = arg;
@@ -314,6 +325,7 @@ export const apiSlice = createApi({
         };
       }
     }),
+
     abortSyncRunById: builder.query({
       query: (arg) => {
         const { workspaceId, syncId, runId } = arg;
@@ -322,6 +334,25 @@ export const apiSlice = createApi({
         return {
           url,
           method: 'POST'
+        };
+      }
+    }),
+
+    getSyncRunLogsById: builder.query({
+      query: (arg) => {
+        const {workspaceId, syncId, runId, collector, since=null, before=null} = arg;
+
+        let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?collector=${collector}`
+         
+        if(since) {
+          url = url + `&since=${since}`
+        }
+        if(before) {
+          url = url + `&before=${before}`
+        }
+        
+        return {
+          url: url
         };
       }
     })
@@ -348,5 +379,6 @@ export const {
   useLazyGetSyncByIdQuery,
   useGetSyncByIdQuery,
   useLazyCreateNewSyncRunQuery,
-  useLazyAbortSyncRunByIdQuery
+  useLazyAbortSyncRunByIdQuery,
+  useLazyGetSyncRunLogsByIdQuery
 } = apiSlice;

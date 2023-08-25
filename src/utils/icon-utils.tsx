@@ -25,7 +25,9 @@ const appIcons = {
   SCHEDULE: <FontAwesomeIcon className="fas fa-calendar" />,
   ARROW_RIGHT: <FontAwesomeIcon className="fas fa-arrow-right" />,
   EDIT: <FontAwesomeIcon className="fa-solid fa-pen" />,
-  UPLOAD: <FontAwesomeIcon className="fa-solid fa-upload" />
+  UPLOAD: <FontAwesomeIcon className="fa-solid fa-upload" />,
+  TIME: <FontAwesomeIcon className="fa-solid fa-clock" />,
+  MESSAGE: <FontAwesomeIcon className="fa-solid fa-message" />
 };
 
 export default appIcons;

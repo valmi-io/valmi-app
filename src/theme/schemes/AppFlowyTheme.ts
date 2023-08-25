@@ -8,14 +8,12 @@
 import { alpha, createTheme, lighten, darken } from '@mui/material';
 import '@mui/lab/themeAugmentation';
 
-// import i18n from 'src/i18n/i18n';
-
 const primaryColor = '#19bc9b';
 const secondaryColor = '#F88A4E';
 const successColor = '#66cf80';
 const warningColor = '#ffd667';
 const errorColor = '#fb006d';
-const blackColor = '#202020';
+export const blackColor = '#202020';
 const whiteColor = '#FFFFFF';
 
 const _lightBg1 = whiteColor; //'#f7f8fc';
@@ -151,7 +149,6 @@ const colors = {
 };
 
 export const AppFlowyTheme = createTheme({
-  // direction: i18n.dir(),
   colors: {
     gradients: {
       blue1: colors.gradients.blue1,
@@ -352,11 +349,9 @@ export const AppFlowyTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundColor: alpha(darken(themeColors.primaryAlt, 0.4), 0.2),
-          //backdropFilter: 'blur(2px)',
 
           '&.MuiBackdrop-invisible': {
             backgroundColor: 'transparent'
-            //backdropFilter: 'blur(2px)'
           }
         }
       }

@@ -48,14 +48,15 @@ const Connections = ({ connection_type }: any) => {
 
   const [connectionsLoading, setConnectionsLoading] = useState<boolean>(true);
   const [connections, setConnections] = useState<any>([]);
-  const [displayError, setDisplayError] = useState(null);
+
+  const [traceError, setTraceError] = useState<any>(null);
 
   useEffect(() => {
     if (data && data.resultData) {
       // checking if data has any trace errors.
       if (hasErrorsInData(data.resultData)) {
         const traceError = getErrorsInData(data.resultData);
-        setDisplayError(traceError);
+        setTraceError(traceError);
       } else {
         filterConnections(data.resultData, connection_type);
       }
@@ -84,6 +85,9 @@ const Connections = ({ connection_type }: any) => {
       );
     }
 
+    {
+      /** Display empty component */
+    }
     return (
       <ListEmptyComponent
         description={'No connections found in this workspace'}
@@ -93,16 +97,20 @@ const Connections = ({ connection_type }: any) => {
 
   return (
     <Card>
-      {/** Displaying Errors */}
+      {/** Display Errors */}
       {isError && <ErrorContainer error={error?.errorData} />}
-      {/** Displaying Trace Error */}
-      {displayError && <ErrorStatusText>{displayError}</ErrorStatusText>}
 
+      {/** Display Trace Error */}
+      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+      {/** Display Skeleton */}
       {isFetching && (
         <SkeletonContainer>
           <SkeletonLoader />
         </SkeletonContainer>
       )}
+
+      {/** Display Content */}
       {!isError && !isFetching && connections && displayContent()}
     </Card>
   );

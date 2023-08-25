@@ -16,7 +16,7 @@ import { NextPageWithLayout } from '../../../_app';
 
 import SidebarLayout from '@/layouts/SidebarLayout';
 import { RootState } from '@/store/reducers';
-import Syncs from '@/content/Syncs';
+import Syncs from '@/content/Syncs/SyncsPage';
 import PageLayout from '@/layouts/PageLayout';
 import { initialiseFlowState } from '../../../../src/content/SyncFlow/stateManagement';
 import { AppDispatch } from '../../../../src/store/store';

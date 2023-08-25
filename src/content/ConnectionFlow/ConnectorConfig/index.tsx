@@ -35,8 +35,6 @@ import Instructions from '../../../components/Instructions';
 import { getOAuthParams } from '../../../../pages/auth/callback';
 import { generateConfigFromSpec } from '../../../utils/connection-utils';
 
-import mockJson from './mock.json';
-
 const Layout = styled(Box)(({}) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -89,7 +87,7 @@ const ConnectorConfig = ({
 
   const fileInputRef = useRef(null);
 
-  const [displayError, setDisplayError] = useState(null);
+  const [traceError, setTraceError] = useState<any>(null);
 
   {
     /* query for connector configuration */
@@ -119,9 +117,8 @@ const ConnectorConfig = ({
   useEffect(() => {
     if (data) {
       if (hasErrorsInData(data)) {
-        // TODO: Handle TRACE error
         const traceError = getErrorsInData(data);
-        setDisplayError(traceError);
+        setTraceError(traceError);
       } else {
         // saving connector spec in store
         dispatch(
@@ -246,16 +243,20 @@ const ConnectorConfig = ({
         selected_connector ? selected_connector.display_name : 'connector'
       }`}
     >
-      {/** Displaying Errors */}
+      {/** Display Errors */}
       {isError && <ErrorComponent error={error} />}
-      {/** Displaying Trace Error */}
-      {displayError && <ErrorStatusText>{displayError}</ErrorStatusText>}
 
+      {/** Display Trace Error */}
+      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+      {/** Display Skeleton */}
       {isFetching && (
         <SkeletonContainer>
           <SkeletonLoader />
         </SkeletonContainer>
       )}
+
+      {/** Display Content */}
       {!isFetching && data && (
         <Layout>
           {/* display fields */}

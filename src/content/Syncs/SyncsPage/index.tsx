@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Thursday, May 25th 2023, 11:19:04 am
@@ -10,21 +11,21 @@ import { useEffect, useState } from 'react';
 import { Card } from '@mui/material';
 
 import { useSelector } from 'react-redux';
-import { useFetchSyncsQuery } from '../../store/api/apiSlice';
-import { RootState } from '../../store/reducers';
+import { useFetchSyncsQuery } from '../../../store/api/apiSlice';
+import { RootState } from '../../../store/reducers';
 import SyncsTable from './SyncsTable';
-import { ErrorStatusText } from '../../components/Error';
+import { ErrorStatusText } from '../../../components/Error';
 import {
   getErrorsInData,
   hasErrorsInData
-} from '../../components/Error/ErrorUtils';
-import SkeletonLoader from '../../components/SkeletonLoader';
-import { SkeletonContainer } from '../../components/Layouts/Layouts';
+} from '../../../components/Error/ErrorUtils';
+import SkeletonLoader from '../../../components/SkeletonLoader';
+import { SkeletonContainer } from '../../../components/Layouts/Layouts';
 
-import ListEmptyComponent from '../../components/ListEmptyComponent';
-import ErrorContainer from '../../components/Error/ErrorContainer';
+import ListEmptyComponent from '../../../components/ListEmptyComponent';
+import ErrorContainer from '../../../components/Error/ErrorContainer';
 
-import { sendErrorToBugsnag } from '../../lib/bugsnag';
+import { sendErrorToBugsnag } from '../../../lib/bugsnag';
 
 const Syncs = () => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);
@@ -39,33 +40,41 @@ const Syncs = () => {
   );
 
   const [syncsData, setSyncsData] = useState(null);
-  const [displayError, setDisplayError] = useState(null);
 
+  const [traceError, setTraceError] = useState<any>(null);
+
+  // This useEffect will handle data
   useEffect(() => {
     if (data) {
+      // Fetch trace errors in the data.
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
-        // sending error to Bugsnag
+        // send error to Bugsnag
         sendErrorToBugsnag(traceError);
 
-        setDisplayError(traceError);
+        setTraceError(traceError);
       } else {
         setSyncsData(data);
       }
     }
   }, [data]);
 
+  // This useEffect will handle errors.
   useEffect(() => {
     if (isError) {
-      // sending error to Bugsnag
+      // send error to Bugsnag
       sendErrorToBugsnag(error);
     }
   }, [isError]);
 
+  // Page content
   const displayContent = () => {
     if (syncsData.length > 0) {
+      // Display Syncs table.
       return <SyncsTable syncs={syncsData} />;
     }
+
+    // Display empty component
     return (
       <ListEmptyComponent description={'No syncs found in this workspace'} />
     );
@@ -73,16 +82,20 @@ const Syncs = () => {
 
   return (
     <Card variant="outlined">
-      {/** Displaying Errors */}
+      {/** Display Errors */}
       {isError && <ErrorContainer error={error} />}
-      {/** Displaying Trace Error */}
-      {displayError && <ErrorStatusText>{displayError}</ErrorStatusText>}
 
+      {/** Display Trace Error */}
+      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+      {/** Display Skeleton */}
       {isFetching && (
         <SkeletonContainer>
           <SkeletonLoader />
         </SkeletonContainer>
       )}
+
+      {/** Display Content */}
       {!isError && !isFetching && syncsData && displayContent()}
     </Card>
   );

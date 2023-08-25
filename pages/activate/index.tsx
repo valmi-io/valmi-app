@@ -21,6 +21,7 @@ import {
 } from '../../src/components/Error/ErrorUtils';
 import { AppDispatch } from '../../src/store/store';
 import { setAppState } from '../../src/store/reducers/appFlow';
+import { isObjectEmpty } from '../../src/utils/lib';
 
 const ActivatePage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -71,7 +72,7 @@ const ActivatePage: NextPageWithLayout = () => {
 
   const hasLoginFlowState = (appState: any) => {
     const { loginFlowState = {} } = appState;
-    if (Object.keys(loginFlowState).length < 1) return false;
+    if (isObjectEmpty(loginFlowState)) return false;
     return true;
   };
 

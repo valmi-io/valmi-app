@@ -7,6 +7,7 @@
 
 import {
   Box,
+  Button,
   Chip,
   Icon,
   IconButton,
@@ -43,9 +44,15 @@ import {
   splitNumberByCommas
 } from '../../../utils/lib';
 import appIcons, { AppIconARROW_RIGHT } from '../../../utils/icon-utils';
+import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/reducers';
+
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
+  syncId: string;
 };
 
 const syncRunColumns: TableColumnProps[] = [
@@ -84,7 +91,13 @@ const MetricChip = styled(Chip)(({ theme }) => ({
   backgroundColor: 'lightgray'
 }));
 
-const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
+const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
+  const router = useRouter();
+
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { workspaceId = '' } = appState;
+
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');
 
@@ -134,7 +147,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   };
 
   const displayConnectionMetrics = (syncRun, connection) => {
-    // get connection status
+    // Get connection status
     let connectionStatus = getConnectionStatus(syncRun, connection);
 
     if (connectionStatus === 'scheduled' || connectionStatus === 'running') {
@@ -149,20 +162,37 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
     }
 
     return (
-      <Stack spacing={0.5}>
+      <Stack spacing={1}>
+        {/** Connection status stack */}
         <Stack spacing={0.5} direction="row" alignItems="center">
+          {/** Display connnection status */}
           <Typography variant="body2">
             {capitalizeFirstLetter(connectionStatus)}
           </Typography>
 
+          {/** Display error icon if connection status is failed */}
           {connectionStatus === 'failed' &&
             getStatusIconComponent(connectionStatus, '', () =>
               displayError(syncRun, connection)
             )}
 
+          {/** Display success icon if connection status is success */}
           {connectionStatus === 'success' &&
             getStatusIconComponent(connectionStatus, '', () => {})}
+
+          {/** Display Log button */}
+          <Button
+            sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
+            startIcon={<LogoutOutlinedIcon />}
+            variant="outlined"
+            size="small"
+            onClick={() => navigateToSyncRunLogs(syncRun, connection)}
+          >
+            Logs
+          </Button>
         </Stack>
+
+        {/** Connection metrics stack */}
         <Stack spacing={1} direction="row" alignItems="center">
           {getConnectionMetrics(syncRun, connection).length > 0
             ? getConnectionMetrics(syncRun, connection).map(
@@ -194,23 +224,24 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
     /** Sync Run Status */
   }
   const displayRunStatus = (syncRun) => {
-    let status = getRunStatus(syncRun);
+    // Get sync runstatus
+    let runStatus = getRunStatus(syncRun);
 
     return (
       <Stack spacing={0.5} direction="row" alignItems="center">
         <ChipComponent
-          label={status}
+          label={runStatus}
           color={
-            status === 'failed'
+            runStatus === 'failed'
               ? 'error'
-              : status === 'success'
+              : runStatus === 'success'
               ? 'primary'
               : 'secondary'
           }
         />
 
-        {status === 'failed' &&
-          getStatusIconComponent(status, 'Show Error', () =>
+        {runStatus === 'failed' &&
+          getStatusIconComponent(runStatus, 'Show Error', () =>
             displayError(syncRun)
           )}
       </Stack>
@@ -221,6 +252,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
     /** Sync Started_at */
   }
   const displayRunStartedAt = (syncRun) => {
+    // Convert UTC date to Local date
     const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
 
     const runStartedAtDisplay =
@@ -238,6 +270,7 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
   }
 
   const displayRunTime = (syncRun) => {
+    // Convert UTC date to Local date
     const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
 
     let runEndAt = null;
@@ -263,6 +296,13 @@ const SyncRunsTable = ({ syncRunsData }: SyncRunsTableProps) => {
 
   const handleClose = () => {
     showErrorDialog(false);
+  };
+
+  const navigateToSyncRunLogs = (syncRun, connection) => {
+    router.push({
+      pathname: `/spaces/${workspaceId}/syncs/${syncId}/runs/${syncRun.run_id}/logs`,
+      query: { connection_type: connection }
+    });
   };
 
   return (

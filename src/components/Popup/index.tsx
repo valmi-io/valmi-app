@@ -7,18 +7,24 @@
 import * as React from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
+import { blackColor } from '../../theme/schemes/AppFlowyTheme';
 
-const Popup = (props: any) => {
-  const { onClose, selectedValue, open, data } = props;
+type PopupProps = {
+  open: boolean;
+  data?: any;
+  title?: string;
+  onClose: () => void;
+  children: React.ReactNode;
+};
 
-  const handleClose = () => {
-    onClose(selectedValue);
-  };
+const Popup = (props: PopupProps) => {
+  const { open, onClose, title, data, children } = props;
 
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>Run data</DialogTitle>
-      <code>{JSON.stringify(data, null, 4)}</code>
+    <Dialog onClose={onClose} open={open}>
+      {title && <DialogTitle>{title}</DialogTitle>}
+      <code style={{ color: blackColor }}>{JSON.stringify(data, null, 4)}</code>
+      {children}
     </Dialog>
   );
 };

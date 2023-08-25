@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { checkIfPropExistsInObject } from '../../../utils/lib';
+import { checkIfPropExistsInObject, isObjectEmpty } from '../../../utils/lib';
 import { getStepsInSyncFlow } from '../stateManagement';
 
 export const getStep = (flowState) => {
@@ -440,7 +440,7 @@ export const showTemplatedMappings = (flowState, destinationMode) => {
     if (
       selectedMode &&
       selectedMode.template_fields &&
-      Object.keys(selectedMode.template_fields).length > 0
+      !isObjectEmpty(selectedMode.template_fields)
     )
       return true;
 
@@ -462,7 +462,7 @@ export const getTemplatedMappingFields = (flowState, destinationMode) => {
 };
 
 export const processTemplatedMappingFields = (templatedFields) => {
-  const templatedFieldsArr = Object.keys(templatedFields).length
+  const templatedFieldsArr = !isObjectEmpty(templatedFields)
     ? Object.keys(templatedFields).map((key) => {
         const name = key;
         const label = templatedFields[key].label

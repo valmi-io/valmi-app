@@ -5,7 +5,7 @@
  */
 
 import { createNewField } from '../../../utils/form-utils';
-import { getConnectorImage } from '../../../utils/lib';
+import { getConnectorImage, isObjectEmpty } from '../../../utils/lib';
 
 export const processFields = (data: any) => {
   const {
@@ -16,7 +16,7 @@ export const processFields = (data: any) => {
     } = {}
   } = data || {};
 
-  const fieldsArr = Object.keys(properties).length
+  const fieldsArr = !isObjectEmpty(properties)
     ? Object.keys(properties).map((key) => {
         const name = key;
         const label = properties[key].title ? properties[key].title : key;
@@ -29,7 +29,7 @@ export const processFields = (data: any) => {
         const enumValue = properties[key].enum || null;
         const isOAuth =
           label.startsWith('Authentication') &&
-          Object.keys(authSpecification).length > 0;
+          !isObjectEmpty(authSpecification);
 
         const oAuthProvider = !authProvider.trim() ? 'provider' : authProvider;
         const isRequired = required.includes(key);
@@ -94,12 +94,12 @@ export const getConnectorDocumentationUrl = (data: any) => {
 
 export const isConnectorRequiresOAuth = (data: any) => {
   const { spec: { authSpecification = {} } = {} } = data || {};
-  if (Object.keys(authSpecification).length > 0) return true;
+  if (!isObjectEmpty(authSpecification)) return true;
   return false;
 };
 
 export const hasAuthorizedOAuth = (oAuthParams: any) => {
-  return Object.keys(oAuthParams).length > 0 ? true : false;
+  return !isObjectEmpty(oAuthParams) ? true : false;
 };
 
 const getFieldType = ({ hasOAuth, enumFlag, isSecretKey, type }: any) => {

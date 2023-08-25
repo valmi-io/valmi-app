@@ -144,3 +144,31 @@ export const getPageButtonTitle = (isPublicSync, syncRuns, isQueryPending) => {
     ? 'STARTING...'
     : 'START SYNC';
 };
+
+export const generateStartSyncPayload = (
+  workspaceId = '',
+  syncId = '',
+  fullRefresh = false
+) => {
+  const payload = {
+    workspaceId: workspaceId,
+    syncId: syncId,
+    config: {
+      full_refresh: fullRefresh
+    }
+  };
+  return payload;
+};
+
+export const generateStopSyncPayload = (
+  workspaceId = '',
+  syncId = '',
+  runId = ''
+) => {
+  const payload = {
+    workspaceId: workspaceId,
+    syncId: syncId,
+    runId: runId
+  };
+  return payload;
+};

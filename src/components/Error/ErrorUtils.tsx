@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { checkIfPropExistsInObject } from '../../utils/lib';
+import { checkIfPropExistsInObject, isObjectEmpty } from '../../utils/lib';
 
 export const hasErrorsInData = (data: any) => {
   // checking if data has any trace errors.
@@ -64,8 +64,8 @@ const extractErrorFromDataObject = (data: any): any => {
     } else if ('message' in data) {
       return extractErrorFromDataObject(data['message']);
     } else {
-      const keys = Object.keys(data);
-      if (keys.length > 0) {
+      if (!isObjectEmpty(data)) {
+        const keys = Object.keys(data);
         const firstKey = keys[0];
         return extractErrorFromDataObject(data[firstKey]);
       }
