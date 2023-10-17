@@ -4,19 +4,23 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
 import { useEffect, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import axios from 'axios';
+
 import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
+
 import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import { setConnectionFlow } from '../../../store/reducers/connectionFlow';
+} from '@components/Error/ErrorUtils';
 
-import axios from 'axios';
+import { RootState } from '@store/reducers';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 const Item = styled(Box)(({}) => ({
   display: 'flex',

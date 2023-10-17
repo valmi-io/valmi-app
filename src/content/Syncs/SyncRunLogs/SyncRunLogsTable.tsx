@@ -5,8 +5,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { useState } from 'react';
+
 import {
-  Box,
   Button,
   Icon,
   Stack,
@@ -19,17 +20,18 @@ import {
   Typography,
   styled
 } from '@mui/material';
-import { TABLE_COLUMN_SIZES } from '../../../utils/table-utils';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+
 import {
   SyncRunLogsTableProps,
   TableColumnProps,
   getMessageTimestamp,
   syncRunLogColumns
-} from './SyncRunLogsUtils';
-import { useState } from 'react';
+} from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import Popup from '../../../components/Popup';
+import Popup from '@components/Popup';
+
+import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 
 const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {

@@ -7,7 +7,8 @@
 import React from 'react';
 
 import { Theme } from '@mui/material';
-import { AppFlowyTheme } from './schemes/AppFlowyTheme';
+
+import { AppFlowyTheme } from '@theme/schemes/AppFlowyTheme';
 
 export function themeCreator(theme: string): Theme {
   return themeMap[theme];

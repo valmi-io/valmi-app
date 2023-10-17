@@ -6,7 +6,8 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { isPublicSync, publicRoutes } from './src/utils/routes';
+
+import { isPublicSync, publicRoutes } from '@utils/routes';
 
 export function middleware(request: NextRequest) {
   let cookie = request.cookies.get('AUTH')?.value;

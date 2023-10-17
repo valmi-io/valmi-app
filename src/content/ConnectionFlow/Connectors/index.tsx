@@ -10,13 +10,17 @@ import { useSelector } from 'react-redux';
 
 import { Box } from '@mui/material';
 
-import ConnectorsList from './ConnectorsList';
-import { RootState } from '../../../store/reducers';
-import { useFetchConnectorsQuery } from '../../../store/api/apiSlice';
-import ConnectorLayout from '../../../layouts/ConnectorLayout';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import constants from '../../../constants';
-import ErrorComponent from '../../../components/Error';
+import ConnectorLayout from '@layouts/ConnectorLayout';
+
+import ConnectorsList from '@content/ConnectionFlow/Connectors/ConnectorsList';
+
+import SkeletonLoader from '@components/SkeletonLoader';
+import ErrorComponent from '@components/Error';
+
+import { RootState } from '@store/reducers';
+import { useFetchConnectorsQuery } from '@store/api/apiSlice';
+
+import constants from '@constants/index';
 
 const Connectors = () => {
   const flowState = useSelector(

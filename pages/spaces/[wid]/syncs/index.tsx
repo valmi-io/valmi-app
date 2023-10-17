@@ -4,22 +4,29 @@
  * Author: Nagendra S @ valmi.io
  */
 
+/*
+ * SyncsPage Component
+ * This component represents a page for displaying syncs and creating new syncs.
+ */
+
 import { ReactElement, useEffect } from 'react';
+
 import { Grid } from '@mui/material';
 
 import { useRouter } from 'next/router';
+
 import { useDispatch, useSelector } from 'react-redux';
 
-import Bugsnag from '@bugsnag/js';
+import { NextPageWithLayout } from '@/pages_app';
 
-import { NextPageWithLayout } from '../../../_app';
+import PageLayout from '@layouts/PageLayout';
+import SidebarLayout from '@layouts/SidebarLayout';
 
-import SidebarLayout from '@/layouts/SidebarLayout';
-import { RootState } from '@/store/reducers';
-import Syncs from '@/content/Syncs/SyncsPage';
-import PageLayout from '@/layouts/PageLayout';
-import { initialiseFlowState } from '../../../../src/content/SyncFlow/stateManagement';
-import { AppDispatch } from '../../../../src/store/store';
+import Syncs from '@content/Syncs/SyncsPage';
+import { initialiseFlowState } from '@content/SyncFlow/stateManagement';
+
+import { RootState } from '@store/reducers';
+import { AppDispatch } from '@store/store';
 
 const SyncsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -32,7 +39,7 @@ const SyncsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateSyncClick = () => {
+  const handleCreateSyncOnClick = () => {
     router.push(`/spaces/${workspaceId}/syncs/create`);
   };
 
@@ -46,7 +53,7 @@ const SyncsPage: NextPageWithLayout = () => {
       pageHeadTitle="Syncs"
       title="Syncs"
       buttonTitle="Sync"
-      handleButtonOnClick={handleCreateSyncClick}
+      handleButtonOnClick={handleCreateSyncOnClick}
     >
       <Grid
         container
@@ -56,7 +63,8 @@ const SyncsPage: NextPageWithLayout = () => {
         spacing={3}
       >
         <Grid item xs={12}>
-          <Syncs />
+          {/* Embed the Syncs component to display sync data */}
+          <Syncs workspaceId={workspaceId} />
         </Grid>
       </Grid>
     </PageLayout>

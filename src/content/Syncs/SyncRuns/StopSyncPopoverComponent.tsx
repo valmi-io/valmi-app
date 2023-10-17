@@ -4,16 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  Box,
-  Button,
-  Divider,
-  Switch,
-  Typography,
-  styled
-} from '@mui/material';
-import { getPageButtonTitle } from './SyncRunsUtils';
-import { getRouterPathname, isPublicSync } from '../../../utils/routes';
+import { Box, Button, Divider, Typography, styled } from '@mui/material';
+
+import { getRouterPathname, isPublicSync } from '@utils/routes';
+
+import { getPageButtonTitle } from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
 const StartSyncOptionsBox = styled(Box)(({ theme }) => ({
   display: 'flex',

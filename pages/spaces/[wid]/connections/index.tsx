@@ -9,12 +9,13 @@ import { ReactElement, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 
-import { NextPageWithLayout } from '../../../_app';
+import { NextPageWithLayout } from '@/pages_app';
 
-import Head from '@/components/PageHead';
+import SidebarLayout from '@layouts/SidebarLayout';
 
-import SidebarLayout from '@/layouts/SidebarLayout';
-import { RootState } from '@/store/reducers';
+import Head from '@components/PageHead';
+
+import { RootState } from '@store/reducers';
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();

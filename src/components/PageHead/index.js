@@ -9,8 +9,9 @@ import PropTypes from 'prop-types';
 
 import Head from 'next/head';
 
-import Meta from './Meta';
-import constants from '../../constants';
+import Meta from '@components/PageHead/Meta';
+
+import constants from '@constants/index';
 
 const propTypes = {
   title: PropTypes.string.isRequired

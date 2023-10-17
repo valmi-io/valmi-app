@@ -10,9 +10,6 @@ import { Box, MenuItem, Stack, styled } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyIcon from '@mui/icons-material/Key';
 
-import { RootState } from '../../../store/reducers';
-
-import { setFlowState } from '../../../store/reducers/syncFlow';
 import {
   getDestinationFields,
   getDestinationIdKey,
@@ -23,9 +20,13 @@ import {
   isDestinationIdMappingRequired,
   saveDestinationIdKey,
   saveSourceIdKey
-} from './mappingManagement';
-import SelectDropdown from '../../../components/SelectDropdown';
-import MappingCard from './MappingCard';
+} from '@content/SyncFlow/Mapping/mappingManagement';
+import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
+
+import SelectDropdown from '@components/SelectDropdown';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,

@@ -6,10 +6,15 @@
  */
 
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
-import { changeStepsArray, syncFlowStateMap } from '../stateManagement';
-import { setFlowState } from '../../../store/reducers/syncFlow';
-import { getMappingStates } from '../Mapping/mappingManagement';
+
+import {
+  changeStepsArray,
+  syncFlowStateMap
+} from '@content/SyncFlow/stateManagement';
+import { getMappingStates } from '@content/SyncFlow/Mapping/mappingManagement';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
 
 const Warehouse = () => {
   const dispatch = useDispatch();

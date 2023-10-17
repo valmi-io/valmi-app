@@ -5,11 +5,13 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { setFlowState } from '../../store/reducers/syncFlow';
-import { MappingState } from './Mapping/MappingState';
-import { ConnectionSelectionState } from './Warehouse/ConnectionSelectionState';
-import { DiscoverState } from './Warehouse/DiscoverState';
-import { getSchedule, getSyncName } from './Schedule/scheduleManagement';
+import { MappingState } from '@content/SyncFlow/Mapping/MappingState';
+import { ConnectionSelectionState } from '@content/SyncFlow/Warehouse/ConnectionSelectionState';
+import { DiscoverState } from '@content/SyncFlow/Warehouse/DiscoverState';
+import {
+  getSchedule,
+  getSyncName
+} from '@content/SyncFlow/Schedule/scheduleManagement';
 import {
   getDestinationIdKey,
   getSelectedDestinationMode,
@@ -22,9 +24,11 @@ import {
   isLastFieldMappedEmpty,
   isMappingStep,
   isThereAStepAhead
-} from './Mapping/mappingManagement';
+} from '@content/SyncFlow/Mapping/mappingManagement';
 
-export function initialiseFlowState(dispatch, flowState, isEditableFlow) {
+import { setFlowState } from '@store/reducers/syncFlow';
+
+export const initialiseFlowState = (dispatch, flowState, isEditableFlow) => {
   const warehouseSteps = [
     {
       refreshKey: 'key_' + Math.random(),
@@ -56,7 +60,7 @@ export function initialiseFlowState(dispatch, flowState, isEditableFlow) {
       })
     );
   }
-}
+};
 
 export const setCurrentStepInFlow = (dispatch, currentStep, flowState) => {
   let stepsCopy = getStepsInSyncFlow(flowState);

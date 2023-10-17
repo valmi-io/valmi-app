@@ -5,11 +5,13 @@
  */
 
 import { FC, ReactNode } from 'react';
+
 import { Box, useTheme } from '@mui/material';
+
 import PropTypes from 'prop-types';
 
-import Sidebar from './Sidebar';
-import Header from './Header';
+import Sidebar from '@layouts/SidebarLayout/Sidebar';
+import Header from '@layouts/SidebarLayout/Header';
 
 interface SidebarLayoutProps {
   children?: ReactNode;

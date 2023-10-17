@@ -7,6 +7,8 @@
 
 import { FC } from 'react';
 
+import { useRouter } from 'next/router';
+
 import {
   Table,
   TableBody,
@@ -22,28 +24,29 @@ import {
   styled
 } from '@mui/material';
 
-import { useRouter } from 'next/router';
-
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ConnectionModel } from './ConnectionModel';
-import { RootState } from '../../store/reducers';
-import { AppDispatch } from '../../store/store';
-import { setConnectionFlow } from '../../store/reducers/connectionFlow';
+import { ConnectionModel } from '@content/Connections/ConnectionModel';
+
 import {
   TableCellComponent,
   TableCellWithEditButton,
   TableCellWithImage
-} from '../../components/Table/TableCellComponent';
-import { TableColumnProps } from '../../utils/table-utils';
-import { ImageSize } from '../../components/ImageComponent';
-import appIcons from '../../utils/icon-utils';
-import { stringAvatar } from '../../utils/lib';
+} from '@components/Table/TableCellComponent';
+import { ImageSize } from '@components/ImageComponent';
+
+import { RootState } from '@store/reducers';
+import { AppDispatch } from '@store/store';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
+
+import { TableColumnProps } from '@utils/table-utils';
+import appIcons from '@utils/icon-utils';
+import { stringAvatar } from '@utils/lib';
 
 interface ConnectionsTableProps {
   className?: string;
   connections: ConnectionModel[];
-  connector_type: string;
+  connectionType: string;
 }
 
 const connectionColumns: TableColumnProps[] = [
@@ -60,7 +63,7 @@ const BoxLayout = styled(Box)(({}) => ({
 
 const ConnectionsTable: FC<ConnectionsTableProps> = ({
   connections,
-  connector_type
+  connectionType
 }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -77,18 +80,12 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
   const generateColumns = (columns: TableColumnProps[]) => {
     return columns.map((column) => {
       return (
-        <TableCell
-          key={column.id}
-          align={column.align}
-          // style={{
-          //   minWidth: column.minWidth
-          // }}
-        >
+        <TableCell key={column.id} align={column.align}>
           <Stack direction="row" alignItems="center">
             {column.icon && (
               <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>
                 {column.icon === 'CUSTOM'
-                  ? appIcons[connector_type]
+                  ? appIcons[connectionType]
                   : column.icon}
               </Icon>
             )}
@@ -109,7 +106,7 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
         connection_title: connection.name,
         isEditableFlow: true,
         selected_connector: {
-          type: connector_type + '_' + connection.type,
+          type: connectionType + '_' + connection.type,
           display_name: connection.display_name
         }
       })

@@ -5,6 +5,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import sha256 from 'crypto-js/sha256';
+
 import {
   getDestinationIdKey,
   getMapping,
@@ -12,15 +14,12 @@ import {
   getTemplateMapping,
   getSelectedDestinationMode,
   getSelectedSourceMode
-} from '../../SyncFlow/Mapping/mappingManagement';
-
+} from '@content/SyncFlow/Mapping/mappingManagement';
 import {
   HOUR,
   getSyncName,
   getSchedule
-} from '../../SyncFlow/Schedule/scheduleManagement';
-
-import sha256 from 'crypto-js/sha256';
+} from '@content/SyncFlow/Schedule/scheduleManagement';
 
 export const generateSyncPayload = (flowState, workspaceId) => {
   const { isEditableFlow = false, extra = null } = flowState;

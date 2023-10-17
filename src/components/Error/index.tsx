@@ -5,7 +5,8 @@
  */
 
 import { Typography, styled } from '@mui/material';
-import { getErrorsInErrorObject } from './ErrorUtils';
+
+import { getErrorsInErrorObject } from '@components/Error/ErrorUtils';
 
 export const ErrorStatusText = styled(Typography)(({ theme }) => ({
   color: theme.colors.error.main

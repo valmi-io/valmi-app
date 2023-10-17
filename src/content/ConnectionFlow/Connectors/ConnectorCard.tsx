@@ -4,13 +4,15 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import React from 'react';
+
 import { styled, darken } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
-import { ConnectorModel } from '@/content/Connections/ConnectionModel';
-import React from 'react';
-import ImageComponent, { ImageSize } from '../../../components/ImageComponent';
+import { ConnectorModel } from '@content/Connections/ConnectionModel';
+
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
 
 interface ConnectorCardProps {
   item: ConnectorModel;

@@ -6,7 +6,7 @@
 
 import React from 'react';
 
-import constants from '../../constants';
+import constants from '@constants/index';
 
 const propTypes = {};
 

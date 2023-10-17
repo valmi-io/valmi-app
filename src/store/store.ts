@@ -4,6 +4,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { createWrapper } from 'next-redux-wrapper';
+
 import {
   configureStore,
   ThunkAction,
@@ -11,7 +13,7 @@ import {
   AnyAction,
   createAsyncThunk
 } from '@reduxjs/toolkit';
-import { createWrapper } from 'next-redux-wrapper';
+
 import {
   FLUSH,
   PAUSE,
@@ -22,9 +24,11 @@ import {
   REGISTER,
   REHYDRATE
 } from 'redux-persist';
+
 import storage from 'redux-persist/lib/storage';
-import { apiSlice } from './api/apiSlice';
-import rootReducer from './reducers';
+
+import { apiSlice } from '@store/api/apiSlice';
+import rootReducer from '@store/reducers';
 
 const makeConfiguredStore = () =>
   configureStore({

@@ -5,14 +5,18 @@
  */
 
 import { Box, IconButton, InputLabel, Typography, styled } from '@mui/material';
+
 import {
   getOauthColorCode,
   getOauthImage,
   getOauthLoginText
-} from '../../content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-import { ErrorStatusText } from '../Error';
-import ImageComponent, { ImageSize } from '../ImageComponent';
-import FontAwesomeIcon from '../Icon/FontAwesomeIcon';
+} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+
+import { ErrorStatusText } from '@components/Error';
+
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
+
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,

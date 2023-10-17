@@ -5,9 +5,11 @@
  */
 
 import * as React from 'react';
+
 import Step from '@mui/material/Step';
 import { Card } from '@mui/material';
-import StepperComponent from './StepperComponent';
+
+import StepperComponent from '@components/Stepper/StepperComponent';
 
 export interface Step {
   label: string;

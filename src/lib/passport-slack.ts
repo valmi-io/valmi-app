@@ -5,8 +5,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Strategy as SlackStrategy } from './passport-slack/index';
 import passport from 'passport';
+
+import { Strategy as SlackStrategy } from '@lib/passport-slack/index';
 
 // logic to save your user or check if user exists in your record to proceed.
 const saveUser = (user) => {

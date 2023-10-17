@@ -5,8 +5,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { checkIfPropExistsInObject, isObjectEmpty } from '../../../utils/lib';
-import { getStepsInSyncFlow } from '../stateManagement';
+import { getStepsInSyncFlow } from '@content/SyncFlow/stateManagement';
+
+import { checkIfPropExistsInObject, isObjectEmpty } from '@utils/lib';
 
 export const getStep = (flowState) => {
   return flowState.hasOwnProperty('isEditableFlow') && flowState.isEditableFlow

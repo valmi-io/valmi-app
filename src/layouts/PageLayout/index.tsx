@@ -4,11 +4,13 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Container } from '@mui/material';
-import PageHead from '../../components/PageHead';
-import PageTitle from '../../components/PageTitle';
-import PageTitleWrapper from '../../components/PageTitleWrapper';
 import { ReactNode } from 'react';
+
+import { Container } from '@mui/material';
+
+import PageHead from '@components/PageHead';
+import PageTitle from '@components/PageTitle';
+import PageTitleWrapper from '@components/PageTitleWrapper';
 
 interface PageLayoutProps {
   pageHeadTitle: string;

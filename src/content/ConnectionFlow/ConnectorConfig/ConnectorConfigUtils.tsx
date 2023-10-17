@@ -4,8 +4,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { createNewField } from '../../../utils/form-utils';
-import { getConnectorImage, isObjectEmpty } from '../../../utils/lib';
+import { createNewField } from '@utils/form-utils';
+import { getConnectorImage, isObjectEmpty } from '@utils/lib';
 
 export const processFields = (data: any) => {
   const {

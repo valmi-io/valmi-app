@@ -6,37 +6,46 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import Head from '@/components/PageHead';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import { useRouter } from 'next/router';
-import { CircularProgress, Stack, Typography } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { CircularProgress, Stack, Typography } from '@mui/material';
 import { CheckOutlined } from '@mui/icons-material';
-import AlertComponent from '../../src/components/Alert';
+
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import { NextPageWithLayout } from '@/pages_app';
+
+import BaseLayout from '@layouts/BaseLayout';
+
+import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
+
+import Head from '@components/PageHead';
+import AlertComponent from '@components/Alert';
 import {
   hasErrorsInData,
   getErrorsInData,
   getErrorsInErrorObject
-} from '../../src/components/Error/ErrorUtils';
-import AuthenticationLayout from '../../src/content/Authentication/AuthenticationLayout';
-import BaseLayout from '../../src/layouts/BaseLayout';
-import { useLazySignupUserQuery } from '../../src/store/api/apiSlice';
-import { AppDispatch } from '../../src/store/store';
-import authStorage from '../../src/utils/auth-storage';
+} from '@components/Error/ErrorUtils';
+
+import { useLazySignupUserQuery } from '@store/api/apiSlice';
+import { AppDispatch } from '@store/store';
+import { setAppState } from '@store/reducers/appFlow';
+import { RootState } from '@store/reducers';
+
+import authStorage from '@utils/auth-storage';
 import {
   getUsernameField,
   getEmailField,
   getPasswordField
-} from '../../src/utils/form-utils';
-import { signupValidationSchema } from '../../src/utils/validation-schema';
-import { NextPageWithLayout } from '../_app';
-import { setAppState } from '../../src/store/reducers/appFlow';
-import { RootState } from '../../src/store/reducers';
-import Link from 'next/link';
+} from '@utils/form-utils';
+import { signupValidationSchema } from '@utils/validation-schema';
 
 const SignupPage: NextPageWithLayout = () => {
   const router = useRouter();

@@ -8,27 +8,27 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Card, styled } from '@mui/material';
 
-import SyncRunLogsTable from './SyncRunLogsTable';
-import { useLazyGetSyncRunLogsByIdQuery } from '../../../store/api/apiSlice';
+import SyncRunLogsTable from '@content/Syncs/SyncRunLogs/SyncRunLogsTable';
 import {
   generateLogsObject,
   generateLogMessages,
   generatePayload,
-  LogPayload,
   LogsType,
   SyncRunLogProps
-} from './SyncRunLogsUtils';
-import { SkeletonContainer } from '../../../components/Layouts/Layouts';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import ErrorContainer from '../../../components/Error/ErrorContainer';
-import {
-  getErrorsInData,
-  hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import { ErrorStatusText } from '../../../components/Error';
-import ListEmptyComponent from '../../../components/ListEmptyComponent';
-import { isObjectEmpty } from '../../../utils/lib';
-import { sendErrorToBugsnag } from '../../../lib/bugsnag';
+} from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
+
+import { SkeletonContainer } from '@components/Layouts/Layouts';
+import SkeletonLoader from '@components/SkeletonLoader';
+import ErrorContainer from '@components/Error/ErrorContainer';
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
+import { ErrorStatusText } from '@components/Error';
+import ListEmptyComponent from '@components/ListEmptyComponent';
+
+import { useLazyGetSyncRunLogsByIdQuery } from '@store/api/apiSlice';
+
+import { isObjectEmpty } from '@utils/lib';
+
+import { sendErrorToBugsnag } from '@lib/bugsnag';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
@@ -49,22 +49,35 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
 
   const [messages, setMessages] = useState<any>([]);
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [logData, setLogData] = useState<any>(null);
+
+  const [logPayload, setLogPayload] = useState<any>(null);
+
+  const [fetch, setFetch] = useState<boolean>(true);
 
   // This useEffect will fetch logs when the router is ready and the dependencies change.
   useEffect(() => {
     if (!router.isReady) return;
 
     // Generate the initial payload for fetching logs.
-    const payload = generatePayload({ since: -1, props: props });
+    let payload = generatePayload({ since: -1, props: props });
+
+    if (!fetch) return;
+
+    if (messages.length < 1) {
+      setIsLoading(true);
+    }
 
     // Fetch logs using the generated payload.
-    fetchLogs(payload);
-  }, [props.syncId, props.runId, router.isReady]);
+    getSyncRunLogs(logPayload ? logPayload : payload);
+  }, [fetch, props.syncId, props.runId, router.isReady]);
 
   // This useEffect will handle data
   useEffect(() => {
     if (data) {
+      // console.log('Logs data', data);
       // Fetch trace errors in the data.
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -73,48 +86,18 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
         sendErrorToBugsnag(traceError);
         setTraceError(traceError);
       } else {
-        const { meta } = data;
-        const { since, before } = meta;
-
-        // Fetch logs if since does not exist.
-        if (!since) {
-          // Generate the payload for fetching logs.
-          const payload = generatePayload({
-            since: before ? before : -1,
-            props: props
-          });
-
-          // Fetch logs using the generated payload.
-          fetchLogs(payload);
-
-          return;
-        } else {
-          const { logs } = data;
-
-          setSinces((prevSinces) => [...prevSinces, since]);
-
-          // Generate the logs object.
-          const generatedLogsObject = generateLogsObject(since, logs);
-
-          setLogs((prevLogs) => ({
-            ...prevLogs,
-            ...generatedLogsObject
-          }));
-
-          let sinceVal = since;
-          if (before) {
-            sinceVal = before;
-          }
-
-          // Generate the payload for fetching logs.
-          const payload = generatePayload({ since: sinceVal, props: props });
-
-          // Fetch logs using the generated payload.
-          fetchLogs(payload);
-        }
+        setFetch(false);
+        setLogData(data);
       }
     }
   }, [data]);
+
+  // This useEffect will handle data
+  useEffect(() => {
+    if (logData) {
+      handleLogData(logData);
+    }
+  }, [logData]);
 
   // This useEffect will generate log messages.
   useEffect(() => {
@@ -129,17 +112,62 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
   // This useEffect will handle errors.
   useEffect(() => {
     if (isError) {
+      //console.log('Logs: error', error);
       // Send error to bugsnag
       sendErrorToBugsnag(error);
 
       setIsLoading(false);
+      setFetch(false);
     }
   }, [isError]);
 
-  // This function will invoke syncrunlogs query with the generated payload.
-  const fetchLogs = (payload: LogPayload) => {
-    setIsLoading(true);
-    getSyncRunLogs(payload);
+  const handleLogData = (logData: any) => {
+    // console.log('trying to handle log data', logData);
+    const { meta = {} } = logData;
+    const { since, before } = meta;
+
+    let payload = null;
+
+    // If since does not exists
+    if (!since) {
+      // If before does not exists, fetch logs using the initial payload.
+      if (!before) return;
+
+      // Generate the new payload with updated since.
+      payload = generatePayload({
+        since: before,
+        props: props
+      });
+    } else {
+      // If since exists.
+
+      // Update setSinces state with the new since value.
+      setSinces((prevSinces) => [...prevSinces, since]);
+
+      // Update the setLogs state with the new generatedLogs.
+      const { logs = {} } = data;
+
+      // Generate the logs object.
+      const generatedLogsObject = generateLogsObject(since, logs);
+
+      setLogs((prevLogs) => ({
+        ...prevLogs,
+        ...generatedLogsObject
+      }));
+
+      // Generate the new payload
+      let sinceVal = since;
+      if (before) {
+        sinceVal = before;
+      }
+
+      // Generate the new payload with updated since.
+      payload = generatePayload({ since: sinceVal, props: props });
+    }
+
+    // Update setLogPayload state with the new payload.
+    setLogPayload(payload);
+    setFetch(true);
   };
 
   // Page content

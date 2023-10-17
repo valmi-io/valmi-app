@@ -5,18 +5,22 @@
  */
 
 import { useContext } from 'react';
-import { useRouter } from 'next/router';
 
-import { Box, List, styled } from '@mui/material';
+import { useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { SidebarContext } from 'src/contexts/SidebarContext';
-import { RootState } from '../../../../store/reducers';
-import { getSidebarRoutes } from '../../../../utils/sidebar-utils';
-import SidebarItemCollapse from '../SidebarItemCollapse';
-import SidebarItem from '../SidebarItem';
-import { setAppState } from '../../../../store/reducers/appFlow';
+import { Box, List, styled } from '@mui/material';
+
+import SidebarItemCollapse from '@layouts/SidebarLayout/Sidebar/SidebarItemCollapse';
+import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
+
+import { SidebarContext } from '@contexts/SidebarContext';
+
+import { RootState } from '@store/reducers';
+import { setAppState } from '@store/reducers/appFlow';
+
+import { getSidebarRoutes } from '@utils/sidebar-utils';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `

@@ -5,24 +5,14 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Card, styled } from '@mui/material';
-import {
-  useLazyAbortSyncRunByIdQuery,
-  useLazyCreateNewSyncRunQuery,
-  useLazyGetSyncRunsByIdQuery
-} from '../../../store/api/apiSlice';
-import {
-  getErrorsInData,
-  hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
+
 import { useRouter } from 'next/router';
-import { ErrorStatusText } from '../../../components/Error';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import SyncRunsTable from './SyncRunsTable';
-import PageTitle from '../../../components/PageTitle';
-import { SkeletonContainer } from '../../../components/Layouts/Layouts';
-import ListEmptyComponent from '../../../components/ListEmptyComponent';
-import ErrorContainer from '../../../components/Error/ErrorContainer';
+
+import { Card, styled } from '@mui/material';
+
+import StartSyncPopoverComponent from '@content/Syncs/SyncRuns/StartSyncPopoverComponent';
+import StopSyncPopoverComponent from '@content/Syncs/SyncRuns/StopSyncPopoverComponent';
+import SyncRunsTable from '@content/Syncs/SyncRuns/SyncRunsTable';
 import {
   generateStartSyncPayload,
   generateStopSyncPayload,
@@ -30,13 +20,27 @@ import {
   getPageButtonTitle,
   hasRunningSyncs,
   syncRunNetworkHandler
-} from './SyncRunsUtils';
-import AlertComponent from '../../../components/Alert';
-import PopoverComponent from '../../../components/Popover';
-import { getRouterPathname, isPublicSync } from '../../../utils/routes';
-import { sendErrorToBugsnag } from '../../../lib/bugsnag';
-import StartSyncPopoverComponent from './StartSyncPopoverComponent';
-import StopSyncPopoverComponent from './StopSyncPopoverComponent';
+} from '@content/Syncs/SyncRuns/SyncRunsUtils';
+
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
+import { ErrorStatusText } from '@components/Error';
+import SkeletonLoader from '@components/SkeletonLoader';
+import PageTitle from '@components/PageTitle';
+import { SkeletonContainer } from '@components/Layouts/Layouts';
+import ListEmptyComponent from '@components/ListEmptyComponent';
+import ErrorContainer from '@components/Error/ErrorContainer';
+import AlertComponent from '@components/Alert';
+import PopoverComponent from '@components/Popover';
+
+import {
+  useLazyAbortSyncRunByIdQuery,
+  useLazyCreateNewSyncRunQuery,
+  useLazyGetSyncRunsByIdQuery
+} from '@store/api/apiSlice';
+
+import { getRouterPathname, isPublicSync } from '@utils/routes';
+
+import { sendErrorToBugsnag } from '@lib/bugsnag';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)

@@ -5,8 +5,9 @@
  */
 
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
+
 import { Box, InputLabel, MenuItem, styled } from '@mui/material';
+
 import {
   displaySchedule,
   getSchedule,
@@ -14,11 +15,14 @@ import {
   getSyncName,
   saveSchedule,
   saveSyncName
-} from './scheduleManagement';
-import { setFlowState } from '../../../store/reducers/syncFlow';
-import { StackLayout } from '@/components/Layouts/Layouts';
-import SelectDropdown from '../../../components/SelectDropdown';
-import FormFieldText from '../../../components/FormInput/FormFieldText';
+} from '@content/SyncFlow/Schedule/scheduleManagement';
+
+import { StackLayout } from '@components/Layouts/Layouts';
+import SelectDropdown from '@components/SelectDropdown';
+import FormFieldText from '@components/FormInput/FormFieldText';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,

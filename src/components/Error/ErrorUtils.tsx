@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { checkIfPropExistsInObject, isObjectEmpty } from '../../utils/lib';
+import { checkIfPropExistsInObject, isObjectEmpty } from '@utils/lib';
 
 export const hasErrorsInData = (data: any) => {
   // checking if data has any trace errors.

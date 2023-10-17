@@ -5,8 +5,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import FormFieldPassword from '../components/FormInput/FormFieldPasword';
-import FormFieldText from '../components/FormInput/FormFieldText';
+import FormFieldPassword from '@components/FormInput/FormFieldPasword';
+import FormFieldText from '@components/FormInput/FormFieldText';
 
 export type FormObject = {
   label: string;

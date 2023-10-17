@@ -6,38 +6,44 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import Head from '@/components/PageHead';
-import { NextPageWithLayout } from '../_app';
-import BaseLayout from '../../src/layouts/BaseLayout';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+
+import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import { useLazyLoginAndFetchWorkSpacesQuery } from '../../src/store/api/apiSlice';
-import authStorage from '../../src/utils/auth-storage';
-import { useRouter } from 'next/router';
+import { CheckOutlined } from '@mui/icons-material';
 import { CircularProgress, Stack, Typography } from '@mui/material';
-import { AppDispatch } from '../../src/store/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUserData } from '../../src/store/reducers/user';
-import { initialiseAppState } from '../../src/utils/login-utils';
-import AuthenticationLayout from '../../src/content/Authentication/AuthenticationLayout';
-import { getEmailField, getPasswordField } from '../../src/utils/form-utils';
 
 import { useForm } from 'react-hook-form';
-
 import { yupResolver } from '@hookform/resolvers/yup';
-import { signinValidationSchema } from '../../src/utils/validation-schema';
-import AlertComponent from '../../src/components/Alert';
-import { CheckOutlined } from '@mui/icons-material';
+
+import { NextPageWithLayout } from '@/pages_app';
+
+import BaseLayout from '@layouts/BaseLayout';
+
+import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
+
+import Head from '@components/PageHead';
+import AlertComponent from '@components/Alert';
 import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../src/components/Error/ErrorUtils';
-import Link from 'next/link';
-import { signOutUser } from '../../src/utils/lib';
-import { setAppState } from '../../src/store/reducers/appFlow';
-import { RootState } from '../../src/store/reducers';
+} from '@components/Error/ErrorUtils';
+
+import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
+import { AppDispatch } from '@store/store';
+import { setUserData } from '@store/reducers/user';
+import { setAppState } from '@store/reducers/appFlow';
+import { RootState } from '@store/reducers';
+
+import { initialiseAppState } from '@utils/login-utils';
+import authStorage from '@utils/auth-storage';
+import { getEmailField, getPasswordField } from '@utils/form-utils';
+import { signinValidationSchema } from '@utils/validation-schema';
+import { signOutUser } from '@utils/lib';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();

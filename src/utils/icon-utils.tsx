@@ -6,7 +6,8 @@
 
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
-import FontAwesomeIcon from '../components/Icon/FontAwesomeIcon';
+
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 export const AppIconARROW_RIGHT = (props: any) => (
   <FontAwesomeIcon {...props} className="fas fa-arrow-right" />

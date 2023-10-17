@@ -21,36 +21,41 @@ import {
   styled
 } from '@mui/material';
 
-import SidebarLayout from '@/layouts/SidebarLayout';
-import HorizontalLinearStepper from '@/components/Stepper';
-import { AppDispatch } from '@/store/store';
-import { RootState } from '@/store/reducers';
-import { EditSyncFlowSteps, SyncFlowSteps } from '@/utils/sync-utils';
-import Warehouse from '@/content/SyncFlow/Warehouse';
-import Mapping from '@/content/SyncFlow/Mapping';
-import Schedule from '@/content/SyncFlow/Schedule';
+import PageLayout from '@layouts/PageLayout';
+import SidebarLayout from '@layouts/SidebarLayout';
+
+import Warehouse from '@content/SyncFlow/Warehouse';
+import Mapping from '@content/SyncFlow/Mapping';
+import Schedule from '@content/SyncFlow/Schedule';
 import {
   enableNext,
   initialiseFlowState,
   isLastStepInSyncFlow,
   isMappingStepInSyncFlow,
   setCurrentStepInFlow
-} from '@/content/SyncFlow/stateManagement';
-import {
-  useLazyAddSyncQuery,
-  useLazyUpdateSyncQuery
-} from '@/store/api/apiSlice';
-import { generateSyncPayload } from '@/content/Syncs/SyncsPage/SyncCreationUtils';
-import PageLayout from '@/layouts/PageLayout';
-import Instructions from '../../../../../src/components/Instructions';
+} from '@content/SyncFlow/stateManagement';
+import { generateSyncPayload } from '@content/Syncs/SyncsPage/SyncCreationUtils';
+import { isMappingStep } from '@content/SyncFlow/Mapping/mappingManagement';
+
+import HorizontalLinearStepper from '@components/Stepper';
+import Instructions from '@components/Instructions';
 import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../../../../src/components/Error/ErrorUtils';
-import AlertComponent from '../../../../../src/components/Alert';
-import { isMappingStep } from '../../../../../src/content/SyncFlow/Mapping/mappingManagement';
-import constants from '../../../../../src/constants';
+} from '@components/Error/ErrorUtils';
+import AlertComponent from '@components/Alert';
+
+import {
+  useLazyAddSyncQuery,
+  useLazyUpdateSyncQuery
+} from '@store/api/apiSlice';
+import { AppDispatch } from '@store/store';
+import { RootState } from '@store/reducers';
+
+import { EditSyncFlowSteps, SyncFlowSteps } from '@utils/sync-utils';
+
+import constants from '@constants/index';
 
 const InstructionsLayout = styled(Box)(({ theme }) => ({
   width: '40%',

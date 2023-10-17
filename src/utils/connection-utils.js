@@ -4,11 +4,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getOAuthParams } from '../../pages/auth/callback';
-import { isConnectorRequiresOAuth } from '../content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-import { ConnectionType } from '../content/Connections/ConnectionModel';
-import { useLazyFetchConnectorSpecQuery } from '../store/api/apiSlice';
-import { setConnectionFlow } from '../store/reducers/connectionFlow';
+import { getOAuthParams } from 'pages/auth/callback';
+
+import { isConnectorRequiresOAuth } from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { ConnectionType } from '@content/Connections/ConnectionModel';
+
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 export const getInitialConnectionFlowState = (
   connection_flow,

@@ -4,8 +4,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import passport from '@/lib/passport-google-auth';
 import nextConnect from 'next-connect';
+
+import passport from '@lib/passport-google-auth';
 
 export default nextConnect()
   .use(passport.initialize())

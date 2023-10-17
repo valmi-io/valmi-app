@@ -5,25 +5,28 @@
  */
 
 import { useEffect, useState } from 'react';
+
+import { useRouter } from 'next/router';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { Card } from '@mui/material';
+
+import SyncDetailsCard from '@content/Syncs/SyncDetails/SyncDetailsCard';
+
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
+import ErrorComponent, { ErrorStatusText } from '@components/Error';
+import SkeletonLoader from '@components/SkeletonLoader';
+import { SkeletonContainer } from '@components/Layouts/Layouts';
+
 import {
   useLazyGetSyncByIdQuery,
   useLazyToggleSyncQuery
-} from '../../../store/api/apiSlice';
-import {
-  getErrorsInData,
-  hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import { useRouter } from 'next/router';
-import { Card } from '@mui/material';
+} from '@store/api/apiSlice';
+import { setFlowState } from '@store/reducers/syncFlow';
+import { RootState } from '@store/reducers';
 
-import ErrorComponent, { ErrorStatusText } from '../../../components/Error';
-import SkeletonLoader from '../../../components/SkeletonLoader';
-import SyncDetailsCard from './SyncDetailsCard';
-import { SkeletonContainer } from '../../../components/Layouts/Layouts';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFlowState } from '../../../store/reducers/syncFlow';
-import { RootState } from '../../../store/reducers';
-import { getRouterPathname, isPublicSync } from '../../../utils/routes';
+import { getRouterPathname, isPublicSync } from '@utils/routes';
 
 const SyncDetails = ({ syncId, workspaceId }: any) => {
   const router = useRouter();

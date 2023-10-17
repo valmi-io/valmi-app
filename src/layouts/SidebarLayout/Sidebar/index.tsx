@@ -5,19 +5,14 @@
  */
 
 import { useContext } from 'react';
-import { SidebarContext } from 'src/contexts/SidebarContext';
 
-import {
-  Box,
-  Drawer,
-  styled,
-  Divider,
-  useTheme,
-  Typography
-} from '@mui/material';
+import { Box, Drawer, styled, Divider, useTheme } from '@mui/material';
 
-import SidebarMenu from './SidebarMenu';
-import Logo from 'src/components/LogoSign';
+import SidebarMenu from '@layouts/SidebarLayout/Sidebar/SidebarMenu';
+
+import { SidebarContext } from '@contexts/SidebarContext';
+
+import Logo from '@components/LogoSign';
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `

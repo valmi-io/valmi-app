@@ -3,15 +3,19 @@
  * Created Date: Friday, April 28th 2023, 5:13:16 pm
  * Author: Nagendra S @ valmi.io
  */
+import { useEffect } from 'react';
+
+import { useRouter } from 'next/router';
+
+import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../src/store/reducers';
-import { AppDispatch } from '../../../src/store/store';
-import { setConnectionFlow } from '../../../src/store/reducers/connectionFlow';
-import { hasErrorsInData } from '../../../src/components/Error/ErrorUtils';
+
+import { hasErrorsInData } from '@components/Error/ErrorUtils';
+
+import { RootState } from '@store/reducers';
+import { AppDispatch } from '@store/store';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 const OAuthRedirectPage = () => {
   const router = useRouter();

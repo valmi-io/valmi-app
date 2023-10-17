@@ -4,12 +4,13 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+
+import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
 
-import Head from '@/components/PageHead';
-import { RootState } from '@/store/reducers';
+import Head from '@components/PageHead';
+import { RootState } from '@store/reducers';
 
 const propTypes = {};
 

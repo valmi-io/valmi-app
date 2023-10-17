@@ -5,8 +5,10 @@
  */
 
 import nextConnect from 'next-connect';
-import passport from '@/lib/passport-hubspot';
+
 import { NextApiRequest, NextApiResponse } from 'next/types';
+
+import passport from '@lib/passport-hubspot';
 
 export default nextConnect().get(
   passport.authenticate('hubspot', { session: false }),

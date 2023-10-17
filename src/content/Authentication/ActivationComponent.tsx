@@ -5,6 +5,10 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { useRouter } from 'next/router';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Box,
   Button,
@@ -14,13 +18,13 @@ import {
   Typography,
   styled
 } from '@mui/material';
-import ImageComponent, { ImageSize } from '../../components/ImageComponent';
-import SkeletonLoader from '../../components/SkeletonLoader';
-import { useRouter } from 'next/router';
-import { ErrorStatusText } from '../../components/Error';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/reducers';
-import { setAppState } from '../../store/reducers/appFlow';
+
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
+import SkeletonLoader from '@components/SkeletonLoader';
+import { ErrorStatusText } from '@components/Error';
+
+import { RootState } from '@store/reducers';
+import { setAppState } from '@store/reducers/appFlow';
 
 const Layout = styled(Paper)(({ theme }) => ({
   display: 'flex',

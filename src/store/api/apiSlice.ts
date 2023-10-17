@@ -6,8 +6,10 @@
  */
 
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
-import AuthStorage from 'src/utils/auth-storage';
-import constants from '../../constants';
+
+import AuthStorage from '@utils/auth-storage';
+
+import constants from '@constants/index';
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -340,17 +342,24 @@ export const apiSlice = createApi({
 
     getSyncRunLogsById: builder.query({
       query: (arg) => {
-        const {workspaceId, syncId, runId, collector, since=null, before=null} = arg;
+        const {
+          workspaceId,
+          syncId,
+          runId,
+          collector,
+          since = null,
+          before = null
+        } = arg;
 
-        let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?collector=${collector}`
-         
-        if(since) {
-          url = url + `&since=${since}`
+        let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?collector=${collector}`;
+
+        if (since) {
+          url = url + `&since=${since}`;
         }
-        if(before) {
-          url = url + `&before=${before}`
+        if (before) {
+          url = url + `&before=${before}`;
         }
-        
+
         return {
           url: url
         };

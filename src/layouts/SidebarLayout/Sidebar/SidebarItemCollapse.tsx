@@ -5,7 +5,8 @@
  */
 
 import { Typography, styled } from '@mui/material';
-import SidebarItem from './SidebarItem';
+
+import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
 
 const Text = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[50],

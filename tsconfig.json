@@ -3,6 +3,17 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@/pages*": ["pages/*"],
+      "@content/*": ["src/content/*"],
+      "@components/*": ["src/components/*"],
+      "@constants/*": ["src/constants/*"],
+      "@store/*": ["src/store/*"],
+      "@theme/*": ["src/theme/*"],
+      "@utils/*": ["src/utils/*"],
+      "@lib/*": ["src/lib/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@contexts/*": ["src/contexts/*"],
       "@/public/*": ["./public/*"]
     },
     "allowJs": true,

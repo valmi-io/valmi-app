@@ -6,34 +6,39 @@
  */
 
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+
+import { useRouter } from 'next/router';
+
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useLazyFetchConnectorSpecQuery } from '@/store/api/apiSlice';
-import { RootState } from '@/store/reducers';
-import ConnectorFormFields from './ConnectorFormFields';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import { styled } from '@mui/material';
+
+import { getOAuthParams } from 'pages/auth/callback';
+
+import ConnectorLayout from '@layouts/ConnectorLayout';
+
+import ConnectorFormFields from '@content/ConnectionFlow/ConnectorConfig/ConnectorFormFields';
 import {
   getConnectorDocumentationUrl,
   getOauthRoute,
   hasAuthorizedOAuth,
   processFields
-} from './ConnectorConfigUtils';
-import ConnectorLayout from '@/layouts/ConnectorLayout';
-import SkeletonLoader from '@/components/SkeletonLoader';
-import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import { styled } from '@mui/material';
-import { useRouter } from 'next/router';
-import { AppDispatch } from '../../../store/store';
-import { setConnectionFlow } from '../../../store/reducers/connectionFlow';
-import {
-  getErrorsInData,
-  hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import ErrorComponent, { ErrorStatusText } from '../../../components/Error';
-import { SkeletonContainer } from '../../../components/Layouts/Layouts';
-import Instructions from '../../../components/Instructions';
-import { getOAuthParams } from '../../../../pages/auth/callback';
-import { generateConfigFromSpec } from '../../../utils/connection-utils';
+} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+
+import SkeletonLoader from '@components/SkeletonLoader';
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
+import ErrorComponent, { ErrorStatusText } from '@components/Error';
+import { SkeletonContainer } from '@components/Layouts/Layouts';
+import Instructions from '@components/Instructions';
+
+import { generateConfigFromSpec } from '@utils/connection-utils';
+
+import { AppDispatch } from '@store/store';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
+import { useLazyFetchConnectorSpecQuery } from '@store/api/apiSlice';
+import { RootState } from '@store/reducers';
 
 const Layout = styled(Box)(({}) => ({
   display: 'flex',

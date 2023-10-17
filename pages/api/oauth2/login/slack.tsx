@@ -4,8 +4,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import passport from '@/lib/passport-slack';
 import nextConnect from 'next-connect';
+
+import passport from '@lib/passport-slack';
 
 // To Test locally use https://localhost - use local-ssl-proxy npm package
 export default nextConnect()

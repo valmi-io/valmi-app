@@ -5,11 +5,13 @@
  */
 
 import { Box, MenuItem, styled } from '@mui/material';
+
 import {
   getRemainingDestinationFields,
   getSourceFields
-} from './mappingManagement';
-import DualSelectDropdown from '../../../components/SelectDropdown/DualSelectDropdown';
+} from '@content/SyncFlow/Mapping/mappingManagement';
+
+import DualSelectDropdown from '@components/SelectDropdown/DualSelectDropdown';
 
 const Layout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2

@@ -5,11 +5,13 @@
  */
 
 import * as React from 'react';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
 
 import { useRouter } from 'next/router';
-import { capitalizeFirstLetter } from '../../utils/lib';
+
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { Box, Typography } from '@mui/material';
+
+import { capitalizeFirstLetter } from '@utils/lib';
 
 export default function IconBreadcrumbs() {
   const router = useRouter();

@@ -4,16 +4,17 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, IconButton, Stack, Tooltip, styled } from '@mui/material';
 import { ReactNode } from 'react';
 
-import SelectDropdown from '.';
-
-import FormFieldText from '../FormInput/FormFieldText';
+import { Box, IconButton, Stack, Tooltip, styled } from '@mui/material';
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseIcon from '@mui/icons-material/Close';
 import InfoIcon from '@mui/icons-material/Info';
+
+import SelectDropdown from '.';
+
+import FormFieldText from '@components/FormInput/FormFieldText';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,

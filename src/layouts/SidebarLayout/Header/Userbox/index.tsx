@@ -7,6 +7,10 @@
 
 import { useRef, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useDispatch, useSelector } from 'react-redux';
+
 import {
   Avatar,
   Box,
@@ -15,18 +19,17 @@ import {
   Hidden,
   Typography
 } from '@mui/material';
-
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
-import authStorage from '../../../../utils/auth-storage';
-import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { AppDispatch } from '../../../../store/store';
-import { RootState } from '../../../../store/reducers';
-import { signOutUser, stringAvatar } from '../../../../utils/lib';
-import PopoverComponent from '../../../../components/Popover';
+import PopoverComponent from '@components/Popover';
+
+import { AppDispatch } from '@store/store';
+import { RootState } from '@store/reducers';
+
+import authStorage from '@utils/auth-storage';
+import { signOutUser, stringAvatar } from '@utils/lib';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `

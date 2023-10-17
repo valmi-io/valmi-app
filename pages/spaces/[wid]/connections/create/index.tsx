@@ -14,36 +14,41 @@ import { Paper, CardActions, Button, CircularProgress } from '@mui/material';
 
 import { useForm } from 'react-hook-form';
 
-import SidebarLayout from '@/layouts/SidebarLayout';
+import axios from 'axios';
+
+import PageLayout from '@layouts/PageLayout';
+import SidebarLayout from '@layouts/SidebarLayout';
+
+import { ConnectionSteps } from '@content/Connections/ConnectionModel';
+import ConnectionTest from '@content/ConnectionFlow/ConnectionTest';
+import Connectors from '@content/ConnectionFlow/Connectors';
+import ConnectorConfig from '@content/ConnectionFlow/ConnectorConfig';
+import {
+  hasAuthorizedOAuth,
+  isConnectorRequiresOAuth
+} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+
+import {
+  getErrorsInData,
+  getErrorsInErrorObject,
+  hasErrorsInData
+} from '@components/Error/ErrorUtils';
+import AlertComponent from '@components/Alert';
+import HorizontalLinearStepper from '@components/Stepper';
+
+import { AppDispatch } from '@store/store';
+import { RootState } from '@store/reducers';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
+
 import {
   enableBack,
   enableNext,
   generateConnectionPayload,
   setConnectorConfigInConnectionFlow,
   setCurrentStepInConnectionFlow
-} from '@/utils/connection-utils';
-import { AppDispatch } from '@/store/store';
-import { RootState } from '@/store/reducers';
-import HorizontalLinearStepper from '@/components/Stepper';
-import { ConnectionSteps } from '@/content/Connections/ConnectionModel';
-import ConnectionTest from '@/content/ConnectionFlow/ConnectionTest';
-import { setConnectionFlow } from '@/store/reducers/connectionFlow';
-import constants from '@/constants';
-import PageLayout from '@/layouts/PageLayout';
-import Connectors from '@/content/ConnectionFlow/Connectors';
-import ConnectorConfig from '@/content/ConnectionFlow/ConnectorConfig';
-import {
-  hasAuthorizedOAuth,
-  isConnectorRequiresOAuth
-} from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+} from '@utils/connection-utils';
 
-import axios from 'axios';
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '../../../../../src/components/Error/ErrorUtils';
-import AlertComponent from '../../../../../src/components/Alert';
+import constants from '@constants/index';
 
 const ConnectionFlow = () => {
   const router = useRouter();

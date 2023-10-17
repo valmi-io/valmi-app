@@ -5,8 +5,10 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next/types';
+
 import nextConnect from 'next-connect';
-import passport from '@/lib/passport-facebook-auth';
+
+import passport from '@lib/passport-facebook-auth';
 
 export default nextConnect().get(
   passport.authenticate('facebook', { session: false }),

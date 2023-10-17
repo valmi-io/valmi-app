@@ -6,13 +6,18 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import Head from '@/components/PageHead';
-import BaseLayout from '../../../../src/layouts/BaseLayout';
-import { useLazyActivateUserQuery } from '../../../../src/store/api/apiSlice';
 import { useRouter } from 'next/router';
-import { NextPageWithLayout } from '../../../_app';
-import ActivationComponent from '../../../../src/content/Authentication/ActivationComponent';
-import { getErrorsInErrorObject } from '../../../../src/components/Error/ErrorUtils';
+
+import { NextPageWithLayout } from '@/pages_app';
+
+import BaseLayout from '@layouts/BaseLayout';
+
+import ActivationComponent from '@content/Authentication/ActivationComponent';
+
+import Head from '@components/PageHead';
+import { getErrorsInErrorObject } from '@components/Error/ErrorUtils';
+
+import { useLazyActivateUserQuery } from '@store/api/apiSlice';
 
 const ActivationConfirmationPage: NextPageWithLayout = () => {
   const router = useRouter();

@@ -5,9 +5,12 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next/types';
+
 import axios from 'axios';
-import { getBaseUrl, getTokenCookie } from './utils';
-import { sendErrorToBugsnag } from '../../src/lib/bugsnag';
+
+import { getBaseUrl, getTokenCookie } from 'pages/api/utils';
+
+import { sendErrorToBugsnag } from '@lib/bugsnag';
 
 const connectionNetworkHandler = async (
   req: NextApiRequest,

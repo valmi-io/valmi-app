@@ -8,11 +8,12 @@ import React from 'react';
 
 import { Box, Chip, Stack, Switch, Typography } from '@mui/material';
 
-import { StackLayout } from '../../../components/Layouts/Layouts';
+import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
 
-import { convertDurationToMinutesOrHours } from '../../../utils/lib';
-import appIcons from '../../../utils/icon-utils';
-import ConnectionCard from './ConnectionCard';
+import { StackLayout } from '@components/Layouts/Layouts';
+
+import { convertDurationToMinutesOrHours } from '@utils/lib';
+import appIcons from '@utils/icon-utils';
 
 type SyncDetailsCardProps = {
   syncData: any;

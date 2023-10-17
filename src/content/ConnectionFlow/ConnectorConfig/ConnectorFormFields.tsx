@@ -5,8 +5,10 @@
  */
 
 import Box from '@mui/material/Box';
-import FormField from '../../../components/FormInput/FormField';
-import { FormObject } from '../../../utils/form-utils';
+
+import FormField from '@components/FormInput/FormField';
+
+import { FormObject } from '@utils/form-utils';
 
 interface ConnectorFormFieldsProps {
   fields: FormObject[];

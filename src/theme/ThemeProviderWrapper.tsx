@@ -11,9 +11,11 @@ import React, {
   useEffect,
   PropsWithChildren
 } from 'react';
+
 import { ThemeProvider } from '@mui/material';
-import { themeCreator } from './base';
 import { StylesProvider } from '@mui/styles';
+
+import { themeCreator } from '@theme/base';
 
 export const ThemeContext = createContext((_themeName: string): void => {});
 

@@ -6,10 +6,14 @@
  */
 
 import React from 'react';
+
 import { Controller } from 'react-hook-form';
+
 import { Box, styled, Stack, Container, Paper } from '@mui/material';
-import { FormObject, getInputField } from '../../utils/form-utils';
-import ImageComponent, { ImageSize } from '../../components/ImageComponent';
+
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
+
+import { FormObject, getInputField } from '@utils/form-utils';
 
 const Layout = styled(Paper)(({ theme }) => ({
   display: 'flex',

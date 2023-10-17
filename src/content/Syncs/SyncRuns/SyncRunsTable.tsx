@@ -5,6 +5,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { useState } from 'react';
+
+import { useRouter } from 'next/router';
+
+import { useSelector } from 'react-redux';
+
 import {
   Box,
   Button,
@@ -22,11 +28,8 @@ import {
   Typography,
   styled
 } from '@mui/material';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
-import {
-  TABLE_COLUMN_SIZES,
-  TableColumnProps
-} from '../../../utils/table-utils';
 import {
   getConnectionMetrics,
   getConnectionStatus,
@@ -34,21 +37,20 @@ import {
   getIcon,
   getRunStatus,
   isSyncRunning
-} from './SyncRunsUtils';
-import { useState } from 'react';
-import AlertComponent from '../../../components/Alert';
+} from '@content/Syncs/SyncRuns/SyncRunsUtils';
+
+import AlertComponent from '@components/Alert';
+
+import { RootState } from '@store/reducers';
+
+import { TABLE_COLUMN_SIZES, TableColumnProps } from '@utils/table-utils';
 import {
   capitalizeFirstLetter,
   convertUTCDateToLocalDate,
   getTimeDifference,
   splitNumberByCommas
-} from '../../../utils/lib';
-import appIcons, { AppIconARROW_RIGHT } from '../../../utils/icon-utils';
-import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
-
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+} from '@utils/lib';
+import appIcons, { AppIconARROW_RIGHT } from '@utils/icon-utils';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
@@ -181,7 +183,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
             getStatusIconComponent(connectionStatus, '', () => {})}
 
           {/** Display Log button */}
-          <Button
+          {/* <Button
             sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
             startIcon={<LogoutOutlinedIcon />}
             variant="outlined"
@@ -189,7 +191,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
             onClick={() => navigateToSyncRunLogs(syncRun, connection)}
           >
             Logs
-          </Button>
+          </Button> */}
         </Stack>
 
         {/** Connection metrics stack */}

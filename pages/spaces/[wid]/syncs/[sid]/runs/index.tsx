@@ -6,17 +6,21 @@
 
 import { ReactElement } from 'react';
 
-import { Grid } from '@mui/material';
-
 import { useRouter } from 'next/router';
 
-import { NextPageWithLayout } from '../../../../../_app';
-import SidebarLayout from '@/layouts/SidebarLayout';
-import SyncRuns from '@/content/Syncs/SyncRuns';
-import PageLayout from '@/layouts/PageLayout';
+import { Grid } from '@mui/material';
+
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../../src/store/reducers';
-import SyncDetails from '../../../../../../src/content/Syncs/SyncDetails';
+
+import { NextPageWithLayout } from '@/pages_app';
+
+import SidebarLayout from '@layouts/SidebarLayout';
+import PageLayout from '@layouts/PageLayout';
+
+import SyncRuns from '@content/Syncs/SyncRuns';
+import SyncDetails from '@content/Syncs/SyncDetails';
+
+import { RootState } from '@store/reducers';
 
 const SyncRunsPage: NextPageWithLayout = () => {
   const router = useRouter();

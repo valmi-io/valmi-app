@@ -1,5 +1,5 @@
-import appIcons from '../../../utils/icon-utils';
-import { TABLE_COLUMN_SIZES } from '../../../utils/table-utils';
+import appIcons from '@utils/icon-utils';
+import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 
 export type LogsType = { [key: string]: any };
 

@@ -5,7 +5,7 @@
  */
 
 import { Box, Stack, Typography, styled } from '@mui/material';
-import FontAwesomeIcon from '../Icon/FontAwesomeIcon';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   display: 'flex',

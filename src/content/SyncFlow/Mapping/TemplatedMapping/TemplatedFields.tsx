@@ -4,8 +4,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, Stack, styled } from '@mui/material';
-import FormFieldText from '../../../../components/FormInput/FormFieldText';
+import { Stack, styled } from '@mui/material';
+
+import FormFieldText from '@components/FormInput/FormFieldText';
 
 const Layout = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2

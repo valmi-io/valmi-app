@@ -4,25 +4,33 @@
  * Author: Nagendra S @ valmi.io
  */
 
+/*
+ * Warehouses Page Component
+ * This component represents a page for displaying warehouses and creating new warehouse.
+ */
+
 import { ReactElement } from 'react';
 
-import SidebarLayout from '@/layouts/SidebarLayout';
-import { NextPageWithLayout } from '../../../../_app';
+import { NextPageWithLayout } from '@/pages_app';
+
+import SidebarLayout from '@layouts/SidebarLayout';
+
 import {
   ConnectionType,
   ConnectionsPageTitle,
   CreateConnectionTitle
-} from '@/content/Connections/ConnectionModel';
-import constants from '@/constants';
-import ConnectionLayout from '../../../../../src/content/Connections/ConnectionsLayout';
+} from '@content/Connections/ConnectionModel';
+import Connections from '@content/Connections';
+
+import constants from '@constants/index';
 
 const Warehouses: NextPageWithLayout = () => {
   return (
-    <ConnectionLayout
+    <Connections
       pageHeadTitle={constants.connections.CONNECTIONS_TITLE}
       title={ConnectionsPageTitle.SRC}
       buttonTitle={CreateConnectionTitle.SRC}
-      connection_type={ConnectionType.SRC}
+      connectionType={ConnectionType.SRC}
     />
   );
 };

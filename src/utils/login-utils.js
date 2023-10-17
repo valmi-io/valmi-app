@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { setAppState } from '../store/reducers/appFlow';
+import { setAppState } from '@store/reducers/appFlow';
 
 export const initialiseAppState = (dispatch, workspaceId) => {
   dispatch(

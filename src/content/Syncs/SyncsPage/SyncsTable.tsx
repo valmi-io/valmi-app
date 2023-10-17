@@ -5,6 +5,10 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { useRouter } from 'next/router';
+
+import { useSelector } from 'react-redux';
+
 import {
   Table,
   TableBody,
@@ -17,22 +21,20 @@ import {
   Stack,
   Icon
 } from '@mui/material';
-
-import { useSelector } from 'react-redux';
-
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
-import { useRouter } from 'next/router';
-import { RootState } from '../../../store/reducers';
-import { TABLE_COLUMN_SIZES } from '../../../utils/table-utils';
-import appIcons from '../../../utils/icon-utils';
-import { convertDurationToMinutesOrHours } from '../../../utils/lib';
 import {
   TableCellComponent,
   TableCellWithImage
-} from '../../../components/Table/TableCellComponent';
-import { ImageSize } from '../../../components/ImageComponent';
+} from '@components/Table/TableCellComponent';
+import { ImageSize } from '@components/ImageComponent';
+
+import { RootState } from '@store/reducers';
+
+import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
+import appIcons from '@utils/icon-utils';
+import { convertDurationToMinutesOrHours } from '@utils/lib';
 
 const syncsColumns: TableColumnProps[] = [
   {

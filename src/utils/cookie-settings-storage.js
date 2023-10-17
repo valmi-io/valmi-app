@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import Storage from './storage';
+import Storage from '@utils/storage';
 
 class CookieSettingsStorage extends Storage {
   get accepted() {

@@ -5,10 +5,11 @@
  */
 
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
+
 import { Box, MenuItem, Stack, styled } from '@mui/material';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
+import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
 import {
   getDestinationModes,
   getSelectedDestinationMode,
@@ -18,17 +19,20 @@ import {
   saveSelectedSourceMode,
   showCustomMappings,
   showTemplatedMappings
-} from './mappingManagement';
-import { setFlowState } from '../../../store/reducers/syncFlow';
-import IdMapping from './IdMapping';
-import FieldMappingContainer from './FieldMappingContainer';
-import SelectDropdown from '../../../components/SelectDropdown';
-import { StackLayout } from '@/components/Layouts/Layouts';
-import { ErrorStatusText } from '../../../components/Error';
-import TemplatedFieldsContainer from './TemplatedMapping';
-import MappingCard from './MappingCard';
-import ConnectionCard from '../../Syncs/SyncDetails/ConnectionCard';
-import appIcons from '../../../utils/icon-utils';
+} from '@content/SyncFlow/Mapping/mappingManagement';
+import IdMapping from '@content/SyncFlow/Mapping/IdMapping';
+import FieldMappingContainer from '@content/SyncFlow/Mapping/FieldMappingContainer';
+import TemplatedFieldsContainer from '@content/SyncFlow/Mapping/TemplatedMapping';
+import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
+
+import SelectDropdown from '@components/SelectDropdown';
+import { StackLayout } from '@components/Layouts/Layouts';
+import { ErrorStatusText } from '@components/Error';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
+
+import appIcons from '@utils/icon-utils';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2

@@ -7,7 +7,9 @@
 import { IconButton, TableCell, Tooltip, Typography } from '@mui/material';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 
-import ImageComponent, { ImageComponentProps } from '../../ImageComponent';
+import ImageComponent, {
+  ImageComponentProps
+} from '@components/ImageComponent';
 
 interface TableCellProps {
   text: string;

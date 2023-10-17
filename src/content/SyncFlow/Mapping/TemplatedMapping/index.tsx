@@ -8,11 +8,15 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import MessageIcon from '@mui/icons-material/Message';
 
-import { getTemplateMapping, updateItemInTemplate } from '../mappingManagement';
-import { setFlowState } from '../../../../store/reducers/syncFlow';
-import { RootState } from '../../../../store/reducers';
-import TemplatedFields from './TemplatedFields';
-import MappingCard from '../MappingCard';
+import {
+  getTemplateMapping,
+  updateItemInTemplate
+} from '@content/SyncFlow/Mapping/mappingManagement';
+import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
+import TemplatedFields from '@content/SyncFlow/Mapping/TemplatedMapping/TemplatedFields';
+
+import { setFlowState } from '@store/reducers/syncFlow';
+import { RootState } from '@store/reducers';
 
 const TemplatedFieldsContainer = () => {
   const dispatch = useDispatch();

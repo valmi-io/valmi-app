@@ -7,25 +7,25 @@
 import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
+
 import { Box, Button, Divider, styled } from '@mui/material';
-
 import PostAddIcon from '@mui/icons-material/PostAdd';
-
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 
-import { RootState } from '../../../store/reducers';
-
-import { setFlowState } from '../../../store/reducers/syncFlow';
 import {
   addNewItemToMap,
   deleteItemFromMap,
   enableCustomMappingItem,
   getMapping,
   updateItemInMap
-} from './mappingManagement';
-import FieldMapping from './FieldMapping';
-import PopoverComponent from '../../../components/Popover';
-import MappingCard from './MappingCard';
+} from '@content/SyncFlow/Mapping/mappingManagement';
+import FieldMapping from '@content/SyncFlow/Mapping/FieldMapping';
+import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
+
+import PopoverComponent from '@components/Popover';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
 
 const MappingButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(1)

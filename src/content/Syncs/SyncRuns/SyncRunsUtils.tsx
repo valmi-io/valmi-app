@@ -9,8 +9,8 @@ import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import FontAwesomeIcon from '../../../components/Icon/FontAwesomeIcon';
+} from '@components/Error/ErrorUtils';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 export const getIcon = (type) => {
   let className = 'fa-circle-exclamation';

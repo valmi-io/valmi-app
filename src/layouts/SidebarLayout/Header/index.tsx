@@ -7,16 +7,20 @@
 
 import { useContext } from 'react';
 
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+
 import { Box, alpha, IconButton, Tooltip, styled, Button } from '@mui/material';
 import MenuTwoToneIcon from '@mui/icons-material/MenuTwoTone';
-import { SidebarContext } from 'src/contexts/SidebarContext';
 import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
 
-import HeaderUserbox from './Userbox';
-import IconBreadcrumbs from '../../../components/Breadcrumb';
-import { useRouter } from 'next/router';
-import { getRouterPathname, isPublicSync } from '../../../utils/routes';
-import Link from 'next/link';
+import HeaderUserbox from '@layouts/SidebarLayout/Header/Userbox';
+
+import { SidebarContext } from '@contexts/SidebarContext';
+
+import IconBreadcrumbs from '@components/Breadcrumb';
+
+import { getRouterPathname, isPublicSync } from '@utils/routes';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `

@@ -5,34 +5,40 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { FC, ReactElement, ReactNode, useEffect } from 'react';
-import React from 'react';
+import React, { FC, ReactElement, ReactNode, useEffect } from 'react';
+
+import { useDispatch, useStore } from 'react-redux';
+
+import { PersistGate } from 'redux-persist/integration/react';
+
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import ThemeProviderWrapper from '@/theme/ThemeProviderWrapper';
+
 import CssBaseline from '@mui/material/CssBaseline';
+
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import createEmotionCache from 'src/createEmotionCache';
-import { SidebarProvider } from 'src/contexts/SidebarContext';
+
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { PersistGate } from 'redux-persist/integration/react';
 
-import { AppDispatch, AppState, wrapper } from 'src/store/store';
-import { useDispatch, useStore } from 'react-redux';
-import { setAppState } from '../src/store/reducers/appFlow';
+import ThemeProviderWrapper from '@theme/ThemeProviderWrapper';
+
+import createEmotionCache from 'src/createEmotionCache';
+
+import { SidebarProvider } from '@contexts/SidebarContext';
+
+import { AppDispatch, AppState, wrapper } from '@store/store';
+import { setAppState } from '@store/reducers/appFlow';
 
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
-import {
-  initializeBugsnag,
-  isBugsnagClientInitialized
-} from '../src/lib/bugsnag';
+import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -46,15 +52,15 @@ type AppPropsWithLayout = AppProps & {
 };
 
 // Check that PostHog is client-side (used to handle Next.js SSR)
-// if (typeof window !== 'undefined') {
-//   posthog.init(process.env.POSTHOG_KEY, {
-//     api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
-//     // Enable debug mode in development
-//     loaded: (posthog) => {
-//       if (process.env.NODE_ENV === 'development') posthog.debug();
-//     }
-//   });
-// }
+if (typeof window !== 'undefined') {
+  posthog.init(process.env.POSTHOG_KEY, {
+    api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
+    // Enable debug mode in development
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === 'development') posthog.debug();
+    }
+  });
+}
 
 // Bugsnag configuration
 if (!isBugsnagClientInitialized()) {
@@ -82,7 +88,7 @@ const MyApp: FC<AppPropsWithLayout> = ({
 
     // Track page views
     const handleRouteComplete = () => {
-      // posthog?.capture('$pageview');
+      posthog?.capture('$pageview');
 
       NProgress.done();
     };
@@ -136,9 +142,9 @@ const MyApp: FC<AppPropsWithLayout> = ({
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <CssBaseline />
-              {/* <PostHogProvider client={posthog}> */}
-              {getLayout(<Component {...pageProps} />)}
-              {/* </PostHogProvider> */}
+              <PostHogProvider client={posthog}>
+                {getLayout(<Component {...pageProps} />)}
+              </PostHogProvider>
             </LocalizationProvider>
           </ThemeProviderWrapper>
         </SidebarProvider>

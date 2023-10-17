@@ -5,8 +5,10 @@
  */
 
 import { Chip, Paper, Stack, Typography, styled } from '@mui/material';
-import ImageComponent, { ImageSize } from '../../../components/ImageComponent';
-import { capitalizeFirstLetter } from '../../../utils/lib';
+
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
+
+import { capitalizeFirstLetter } from '@utils/lib';
 
 const ConnectorChip = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100],

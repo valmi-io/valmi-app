@@ -5,10 +5,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { createSlice } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
-import { PayloadAction } from '@reduxjs/toolkit';
-import { ConnectionType } from '../../content/Connections/ConnectionModel';
+
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { ConnectionType } from '@content/Connections/ConnectionModel';
 
 type ConnectionFlowState = {
   flowState: {

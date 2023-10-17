@@ -5,10 +5,12 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next/types';
+
 import axios from 'axios';
 
-import { configureCredentials } from './utils';
-import { sendErrorToBugsnag } from '../../src/lib/bugsnag';
+import { configureCredentials } from 'pages/api/utils';
+
+import { sendErrorToBugsnag } from '@lib/bugsnag';
 
 const getFbLongLivedToken = async (
   req: NextApiRequest,

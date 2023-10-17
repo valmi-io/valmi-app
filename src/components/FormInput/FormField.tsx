@@ -6,10 +6,12 @@
  */
 
 import React from 'react';
+
 import { Controller } from 'react-hook-form';
 
-import FormFieldAuth from './FormFieldAuth';
-import { FormObject, getInputField } from '../../utils/form-utils';
+import FormFieldAuth from '@components/FormInput/FormFieldAuth';
+
+import { FormObject, getInputField } from '@utils/form-utils';
 interface FormFieldProps extends FormObject {
   hasAuthorizedOAuth?: boolean;
   oauth_error?: string;

@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { HOUR, MIN } from '../content/SyncFlow/Schedule/scheduleManagement';
+import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 
 export const stringAvatar = (name: string) => {
   return {

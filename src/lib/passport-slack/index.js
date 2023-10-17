@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-const Strategy = require('./strategy');
+const Strategy = require('@lib/passport-slack/strategy');
 
 exports = module.exports = Strategy;
 exports.Strategy = Strategy;

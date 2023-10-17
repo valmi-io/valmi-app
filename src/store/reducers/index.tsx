@@ -5,12 +5,12 @@
  */
 
 import { combineReducers } from '@reduxjs/toolkit';
-import { apiSlice } from '../api/apiSlice';
 
-import { user } from './user';
-import { connectionFlow } from './connectionFlow';
-import { syncFlow } from './syncFlow';
-import { appFlow } from './appFlow';
+import { apiSlice } from '@store/api/apiSlice';
+import { user } from '@store/reducers/user';
+import { connectionFlow } from '@store/reducers/connectionFlow';
+import { syncFlow } from '@store/reducers/syncFlow';
+import { appFlow } from '@store/reducers/appFlow';
 
 const rootReducer = combineReducers({
   [appFlow.name]: appFlow.reducer,

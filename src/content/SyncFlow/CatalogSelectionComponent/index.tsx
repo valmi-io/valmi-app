@@ -5,11 +5,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
-import { MenuItem } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { setFlowState } from '../../../store/reducers/syncFlow';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { MenuItem } from '@mui/material';
+
 import {
   getCatalogLabel,
   getMyRefreshKey,
@@ -18,17 +19,22 @@ import {
   setMyRefreshKey,
   setResults,
   setSelectedValue
-} from '../stateManagement';
-import { capitalizeFirstLetter } from '../../../utils/lib';
+} from '@content/SyncFlow/stateManagement';
+
 import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../../components/Error/ErrorUtils';
-import { ErrorStatusText } from '../../../components/Error';
-import SelectDropdown from '../../../components/SelectDropdown';
-import { StackLayout } from '@/components/Layouts/Layouts';
-import ImageComponent, { ImageSize } from '../../../components/ImageComponent';
+} from '@components/Error/ErrorUtils';
+import { ErrorStatusText } from '@components/Error';
+import SelectDropdown from '@components/SelectDropdown';
+import { StackLayout } from '@components/Layouts/Layouts';
+import ImageComponent, { ImageSize } from '@components/ImageComponent';
+
+import { RootState } from '@store/reducers';
+import { setFlowState } from '@store/reducers/syncFlow';
+
+import { capitalizeFirstLetter } from '@utils/lib';
 
 const CatalogSelectionComponent = (props) => {
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);

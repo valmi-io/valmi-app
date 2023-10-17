@@ -4,8 +4,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Step } from '../../components/Stepper';
-import constants from '../../constants';
+import { Step } from '@components/Stepper';
+import constants from '@constants/index';
 
 export enum ConnectionType {
   SRC = 'SRC',

@@ -5,9 +5,13 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useLazyFetchCredentialsQuery } from '../../../store/api/apiSlice';
-import CatalogSelectionComponent from '../CatalogSelectionComponent';
-import { setSelectedValue, setVarsinSubStep } from '../stateManagement';
+import CatalogSelectionComponent from '@content/SyncFlow/CatalogSelectionComponent';
+import {
+  setSelectedValue,
+  setVarsinSubStep
+} from '@content/SyncFlow/stateManagement';
+
+import { useLazyFetchCredentialsQuery } from '@store/api/apiSlice';
 
 export function ConnectionSelectionState(
   refreshKey,

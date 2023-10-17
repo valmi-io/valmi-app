@@ -1,86 +1,70 @@
-// @ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
+ * Created Date: Friday, May 26th 2023, 12:43:41 pm
  * Author: Nagendra S @ valmi.io
  */
 
-import { Card } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { useFetchCredentialsQuery } from '../../store/api/apiSlice';
-import { useEffect, useState } from 'react';
-import { RootState } from '../../store/reducers';
-import ConnectionsTable from './ConnectionsTable';
-import { ErrorStatusText } from '../../components/Error';
-import {
-  getErrorsInData,
-  hasErrorsInData
-} from '../../components/Error/ErrorUtils';
-import { SkeletonContainer } from '../../components/Layouts/Layouts';
-import SkeletonLoader from '../../components/SkeletonLoader';
-import ListEmptyComponent from '../../components/ListEmptyComponent';
-import ErrorContainer from '../../components/Error/ErrorContainer';
+import { useEffect } from 'react';
 
-const getConnectorConfig = (connector: any) => {
-  const config = {
-    id: connector.id,
-    name: connector.name,
-    display_name: connector.display_name,
-    config: connector.connector_config,
-    type: connector.connector_type.split('_')[1],
-    account: connector.account
-  };
-  return config;
+import { useRouter } from 'next/router';
+import { Card, Grid, Paper } from '@mui/material';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import PageLayout from '@layouts/PageLayout';
+
+import { useFilteredConnectionsData } from '@content/Connections/useFilteredConnectionsData';
+import ConnectionsTable from '@content/Connections/ConnectionsTable';
+
+import ListEmptyComponent from '@components/ListEmptyComponent';
+import ErrorContainer from '@components/Error/ErrorContainer';
+import { ErrorStatusText } from '@components/Error';
+import { SkeletonContainer } from '@components/Layouts/Layouts';
+import SkeletonLoader from '@components/SkeletonLoader';
+
+import { RootState } from '@store/reducers';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
+
+import { initialiseConnectionFlowState } from '@utils/connection-utils';
+
+type ConnectionLayoutProps = {
+  pageHeadTitle: string;
+  title: string;
+  buttonTitle: string;
+  connectionType: string;
 };
 
-const Connections = ({ connection_type }: any) => {
+const Connections = (props: ConnectionLayoutProps) => {
+  const { pageHeadTitle, title, buttonTitle, connectionType } = props;
+
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  // Redux store state.
   const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  /** Redux store */
+  const connection_flow = useSelector(
+    (state: RootState) => state.connectionFlow
+  );
 
   const { workspaceId = '' } = appState;
 
-  const { data, isFetching, isError, error } = useFetchCredentialsQuery(
-    {
-      workspaceId,
-      queryId: 0
-    },
-    { refetchOnMountOrArgChange: true }
-  );
-
-  const [connectionsLoading, setConnectionsLoading] = useState<boolean>(true);
-  const [connections, setConnections] = useState<any>([]);
-
-  const [traceError, setTraceError] = useState<any>(null);
+  const { connectionsError, filteredConnectionsData, isFetching, traceError } =
+    useFilteredConnectionsData(workspaceId, connectionType);
 
   useEffect(() => {
-    if (data && data.resultData) {
-      // checking if data has any trace errors.
-      if (hasErrorsInData(data.resultData)) {
-        const traceError = getErrorsInData(data.resultData);
-        setTraceError(traceError);
-      } else {
-        filterConnections(data.resultData, connection_type);
-      }
-    }
-  }, [data]);
-
-  const filterConnections = (data, connection_type) => {
-    let connections = [];
-    data.forEach((connector) => {
-      const connectorType = connector.connector_type.split('_')[0];
-      if (connection_type === connectorType) {
-        connections.push(getConnectorConfig(connector));
-      }
-    });
-    setConnections(connections);
-    setConnectionsLoading(false);
-  };
+    // initialising connection_flow state.
+    initialiseConnectionFlowState(dispatch, connection_flow, connectionType);
+  }, []);
 
   const displayContent = () => {
-    if (connections.length > 0) {
+    if (filteredConnectionsData.length > 0) {
+      // Display connections when connections data length > 0
       return (
         <ConnectionsTable
-          connections={connections}
-          connector_type={connection_type}
+          connections={filteredConnectionsData}
+          connectionType={connectionType}
         />
       );
     }
@@ -95,24 +79,61 @@ const Connections = ({ connection_type }: any) => {
     );
   };
 
+  const navigateToCreateConnectionsPage = () => {
+    // update connection_type in connection_flow state.
+    dispatch(
+      setConnectionFlow({
+        connection_type: connectionType,
+        currentStep: 0,
+        steps: [],
+        isEditableFlow: false
+      })
+    );
+
+    router.push(`/spaces/${workspaceId}/connections/create`);
+  };
+
   return (
-    <Card>
-      {/** Display Errors */}
-      {isError && <ErrorContainer error={error?.errorData} />}
+    <PageLayout
+      pageHeadTitle={pageHeadTitle}
+      title={title}
+      buttonTitle={buttonTitle}
+      handleButtonOnClick={navigateToCreateConnectionsPage}
+    >
+      <Paper variant="outlined">
+        <Grid
+          container
+          direction="row"
+          justifyContent="center"
+          alignItems="stretch"
+          spacing={3}
+        >
+          {/* Display Connection based on connection_type */}
+          <Grid item xs={12}>
+            <Card>
+              {/** Display Errors */}
+              {connectionsError && <ErrorContainer error={connectionsError} />}
 
-      {/** Display Trace Error */}
-      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+              {/** Display Trace Error */}
+              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
-      {/** Display Skeleton */}
-      {isFetching && (
-        <SkeletonContainer>
-          <SkeletonLoader />
-        </SkeletonContainer>
-      )}
+              {/** Display Skeleton */}
+              {isFetching && (
+                <SkeletonContainer>
+                  <SkeletonLoader />
+                </SkeletonContainer>
+              )}
 
-      {/** Display Content */}
-      {!isError && !isFetching && connections && displayContent()}
-    </Card>
+              {/** Display Page Content */}
+              {!connectionsError &&
+                !isFetching &&
+                filteredConnectionsData &&
+                displayContent()}
+            </Card>
+          </Grid>
+        </Grid>
+      </Paper>
+    </PageLayout>
   );
 };
 

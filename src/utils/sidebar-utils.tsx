@@ -5,7 +5,8 @@
  */
 
 import { Cable } from '@mui/icons-material';
-import appIcons from './icon-utils';
+
+import appIcons from '@utils/icon-utils';
 
 export const getSidebarRoutes = (workspaceId: any) => {
   return [

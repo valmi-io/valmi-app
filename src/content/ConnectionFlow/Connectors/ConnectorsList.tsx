@@ -4,17 +4,21 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { useEffect } from 'react';
+
 import { Grid } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ConnectorModel } from '@/content/Connections/ConnectionModel';
-import { RootState } from '@/store/reducers';
-import { AppDispatch } from '@/store/store';
-import ConnectorCard from './ConnectorCard';
-import { setConnectionFlow } from '../../../store/reducers/connectionFlow';
-import { useEffect } from 'react';
-import { initialiseConnectorSelectionState } from '../../../utils/connection-utils';
+import { ConnectorModel } from '@content/Connections/ConnectionModel';
+import ConnectorCard from '@content/ConnectionFlow/Connectors/ConnectorCard';
+
+import { RootState } from '@store/reducers';
+import { AppDispatch } from '@store/store';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
+
+import { initialiseConnectorSelectionState } from '@utils/connection-utils';
+
 interface ConnectorListProps {
   data: ConnectorModel[];
 }

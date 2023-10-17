@@ -5,8 +5,10 @@
  */
 
 import { NextApiRequest, NextApiResponse } from 'next/types';
+
 import nextConnect from 'next-connect';
-import passport from '@/lib/passport-slack';
+
+import passport from '@lib/passport-slack';
 
 export default nextConnect().get(
   passport.authenticate('slack', { session: false }),

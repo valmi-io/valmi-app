@@ -6,22 +6,29 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import Head from '@/components/PageHead';
 import { useRouter } from 'next/router';
+
 import { useDispatch, useSelector } from 'react-redux';
-import BaseLayout from '../../src/layouts/BaseLayout';
-import { RootState } from '../../src/store/reducers';
-import { NextPageWithLayout } from '../_app';
-import ActivationComponent from '../../src/content/Authentication/ActivationComponent';
-import { useLazyResendActivationTokenQuery } from '../../src/store/api/apiSlice';
+
+import { NextPageWithLayout } from '@/pages_app';
+
+import BaseLayout from '@layouts/BaseLayout';
+
+import ActivationComponent from '@content/Authentication/ActivationComponent';
+
+import Head from '@components/PageHead';
 import {
   getErrorsInData,
   getErrorsInErrorObject,
   hasErrorsInData
-} from '../../src/components/Error/ErrorUtils';
-import { AppDispatch } from '../../src/store/store';
-import { setAppState } from '../../src/store/reducers/appFlow';
-import { isObjectEmpty } from '../../src/utils/lib';
+} from '@components/Error/ErrorUtils';
+
+import { RootState } from '@store/reducers';
+import { useLazyResendActivationTokenQuery } from '@store/api/apiSlice';
+import { AppDispatch } from '@store/store';
+import { setAppState } from '@store/reducers/appFlow';
+
+import { isObjectEmpty } from '@utils/lib';
 
 const ActivatePage: NextPageWithLayout = () => {
   const router = useRouter();
