@@ -8,8 +8,6 @@ import { useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { Box } from '@mui/material';
-
 import ConnectorLayout from '@layouts/ConnectorLayout';
 
 import ConnectorsList from '@content/ConnectionFlow/Connectors/ConnectorsList';
@@ -48,11 +46,7 @@ const Connectors = () => {
       title={constants.connections.SELECT_CONNECTOR_LAYOUT_TITLE}
     >
       {isError && <ErrorComponent error={error} />}
-      {isLoading && (
-        <Box sx={{ width: '50%' }}>
-          <SkeletonLoader />
-        </Box>
-      )}
+      <SkeletonLoader loading={isLoading} />
       {!isLoading && data && <ConnectorsList data={filteredData} />}
     </ConnectorLayout>
   );

@@ -7,13 +7,9 @@
 
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
-
 import { Box, styled, Stack, Container, Paper } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
-
-import { FormObject, getInputField } from '@utils/form-utils';
 
 const Layout = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -32,8 +28,6 @@ const ContainerLayout = styled(Container)(({}) => ({
 }));
 
 const AuthenticationLayout = (props) => {
-  const { control, fields, handleSubmit, onSubmit } = props;
-
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
       <ContainerLayout maxWidth="sm">
@@ -46,47 +40,7 @@ const AuthenticationLayout = (props) => {
               size={ImageSize.logo}
             />
           </Stack>
-
-          <Box
-            component="form"
-            sx={{
-              '& .MuiTextField-root': {
-                mt: 1,
-                mb: 1,
-                width: '100%'
-              }
-            }}
-            noValidate
-            onSubmit={handleSubmit(onSubmit)}
-            autoComplete="off"
-          >
-            {fields.map((inputField: FormObject) => (
-              <Controller
-                key={inputField.name}
-                name={inputField.name}
-                control={control}
-                defaultValue=""
-                rules={{ required: inputField.required }}
-                render={({ field, fieldState: { error } }) => {
-                  return getInputField(
-                    field,
-                    inputField.description,
-                    error ? true : false,
-                    inputField.label,
-                    inputField.enumValue,
-                    inputField.required,
-                    inputField.disabled,
-                    !field.value ? '' : field.value,
-                    inputField.fieldType,
-                    null,
-                    null,
-                    null
-                  );
-                }}
-              />
-            ))}
-            <Stack sx={{ mb: 1 }}>{props.children}</Stack>
-          </Box>
+          {props.children}
         </Layout>
       </ContainerLayout>
     </Box>

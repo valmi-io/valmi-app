@@ -21,7 +21,7 @@ export const getIcon = (type) => {
 };
 
 export const getRunStatus = (syncRun) => {
-  let runStatus = syncRun.status ? syncRun.status : 'status';
+  let runStatus = syncRun?.status ? syncRun.status : 'status';
 
   // check if run_manager exists in syncrun object
   if (!checkIfRunManagerExists(syncRun)) return runStatus;
@@ -100,10 +100,10 @@ export const isSyncRunning = (syncRun) => {
 };
 
 export const hasRunningSyncs = (syncRuns) => {
+  if (!syncRuns) return false;
   const currentSyncRun = getCurrentSyncRun(syncRuns);
   let status = getRunStatus(currentSyncRun);
   if (status === 'scheduled' || status === 'running') return true;
-  return false;
 };
 
 export const getCurrentSyncRun = (syncRuns) => {
@@ -134,13 +134,17 @@ export const syncRunNetworkHandler = async (
   }
 };
 
-export const getPageButtonTitle = (isPublicSync, syncRuns, isQueryPending) => {
+export const getPageButtonTitle = (
+  isPublicSync,
+  syncRuns,
+  isPromisePending
+) => {
   if (isPublicSync) return 'LIVE DATA';
   return hasRunningSyncs(syncRuns)
-    ? isQueryPending
+    ? isPromisePending
       ? 'STOPPING...'
       : 'STOP SYNC'
-    : isQueryPending
+    : isPromisePending
     ? 'STARTING...'
     : 'START SYNC';
 };

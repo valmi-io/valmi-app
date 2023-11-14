@@ -17,7 +17,7 @@ import {
   SyncRunLogProps
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
-import { SkeletonContainer } from '@components/Layouts/Layouts';
+import { SkeletonLayout } from '@components/Layouts/Layouts';
 import SkeletonLoader from '@components/SkeletonLoader';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
@@ -190,11 +190,7 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
       {/** Display Skeleton */}
-      {isLoading && (
-        <SkeletonContainer>
-          <SkeletonLoader />
-        </SkeletonContainer>
-      )}
+      <SkeletonLoader loading={isLoading} />
 
       {/** Display Content */}
       {!isError && !isLoading && data && displayContent()}

@@ -62,11 +62,15 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
   const handleRowHover = (rowData) => {
     //  Delay the dialog appearance by 300 milliseconds
     const timeDelay = 300; // milliseconds
-    const timeout = setTimeout(() => {
+
+    // setTimeout callback
+    const openDialog = () => {
       setSelectedRowData(rowData, null, 2);
       setCopied(false);
       setDialogOpen(true);
-    }, timeDelay);
+    };
+
+    const timeout = setTimeout(openDialog, timeDelay);
 
     // Store the timeout ID
     setHoverTimeout(timeout);

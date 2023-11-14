@@ -42,10 +42,6 @@ const ContainerLayout = styled(Container)(({}) => ({
   alignItems: 'center'
 }));
 
-const SkeletonContainer = styled(Box)(({}) => ({
-  width: '100%'
-}));
-
 type ActivationComponentProps = {
   isLoading?: boolean;
   cardTitle?: string;
@@ -128,11 +124,7 @@ const ActivationComponent = (props: ActivationComponentProps) => {
             />
           </Stack>
           <Stack sx={{ mb: 1 }}>
-            {isLoading && (
-              <SkeletonContainer>
-                <SkeletonLoader />
-              </SkeletonContainer>
-            )}
+            <SkeletonLoader loading={isLoading} />
 
             {!isLoading && displayContent()}
           </Stack>

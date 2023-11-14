@@ -19,7 +19,6 @@ import ConnectionsTable from '@content/Connections/ConnectionsTable';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import { ErrorStatusText } from '@components/Error';
-import { SkeletonContainer } from '@components/Layouts/Layouts';
 import SkeletonLoader from '@components/SkeletonLoader';
 
 import { RootState } from '@store/reducers';
@@ -118,11 +117,7 @@ const Connections = (props: ConnectionLayoutProps) => {
               {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
               {/** Display Skeleton */}
-              {isFetching && (
-                <SkeletonContainer>
-                  <SkeletonLoader />
-                </SkeletonContainer>
-              )}
+              <SkeletonLoader loading={isFetching} />
 
               {/** Display Page Content */}
               {!connectionsError &&

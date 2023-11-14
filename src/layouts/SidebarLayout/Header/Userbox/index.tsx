@@ -68,11 +68,11 @@ const HeaderUserbox = () => {
   // Popover states
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = (): void => {
+  const handlePopoverClose = (): void => {
     setAnchorEl(null);
   };
 
@@ -101,7 +101,7 @@ const HeaderUserbox = () => {
 
   return (
     <>
-      <UserBoxButton color="primary" ref={ref} onClick={handleOpen}>
+      <UserBoxButton color="primary" ref={ref} onClick={handlePopoverOpen}>
         {userAvatar()}
 
         <Hidden mdDown>{userTitle()}</Hidden>
@@ -111,7 +111,7 @@ const HeaderUserbox = () => {
       </UserBoxButton>
 
       {Boolean(anchorEl) && (
-        <PopoverComponent anchorEl={anchorEl} handleClose={handleClose}>
+        <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
           <MenuUserBox
             sx={{ minWidth: 210 }}
             display="flex"

@@ -15,6 +15,6 @@ export const StackLayout = styled(Stack)(({ theme }) => ({
   padding: theme.spacing(2)
 }));
 
-export const SkeletonContainer = styled(Box)(({}) => ({
+export const SkeletonLayout = styled(Box)(({}) => ({
   width: '50%'
 }));

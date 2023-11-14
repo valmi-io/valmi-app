@@ -7,23 +7,23 @@
 import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import { CheckOutlined } from '@mui/icons-material';
-import { CircularProgress, Stack, Typography } from '@mui/material';
-
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { Stack } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import BaseLayout from '@layouts/BaseLayout';
 
 import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
+import { useAuthenticationForm } from '@content/Authentication/useAuthenticationForm';
+import AuthenticationFormFooter from '@content/Authentication/AuthenticationFormFooter';
+import AuthenticationForm from '@content/Authentication/AuthenticationForm';
+import {
+  generateAuthenticationPayload,
+  generateLoginFormFields
+} from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
 import AlertComponent from '@components/Alert';
@@ -41,7 +41,6 @@ import { RootState } from '@store/reducers';
 
 import { initialiseAppState } from '@utils/login-utils';
 import authStorage from '@utils/auth-storage';
-import { getEmailField, getPasswordField } from '@utils/form-utils';
 import { signinValidationSchema } from '@utils/validation-schema';
 import { signOutUser } from '@utils/lib';
 
@@ -65,10 +64,9 @@ const Login: NextPageWithLayout = () => {
 
   const [userEmail, setUserEmail] = useState('');
 
-  const { control, handleSubmit } = useForm({
-    defaultValues: {},
-    resolver: yupResolver(signinValidationSchema)
-  });
+  const { control, handleSubmit } = useAuthenticationForm(
+    signinValidationSchema
+  );
 
   useEffect(() => {
     if (authStorage.loggedIn) {
@@ -84,15 +82,11 @@ const Login: NextPageWithLayout = () => {
     setAlertMessage(message);
   };
 
-  const generateInputFields = () => {
-    return [getEmailField(), getPasswordField()];
-  };
-
   const onSubmit = (values: any) => {
-    const payload = {
-      email: values['email'],
-      password: values['password']
-    };
+    {
+      /** Generate login payload */
+    }
+    const payload = generateAuthenticationPayload(values);
     setUserEmail(values['email']);
     loginHandler(payload);
   };
@@ -130,29 +124,6 @@ const Login: NextPageWithLayout = () => {
     showAlertDialog(false);
   };
 
-  const displaySubmitButton = (isFetching: any, loginData: any) => {
-    let endIcon = null;
-    endIcon = isFetching && (
-      <CircularProgress size={16} sx={{ color: 'white' }} />
-    );
-    if (loginData) {
-      endIcon = <CheckOutlined fontSize="small" />;
-    }
-    return (
-      <Button
-        type="submit"
-        fullWidth={true}
-        variant="contained"
-        color="primary"
-        size="large"
-        endIcon={endIcon}
-        sx={{ mt: 2 }}
-      >
-        Sign in
-      </Button>
-    );
-  };
-
   const resendActivationLinkHandler = () => {
     dispatch(
       setAppState({
@@ -179,29 +150,26 @@ const Login: NextPageWithLayout = () => {
         onButtonClick={resendActivationLinkHandler}
         isError={isErrorAlert}
       />
-      <AuthenticationLayout
-        fields={generateInputFields()}
-        control={control}
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-      >
-        <Stack spacing={2}>
-          {displaySubmitButton(isFetching, loginData)}
-
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link href="/signup" style={{ textDecoration: 'none' }}>
-                <Typography
-                  sx={{
-                    color: (theme) => theme.palette.primary.main
-                  }}
-                  variant="body2"
-                >
-                  {"Don't have an account? Sign up"}
-                </Typography>
-              </Link>
-            </Grid>
-          </Grid>
+      {/** Page layout */}
+      <AuthenticationLayout>
+        {/** Display form */}
+        <AuthenticationForm
+          fields={generateLoginFormFields()}
+          control={control}
+          handleSubmit={handleSubmit}
+          onSubmit={onSubmit}
+          isFetching={isFetching}
+          data={loginData}
+          buttonText={'Sign in'}
+        />
+        <Stack sx={{ mt: 1 }}>
+          <Stack spacing={2}>
+            {/** Display footer */}
+            <AuthenticationFormFooter
+              href={'/signup'}
+              footerText={"Don't have an account? Sign up"}
+            />
+          </Stack>
         </Stack>
       </AuthenticationLayout>
     </>

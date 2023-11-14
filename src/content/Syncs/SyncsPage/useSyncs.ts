@@ -4,17 +4,22 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useState } from 'react';
-
 import { useFetchSyncsQuery } from '@store/api/apiSlice';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
 
 import { useTraceErrorCheck } from '@hooks/useTraceErrorCheck';
 
-export const useSyncsData = (workspaceId: string) => {
-  const [syncsError, setSyncsError] = useState<any>(null);
+/**
+ * Responsible for fetching the `syncs`.
+ *
+ * - Responsible for taking `workspaceId` prop.
+ * - Passes `data` to the `useTraceErrorCheck` hook.
+ * - Responsible for sending error to `bugsnag`.
+ * - returns `data`, `error`, `traceError`, `isFetching` values.
+ */
 
+export const useSyncs = (workspaceId: string) => {
   const { data, isFetching, isError, error } = useFetchSyncsQuery(
     {
       workspaceId
@@ -25,16 +30,10 @@ export const useSyncsData = (workspaceId: string) => {
   // Use the custom hook to check for trace errors in the data
   const traceError = useTraceErrorCheck(data);
 
-  if (traceError) {
-    // Send error to Bugsnag when a trace error is detected
-    sendErrorToBugsnag(traceError);
+  if (traceError || isError) {
+    // Send error to Bugsnag when a `error` is detected
+    sendErrorToBugsnag(traceError || error);
   }
 
-  if (isError && !syncsError) {
-    // Send error to Bugsnag when a general error occurs
-    setSyncsError(error);
-    sendErrorToBugsnag(error);
-  }
-
-  return { data, isFetching, traceError, syncsError };
+  return { data, isFetching, traceError, error };
 };

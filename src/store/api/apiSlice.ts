@@ -320,6 +320,7 @@ export const apiSlice = createApi({
       query: (arg) => {
         const { workspaceId, syncId, config } = arg;
         const url = `/workspaces/${workspaceId}/syncs/${syncId}/runs/create`;
+
         return {
           url,
           method: 'POST',

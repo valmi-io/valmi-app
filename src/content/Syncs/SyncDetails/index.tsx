@@ -17,7 +17,6 @@ import SyncDetailsCard from '@content/Syncs/SyncDetails/SyncDetailsCard';
 import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
-import { SkeletonContainer } from '@components/Layouts/Layouts';
 
 import {
   useLazyGetSyncByIdQuery,
@@ -129,11 +128,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
       {/** Display Trace Error */}
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
-      {isFetching && (
-        <SkeletonContainer>
-          <SkeletonLoader />
-        </SkeletonContainer>
-      )}
+      <SkeletonLoader loading={isFetching} />
 
       {isPublicSync(getRouterPathname(query, url)) ? (
         <SyncDetailsCard

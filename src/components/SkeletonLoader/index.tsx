@@ -5,14 +5,26 @@
  */
 
 import Skeleton from '@mui/material/Skeleton';
+import { SkeletonLayout } from '../Layouts/Layouts';
 
-const SkeletonLoader = () => {
+interface SkeletonLoadingProps {
+  loading: boolean;
+}
+
+/**
+ * Responsible for taking a `loading` prop and rendering `Skeleton`.
+ *
+ * - Responsible for its inner layout.
+ */
+
+const SkeletonLoader = ({ loading }: SkeletonLoadingProps) => {
+  if (!loading) return null;
   return (
-    <>
+    <SkeletonLayout>
       {[...Array(5)].map((_, index) => (
         <Skeleton key={index} animation="wave" sx={{ my: 4, mx: 1 }} />
       ))}
-    </>
+    </SkeletonLayout>
   );
 };
 

@@ -45,11 +45,11 @@ const FieldMappingContainer = () => {
     dispatch(setFlowState(flowState));
   };
 
-  const handleClickOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handlePopoverClose = () => {
     setAnchorEl(null);
   };
 
@@ -73,7 +73,7 @@ const FieldMappingContainer = () => {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={() => {
             saveToStore(addNewItemToMap(flowState, itemType));
-            handleClose();
+            handlePopoverClose();
           }}
         >
           {title}
@@ -89,7 +89,7 @@ const FieldMappingContainer = () => {
     >
       {/* Display Popover when clicked on the Add mapping button  */}
       {Boolean(anchorEl) && (
-        <PopoverComponent anchorEl={anchorEl} handleClose={handleClose}>
+        <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
           {displayPopoverItem('Predefined field', 'dropdown')}
           <Divider />
           {displayPopoverItem('Custom field', 'free')}
@@ -111,7 +111,7 @@ const FieldMappingContainer = () => {
       />
 
       {/** Add mapping button*/}
-      <MappingButton variant="contained" onClick={handleClickOpen}>
+      <MappingButton variant="contained" onClick={handlePopoverOpen}>
         + Add Mapping
       </MappingButton>
     </MappingCard>

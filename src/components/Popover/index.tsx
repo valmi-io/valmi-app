@@ -8,17 +8,17 @@ import { Paper, Popover } from '@mui/material';
 import React from 'react';
 
 type PopoverProps = {
-  handleClose: () => void;
+  onClose: () => void;
   anchorEl: any;
   children: React.ReactNode;
 };
 
 const PopoverComponent = (props: PopoverProps) => {
-  const { handleClose, anchorEl, children } = props;
+  const { onClose, anchorEl, children } = props;
   return (
     <Popover
       anchorEl={anchorEl}
-      onClose={handleClose}
+      onClose={onClose}
       open={Boolean(anchorEl)}
       anchorOrigin={{
         vertical: 'bottom',

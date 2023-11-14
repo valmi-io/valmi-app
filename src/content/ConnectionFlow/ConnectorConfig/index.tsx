@@ -30,7 +30,6 @@ import {
 import SkeletonLoader from '@components/SkeletonLoader';
 import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
-import { SkeletonContainer } from '@components/Layouts/Layouts';
 import Instructions from '@components/Instructions';
 
 import { generateConfigFromSpec } from '@utils/connection-utils';
@@ -255,11 +254,7 @@ const ConnectorConfig = ({
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
       {/** Display Skeleton */}
-      {isFetching && (
-        <SkeletonContainer>
-          <SkeletonLoader />
-        </SkeletonContainer>
-      )}
+      <SkeletonLoader loading={isFetching} />
 
       {/** Display Content */}
       {!isFetching && data && (

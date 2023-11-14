@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Thursday, April 13th 2023, 8:34:45 pm
@@ -7,24 +8,23 @@
 import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-
-import { CircularProgress, Stack, Typography } from '@mui/material';
-import { CheckOutlined } from '@mui/icons-material';
-
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { Stack } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import BaseLayout from '@layouts/BaseLayout';
 
 import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
+import { useAuthenticationForm } from '@content/Authentication/useAuthenticationForm';
+import AuthenticationFormFooter from '@content/Authentication/AuthenticationFormFooter';
+import AuthenticationForm from '@content/Authentication/AuthenticationForm';
+import {
+  generateAuthenticationPayload,
+  generateSignupFormFields
+} from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
 import AlertComponent from '@components/Alert';
@@ -40,12 +40,9 @@ import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
 import authStorage from '@utils/auth-storage';
-import {
-  getUsernameField,
-  getEmailField,
-  getPasswordField
-} from '@utils/form-utils';
+
 import { signupValidationSchema } from '@utils/validation-schema';
+// import useSignupHandler from '../../src/content/Authentication/useSignuphandler';
 
 const SignupPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -65,10 +62,11 @@ const SignupPage: NextPageWithLayout = () => {
 
   const [userEmail, setUserEmail] = useState('');
 
-  const { control, handleSubmit } = useForm({
-    defaultValues: {},
-    resolver: yupResolver(signupValidationSchema)
-  });
+  const { control, handleSubmit } = useAuthenticationForm(
+    signupValidationSchema
+  );
+
+  // const { handleSignup, data, isFetching, error } = useSignupHandler();
 
   useEffect(() => {
     if (authStorage.loggedIn) {
@@ -84,18 +82,14 @@ const SignupPage: NextPageWithLayout = () => {
     setAlertMessage(message);
   };
 
-  const generateInputFields = () => {
-    return [getUsernameField(), getEmailField(), getPasswordField()];
-  };
-
   const onSubmit = (values: any) => {
     setUserData(null);
-    const payload = {
-      username: values['username'],
-      email: values['email'],
-      password: values['password']
-    };
+    {
+      /** Generate signup payload */
+    }
+    const payload = generateAuthenticationPayload(values);
     setUserEmail(values['email']);
+
     signupHandler(payload);
   };
 
@@ -145,29 +139,6 @@ const SignupPage: NextPageWithLayout = () => {
     showAlertDialog(false);
   };
 
-  const displaySubmitButton = (isFetching: any, userData: any) => {
-    let endIcon = null;
-    endIcon = isFetching && (
-      <CircularProgress size={16} sx={{ color: 'white' }} />
-    );
-    if (userData) {
-      endIcon = <CheckOutlined fontSize="small" />;
-    }
-    return (
-      <Button
-        type="submit"
-        fullWidth={true}
-        variant="contained"
-        color="primary"
-        size="large"
-        endIcon={endIcon}
-        sx={{ mt: 2 }}
-      >
-        Sign up
-      </Button>
-    );
-  };
-
   const resendActivationLinkHandler = () => {
     dispatch(
       setAppState({
@@ -198,29 +169,26 @@ const SignupPage: NextPageWithLayout = () => {
         onButtonClick={resendActivationLinkHandler}
         isError={isErrorAlert}
       />
-      <AuthenticationLayout
-        fields={generateInputFields()}
-        control={control}
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-      >
-        <Stack spacing={2}>
-          {displaySubmitButton(isFetching, userData)}
-
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <Typography
-                  sx={{
-                    color: (theme) => theme.palette.primary.main
-                  }}
-                  variant="body2"
-                >
-                  {'Already have an account? Sign in'}
-                </Typography>
-              </Link>
-            </Grid>
-          </Grid>
+      {/** Page layout*/}
+      <AuthenticationLayout>
+        {/** Display Signup form */}
+        <AuthenticationForm
+          fields={generateSignupFormFields()}
+          control={control}
+          handleSubmit={handleSubmit}
+          onSubmit={onSubmit}
+          isFetching={isFetching}
+          data={userData}
+          buttonText={' Sign up'}
+        />
+        <Stack sx={{ mt: 1 }}>
+          <Stack spacing={2}>
+            {/** Display footer */}
+            <AuthenticationFormFooter
+              href={'/login'}
+              footerText={'Already have an account? Sign in'}
+            />
+          </Stack>
         </Stack>
       </AuthenticationLayout>
     </>

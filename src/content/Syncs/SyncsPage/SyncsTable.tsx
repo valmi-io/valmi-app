@@ -9,75 +9,25 @@ import { useRouter } from 'next/router';
 
 import { useSelector } from 'react-redux';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TableContainer,
-  styled,
-  Chip,
-  Stack,
-  Icon
-} from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
-import {
-  TableCellComponent,
-  TableCellWithImage
-} from '@components/Table/TableCellComponent';
-import { ImageSize } from '@components/ImageComponent';
+import { Table, TableBody, TableHead, TableContainer } from '@mui/material';
 
 import { RootState } from '@store/reducers';
 
-import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
-import appIcons from '@utils/icon-utils';
-import { convertDurationToMinutesOrHours } from '@utils/lib';
+import SyncTableRow from './SyncTableRow';
+import SyncTableColumns from './SyncTableColumns';
+import { SyncColumns } from './SyncColumns';
 
-const syncsColumns: TableColumnProps[] = [
-  {
-    id: '1',
-    label: 'Name',
-    minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.NAME
-  },
-  {
-    id: '2',
-    label: 'Warehouse',
-    minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.SRC
-  },
-  { id: '3', label: '', minWidth: TABLE_COLUMN_SIZES[0] },
-  {
-    id: '4',
-    label: 'Destination',
-    minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.DEST
-  },
-  {
-    id: '5',
-    label: 'Schedule',
-    minWidth: TABLE_COLUMN_SIZES[0],
-    icon: appIcons.SCHEDULE
-  },
-  {
-    id: '6',
-    label: 'Status',
-    minWidth: TABLE_COLUMN_SIZES[0],
-    icon: appIcons.STATUS
-  },
-  { id: '7', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
-];
+export interface SyncOnClickProps {
+  syncId: string;
+}
 
-const ChipComponent = styled(Chip)(({ theme }) => ({
-  color: theme.colors.alpha.white[100]
-}));
-
-const CustomizedTableRow = styled(TableRow)(({}) => ({
-  cursor: 'pointer'
-}));
+/**
+ * Responsible for taking a list of `syncs` prop and rendering them `SyncTableRow`s
+ *
+ * - Responsible for passing the `syncsColumns` prop to the `SyncTableColumns` component
+ * - Responsible for passing the `sync` prop to the `SyncTableRow` component.
+ * - Responsible for handling sync `onClick`
+ */
 
 const SyncsTable = ({ syncs }) => {
   const router = useRouter();
@@ -86,35 +36,9 @@ const SyncsTable = ({ syncs }) => {
 
   const { workspaceId = '' } = appState;
 
-  const generateColumns = (columns: TableColumnProps[]) => {
-    return columns.map((column) => {
-      return (
-        <TableCell
-          key={column.id}
-          align={column.align}
-          style={{
-            minWidth: column.minWidth
-          }}
-        >
-          <Stack direction="row" alignItems="center">
-            {column.icon && (
-              <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>
-                {column.icon}
-              </Icon>
-            )}
-            {column.label}
-          </Stack>
-        </TableCell>
-      );
-    });
-  };
-
-  const navigateToSyncRuns = (sync) => {
-    router.push(`/spaces/${workspaceId}/syncs/${sync.id}/runs`);
-  };
-
-  const getConnectorName = (sync, connectionType) => {
-    return sync[connectionType].credential.connector_type.split('_')[1];
+  const handleOnClick = ({ syncId }: SyncOnClickProps) => {
+    // navigate to sync runs
+    router.push(`/spaces/${workspaceId}/syncs/${syncId}/runs`);
   };
 
   return (
@@ -124,61 +48,19 @@ const SyncsTable = ({ syncs }) => {
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>
-            <TableRow>{generateColumns(syncsColumns)}</TableRow>
+            <SyncTableColumns columns={SyncColumns} />
           </TableHead>
           {/* Syncs Table Body */}
           <TableBody>
-            {syncs.length > 0 &&
-              syncs.map((sync) => {
-                return (
-                  <CustomizedTableRow
-                    hover
-                    key={sync.id}
-                    onClick={() => {
-                      navigateToSyncRuns(sync);
-                    }}
-                  >
-                    <TableCellComponent text={sync.name} />
-                    <TableCellWithImage
-                      title={sync.source.name}
-                      size={ImageSize.small}
-                      src={`/connectors/${getConnectorName(
-                        sync,
-                        'source'
-                      ).toLowerCase()}.svg`}
-                    />
-                    <TableCell>
-                      <ArrowForwardIcon style={{ fontSize: 18 }} />
-                    </TableCell>
-                    <TableCellWithImage
-                      size={ImageSize.small}
-                      title={sync.destination.name}
-                      src={`/connectors/${getConnectorName(
-                        sync,
-                        'destination'
-                      ).toLowerCase()}.svg`}
-                    />
-                    <TableCellComponent
-                      text={convertDurationToMinutesOrHours(
-                        sync.schedule.run_interval
-                      )}
-                    />
-
-                    <TableCell>
-                      <ChipComponent
-                        color={
-                          sync.status === 'active' ? 'secondary' : 'warning'
-                        }
-                        label={sync.status}
-                      />
-                    </TableCell>
-
-                    <TableCell>
-                      <NavigateNextIcon style={{ fontSize: 20 }} />
-                    </TableCell>
-                  </CustomizedTableRow>
-                );
-              })}
+            {syncs.map((sync) => {
+              return (
+                <SyncTableRow
+                  key={sync.id}
+                  sync={sync}
+                  onClick={handleOnClick}
+                />
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

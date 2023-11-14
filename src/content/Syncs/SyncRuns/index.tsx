@@ -4,293 +4,71 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useState, useEffect } from 'react';
-
-import { useRouter } from 'next/router';
+import { useState, useEffect, useMemo } from 'react';
 
 import { Card, styled } from '@mui/material';
 
-import StartSyncPopoverComponent from '@content/Syncs/SyncRuns/StartSyncPopoverComponent';
-import StopSyncPopoverComponent from '@content/Syncs/SyncRuns/StopSyncPopoverComponent';
 import SyncRunsTable from '@content/Syncs/SyncRuns/SyncRunsTable';
-import {
-  generateStartSyncPayload,
-  generateStopSyncPayload,
-  getCurrentSyncRun,
-  getPageButtonTitle,
-  hasRunningSyncs,
-  syncRunNetworkHandler
-} from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
-import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
-import PageTitle from '@components/PageTitle';
-import { SkeletonContainer } from '@components/Layouts/Layouts';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import AlertComponent from '@components/Alert';
-import PopoverComponent from '@components/Popover';
 
-import {
-  useLazyAbortSyncRunByIdQuery,
-  useLazyCreateNewSyncRunQuery,
-  useLazyGetSyncRunsByIdQuery
-} from '@store/api/apiSlice';
-
-import { getRouterPathname, isPublicSync } from '@utils/routes';
-
-import { sendErrorToBugsnag } from '@lib/bugsnag';
+import { useSyncRuns } from './useSyncRuns';
+import SyncRunsHeader from './SyncRunsHeader';
+import { SyncRunRootContext } from '@contexts/Contexts';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
 }));
 
 const SyncRuns = ({ syncId, workspaceId }: any) => {
-  const router = useRouter();
-
-  const url = router.pathname;
-  const query = router.query;
-
-  // Sync runs query
-  const [getSyncRuns, { data, isLoading, isError, error }] =
-    useLazyGetSyncRunsByIdQuery();
-
-  // Create a new sync run query
-  const [createNewSyncRunQuery] = useLazyCreateNewSyncRunQuery();
-
-  // Sync run abort query
-  const [abortSyncRunQuery] = useLazyAbortSyncRunByIdQuery();
-
-  // sync run states
-  const [lastSync, setLastSync] = useState(new Date().toISOString());
-
-  const [traceError, setTraceError] = useState<any>(null);
-  const [syncRuns, setSyncRuns] = useState([]);
-
-  const [isQueryPending, setIsQueryPending] = useState(false);
-  const [syncRunsFetchError, setSyncRunsFetchError] = useState(false);
-
   // alert dialog states
-
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
 
-  // Popover states
-
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [fullRefresh, setFullRefresh] = useState(false);
+  const {
+    data: syncRuns,
+    error,
+    updateLastSync,
+    isLoading,
+    traceError
+  } = useSyncRuns({
+    syncId: syncId,
+    workspaceId: workspaceId
+  });
 
   useEffect(() => {
-    if (syncRuns.length > 0) {
-      const runInterval = setInterval(() => {
-        setLastSync(new Date().toISOString());
-      }, 3000);
+    if (syncRuns?.length > 0) {
+      const interval = 3000; // in milliseconds
 
+      const runInterval = setInterval(updateLastSync, interval);
       return () => {
         clearInterval(runInterval);
       };
     }
   }, [syncRuns]);
 
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const fetchSyncRuns = () => {
-      const publicWorkspaceId = process.env.PUBLIC_WORKSPACE;
-      const publicSyncId = process.env.PUBLIC_SYNC;
-
-      // extracting workspace id and syncid from router.pathname
-      const pathname = getRouterPathname(query, url);
-
-      let syncPayload = {
-        syncId: isPublicSync(pathname) ? publicSyncId : syncId,
-        workspaceId: isPublicSync(pathname) ? publicWorkspaceId : workspaceId,
-        before: lastSync,
-        limit: 25
-      };
-      getSyncRuns(syncPayload);
-    };
-
-    // Fetch sync runs if current network request is successful.
-    if (!isLoading && !syncRunsFetchError) {
-      fetchSyncRuns();
-    }
-  }, [lastSync, syncId, router.isReady]);
-
-  useEffect(() => {
-    // syncRuns callback data
-    if (data) {
-      if (hasErrorsInData(data)) {
-        const traceError = getErrorsInData(data);
-        setSyncRunsFetchError(true);
-
-        // send error to bugsnag
-        sendErrorToBugsnag(traceError);
-
-        setTraceError(traceError);
-      } else {
-        setSyncRunsFetchError(false);
-        setSyncRuns(data);
-      }
-    }
-  }, [data]);
-
-  useEffect(() => {
-    // syncRuns Error handling
-    if (isError) {
-      // send error to bugsnag
-      sendErrorToBugsnag(error);
-      setSyncRunsFetchError(true);
-    }
-  }, [isError]);
-
-  // sync run stop handler
-  const stopSyncRun = () => {
-    closePopover();
-
-    setIsQueryPending(true);
-    // current running sync
-    const currentSyncRun = getCurrentSyncRun(syncRuns);
-
-    const syncId = currentSyncRun.sync_id;
-    const runId = currentSyncRun.run_id;
-
-    // generate stop sync run payload
-    const payload = generateStopSyncPayload(workspaceId, syncId, runId);
-
-    // query to stop the sync
-    const query = abortSyncRunQuery;
-
-    let isErrorAlert = false;
-    syncRunNetworkHandler(
-      query,
-      payload,
-      (trace: any, res: any) => {
-        if (trace) {
-          isErrorAlert = true;
-          displayAlertDialog(trace, isErrorAlert);
-          setIsQueryPending(false);
-        } else {
-          setLastSync(new Date().toISOString());
-          displayAlertDialog(`Sync run terminated successfully`, isErrorAlert);
-          setIsQueryPending(false);
-        }
-      },
-      (err: any) => {
-        isErrorAlert = true;
-        displayAlertDialog(err, isErrorAlert);
-        setIsQueryPending(false);
-      }
-    );
-  };
-
-  // sync run start handler
-  const startSyncRun = () => {
-    // close popover
-    closePopover();
-
-    setIsQueryPending(true);
-
-    // generate start sync run payload
-    const payload = generateStartSyncPayload(workspaceId, syncId, fullRefresh);
-
-    // query to start the sync
-    const query = createNewSyncRunQuery;
-
-    let isErrorAlert = false;
-
-    syncRunNetworkHandler(
-      query,
-      payload,
-      (trace: any, res: any) => {
-        if (trace) {
-          isErrorAlert = true;
-          displayAlertDialog(trace, isErrorAlert);
-          setIsQueryPending(false);
-        } else {
-          const message = res?.message || 'unknown';
-          if (res.success) {
-            setLastSync(new Date().toISOString());
-            displayAlertDialog(message, isErrorAlert);
-          } else {
-            isErrorAlert = true;
-            const message = res?.message || 'unknown error';
-            displayAlertDialog(message, isErrorAlert);
-          }
-          setIsQueryPending(false);
-        }
-      },
-      (err: any) => {
-        isErrorAlert = true;
-        displayAlertDialog(err, isErrorAlert);
-        setIsQueryPending(false);
-      }
-    );
-  };
-
-  // Popover open handler
-  const openPopover = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  // Popover close handler
-  const closePopover = (): void => {
-    setAnchorEl(null);
-  };
-
-  // display Alert dialog
-  const displayAlertDialog = (message: string, isError: boolean) => {
+  // Alert open handler
+  const handleAlertDialog = (message: string, isError: boolean) => {
     showAlertDialog(true);
     setIsErrorAlert(isError);
     setAlertMessage(message);
   };
 
-  // close Alert Dialog
-  const closeAlertDialog = () => {
+  // Alert close handler
+  const handleAlertClose = () => {
     setAlertMessage('');
     showAlertDialog(false);
   };
 
-  // full_refresh switch on change handler
-  const handleSwitchOnChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    val: any
-  ) => {
-    event.stopPropagation();
-    setFullRefresh(val);
-  };
-
-  // Popover content
-  const displayPopoverComponent = () => {
-    if (hasRunningSyncs(syncRuns)) {
-      return (
-        <StopSyncPopoverComponent
-          closePopover={closePopover}
-          isQueryPending={isQueryPending}
-          query={query}
-          stopSyncRun={stopSyncRun}
-          syncRuns={syncRuns}
-          url={url}
-        />
-      );
-    }
-
-    return (
-      <StartSyncPopoverComponent
-        fullRefresh={fullRefresh}
-        handleSwitchOnChange={(event, checked) =>
-          handleSwitchOnChange(event, checked)
-        }
-        isQueryPending={isQueryPending}
-        query={query}
-        url={url}
-        startSyncRun={startSyncRun}
-        syncRuns={syncRuns}
-      />
-    );
-  };
+  const rootContextValue = useMemo(
+    () => ({ updateLastSync, handleAlertDialog }),
+    [updateLastSync]
+  );
 
   // Page content
   const displayContent = () => {
@@ -303,56 +81,34 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   };
 
   return (
-    <>
-      <PageTitle
-        title={'Run History'}
-        displayButton={true}
-        buttonTitle={getPageButtonTitle(
-          isPublicSync(getRouterPathname(query, url)),
-          syncRuns,
-          isQueryPending
-        )}
-        disabled={isQueryPending}
-        onClick={openPopover}
-        link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        linkurl={process.env.PUBLIC_SYNC_URL}
-        isFetching={isQueryPending}
-        displayStartIcon={false}
+    <SyncRunRootContext.Provider value={rootContextValue}>
+      <SyncRunsHeader
+        workspaceId={workspaceId}
+        syncId={syncId}
+        syncRuns={syncRuns}
       />
 
       <AlertComponent
         open={alertDialog}
-        onClose={closeAlertDialog}
+        onClose={handleAlertClose}
         message={alertMessage}
         isError={isErrorAlert}
       />
 
-      {/** Start Sync - Popover components */}
-
-      {Boolean(anchorEl) && (
-        <PopoverComponent anchorEl={anchorEl} handleClose={closePopover}>
-          {displayPopoverComponent()}
-        </PopoverComponent>
-      )}
-
       <CustomizedCard variant="outlined">
         {/** Display Errors */}
-        {isError && <ErrorContainer error={error} />}
+        {error && <ErrorContainer error={error} />}
 
         {/** Display Trace Error */}
         {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
         {/** Display Skeleton */}
-        {isLoading && (
-          <SkeletonContainer>
-            <SkeletonLoader />
-          </SkeletonContainer>
-        )}
+        <SkeletonLoader loading={isLoading} />
 
         {/** Display Content */}
-        {!isError && !isLoading && displayContent()}
+        {!error && !isLoading && syncRuns && displayContent()}
       </CustomizedCard>
-    </>
+    </SyncRunRootContext.Provider>
   );
 };
 

@@ -4,37 +4,92 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, Button, Divider, Typography, styled } from '@mui/material';
+import { Box, Button, Divider, Typography } from '@mui/material';
 
 import { getRouterPathname, isPublicSync } from '@utils/routes';
 
-import { getPageButtonTitle } from '@content/Syncs/SyncRuns/SyncRunsUtils';
-
-const StartSyncOptionsBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: theme.colors.alpha.black[5],
-  padding: theme.spacing(2)
-}));
+import {
+  generateStopSyncPayload,
+  getCurrentSyncRun,
+  getPageButtonTitle,
+  syncRunNetworkHandler
+} from '@content/Syncs/SyncRuns/SyncRunsUtils';
+import { useContext } from 'react';
+import { SyncRunContext, SyncRunRootContext } from '../../../contexts/Contexts';
+import { useLazyAbortSyncRunByIdQuery } from '../../../store/api/apiSlice';
 
 type props = {
-  stopSyncRun: () => void;
   closePopover: () => void;
   query: any;
   url: string;
   syncRuns: any;
-  isQueryPending: boolean;
+  workspaceId: string;
 };
 
 const StopSyncPopoverComponent = ({
   closePopover,
-  stopSyncRun,
   query,
   url,
   syncRuns,
-  isQueryPending
+  workspaceId
 }: props) => {
+  // Sync run abort query
+  const [abortSyncRunQuery] = useLazyAbortSyncRunByIdQuery();
+
+  const { updateLastSync, handleAlertDialog } = useContext(SyncRunRootContext);
+
+  const { isPromisePending, setIsPromisePending } = useContext(SyncRunContext);
+
+  const handlePromiseStatus = (status: boolean) => {
+    setIsPromisePending(status);
+  };
+
+  const handleAlertDialogStatus = (msg: string, error: boolean) => {
+    handleAlertDialog(msg, error);
+  };
+
+  const successHandler = (trace: any, res: any) => {
+    let isErrorAlert = false;
+    if (trace) {
+      isErrorAlert = true;
+      handleAlertDialogStatus(trace, isErrorAlert);
+      handlePromiseStatus(false);
+    } else {
+      updateLastSync();
+      handleAlertDialogStatus(`Sync run terminated successfully`, isErrorAlert);
+      handlePromiseStatus(false);
+    }
+  };
+
+  const errorHandler = (err: any) => {
+    let isErrorAlert = true;
+    handleAlertDialogStatus(err, isErrorAlert);
+    handlePromiseStatus(false);
+  };
+
+  // sync run stop handler
+  const stopSyncRun = () => {
+    closePopover();
+
+    handlePromiseStatus(true);
+    // current running sync
+
+    const currentSyncRun = getCurrentSyncRun(syncRuns);
+
+    const syncId = currentSyncRun.sync_id;
+    const runId = currentSyncRun.run_id;
+
+    // generate stop sync run payload
+    const payload = generateStopSyncPayload(workspaceId, syncId, runId);
+
+    syncRunNetworkHandler(
+      abortSyncRunQuery,
+      payload,
+      successHandler,
+      errorHandler
+    );
+  };
+
   return (
     <>
       <Box sx={{ padding: (theme) => theme.spacing(3) }}>
@@ -53,7 +108,7 @@ const StopSyncPopoverComponent = ({
             {getPageButtonTitle(
               isPublicSync(getRouterPathname(query, url)),
               syncRuns,
-              isQueryPending
+              isPromisePending
             )}
           </Typography>
         </Button>
