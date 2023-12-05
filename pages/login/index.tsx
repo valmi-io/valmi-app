@@ -40,9 +40,9 @@ import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
 import { initialiseAppState } from '@utils/login-utils';
-import authStorage from '@utils/auth-storage';
 import { signinValidationSchema } from '@utils/validation-schema';
-import { signOutUser } from '@utils/lib';
+import { useLoginStatus } from '../../src/hooks/useLoginStatus';
+import { signOutUser } from '../../src/utils/lib';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
@@ -68,13 +68,15 @@ const Login: NextPageWithLayout = () => {
     signinValidationSchema
   );
 
+  const { isLoggedIn } = useLoginStatus();
+
   useEffect(() => {
-    if (authStorage.loggedIn) {
+    if (isLoggedIn) {
       router.push('/');
     } else {
-      signOutUser(authStorage, dispatch, router);
+      signOutUser(router);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const displayAlertDialog = (message: any, isError: any) => {
     showAlertDialog(true);
@@ -95,8 +97,6 @@ const Login: NextPageWithLayout = () => {
     try {
       const data: any = await loginAndFetchWorkSpaces(payload).unwrap();
 
-      console.log('login data:-', data);
-
       let isErrorAlert = false;
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -114,7 +114,6 @@ const Login: NextPageWithLayout = () => {
         router.push(`/spaces/${workspaceID}/syncs`);
       }
     } catch (error) {
-      console.log('login error:_', error);
       const errors = getErrorsInErrorObject(error);
       const { message = 'unknown' } = errors || {};
       const isErrorAlert = true;

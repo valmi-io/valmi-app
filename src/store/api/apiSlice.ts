@@ -7,9 +7,12 @@
 
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 
-import AuthStorage from '@utils/auth-storage';
-
 import constants from '@constants/index';
+import {
+  getAccessToken,
+  logoutUser,
+  setTokenCookie
+} from '../../../pages/api/utils';
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -17,10 +20,13 @@ const staggeredBaseQueryWithBailOut = retry(
       baseUrl: constants.urls.API_URL,
       timeout: 60000, // 60 seconds
       prepareHeaders: async (headers, { getState }) => {
-        const token = (await AuthStorage.token) || '';
+        const response = await getAccessToken();
+        const jsonData = await response.json();
 
-        if (token) {
-          headers.set('authorization', `Bearer ${token}`);
+        const accessToken = jsonData.accessToken || '';
+
+        if (accessToken) {
+          headers.set('authorization', `Bearer ${accessToken}`);
         }
 
         return headers;
@@ -100,23 +106,27 @@ export const apiSlice = createApi({
           }
         });
         if (user.error) return { error: user.error };
-        const token = user.data.auth_token;
+        const accessToken = user.data.auth_token;
 
-        // storing auth token in cookie.
-        AuthStorage.value = {
-          token: token
-        };
+        /**
+         * Setting http-only cookie
+         * */
+        const response = await setTokenCookie(accessToken);
 
-        const result = await baseQuery('/spaces/');
+        if (response.status === 200) {
+          const result = await baseQuery('/spaces/');
 
-        if (result.error) {
-          if (result.error?.data?.detail === 'Unauthorized') {
-            // destroy auth token
-            //AuthStorage.destroy();
+          if (result.error) {
+            if (result.error?.data?.detail === 'Unauthorized') {
+              // destroy auth token
+              const response = await logoutUser();
+              const jsonData = await response.json();
+            }
+            return { error: result.error };
           }
-          return { error: result.error };
+          return result.data && { data: result.data };
         }
-        return result.data && { data: result.data };
+        return { error: 'Failed to set cookie' };
       }
     }),
 

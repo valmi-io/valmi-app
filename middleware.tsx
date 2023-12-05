@@ -14,8 +14,9 @@ export function middleware(request: NextRequest) {
   let bearerToken = '';
   if (cookie) {
     cookie = JSON.parse(cookie);
-    bearerToken = (cookie as { token?: string })?.token || '';
+    bearerToken = (cookie as { accessToken?: string })?.accessToken || '';
   }
+
   const pathName = request.nextUrl.pathname;
 
   if (!isPublicSync(pathName)) {

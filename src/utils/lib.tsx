@@ -6,6 +6,7 @@
  */
 
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
+import { logoutUser } from '../../pages/api/utils';
 
 export const stringAvatar = (name: string) => {
   return {
@@ -76,11 +77,14 @@ export const getConnectorImage = (connectorType) => {
   return `/connectors/${connectorType.toLowerCase()}.svg`;
 };
 
-export const signOutUser = (authStorage, dispatch, router) => {
-  //dispatch(resetStore());
-  authStorage.destroy();
-  router.replace('/login');
-  // router.push('/login');
+export const signOutUser = async (router) => {
+  try {
+    const response = await logoutUser();
+    const jsonData = await response.json();
+  } catch (err) {
+  } finally {
+    router.replace('/login');
+  }
 };
 
 export const splitNumberByCommas = (number) => {

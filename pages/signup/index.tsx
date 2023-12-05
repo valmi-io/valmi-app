@@ -38,10 +38,8 @@ import { AppDispatch } from '@store/store';
 import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
-import authStorage from '@utils/auth-storage';
-
 import { signupValidationSchema } from '@utils/validation-schema';
-// import useSignupHandler from '../../src/content/Authentication/useSignuphandler';
+import { useLoginStatus } from '../../src/hooks/useLoginStatus';
 
 const SignupPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -65,15 +63,13 @@ const SignupPage: NextPageWithLayout = () => {
     signupValidationSchema
   );
 
-  // const { handleSignup, data, isFetching, error } = useSignupHandler();
+  const { isLoggedIn } = useLoginStatus();
 
   useEffect(() => {
-    if (authStorage.loggedIn) {
+    if (isLoggedIn) {
       router.push('/');
-    } else {
-      //signOutUser(authStorage, dispatch, router);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const displayAlertDialog = (message: any, isError: any) => {
     showAlertDialog(true);

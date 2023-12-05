@@ -77,7 +77,6 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
   // This useEffect will handle data
   useEffect(() => {
     if (data) {
-      // console.log('Logs data', data);
       // Fetch trace errors in the data.
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -112,7 +111,6 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
   // This useEffect will handle errors.
   useEffect(() => {
     if (isError) {
-      //console.log('Logs: error', error);
       // Send error to bugsnag
       sendErrorToBugsnag(error);
 
@@ -122,7 +120,6 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
   }, [isError]);
 
   const handleLogData = (logData: any) => {
-    // console.log('trying to handle log data', logData);
     const { meta = {} } = logData;
     const { since, before } = meta;
 

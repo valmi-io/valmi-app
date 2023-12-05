@@ -4,8 +4,6 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { parse } from 'cookie';
-
 export const configureCredentials = (data: any) => {
   let config = data?.config
     ? data.config.credentials
@@ -30,16 +28,30 @@ export const getBaseUrl = () => {
   return process.env[`SERVER_SIDE_API_URL`];
 };
 
-export function parseCookies(req: any) {
-  // For API Routes we don't need to parse the cookies.
-  if (req.cookies) return req.cookies;
+export const setTokenCookie = (accessToken: string) => {
+  return fetch('/api/login', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ accessToken })
+  });
+};
 
-  // For pages we do need to parse the cookies.
-  const cookie = req.headers?.cookie;
-  return parse(cookie || '');
-}
+export const getAccessToken = () => {
+  return fetch('/api/access', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};
 
-export function getTokenCookie(req: any) {
-  const cookies = parseCookies(req);
-  return cookies['AUTH'];
-}
+export const logoutUser = () => {
+  return fetch('/api/logout', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+};

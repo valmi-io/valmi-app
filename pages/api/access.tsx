@@ -1,24 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next/types';
-import { getTokenCookie } from './utils';
+
+import cookie from 'cookie';
 
 type ResponseData = {
-  token: string;
+  accessToken: string;
 };
 
 export default function accessTokenHandler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  let bearerToken = getTokenCookie(req);
+  const cookies = cookie.parse(req.headers?.cookie ?? '');
+  const appCookie = cookies?.['AUTH'] ?? '';
+  const parsedCookies = appCookie ? JSON.parse(appCookie) : {};
+  const accessToken = parsedCookies?.accessToken ?? null;
 
-  if (!bearerToken) {
-    bearerToken = '';
-  } else {
-    const cookie = JSON.parse(bearerToken);
-    const token = cookie.token;
-    bearerToken = token;
-  }
-
-  console.log('Bearer token:_', bearerToken);
-  res.status(200).json({ token: bearerToken });
+  res.status(200).json({ accessToken: accessToken });
 }

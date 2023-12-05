@@ -8,7 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types';
 
 import axios from 'axios';
 
-import { getBaseUrl, getTokenCookie } from 'pages/api/utils';
+import { getAccessToken, getBaseUrl } from 'pages/api/utils';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
 
@@ -19,15 +19,11 @@ const checkConnection = async (req: NextApiRequest, res: NextApiResponse) => {
   // query
   url = `${getBaseUrl()}${url}`;
 
-  let bearerToken = getTokenCookie(req);
+  const response = await getAccessToken();
 
-  if (!bearerToken) {
-    bearerToken = '';
-  } else {
-    const cookie = JSON.parse(bearerToken);
-    const token = cookie.token;
-    bearerToken = token;
-  }
+  const jsonData = await response.json();
+
+  const bearerToken = jsonData.accessToken || '';
 
   try {
     const response = await axios.post(url, payload, {

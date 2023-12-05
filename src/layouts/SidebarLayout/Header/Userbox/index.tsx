@@ -28,7 +28,6 @@ import PopoverComponent from '@components/Popover';
 import { AppDispatch } from '@store/store';
 import { RootState } from '@store/reducers';
 
-import authStorage from '@utils/auth-storage';
 import { signOutUser, stringAvatar } from '@utils/lib';
 
 const UserBoxButton = styled(Button)(
@@ -61,7 +60,7 @@ const UserBoxLabel = styled(Typography)(
 
 const HeaderUserbox = () => {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
+
   const user = useSelector((state: RootState) => state.user.user);
 
   const ref = useRef<any>(null);
@@ -77,7 +76,7 @@ const HeaderUserbox = () => {
   };
 
   const handleSignoutClick = (): void => {
-    signOutUser(authStorage, dispatch, router);
+    signOutUser(router);
   };
 
   const userAvatar = () => {

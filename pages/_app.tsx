@@ -88,7 +88,7 @@ const MyApp: FC<AppPropsWithLayout> = ({
 
     // Track page views
     const handleRouteComplete = () => {
-      //posthog?.capture('$pageview');
+      posthog?.capture('$pageview');
 
       NProgress.done();
     };
