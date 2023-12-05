@@ -95,6 +95,8 @@ const Login: NextPageWithLayout = () => {
     try {
       const data: any = await loginAndFetchWorkSpaces(payload).unwrap();
 
+      console.log('login data:-', data);
+
       let isErrorAlert = false;
       if (hasErrorsInData(data)) {
         const traceError = getErrorsInData(data);
@@ -112,6 +114,7 @@ const Login: NextPageWithLayout = () => {
         router.push(`/spaces/${workspaceID}/syncs`);
       }
     } catch (error) {
+      console.log('login error:_', error);
       const errors = getErrorsInErrorObject(error);
       const { message = 'unknown' } = errors || {};
       const isErrorAlert = true;

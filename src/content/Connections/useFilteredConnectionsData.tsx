@@ -7,6 +7,7 @@
  */
 
 import { useConnectionsData } from '@content/Connections/useConnectionsData';
+import { useMemo } from 'react';
 
 const getConnectorConfig = (connector: any) => {
   const config = {
@@ -33,12 +34,15 @@ export const useFilteredConnectionsData = (
 
   // Filter connections data based on the connection type
 
-  const filteredConnectionsData: any = connectionsData
-    .filter((connector: any) => {
-      const connectorType = connector.connector_type.split('_')[0];
-      return connectionType === connectorType;
-    })
-    .map(getConnectorConfig);
+  const filteredConnectionsData = useMemo(() => {
+    const filteredConnections = connectionsData
+      .filter((connector: any) => {
+        const connectorType = connector.connector_type.split('_')[0];
+        return connectionType === connectorType;
+      })
+      .map(getConnectorConfig);
+    return filteredConnections;
+  }, [connectionsData]);
 
   return { filteredConnectionsData, connectionsError, isFetching, traceError };
 };

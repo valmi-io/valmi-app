@@ -16,8 +16,6 @@ import {
   TableHead,
   TableRow,
   TableContainer,
-  Stack,
-  Icon,
   Box,
   Avatar,
   Typography,
@@ -39,22 +37,15 @@ import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
-import { TableColumnProps } from '@utils/table-utils';
-import appIcons from '@utils/icon-utils';
 import { stringAvatar } from '@utils/lib';
+import ConnectionTableColumns from './ConnectionTableColumns';
+import { ConnectionColumns } from './ConnectionColumns';
 
 interface ConnectionsTableProps {
   className?: string;
   connections: ConnectionModel[];
   connectionType: string;
 }
-
-const connectionColumns: TableColumnProps[] = [
-  { id: '1', label: 'Name', minWidth: 300, icon: appIcons.NAME },
-  { id: '2', label: 'Account', minWidth: 300, icon: appIcons.ACCOUNT },
-  { id: '3', label: 'Connector', minWidth: 300, icon: 'CUSTOM' },
-  { id: '4', label: '', align: 'right', action: true, minWidth: 100 }
-];
 
 const BoxLayout = styled(Box)(({}) => ({
   display: 'flex',
@@ -76,25 +67,6 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
-
-  const generateColumns = (columns: TableColumnProps[]) => {
-    return columns.map((column) => {
-      return (
-        <TableCell key={column.id} align={column.align}>
-          <Stack direction="row" alignItems="center">
-            {column.icon && (
-              <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>
-                {column.icon === 'CUSTOM'
-                  ? appIcons[connectionType]
-                  : column.icon}
-              </Icon>
-            )}
-            {column.label}
-          </Stack>
-        </TableCell>
-      );
-    });
-  };
 
   const handleEditConnectionClick = (connection) => {
     // setconnectionflow
@@ -148,7 +120,10 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
         <Table>
           {/* Connections Table Columns */}
           <TableHead>
-            <TableRow>{generateColumns(connectionColumns)}</TableRow>
+            <ConnectionTableColumns
+              columns={ConnectionColumns}
+              connectionType={connectionType}
+            />
           </TableHead>
           {/* Connections Table Body */}
           <TableBody>

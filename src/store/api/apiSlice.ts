@@ -19,7 +19,6 @@ const staggeredBaseQueryWithBailOut = retry(
       prepareHeaders: async (headers, { getState }) => {
         const token = (await AuthStorage.token) || '';
 
-        // If we have a token set in state, let's assume that we should be passing it.
         if (token) {
           headers.set('authorization', `Bearer ${token}`);
         }
@@ -113,7 +112,7 @@ export const apiSlice = createApi({
         if (result.error) {
           if (result.error?.data?.detail === 'Unauthorized') {
             // destroy auth token
-            AuthStorage.destroy();
+            //AuthStorage.destroy();
           }
           return { error: result.error };
         }

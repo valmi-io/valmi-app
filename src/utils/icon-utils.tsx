@@ -13,7 +13,25 @@ export const AppIconARROW_RIGHT = (props: any) => (
   <FontAwesomeIcon {...props} className="fas fa-arrow-right" />
 );
 
-const appIcons = {
+export interface IAppIcons {
+  SRC: React.ReactElement;
+  DEST: React.ReactElement;
+  WAREHOUSE: React.ReactElement;
+  DESTINATION: React.ReactElement;
+  SYNC: React.ReactElement;
+  STATUS: React.ReactElement;
+  STARTED_AT: React.ReactElement;
+  NAME: React.ReactElement;
+  ACCOUNT: React.ReactElement;
+  SCHEDULE: React.ReactElement;
+  ARROW_RIGHT: React.ReactElement;
+  EDIT: React.ReactElement;
+  UPLOAD: React.ReactElement;
+  TIME: React.ReactElement;
+  MESSAGE: React.ReactElement;
+}
+
+const appIcons: IAppIcons = {
   SRC: <FontAwesomeIcon className="fas fa-database" />,
   DEST: <FontAwesomeIcon className="fas fa-location-pin" />,
   WAREHOUSE: <FontAwesomeIcon className="fas fa-database" />,
