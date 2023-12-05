@@ -8,7 +8,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types';
 
 import axios from 'axios';
 
-import { getAccessToken, getBaseUrl } from 'pages/api/utils';
+import { getAccessTokenCookie, getBaseUrl } from 'pages/api/utils';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
 
@@ -21,11 +21,7 @@ const connectionNetworkHandler = async (
   // query
   connectionUrl = `${getBaseUrl()}${connectionUrl}`;
 
-  const response = await getAccessToken();
-
-  const jsonData = await response.json();
-
-  const bearerToken = jsonData.accessToken || '';
+  const bearerToken = getAccessTokenCookie(req) || '';
 
   try {
     const response = await axios.post(connectionUrl, payload, {

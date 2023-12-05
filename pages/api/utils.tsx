@@ -4,6 +4,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import cookie from 'cookie';
+
 export const configureCredentials = (data: any) => {
   let config = data?.config
     ? data.config.credentials
@@ -54,4 +56,12 @@ export const logoutUser = () => {
       'Content-Type': 'application/json'
     }
   });
+};
+
+export const getAccessTokenCookie = (req: any) => {
+  const cookies = cookie.parse(req.headers?.cookie ?? '');
+  const appCookie = cookies?.['AUTH'] ?? '';
+  const parsedCookies = appCookie ? JSON.parse(appCookie) : {};
+  const accessToken = parsedCookies?.accessToken ?? null;
+  return accessToken;
 };
