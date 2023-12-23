@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Monday, August 21st 2023, 1:40:45 pm
+ * Author: Nagendra S @ valmi.io
+ */
+
 import appIcons from '@utils/icon-utils';
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 
@@ -20,7 +26,7 @@ export type LogPayload = {
   syncId: string;
   workspaceId: string;
   runId: string;
-  collector: 'src' | 'dest';
+  connector: 'src' | 'dest';
   since?: number | null;
   before?: number | null;
 };
@@ -38,6 +44,10 @@ export interface TableColumnProps {
   align?: 'right' | 'center';
 }
 
+/**
+ * Generates SyncRunLogColums
+ * @returns SyncRunLogColumns.
+ */
 export const syncRunLogColumns: TableColumnProps[] = [
   {
     id: '1',
@@ -53,6 +63,11 @@ export const syncRunLogColumns: TableColumnProps[] = [
   }
 ];
 
+/**
+ * Generates log payload
+ * @param{LogPayloadIn} logPayload
+ * @returns logPayload
+ */
 export const generatePayload = (logPayload: LogPayloadIn) => {
   const { props, since, before } = logPayload;
   const { syncId, runId, connectionType, workspaceId } = props;
@@ -60,7 +75,7 @@ export const generatePayload = (logPayload: LogPayloadIn) => {
   const payload: LogPayload = {
     syncId,
     runId,
-    collector: connectionType,
+    connector: connectionType,
     workspaceId
   };
 
@@ -75,11 +90,17 @@ export const generatePayload = (logPayload: LogPayloadIn) => {
   return payload;
 };
 
-export const generateLogMessages = (sinces: any, lines: any) => {
+/**
+ * Generates log Messages
+ * @param sinces
+ * @param logs
+ * @returns log Messages
+ */
+export const generateLogMessages = (sinces: any, logs: any) => {
   let messages: any = [];
 
   sinces.forEach((item: any) => {
-    const logsArr = lines[item];
+    const logsArr = logs[item];
     logsArr.forEach((log: any) => {
       const modifiedLog = {
         timestamp: log[0],
@@ -93,6 +114,12 @@ export const generateLogMessages = (sinces: any, lines: any) => {
   return messages;
 };
 
+/**
+ * Generates logs Object
+ * @param since
+ * @param logs
+ * @returns logs object
+ */
 export const generateLogsObject = (since: string, logs: []) => {
   let modifiedLogsObj: any = {};
 
@@ -100,6 +127,11 @@ export const generateLogsObject = (since: string, logs: []) => {
   return modifiedLogsObj;
 };
 
+/**
+ * Formats log message timestamp
+ * @param timestamp
+ * @returns messageTimeStamp
+ */
 export const getMessageTimestamp = (timestamp: any): string => {
   // Convert timestamp(microseconds) to milliseconds
   const timestampInMilliseconds = timestamp / 1000;

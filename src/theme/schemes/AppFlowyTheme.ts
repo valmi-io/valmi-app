@@ -1264,13 +1264,11 @@ export const AppFlowyTheme = createTheme({
     h1: {
       fontWeight: 700,
       lineHeight: 1.4,
-
       fontSize: 44
     },
     h2: {
       fontWeight: 600,
       lineHeight: 1.4,
-
       fontSize: 32
     },
     h3: {
@@ -1282,31 +1280,26 @@ export const AppFlowyTheme = createTheme({
     h4: {
       fontWeight: 600,
       lineHeight: 1.4,
-
       fontSize: 20
     },
     h5: {
       fontWeight: 600,
       lineHeight: 1.4,
-
       fontSize: 14
     },
     h6: {
-      fontSize: 15,
+      fontSize: 13,
       lineHeight: 1.4,
-
       fontWeight: 600
     },
     body1: {
       fontSize: 16,
       lineHeight: 1.4,
-
       fontWeight: 500
     },
     body2: {
       fontSize: 14,
       lineHeight: 1.4,
-
       fontWeight: 500
     },
     button: {
@@ -1320,7 +1313,7 @@ export const AppFlowyTheme = createTheme({
       color: colors.alpha.black[50]
     },
     subtitle1: {
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: 600,
       color: colors.alpha.black[70]
     },

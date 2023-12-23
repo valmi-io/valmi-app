@@ -4,7 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-module.exports = {
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true'
+});
+
+module.exports = withBundleAnalyzer({
   devIndicators: {
     buildActivity: false
   },
@@ -22,4 +26,4 @@ module.exports = {
     BUGSNAG_APP_VERSION: process.env.BUGSNAG_APP_VERSION,
     BUGSNAG_AUTO_DETECT_ERRORS: process.env.BUGSNAG_AUTO_DETECT_ERRORS
   }
-};
+});

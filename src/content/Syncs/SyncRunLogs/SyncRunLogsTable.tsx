@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Monday, August 21st 2023, 11:33:57 am
@@ -17,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableRowProps,
   Typography,
   styled
 } from '@mui/material';
@@ -59,13 +59,14 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
 
   const [hoverTimeout, setHoverTimeout] = useState(null);
 
-  const handleRowHover = (rowData) => {
+  const handleRowHover = (rowData: any) => {
+    return;
     //  Delay the dialog appearance by 300 milliseconds
     const timeDelay = 300; // milliseconds
 
     // setTimeout callback
     const openDialog = () => {
-      setSelectedRowData(rowData, null, 2);
+      //setSelectedRowData(rowData, null, 2);
       setCopied(false);
       setDialogOpen(true);
     };
@@ -73,7 +74,7 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
     const timeout = setTimeout(openDialog, timeDelay);
 
     // Store the timeout ID
-    setHoverTimeout(timeout);
+    // setHoverTimeout(timeout);
   };
 
   const handleCopyToClipboard = () => {
@@ -121,11 +122,11 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
     <>
       <TableContainer>
         <Table>
-          {/* Sync Run Log Table Columns */}
+          {/* Logs Table Columns */}
           <TableHead>
             <TableRow>{generateColumns(syncRunLogColumns)}</TableRow>
           </TableHead>
-          {/* Syncs Table Body */}
+          {/* Logs Table Body */}
           <TableBody>
             {syncRunLogs &&
               syncRunLogs.length > 0 &&
@@ -133,14 +134,15 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
                 return (
                   <CustomizedTableRow hover key={`log_key ${index}`}>
                     <TableCell>
-                      <Typography variant="body2">
+                      <Typography variant="subtitle1">
                         {getMessageTimestamp(runLog.timestamp)}
                       </Typography>
-                      {/* <Box>{getMessageTimestamp(runLog.timestamp)}</Box> */}
                     </TableCell>
 
                     <TableCell onMouseEnter={() => handleRowHover(runLog)}>
-                      <LogMessage variant="body2">{runLog.message}</LogMessage>
+                      <LogMessage variant="subtitle1">
+                        {runLog.message}
+                      </LogMessage>
                     </TableCell>
                   </CustomizedTableRow>
                 );

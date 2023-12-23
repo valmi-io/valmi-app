@@ -24,12 +24,25 @@ const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
 }));
 
+/**
+ * Responsible for displaying `Runs` page and its components.
+ *
+ * Queries for `SyncRuns` using `useSyncRuns` hook.
+ * @param syncId
+ * @param workspaceId
+ */
+
 const SyncRuns = ({ syncId, workspaceId }: any) => {
   // alert dialog states
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
 
+  /**
+   * Hook -  Responsible for fetching sync runs.
+   *
+   * @returns states needed to update the UI.
+   */
   const {
     data: syncRuns,
     error,
@@ -41,6 +54,9 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     workspaceId: workspaceId
   });
 
+  /**
+   * Fetches sync runs every 3 seconds by updating last sync timestamp
+   */
   useEffect(() => {
     if (syncRuns?.length > 0) {
       const interval = 3000; // in milliseconds
@@ -52,31 +68,41 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     }
   }, [syncRuns]);
 
-  // Alert open handler
+  /**
+   * Responsible for opening alert dialog.
+   */
   const handleAlertDialog = (message: string, isError: boolean) => {
     showAlertDialog(true);
     setIsErrorAlert(isError);
     setAlertMessage(message);
   };
 
-  // Alert close handler
+  /**
+   * Responsible for closing alert dialog.
+   */
   const handleAlertClose = () => {
     setAlertMessage('');
     showAlertDialog(false);
   };
 
+  /**
+   * Context - which can be accessed by children down the UI Tree.
+   * @returns updateLastSync, handleAlertDialog.
+   */
   const rootContextValue = useMemo(
     () => ({ updateLastSync, handleAlertDialog }),
     [updateLastSync]
   );
 
-  // Page content
-  const displayContent = () => {
+  /**
+   * Responsible for displaying Runs Table and EmptyRuns.
+   * @returns Runs, Empty Component based on data.
+   */
+  const displayPageContent = () => {
     if (syncRuns.length > 0) {
-      // Display Syncruns table
       return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} />;
     }
-    // Display empty component
+
     return <ListEmptyComponent description={'No runs found in this sync'} />;
   };
 
@@ -106,7 +132,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
         <SkeletonLoader loading={isLoading} />
 
         {/** Display Content */}
-        {!error && !isLoading && syncRuns && displayContent()}
+        {!error && !isLoading && syncRuns && displayPageContent()}
       </CustomizedCard>
     </SyncRunRootContext.Provider>
   );

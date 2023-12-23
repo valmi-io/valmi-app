@@ -16,16 +16,21 @@ import SyncRunStatus from './SyncRunStatus';
 interface SyncRunTableRowProps {
   syncRun: any;
   displayError: any;
+  onLogClick: (syncRun: any, connection: any) => void;
 }
 
 /**
  * Responsible for rendering `sync run`.
  *
- * - Responsible for the styling of the sync.
+ * - Responsible for the styling of the sync run.
  *
  */
 
-const SyncRunTableRow = ({ syncRun, displayError }: SyncRunTableRowProps) => {
+const SyncRunTableRow = ({
+  syncRun,
+  displayError,
+  onLogClick
+}: SyncRunTableRowProps) => {
   return (
     <TableRow hover>
       <TableCell>
@@ -33,6 +38,7 @@ const SyncRunTableRow = ({ syncRun, displayError }: SyncRunTableRowProps) => {
           connection={'src'}
           displayError={displayError}
           syncRun={syncRun}
+          onLogClick={onLogClick}
         />
       </TableCell>
 
@@ -44,6 +50,7 @@ const SyncRunTableRow = ({ syncRun, displayError }: SyncRunTableRowProps) => {
           connection={'dest'}
           displayError={displayError}
           syncRun={syncRun}
+          onLogClick={onLogClick}
         />
       </TableCell>
       <TableCell>

@@ -17,7 +17,6 @@ import {
   SyncRunLogProps
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
-import { SkeletonLayout } from '@components/Layouts/Layouts';
 import SkeletonLoader from '@components/SkeletonLoader';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
@@ -29,16 +28,30 @@ import { useLazyGetSyncRunLogsByIdQuery } from '@store/api/apiSlice';
 import { isObjectEmpty } from '@utils/lib';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
+import SyncRunLogFooter from './SyncRunLogFooter';
 
 const CustomizedCard = styled(Card)(({ theme }) => ({
   marginTop: theme.spacing(4)
 }));
 
+/**
+ * Responsible for rendering the logs page and its components.
+ *
+ * - Queries for `syncRunLogs`.
+ * - Passes `syncRunLogs` prop to the `SyncRunLogsTable` component.
+ * - Passes `fetch, isFetching` props to the `SyncRunLogFooter` component
+ *  and responsible for handling `handleFetchMore` function.
+ * - Passes `error` prop to the  `ErrorContainer` component.
+ * - Passes `traceError` prop to the `ErrorStatusText` component
+ * - Responsible for rendering `ListEmptyComponent` when `logs` are empty.
+ */
+
 const SyncRunLogs = (props: SyncRunLogProps) => {
+  const { runId, syncId } = props;
   const router = useRouter();
 
   // Sync run logs query
-  const [getSyncRunLogs, { data, isError, error }] =
+  const [getSyncRunLogs, { data, isError, error, isFetching }] =
     useLazyGetSyncRunLogsByIdQuery();
 
   const [traceError, setTraceError] = useState<any>(null);
@@ -62,7 +75,7 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
     if (!router.isReady) return;
 
     // Generate the initial payload for fetching logs.
-    let payload = generatePayload({ since: -1, props: props });
+    const payload = generatePayload({ since: -1, props: props });
 
     if (!fetch) return;
 
@@ -71,10 +84,10 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
     }
 
     // Fetch logs using the generated payload.
-    getSyncRunLogs(logPayload ? logPayload : payload);
-  }, [fetch, props.syncId, props.runId, router.isReady]);
+    fetchLogs(logPayload ?? payload);
+  }, [fetch, syncId, runId, router.isReady]);
 
-  // This useEffect will handle data
+  // This useEffect will check for traces and updateLogData.
   useEffect(() => {
     if (data) {
       // Fetch trace errors in the data.
@@ -86,6 +99,7 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
         setTraceError(traceError);
       } else {
         setFetch(false);
+
         setLogData(data);
       }
     }
@@ -119,59 +133,98 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
     }
   }, [isError]);
 
+  /**
+   * Fetch logs using payload.
+   * @param payload
+   */
+  const fetchLogs = (payload: any) => {
+    getSyncRunLogs(payload);
+  };
+
+  /**
+   * Checks if since exists in SincesArray
+   * @param sincesArray
+   * @param since
+   * @returns true | false
+   */
+  const isSinceExistsInArray = (sincesArray: any, since: any): boolean => {
+    return sincesArray.indexOf(since) === -1 ? false : true;
+  };
+
+  /**
+   * Handles log data.
+   * Updates Sinces array and Logs object based on data.
+   * @param logData
+   */
   const handleLogData = (logData: any) => {
-    const { meta = {} } = logData;
+    const { meta = {}, logs = [] } = logData ?? {};
     const { since, before } = meta;
 
-    let payload = null;
-
-    // If since does not exists
     if (!since) {
-      // If before does not exists, fetch logs using the initial payload.
-      if (!before) return;
-
-      // Generate the new payload with updated since.
-      payload = generatePayload({
-        since: before,
+      // Generate the new payload with updated since property.
+      // If before is null, since = -1
+      const payload = generatePayload({
+        since: before ?? -1,
         props: props
       });
+
+      // Update logPayload state with the new generated payload
+      setLogPayload(payload);
+
+      // Update fetch state to true
+      setFetch(true);
     } else {
-      // If since exists.
-
-      // Update setSinces state with the new since value.
-      setSinces((prevSinces) => [...prevSinces, since]);
-
-      // Update the setLogs state with the new generatedLogs.
-      const { logs = {} } = data;
+      // Append since, if not existed in existing sinces array.
+      if (!isSinceExistsInArray(sinces, since)) {
+        setSinces((prevSinces) => [...prevSinces, since]);
+      }
 
       // Generate the logs object.
       const generatedLogsObject = generateLogsObject(since, logs);
 
+      // Update the setLogs state with the new generatedLogs.
       setLogs((prevLogs) => ({
         ...prevLogs,
         ...generatedLogsObject
       }));
+    }
+  };
 
-      // Generate the new payload
-      let sinceVal = since;
-      if (before) {
-        sinceVal = before;
-      }
+  /**
+   *  Handles fetching more logs when a button is clicked.
+   *  @param logData
+   */
+  const handleFetchMore = (logData: any) => {
+    const { meta = {} } = logData;
+    const { since, before } = meta;
 
-      // Generate the new payload with updated since.
-      payload = generatePayload({ since: sinceVal, props: props });
+    let sinceVal = since;
+    if (before) {
+      sinceVal = before;
     }
 
-    // Update setLogPayload state with the new payload.
+    // Generate the new payload with updated since.
+    const payload = generatePayload({ since: sinceVal, props: props });
     setLogPayload(payload);
     setFetch(true);
   };
 
-  // Page content
-  const displayContent = () => {
+  /**
+   * Responsible for displaying Logs Table and Logs Footer.
+   * @returns Logs, Footer and Empty Component based on data.
+   */
+  const displayPageContent = () => {
     if (messages.length > 0) {
-      // Display Syncrunlogs table.
-      return <SyncRunLogsTable syncRunLogs={messages} />;
+      return (
+        <>
+          <SyncRunLogsTable syncRunLogs={messages} />
+          <SyncRunLogFooter
+            fetch={fetch}
+            isFetching={isFetching}
+            onClick={() => handleFetchMore(logData)}
+          />
+        </>
+      );
     }
 
     // Display empty component
@@ -190,7 +243,7 @@ const SyncRunLogs = (props: SyncRunLogProps) => {
       <SkeletonLoader loading={isLoading} />
 
       {/** Display Content */}
-      {!isError && !isLoading && data && displayContent()}
+      {!isError && !isLoading && data && displayPageContent()}
     </CustomizedCard>
   );
 };

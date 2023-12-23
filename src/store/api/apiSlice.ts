@@ -356,12 +356,12 @@ export const apiSlice = createApi({
           workspaceId,
           syncId,
           runId,
-          collector,
+          connector,
           since = null,
           before = null
         } = arg;
 
-        let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?collector=${collector}`;
+        let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?connector=${connector}`;
 
         if (since) {
           url = url + `&since=${since}`;

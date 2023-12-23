@@ -6,7 +6,9 @@
 
 import React from 'react';
 
-import { Chip, Stack, Typography, styled } from '@mui/material';
+import { Button, Chip, Stack, Typography, styled } from '@mui/material';
+
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 import { getConnectionMetrics, getConnectionStatus } from './SyncRunsUtils';
 
@@ -14,7 +16,7 @@ import { capitalizeFirstLetter, splitNumberByCommas } from '@utils/lib';
 
 import RunStatusIcon from './RunStatusIcon';
 
-const MetricChip = styled(Chip)(({ theme }) => ({
+const MetricChip = styled(Chip)(({}) => ({
   backgroundColor: 'lightgray'
 }));
 
@@ -22,14 +24,18 @@ interface ConnectionMetricsProps {
   syncRun: any;
   connection: any;
   displayError: any;
+  onLogClick: (syncRun: any, connection: any) => void;
 }
 
 const ConnectionMetrics = ({
   syncRun,
   connection,
-  displayError
+  displayError,
+  onLogClick
 }: ConnectionMetricsProps) => {
   let connectionStatus = getConnectionStatus(syncRun, connection);
+
+  let disableLogs = true;
 
   if (connectionStatus === 'scheduled' || connectionStatus === 'running') {
     if (connection === 'dest') {
@@ -40,6 +46,8 @@ const ConnectionMetrics = ({
           ? 'Preparing Data...'
           : 'Extracting Data...';
     }
+  } else {
+    disableLogs = false;
   }
 
   const handleStatusOnClick = () => {
@@ -73,15 +81,17 @@ const ConnectionMetrics = ({
           />
         )}
         {/** Display Log button */}
-        {/* <Button
-                  sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
-                  startIcon={<LogoutOutlinedIcon />}
-                  variant="outlined"
-                  size="small"
-                  onClick={() => navigateToSyncRunLogs(syncRun, connection)}
-                >
-                  Logs
-                </Button> */}
+
+        <Button
+          sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
+          startIcon={<LogoutOutlinedIcon />}
+          variant={disableLogs ? 'contained' : 'outlined'}
+          size="small"
+          disabled={disableLogs}
+          onClick={() => onLogClick(syncRun, connection)}
+        >
+          Logs
+        </Button>
       </Stack>
 
       {/** Connection metrics stack */}

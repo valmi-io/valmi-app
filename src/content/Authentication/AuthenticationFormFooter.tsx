@@ -16,7 +16,11 @@ const AuthenticationFormFooter: React.FC<AuthenticationFormFooterProps> = ({
   return (
     <Grid container justifyContent="flex-end">
       <Grid item>
-        <Link href={href} style={{ textDecoration: 'none' }}>
+        <Link
+          aria-label={footerText}
+          href={href}
+          style={{ textDecoration: 'none' }}
+        >
           <Typography
             sx={{
               color: (theme) => theme.palette.primary.main

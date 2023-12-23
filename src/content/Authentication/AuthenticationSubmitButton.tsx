@@ -24,6 +24,7 @@ const AuthenticationSubmitButton: React.FC<AuthenticationSubmitButtonProps> = ({
 
   return (
     <Button
+      aria-label="form submit"
       type="submit"
       fullWidth={true}
       variant="contained"

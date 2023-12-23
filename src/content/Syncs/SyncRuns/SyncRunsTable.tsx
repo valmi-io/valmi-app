@@ -11,14 +11,7 @@ import { useRouter } from 'next/router';
 
 import { useSelector } from 'react-redux';
 
-import {
-  Button,
-  Table,
-  TableBody,
-  TableContainer,
-  TableHead
-} from '@mui/material';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { Table, TableBody, TableContainer, TableHead } from '@mui/material';
 
 import { getErrorInSyncRun } from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
@@ -90,6 +83,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
                     key={`run_key ${index}`}
                     displayError={displayError}
                     syncRun={syncRun}
+                    onLogClick={navigateToSyncRunLogs}
                   />
                 );
               })}

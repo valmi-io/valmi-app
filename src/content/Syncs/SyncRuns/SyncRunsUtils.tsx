@@ -47,7 +47,7 @@ export const getErrorInSyncRun = (syncRun, connection) => {
 };
 
 export const getConnectionStatus = (syncRun, connection) => {
-  let connectionStatus = syncRun.status || 'status';
+  let connectionStatus = getConnectionPipelineStatus(syncRun, connection);
   // check if run_manager exists in syncRun object
   if (checkIfRunManagerExists(syncRun)) {
     const runManagerStatus =
@@ -70,6 +70,22 @@ export const checkIfRunManagerExists = (syncRun) => {
   )
     return false;
   return true;
+};
+
+export const getConnectionPipelineStatus = (
+  syncRun: any,
+  connection: string
+): string => {
+  let connectionStatus = syncRun.status ?? 'status';
+  if (
+    !!syncRun.extra &&
+    syncRun.extra[connection] &&
+    syncRun.extra[connection].status
+  ) {
+    connectionStatus =
+      syncRun.extra[connection].status.status ?? connectionStatus;
+  }
+  return connectionStatus;
 };
 
 export const getConnectionMetrics = (syncRun, connection) => {
