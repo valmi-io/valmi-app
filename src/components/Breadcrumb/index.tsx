@@ -22,6 +22,12 @@ const HeaderTitle = () => {
 
   const valuesAfterWid = url.split('/').slice(3);
 
+  /**
+   *
+   * @param route
+   * @returns {Function}
+   */
+
   const filterRoute = (route: any) => {
     const match = route.match(/\[(.*?)\]/);
     if (match && match.length > 1) {

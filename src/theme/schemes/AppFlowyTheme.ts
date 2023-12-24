@@ -32,6 +32,9 @@ const themeColors = {
   primaryAlt: '#000C57'
 };
 
+/**
+ * Poppins - Google font
+ */
 const poppins = Poppins({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
@@ -731,14 +734,6 @@ export const AppFlowyTheme = createTheme({
     },
     MuiIcon: {
       styleOverrides: {
-        root: {
-          // Match 24px = 3 * 2 + 1.125 * 16
-          // boxSizing: 'content-box',
-          // // padding: 3,
-          // backgroundColor: 'orange',
-          // // fontSize: '1.125rem'
-          // fontSize: '1rem'
-        },
         fontSizeLarge: {
           backgroundColor: 'indianred',
           fontSize: '100px'
@@ -773,7 +768,6 @@ export const AppFlowyTheme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          //marginBottom: 8,
           '& .MuiTouchRipple-root': {
             opacity: 0.3
           },
@@ -831,7 +825,6 @@ export const AppFlowyTheme = createTheme({
           boxShadow: 'none'
         },
         elevation: {
-          //boxShadow: colors.shadows.card
           boxShadow: 'none'
         },
         elevation2: {
@@ -840,9 +833,7 @@ export const AppFlowyTheme = createTheme({
         elevation24: {
           boxShadow: colors.shadows.cardLg
         },
-        outlined: {
-          //boxShadow: colors.shadows.card
-        }
+        outlined: {}
       }
     },
 
@@ -956,9 +947,7 @@ export const AppFlowyTheme = createTheme({
     },
     MuiMenu: {
       styleOverrides: {
-        paper: {
-          //padding: 12
-        },
+        paper: {},
         list: {
           marginTop: 5,
           borderRadius: 10,
@@ -975,7 +964,7 @@ export const AppFlowyTheme = createTheme({
             fontWeight: 400,
 
             transition: 'all .2s',
-            // color: colors.alpha.black[70],
+
             color: colors.alpha.black[100],
 
             '& .MuiTouchRipple-root': {
