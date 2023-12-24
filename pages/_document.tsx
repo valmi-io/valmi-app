@@ -15,16 +15,6 @@ export default class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <link rel="manifest" href="/manifest.json" />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400&display=swap"
-          />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-            rel="stylesheet"
-          />
           <link
             rel="shortcut icon"
             type="image/x-icon"

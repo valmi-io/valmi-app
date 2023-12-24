@@ -11,13 +11,17 @@ import {
   hasErrorsInData
 } from '@components/Error/ErrorUtils';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import {
+  faCheckCircle,
+  faCircleExclamation
+} from '@fortawesome/free-solid-svg-icons';
 
 export const getIcon = (type) => {
-  let className = 'fa-circle-exclamation';
+  let className = faCircleExclamation;
   if (type === 'success') {
-    className = 'fa-check-circle';
+    className = faCheckCircle;
   }
-  return <FontAwesomeIcon className={`fas ${className}`} />;
+  return <FontAwesomeIcon icon={className} />;
 };
 
 export const getRunStatus = (syncRun) => {

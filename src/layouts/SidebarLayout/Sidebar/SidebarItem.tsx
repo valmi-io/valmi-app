@@ -4,23 +4,15 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  ListItemButton,
-  ListItemIcon,
-  Typography,
-  styled
-} from '@mui/material';
-
-const Icon = styled(ListItemIcon)(({ theme }) => ({
-  color: theme.colors.alpha.white[100]
-}));
+import { ListItemButton, Typography, styled, useTheme } from '@mui/material';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 const Label = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[70]
-  //marginLeft: -20,
 }));
 
 const SidebarItem = ({ item, endpoint, onClick }: any) => {
+  const theme = useTheme();
   return (
     <ListItemButton
       onClick={() => onClick(item.path)}
@@ -30,7 +22,13 @@ const SidebarItem = ({ item, endpoint, onClick }: any) => {
           : ''
       }
     >
-      <Icon>{item.sidebarProps.icon && item.sidebarProps.icon}</Icon>
+      {item.sidebarProps.icon && (
+        <FontAwesomeIcon
+          icon={item.sidebarProps.icon}
+          style={{ marginRight: theme.spacing(3) }}
+        />
+      )}
+
       <Label variant="h5">{item.sidebarProps.displayText}</Label>
     </ListItemButton>
   );

@@ -29,6 +29,7 @@ const SidebarLayout: FC<SidebarLayoutProps> = ({ children }) => {
         }}
       >
         <Header />
+
         <Sidebar />
         <Box
           sx={{

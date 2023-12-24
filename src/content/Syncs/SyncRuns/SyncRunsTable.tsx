@@ -19,8 +19,8 @@ import AlertComponent from '@components/Alert';
 
 import { RootState } from '@store/reducers';
 import { SyncRunColumns } from './SyncRunColumns';
-import SyncRunTableColumns from './SyncRunTableColumns';
 import SyncRunTableRow from './SyncRunTableRow';
+import TableHeader from '@components/Table/TableHeader';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
@@ -70,7 +70,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>
-            <SyncRunTableColumns columns={SyncRunColumns} />
+            <TableHeader columns={SyncRunColumns} />
           </TableHead>
 
           {/* Syncs Table Body */}

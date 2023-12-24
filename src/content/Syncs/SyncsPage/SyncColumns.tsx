@@ -16,7 +16,8 @@ export const SyncColumns: TableColumnProps[] = [
     id: '1',
     label: 'Name',
     minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.NAME
+    icon: appIcons.NAME,
+    muiIcon: true
   },
   {
     id: '2',
@@ -41,7 +42,8 @@ export const SyncColumns: TableColumnProps[] = [
     id: '6',
     label: 'Status',
     minWidth: TABLE_COLUMN_SIZES[0],
-    icon: appIcons.STATUS
+    icon: appIcons.STATUS,
+    muiIcon: true
   },
   { id: '7', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
 ];

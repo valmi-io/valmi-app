@@ -9,7 +9,7 @@ import { useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import {
   Avatar,
@@ -25,7 +25,6 @@ import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 
 import PopoverComponent from '@components/Popover';
 
-import { AppDispatch } from '@store/store';
 import { RootState } from '@store/reducers';
 
 import { signOutUser, stringAvatar } from '@utils/lib';

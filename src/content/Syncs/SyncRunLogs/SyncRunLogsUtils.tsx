@@ -5,7 +5,7 @@
  */
 
 import appIcons from '@utils/icon-utils';
-import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
+import { TABLE_COLUMN_SIZES, TableColumnProps } from '@utils/table-utils';
 
 export type LogsType = { [key: string]: any };
 
@@ -34,15 +34,6 @@ export type LogPayload = {
 export type SyncRunLogsTableProps = {
   syncRunLogs: any;
 };
-
-export interface TableColumnProps {
-  id: string;
-  label: string;
-  icon?: any;
-  action?: boolean | false;
-  minWidth?: number;
-  align?: 'right' | 'center';
-}
 
 /**
  * Generates SyncRunLogColums

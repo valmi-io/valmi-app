@@ -7,8 +7,8 @@
 import React from 'react';
 
 import { Stack, TableCell, TableRow } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-import { AppIconARROW_RIGHT } from '@utils/icon-utils';
 import ConnectionMetrics from './ConnectionMetrics';
 import SyncRunTimeStamp from './SyncRunTimeStamp';
 import SyncRunStatus from './SyncRunStatus';
@@ -43,7 +43,7 @@ const SyncRunTableRow = ({
       </TableCell>
 
       <TableCell>
-        <AppIconARROW_RIGHT />
+        <ArrowForwardIcon style={{ fontSize: 18 }} />
       </TableCell>
       <TableCell>
         <ConnectionMetrics

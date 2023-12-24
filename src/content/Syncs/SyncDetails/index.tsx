@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -45,6 +45,11 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   const [toggleSync, { data: updateSyncData }] = useLazyToggleSyncQuery();
 
+  let publicSync = useMemo(
+    () => isPublicSync(getRouterPathname(query, url)),
+    [query, url]
+  );
+
   useEffect(() => {
     if (updateSyncData) {
       if (!isPublicSync(getRouterPathname(query, url))) {
@@ -60,7 +65,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (!isPublicSync(getRouterPathname(query, url))) {
+    if (!publicSync) {
       const payload = {
         syncId: syncId,
         workspaceId: workspaceId
@@ -120,6 +125,17 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
     }
   };
 
+  const displayPageContent = (isPublicSync: boolean) => {
+    return (
+      <SyncDetailsCard
+        syncData={syncDetails}
+        handleSyncSwitch={handleSyncSwitch}
+        handleEditSync={handleEditSync}
+        isPublicSync={isPublicSync}
+      />
+    );
+  };
+
   return (
     <Card variant="outlined">
       {/** Display Errors */}
@@ -130,25 +146,12 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
       <SkeletonLoader loading={isFetching} />
 
-      {isPublicSync(getRouterPathname(query, url)) ? (
-        <SyncDetailsCard
-          syncData={syncDetails}
-          handleSyncSwitch={handleSyncSwitch}
-          handleEditSync={handleEditSync}
-          isPublicSync={isPublicSync(getRouterPathname(query, url))}
-        />
-      ) : (
-        !isError &&
-        !isFetching &&
-        syncDetails && (
-          <SyncDetailsCard
-            syncData={syncDetails}
-            handleSyncSwitch={handleSyncSwitch}
-            handleEditSync={handleEditSync}
-            isPublicSync={false}
-          />
-        )
-      )}
+      {publicSync
+        ? displayPageContent(publicSync)
+        : !isError &&
+          !isFetching &&
+          syncDetails &&
+          displayPageContent(publicSync)}
     </Card>
   );
 };

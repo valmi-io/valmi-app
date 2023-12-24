@@ -26,6 +26,9 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
+import { config } from '@fortawesome/fontawesome-svg-core';
+import '@fortawesome/fontawesome-svg-core/styles.css';
+
 import ThemeProviderWrapper from '@theme/ThemeProviderWrapper';
 
 import createEmotionCache from 'src/createEmotionCache';
@@ -41,6 +44,8 @@ import { PostHogProvider } from 'posthog-js/react';
 import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
 
 const clientSideEmotionCache = createEmotionCache();
+
+config.autoAddCss = false;
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;

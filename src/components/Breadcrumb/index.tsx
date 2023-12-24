@@ -9,11 +9,11 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography } from '@mui/material';
-
+import { Box, Typography, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { capitalizeFirstLetter } from '@utils/lib';
 
-export default function IconBreadcrumbs() {
+const HeaderTitle = () => {
   const router = useRouter();
   const url = router.pathname;
 
@@ -31,8 +31,29 @@ export default function IconBreadcrumbs() {
     return capitalizeFirstLetter(route);
   };
 
+  /**
+   * Navigates back in history.
+   * Equivalent to clicking the browser back button.
+   * Executes window.history.back()
+   * @returns {Function}
+   */
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
-    <Box>
+    <Box display="flex" alignItems="center">
+      <IconButton
+        aria-label="back"
+        sx={{
+          backgroundColor: (theme) => theme.colors.primary.main,
+          color: 'white',
+          mr: (theme) => theme.spacing(1)
+        }}
+        onClick={handleBack}
+      >
+        <ArrowBackIcon />
+      </IconButton>
       <Breadcrumbs separator={'/'} aria-label="breadcrumb">
         {valuesAfterWid.length > 0 &&
           valuesAfterWid.map((route, index) => {
@@ -45,4 +66,6 @@ export default function IconBreadcrumbs() {
       </Breadcrumbs>
     </Box>
   );
-}
+};
+
+export default HeaderTitle;

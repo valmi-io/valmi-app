@@ -6,6 +6,7 @@
 
 import { Box, Stack, Typography, styled } from '@mui/material';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import { faUnsplash } from '@fortawesome/free-brands-svg-icons';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -26,10 +27,7 @@ const ListEmptyComponent = (props: ListEmptyComponentProps) => {
   return (
     <BoxLayout>
       <Stack spacing={3} alignItems="center">
-        <FontAwesomeIcon
-          className="fa-brands fa-unsplash"
-          style={{ fontSize: 80 }}
-        />
+        <FontAwesomeIcon icon={faUnsplash} style={{ fontSize: 80 }} />
         <Typography
           sx={{ color: (theme) => theme.colors.alpha.black[50] }}
           variant="body1"

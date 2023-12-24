@@ -27,6 +27,7 @@ import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
 
 import SelectDropdown from '@components/SelectDropdown';
 import { StackLayout } from '@components/Layouts/Layouts';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 import { ErrorStatusText } from '@components/Error';
 
 import { RootState } from '@store/reducers';
@@ -84,7 +85,7 @@ const Mapping = () => {
             />
 
             {/* right arrow icon */}
-            {appIcons.ARROW_RIGHT}
+            <FontAwesomeIcon icon={appIcons.ARROW_RIGHT} />
 
             <ConnectionCard
               connectionType={destinationConnectionType}

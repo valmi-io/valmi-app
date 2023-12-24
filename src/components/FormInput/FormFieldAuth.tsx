@@ -17,6 +17,7 @@ import { ErrorStatusText } from '@components/Error';
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,
@@ -123,7 +124,7 @@ const FormFieldAuth = (props: any) => {
         </Box>
         {hasOAuthAuthorized && (
           <IconButton color={'primary'}>
-            <FontAwesomeIcon className={`fas fa-check-circle`} />
+            <FontAwesomeIcon icon={faCheckCircle} />
           </IconButton>
         )}
       </Item>

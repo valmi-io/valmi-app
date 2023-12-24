@@ -1,3 +1,4 @@
+//@ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Monday, August 21st 2023, 11:33:57 am
@@ -8,8 +9,6 @@ import { useState } from 'react';
 
 import {
   Button,
-  Icon,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -24,7 +23,6 @@ import FileCopyIcon from '@mui/icons-material/FileCopy';
 
 import {
   SyncRunLogsTableProps,
-  TableColumnProps,
   getMessageTimestamp,
   syncRunLogColumns
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
@@ -32,6 +30,7 @@ import {
 import Popup from '@components/Popup';
 
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
+import TableHeader from '@components/Table/TableHeader';
 
 const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {
@@ -52,29 +51,15 @@ const LogMessage = styled(Typography)(({}) => ({
 }));
 
 const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRowData, setSelectedRowData] = useState<unknown>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
 
   const [copied, setCopied] = useState(false);
 
-  const [hoverTimeout, setHoverTimeout] = useState(null);
-
-  const handleRowHover = (rowData: any) => {
-    return;
-    //  Delay the dialog appearance by 300 milliseconds
-    const timeDelay = 300; // milliseconds
-
-    // setTimeout callback
-    const openDialog = () => {
-      //setSelectedRowData(rowData, null, 2);
-      setCopied(false);
-      setDialogOpen(true);
-    };
-
-    const timeout = setTimeout(openDialog, timeDelay);
-
-    // Store the timeout ID
-    // setHoverTimeout(timeout);
+  const handleRowOnClick = (rowData: any) => {
+    setSelectedRowData(rowData, null, 2);
+    setCopied(false);
+    setDialogOpen(true);
   };
 
   const handleCopyToClipboard = () => {
@@ -85,37 +70,7 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
   };
 
   const handleCloseDialog = () => {
-    // Clear the timeout if the mouse leaves before the delay
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout);
-      setHoverTimeout(null);
-    }
-
     setDialogOpen(false);
-  };
-
-  // generate run logs columns
-  const generateColumns = (columns: TableColumnProps[]) => {
-    return columns.map((column) => {
-      return (
-        <TableCell
-          key={column.id}
-          align={column.align}
-          style={{
-            minWidth: column.minWidth
-          }}
-        >
-          <Stack direction="row" alignItems="center">
-            {column.icon && (
-              <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>
-                {column.icon}
-              </Icon>
-            )}
-            {column.label}
-          </Stack>
-        </TableCell>
-      );
-    });
   };
 
   return (
@@ -124,7 +79,7 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
         <Table>
           {/* Logs Table Columns */}
           <TableHead>
-            <TableRow>{generateColumns(syncRunLogColumns)}</TableRow>
+            <TableHeader columns={syncRunLogColumns} />
           </TableHead>
           {/* Logs Table Body */}
           <TableBody>
@@ -132,14 +87,18 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
               syncRunLogs.length > 0 &&
               syncRunLogs.map((runLog: any, index: any) => {
                 return (
-                  <CustomizedTableRow hover key={`log_key ${index}`}>
+                  <CustomizedTableRow
+                    onClick={() => handleRowOnClick(runLog)}
+                    hover
+                    key={`log_key ${index}`}
+                  >
                     <TableCell>
                       <Typography variant="subtitle1">
                         {getMessageTimestamp(runLog.timestamp)}
                       </Typography>
                     </TableCell>
 
-                    <TableCell onMouseEnter={() => handleRowHover(runLog)}>
+                    <TableCell>
                       <LogMessage variant="subtitle1">
                         {runLog.message}
                       </LogMessage>

@@ -18,30 +18,32 @@ const Text = styled(Typography)(({ theme }) => ({
 }));
 
 const SidebarItemCollapse = ({ item, onClick, endpoint }: any) => {
-  return item.sidebarProps ? (
-    <>
-      <Text variant="h6">{item.sidebarProps.displayText}</Text>
-      {item.child?.map((route: any, index: any) =>
-        route.sidebarProps ? (
-          route.child ? (
-            <SidebarItemCollapse
-              item={route}
-              key={index}
-              endpoint={endpoint}
-              onClick={onClick}
-            />
-          ) : (
-            <SidebarItem
-              item={route}
-              key={index}
-              endpoint={endpoint}
-              onClick={onClick}
-            />
-          )
-        ) : null
-      )}
-    </>
-  ) : null;
+  return (
+    item.sidebarProps && (
+      <>
+        <Text variant="body1">{item.sidebarProps.displayText}</Text>
+        {item.child?.map(
+          (route: any, index: any) =>
+            route.sidebarProps &&
+            (route.child ? (
+              <SidebarItemCollapse
+                item={route}
+                key={index}
+                endpoint={endpoint}
+                onClick={onClick}
+              />
+            ) : (
+              <SidebarItem
+                item={route}
+                key={index}
+                endpoint={endpoint}
+                onClick={onClick}
+              />
+            ))
+        )}
+      </>
+    )
+  );
 };
 
 export default SidebarItemCollapse;

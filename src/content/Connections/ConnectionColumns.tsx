@@ -12,7 +12,7 @@ import appIcons from '@utils/icon-utils';
  */
 
 export const ConnectionColumns: TableColumnProps[] = [
-  { id: '1', label: 'Name', minWidth: 300, icon: appIcons.NAME },
+  { id: '1', label: 'Name', minWidth: 300, icon: appIcons.NAME, muiIcon: true },
   { id: '2', label: 'Account', minWidth: 300, icon: appIcons.ACCOUNT },
   { id: '3', label: 'Connector', minWidth: 300, icon: 'CUSTOM' },
   { id: '4', label: '', align: 'right', action: true, minWidth: 100 }

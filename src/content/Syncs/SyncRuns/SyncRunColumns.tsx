@@ -35,6 +35,7 @@ export const SyncRunColumns: TableColumnProps[] = [
     id: '5',
     label: 'Status',
     minWidth: TABLE_COLUMN_SIZES[0],
-    icon: appIcons.STATUS
+    icon: appIcons.STATUS,
+    muiIcon: true
   }
 ];

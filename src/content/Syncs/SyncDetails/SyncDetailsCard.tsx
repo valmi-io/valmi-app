@@ -14,6 +14,7 @@ import { StackLayout } from '@components/Layouts/Layouts';
 
 import { convertDurationToMinutesOrHours } from '@utils/lib';
 import appIcons from '@utils/icon-utils';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 
 type SyncDetailsCardProps = {
   syncData: any;
@@ -110,7 +111,7 @@ const SyncDetailsCard = ({
             />
 
             {/* right arrow icon */}
-            {appIcons.ARROW_RIGHT}
+            <FontAwesomeIcon icon={appIcons.ARROW_RIGHT} />
 
             <ConnectionCard
               connectionType={
@@ -125,7 +126,7 @@ const SyncDetailsCard = ({
         </Stack>
         <Stack display="flex" direction="column" justifyContent="space-between">
           <Stack spacing={0.5} direction="row">
-            {appIcons.SCHEDULE}
+            <FontAwesomeIcon icon={appIcons.SCHEDULE} />
             <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
               isPublicSync ? '900000' : run_interval
             )}`}</Typography>
@@ -133,7 +134,8 @@ const SyncDetailsCard = ({
 
           {!isPublicSync && (
             <Stack spacing={0.5} direction="row">
-              {appIcons.EDIT}
+              <FontAwesomeIcon icon={appIcons.EDIT} />
+
               <Typography
                 onClick={() => handleEditSync(syncData)}
                 variant="body2"

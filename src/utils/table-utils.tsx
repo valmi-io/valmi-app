@@ -11,6 +11,7 @@ export interface TableColumnProps {
   action?: boolean | false;
   minWidth?: number;
   align?: 'right' | 'center';
+  muiIcon?: boolean;
 }
 
 export const TABLE_COLUMN_SIZES = {

@@ -7,46 +7,54 @@
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
-
-export const AppIconARROW_RIGHT = (props: any) => (
-  <FontAwesomeIcon {...props} className="fas fa-arrow-right" />
-);
+import {
+  faArrowRight,
+  faCalendar,
+  faClock,
+  faDatabase,
+  faLocationPin,
+  faMessage,
+  faPen,
+  faRotate,
+  faUpload,
+  faUser
+} from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export interface IAppIcons {
-  SRC: React.ReactElement;
-  DEST: React.ReactElement;
-  WAREHOUSE: React.ReactElement;
-  DESTINATION: React.ReactElement;
-  SYNC: React.ReactElement;
+  SRC: IconDefinition;
+  DEST: IconDefinition;
+  WAREHOUSE: IconDefinition;
+  DESTINATION: IconDefinition;
+  SYNC: IconDefinition;
   STATUS: React.ReactElement;
-  STARTED_AT: React.ReactElement;
+  STARTED_AT: IconDefinition;
   NAME: React.ReactElement;
-  ACCOUNT: React.ReactElement;
-  SCHEDULE: React.ReactElement;
-  ARROW_RIGHT: React.ReactElement;
-  EDIT: React.ReactElement;
-  UPLOAD: React.ReactElement;
-  TIME: React.ReactElement;
-  MESSAGE: React.ReactElement;
+  ACCOUNT: IconDefinition;
+  SCHEDULE: IconDefinition;
+  ARROW_RIGHT: IconDefinition;
+  EDIT: IconDefinition;
+  UPLOAD: IconDefinition;
+  TIME: IconDefinition;
+  MESSAGE: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
-  SRC: <FontAwesomeIcon className="fas fa-database" />,
-  DEST: <FontAwesomeIcon className="fas fa-location-pin" />,
-  WAREHOUSE: <FontAwesomeIcon className="fas fa-database" />,
-  DESTINATION: <FontAwesomeIcon className="fas fa-location-pin" />,
-  SYNC: <FontAwesomeIcon className="fas fa-rotate" />,
+  SRC: { ...faDatabase },
+  DEST: { ...faLocationPin },
+  WAREHOUSE: { ...faDatabase },
+  DESTINATION: { ...faLocationPin },
+  SYNC: { ...faRotate },
   STATUS: <ToggleOnIcon />,
-  STARTED_AT: <FontAwesomeIcon className="fas fa-clock" />,
+  STARTED_AT: { ...faClock },
   NAME: <AbcIcon />,
-  ACCOUNT: <FontAwesomeIcon className="fas fa-user" />,
-  SCHEDULE: <FontAwesomeIcon className="fas fa-calendar" />,
-  ARROW_RIGHT: <FontAwesomeIcon className="fas fa-arrow-right" />,
-  EDIT: <FontAwesomeIcon className="fa-solid fa-pen" />,
-  UPLOAD: <FontAwesomeIcon className="fa-solid fa-upload" />,
-  TIME: <FontAwesomeIcon className="fa-solid fa-clock" />,
-  MESSAGE: <FontAwesomeIcon className="fa-solid fa-message" />
+  ACCOUNT: { ...faUser },
+  SCHEDULE: { ...faCalendar },
+  ARROW_RIGHT: { ...faArrowRight },
+  EDIT: { ...faPen },
+  UPLOAD: { ...faUpload },
+  TIME: { ...faClock },
+  MESSAGE: { ...faMessage }
 };
 
 export default appIcons;

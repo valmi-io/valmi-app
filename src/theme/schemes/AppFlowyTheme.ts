@@ -7,6 +7,7 @@
 
 import { alpha, createTheme, lighten, darken } from '@mui/material';
 import '@mui/lab/themeAugmentation';
+import { Poppins } from 'next/font/google';
 
 const primaryColor = '#19bc9b';
 const secondaryColor = '#F88A4E';
@@ -30,6 +31,22 @@ const themeColors = {
   white: whiteColor,
   primaryAlt: '#000C57'
 };
+
+const poppins = Poppins({
+  weight: ['300', '400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  fallback: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    'Segoe UI',
+    'Helvetica',
+    'Arial',
+    'sans-serif',
+    'Apple Color Emoji',
+    'Segoe UI Emoji'
+  ]
+});
 
 const colors = {
   gradients: {
@@ -1255,12 +1272,10 @@ export const AppFlowyTheme = createTheme({
     }
   },
   shape: {
-    // sx={{ borderRadius: 1 }}> theme.shape.borderRadius * 1
     borderRadius: 10
   },
   typography: {
-    fontFamily:
-      'Poppins, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+    fontFamily: poppins.style.fontFamily,
     h1: {
       fontWeight: 700,
       lineHeight: 1.4,

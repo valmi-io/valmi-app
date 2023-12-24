@@ -14,8 +14,9 @@ import { Table, TableBody, TableHead, TableContainer } from '@mui/material';
 import { RootState } from '@store/reducers';
 
 import SyncTableRow from './SyncTableRow';
-import SyncTableColumns from './SyncTableColumns';
+
 import { SyncColumns } from './SyncColumns';
+import TableHeader from '@components/Table/TableHeader';
 
 export interface SyncOnClickProps {
   syncId: string;
@@ -48,7 +49,7 @@ const SyncsTable = ({ syncs }) => {
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>
-            <SyncTableColumns columns={SyncColumns} />
+            <TableHeader columns={SyncColumns} />
           </TableHead>
           {/* Syncs Table Body */}
           <TableBody>

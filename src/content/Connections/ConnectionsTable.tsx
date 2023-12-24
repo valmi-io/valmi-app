@@ -38,8 +38,8 @@ import { AppDispatch } from '@store/store';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 import { stringAvatar } from '@utils/lib';
-import ConnectionTableColumns from './ConnectionTableColumns';
 import { ConnectionColumns } from './ConnectionColumns';
+import TableHeader from '../../components/Table/TableHeader';
 
 interface ConnectionsTableProps {
   className?: string;
@@ -120,7 +120,7 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
         <Table>
           {/* Connections Table Columns */}
           <TableHead>
-            <ConnectionTableColumns
+            <TableHeader
               columns={ConnectionColumns}
               connectionType={connectionType}
             />
