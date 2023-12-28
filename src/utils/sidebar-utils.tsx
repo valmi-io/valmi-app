@@ -84,7 +84,7 @@ export const getSidebarRoutes = ({
       child: [
         {
           id: 30,
-          path: `/spaces/${workspaceId}/cloud-warehouses`,
+          path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
             displayText: 'SaaS TOOLS',
             icon: appIcons.DEST
@@ -95,7 +95,7 @@ export const getSidebarRoutes = ({
           path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
             displayText: 'WAREHOUSES',
-            icon: appIcons.SRC
+            icon: appIcons.DEST
           }
         }
       ]
