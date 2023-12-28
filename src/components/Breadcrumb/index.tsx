@@ -9,9 +9,16 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, Icon, styled } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { capitalizeFirstLetter } from '@utils/lib';
+import { blackColor } from '@theme/schemes/AppFlowyTheme';
+
+const BackIcon = styled(Icon)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+  color: blackColor,
+  cursor: 'pointer'
+}));
 
 const HeaderTitle = () => {
   const router = useRouter();
@@ -49,17 +56,9 @@ const HeaderTitle = () => {
 
   return (
     <Box display="flex" alignItems="center">
-      <IconButton
-        aria-label="back"
-        sx={{
-          backgroundColor: (theme) => theme.colors.primary.main,
-          color: 'white',
-          mr: (theme) => theme.spacing(1)
-        }}
-        onClick={handleBack}
-      >
+      <BackIcon onClick={handleBack}>
         <ArrowBackIcon />
-      </IconButton>
+      </BackIcon>
       <Breadcrumbs separator={'/'} aria-label="breadcrumb">
         {valuesAfterWid.length > 0 &&
           valuesAfterWid.map((route, index) => {

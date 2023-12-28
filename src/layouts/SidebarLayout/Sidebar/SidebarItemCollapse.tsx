@@ -6,7 +6,10 @@
 
 import { Typography, styled } from '@mui/material';
 
-import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
+import SidebarItem, {
+  TSidebarItemProps
+} from '@layouts/SidebarLayout/Sidebar/SidebarItem';
+import { memo } from 'react';
 
 const Text = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[50],
@@ -17,27 +20,31 @@ const Text = styled(Typography)(({ theme }) => ({
   paddingBottom: theme.spacing(1)
 }));
 
-const SidebarItemCollapse = ({ item, onClick, endpoint }: any) => {
+const SidebarItemCollapse = ({
+  item,
+  onClick,
+  currentRoute
+}: TSidebarItemProps) => {
   return (
     item.sidebarProps && (
       <>
         <Text variant="body1">{item.sidebarProps.displayText}</Text>
         {item.child?.map(
-          (route: any, index: any) =>
+          (route) =>
             route.sidebarProps &&
             (route.child ? (
               <SidebarItemCollapse
-                item={route}
-                key={index}
-                endpoint={endpoint}
+                currentRoute={currentRoute}
                 onClick={onClick}
+                item={route}
+                key={route.id}
               />
             ) : (
               <SidebarItem
-                item={route}
-                key={index}
-                endpoint={endpoint}
+                currentRoute={currentRoute}
                 onClick={onClick}
+                item={route}
+                key={route.id}
               />
             ))
         )}
@@ -46,4 +53,4 @@ const SidebarItemCollapse = ({ item, onClick, endpoint }: any) => {
   );
 };
 
-export default SidebarItemCollapse;
+export default memo(SidebarItemCollapse);

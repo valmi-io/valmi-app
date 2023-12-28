@@ -17,7 +17,8 @@ import {
   faPen,
   faRotate,
   faUpload,
-  faUser
+  faUser,
+  faChartGantt
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -37,6 +38,7 @@ export interface IAppIcons {
   UPLOAD: IconDefinition;
   TIME: IconDefinition;
   MESSAGE: IconDefinition;
+  TRACK: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -54,7 +56,8 @@ const appIcons: IAppIcons = {
   EDIT: { ...faPen },
   UPLOAD: { ...faUpload },
   TIME: { ...faClock },
-  MESSAGE: { ...faMessage }
+  MESSAGE: { ...faMessage },
+  TRACK: { ...faChartGantt }
 };
 
 export default appIcons;

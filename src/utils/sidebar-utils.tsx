@@ -8,37 +8,99 @@ import { Cable } from '@mui/icons-material';
 
 import appIcons from '@utils/icon-utils';
 
-export const getSidebarRoutes = (workspaceId: any) => {
-  return [
+type TSidebarPropsIn = {
+  workspaceId: string | any;
+  jitsuEnabled: boolean;
+};
+
+type TSidebarRouteProps = {
+  displayText: string;
+  icon: any;
+};
+
+export type TSidebarRoute = {
+  id: number;
+  path: string;
+  sidebarProps: TSidebarRouteProps;
+  child?: TSidebarRoute[];
+};
+
+export type TSidebarRoutePropsOut = TSidebarRoute[];
+
+export const getSidebarRoutes = ({
+  workspaceId,
+  jitsuEnabled
+}: TSidebarPropsIn): TSidebarRoutePropsOut => {
+  const routes: TSidebarRoute[] = [
+    jitsuEnabled && {
+      id: 0,
+      path: `/spaces/${workspaceId}/tracks`,
+      sidebarProps: {
+        displayText: 'TRACKS',
+        icon: appIcons.TRACK
+      }
+    },
     {
+      id: 1,
       path: `/spaces/${workspaceId}/syncs`,
       sidebarProps: {
-        displayText: 'Syncs',
+        displayText: 'ACTIVATE',
         icon: appIcons.SYNC
       }
     },
     {
-      path: `/spaces/${workspaceId}/connections`,
+      id: 2,
+      path: '',
       sidebarProps: {
-        displayText: 'Connections',
-        icon: <Cable />
+        displayText: 'SOURCES',
+        icon: null
       },
       child: [
-        {
-          path: `/spaces/${workspaceId}/connections/warehouses`,
+        jitsuEnabled && {
+          id: 20,
+          path: `/spaces/${workspaceId}/streams`,
           sidebarProps: {
-            displayText: 'Warehouses',
+            displayText: 'STREAMS',
             icon: appIcons.SRC
           }
         },
         {
+          id: 21,
+          path: `/spaces/${workspaceId}/connections/warehouses`,
+          sidebarProps: {
+            displayText: 'WAREHOUSES',
+            icon: appIcons.DEST
+          }
+        }
+      ]
+    },
+    {
+      id: 3,
+      path: '',
+      sidebarProps: {
+        displayText: 'DESTINATIONS',
+        icon: null
+      },
+      child: [
+        jitsuEnabled && {
+          id: 30,
+          path: `/spaces/${workspaceId}/cloud-warehouses`,
+          sidebarProps: {
+            displayText: 'CLOUD WAREHOUSES',
+            icon: appIcons.SRC
+          }
+        },
+        {
+          id: 31,
           path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
-            displayText: 'Destinations',
+            displayText: 'WAREHOUSES',
             icon: appIcons.DEST
           }
         }
       ]
     }
-  ];
+  ].filter(Boolean) as TSidebarRoute[];
+
+  return routes;
 };

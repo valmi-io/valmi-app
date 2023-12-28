@@ -59,8 +59,9 @@ export const syncRunLogColumns: TableColumnProps[] = [
  * @param{LogPayloadIn} logPayload
  * @returns logPayload
  */
-export const generatePayload = (logPayload: LogPayloadIn) => {
+export const generateLogPayload = (logPayload: LogPayloadIn) => {
   const { props, since, before } = logPayload;
+
   const { syncId, runId, connectionType, workspaceId } = props;
 
   const payload: LogPayload = {

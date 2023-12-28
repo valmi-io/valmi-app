@@ -4,23 +4,29 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { memo } from 'react';
+
 import { ListItemButton, Typography, styled, useTheme } from '@mui/material';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import { TSidebarRoute } from '@utils/sidebar-utils';
 
 const Label = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[70]
 }));
 
-const SidebarItem = ({ item, endpoint, onClick }: any) => {
+export type TSidebarItemProps = {
+  item: TSidebarRoute;
+  currentRoute: any;
+  onClick: (path: string) => void;
+};
+
+const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   const theme = useTheme();
+
   return (
     <ListItemButton
       onClick={() => onClick(item.path)}
-      className={
-        endpoint === `${item.sidebarProps.displayText.toLowerCase()}`
-          ? 'active'
-          : ''
-      }
+      className={currentRoute === item.id ? 'active' : ''}
     >
       {item.sidebarProps.icon && (
         <FontAwesomeIcon
@@ -34,4 +40,4 @@ const SidebarItem = ({ item, endpoint, onClick }: any) => {
   );
 };
 
-export default SidebarItem;
+export default memo(SidebarItem);

@@ -4,7 +4,14 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useContext } from 'react';
+import {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -20,7 +27,8 @@ import { SidebarContext } from '@contexts/SidebarContext';
 import { RootState } from '@store/reducers';
 import { setAppState } from '@store/reducers/appFlow';
 
-import { getSidebarRoutes } from '@utils/sidebar-utils';
+import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
+import { isJitsuEnabled } from '@utils/routes';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -61,65 +69,91 @@ const SubMenuWrapper = styled(Box)(
 `
 );
 
-const SidebarMenu = () => {
-  const dispatch = useDispatch();
-  const { closeSidebar } = useContext(SidebarContext);
+type TSidebarMenuProps = {
+  workspaceId: any;
+};
+
+const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { closeSidebar } = useContext(SidebarContext);
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '', currentRoute } = appState;
+  const { currentRoute = '' } = appState;
 
-  const handleListItemClick = (path: any) => {
-    // extracting current route from path
-    const currentRoute = path?.split('/').slice(-1)[0];
+  const sidebarRoutes = useMemo(() => {
+    return getSidebarRoutes({ workspaceId, jitsuEnabled: isJitsuEnabled() });
+  }, [workspaceId, isJitsuEnabled()]);
 
-    // update current route in redux store.
-    dispatch(
-      setAppState({
-        ...appState,
-        currentRoute: currentRoute
-      })
-    );
+  const getActiveIndex = (routes: TSidebarRoute[]): number => {
+    let activeIndex = -1;
+    for (let i = 0; i < routes.length; i++) {
+      let item = routes[i];
+      let currentPath = item.path?.split('/').slice(-1)[0].toLowerCase();
 
-    // Navigate to route based on the name of the list item
-    router.push(path);
+      if (currentRoute === currentPath) {
+        activeIndex = item.id;
+        break;
+      } else if (item.child) {
+        activeIndex = getActiveIndex(item.child);
+        if (activeIndex !== -1) {
+          break;
+        }
+      }
+    }
 
-    // Close the sidebar
-    closeSidebar();
+    return activeIndex;
   };
+
+  const handleItemOnClick = useCallback(
+    (path: string) => {
+      // extracting current route from path
+      const currentRoute = path?.split('/').slice(-1)[0];
+      // update current route in redux store.
+      dispatch(
+        setAppState({
+          ...appState,
+          currentRoute: currentRoute
+        })
+      );
+      // Navigate to route based on the name of the list item
+      router.push(path);
+      // Close the sidebar
+      closeSidebar();
+    },
+    [dispatch]
+  );
+
+  const sidebarItems = sidebarRoutes.map((route) => {
+    if (!route) return null;
+    return route.sidebarProps && route.child ? (
+      <SidebarItemCollapse
+        key={route.id}
+        item={route}
+        currentRoute={getActiveIndex(sidebarRoutes)}
+        onClick={handleItemOnClick}
+      />
+    ) : (
+      <SidebarItem
+        key={route.id}
+        item={route}
+        currentRoute={getActiveIndex(sidebarRoutes)}
+        onClick={handleItemOnClick}
+      />
+    );
+  });
 
   return (
     <>
       <MenuWrapper>
-        <List component="div">
-          <SubMenuWrapper>
-            <List>
-              {getSidebarRoutes(workspaceId).map(
-                (route, index) =>
-                  route.sidebarProps &&
-                  (route.child ? (
-                    <SidebarItemCollapse
-                      item={route}
-                      key={index}
-                      endpoint={currentRoute}
-                      onClick={handleListItemClick}
-                    />
-                  ) : (
-                    <SidebarItem
-                      item={route}
-                      key={index}
-                      endpoint={currentRoute}
-                      onClick={handleListItemClick}
-                    />
-                  ))
-              )}
-            </List>
-          </SubMenuWrapper>
-        </List>
+        <SubMenuWrapper>
+          <List>{sidebarItems}</List>
+        </SubMenuWrapper>
       </MenuWrapper>
     </>
   );
 };
 
-export default SidebarMenu;
+export default memo(SidebarMenu);

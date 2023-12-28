@@ -13,6 +13,8 @@ import SidebarMenu from '@layouts/SidebarLayout/Sidebar/SidebarMenu';
 import { SidebarContext } from '@contexts/SidebarContext';
 
 import Logo from '@components/LogoSign';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store/reducers';
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -26,9 +28,13 @@ const SidebarWrapper = styled(Box)(
 `
 );
 
-function Sidebar() {
+const Sidebar = () => {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
-  const closeSidebar = () => toggleSidebar();
+
+  const workspaceId = useSelector(
+    (state: RootState) => state.appFlow.appState.workspaceId
+  );
+
   const theme = useTheme();
 
   return (
@@ -66,7 +72,7 @@ function Sidebar() {
             background: theme.colors.alpha.trueWhite[10]
           }}
         />
-        <SidebarMenu />
+        <SidebarMenu key={'SidebarMenu'} workspaceId={workspaceId} />
       </SidebarWrapper>
       <Drawer
         sx={{
@@ -74,7 +80,7 @@ function Sidebar() {
         }}
         anchor={theme.direction === 'rtl' ? 'right' : 'left'}
         open={sidebarToggle}
-        onClose={closeSidebar}
+        onClose={toggleSidebar}
         variant="temporary"
         elevation={9}
       >
@@ -103,11 +109,11 @@ function Sidebar() {
               background: theme.colors.alpha.trueWhite[10]
             }}
           />
-          <SidebarMenu />
+          <SidebarMenu key={'SidebarDrawer'} workspaceId={workspaceId} />
         </SidebarWrapper>
       </Drawer>
     </>
   );
-}
+};
 
 export default Sidebar;

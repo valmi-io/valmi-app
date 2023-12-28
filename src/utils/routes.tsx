@@ -17,6 +17,10 @@ export const isPublicSync = (pathname: string): boolean => {
   return false;
 };
 
+export const isJitsuEnabled = () => {
+  return process.env.ENABLE_JITSU === 'True' ? true : false;
+};
+
 export const filterRoute = (routerQueryObj: any, route: any) => {
   const match = route.match(/\[(.*?)\]/);
   if (match && match.length > 1) {

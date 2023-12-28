@@ -8,8 +8,6 @@ import React from 'react';
 
 import { Button, Chip, Stack, Typography, styled } from '@mui/material';
 
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-
 import { getConnectionMetrics, getConnectionStatus } from './SyncRunsUtils';
 
 import { capitalizeFirstLetter, splitNumberByCommas } from '@utils/lib';
@@ -84,7 +82,6 @@ const ConnectionMetrics = ({
 
         <Button
           sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
-          startIcon={<LogoutOutlinedIcon />}
           variant={disableLogs ? 'contained' : 'outlined'}
           size="small"
           disabled={disableLogs}
@@ -92,6 +89,16 @@ const ConnectionMetrics = ({
         >
           Logs
         </Button>
+
+        {/** Display Samples button */}
+
+        {/* <Button
+          sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
+          variant={disableLogs ? 'contained' : 'outlined'}
+          size="small"
+        >
+          Samples
+        </Button> */}
       </Stack>
 
       {/** Connection metrics stack */}
