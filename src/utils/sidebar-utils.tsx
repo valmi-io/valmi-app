@@ -87,7 +87,7 @@ export const getSidebarRoutes = ({
           path: `/spaces/${workspaceId}/cloud-warehouses`,
           sidebarProps: {
             displayText: 'SaaS TOOLS',
-            icon: appIcons.SRC
+            icon: appIcons.DEST
           }
         },
         jitsuEnabled && {
@@ -95,7 +95,7 @@ export const getSidebarRoutes = ({
           path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
             displayText: 'WAREHOUSES',
-            icon: appIcons.DEST
+            icon: appIcons.SRC
           }
         }
       ]
