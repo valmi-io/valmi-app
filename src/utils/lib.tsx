@@ -90,3 +90,12 @@ export const signOutUser = async (router) => {
 export const splitNumberByCommas = (number) => {
   return number.toLocaleString();
 };
+
+
+export function isTrue(val) {
+  try {
+      return !!JSON.parse(val);
+  } catch {
+      return false;
+  }
+}

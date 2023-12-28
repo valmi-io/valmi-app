@@ -4,6 +4,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { isTrue } from './lib';
+
 export const publicRoutes = [
   '/login',
   '/signup',
@@ -18,7 +20,7 @@ export const isPublicSync = (pathname: string): boolean => {
 };
 
 export const isJitsuEnabled = () => {
-  return process.env.ENABLE_JITSU === 'True' ? true : false;
+  return !isTrue(process.env.ENABLE_JITSU);
 };
 
 export const filterRoute = (routerQueryObj: any, route: any) => {

@@ -36,7 +36,7 @@ export const getSidebarRoutes = ({
       id: 0,
       path: `/spaces/${workspaceId}/tracks`,
       sidebarProps: {
-        displayText: 'TRACKS',
+        displayText: 'TRACK',
         icon: appIcons.TRACK
       }
     },
@@ -69,7 +69,7 @@ export const getSidebarRoutes = ({
           path: `/spaces/${workspaceId}/connections/warehouses`,
           sidebarProps: {
             displayText: 'WAREHOUSES',
-            icon: appIcons.DEST
+            icon: appIcons.SRC
           }
         }
       ]
@@ -82,15 +82,15 @@ export const getSidebarRoutes = ({
         icon: null
       },
       child: [
-        jitsuEnabled && {
+        {
           id: 30,
           path: `/spaces/${workspaceId}/cloud-warehouses`,
           sidebarProps: {
-            displayText: 'CLOUD WAREHOUSES',
+            displayText: 'SaaS TOOLS',
             icon: appIcons.SRC
           }
         },
-        {
+        jitsuEnabled && {
           id: 31,
           path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
