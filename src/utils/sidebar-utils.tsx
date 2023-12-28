@@ -4,8 +4,6 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Cable } from '@mui/icons-material';
-
 import appIcons from '@utils/icon-utils';
 
 type TSidebarPropsIn = {

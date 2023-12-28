@@ -3,51 +3,61 @@
  * Created Date: Thursday, May 4th 2023, 8:30:34 pm
  * Author: Nagendra S @ valmi.io
  */
+import { memo, useState } from 'react';
 
-import { Typography, styled } from '@mui/material';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import List from '@mui/material/List';
+
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import SidebarItem, {
   TSidebarItemProps
 } from '@layouts/SidebarLayout/Sidebar/SidebarItem';
-import { memo } from 'react';
-
-const Text = styled(Typography)(({ theme }) => ({
-  color: theme.colors.alpha.white[50],
-  display: 'block',
-  paddingLeft: theme.spacing(2),
-  paddingRight: theme.spacing(2),
-  paddingTop: theme.spacing(1),
-  paddingBottom: theme.spacing(1)
-}));
 
 const SidebarItemCollapse = ({
   item,
   onClick,
   currentRoute
 }: TSidebarItemProps) => {
+  const [open, setOpen] = useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
   return (
     item.sidebarProps && (
       <>
-        <Text variant="body1">{item.sidebarProps.displayText}</Text>
-        {item.child?.map(
-          (route) =>
-            route.sidebarProps &&
-            (route.child ? (
-              <SidebarItemCollapse
-                currentRoute={currentRoute}
-                onClick={onClick}
-                item={route}
-                key={route.id}
-              />
-            ) : (
-              <SidebarItem
-                currentRoute={currentRoute}
-                onClick={onClick}
-                item={route}
-                key={route.id}
-              />
-            ))
-        )}
+        <ListItemButton onClick={handleClick}>
+          <ListItemText primary={item.sidebarProps.displayText} />
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {item.child?.map(
+              (route) =>
+                route.sidebarProps &&
+                (route.child ? (
+                  <SidebarItemCollapse
+                    currentRoute={currentRoute}
+                    onClick={onClick}
+                    item={route}
+                    key={route.id}
+                  />
+                ) : (
+                  <SidebarItem
+                    currentRoute={currentRoute}
+                    onClick={onClick}
+                    item={route}
+                    key={route.id}
+                  />
+                ))
+            )}
+          </List>
+        </Collapse>
       </>
     )
   );

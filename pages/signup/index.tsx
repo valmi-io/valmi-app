@@ -39,7 +39,7 @@ import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
 import { signupValidationSchema } from '@utils/validation-schema';
-import { useLoginStatus } from '../../src/hooks/useLoginStatus';
+import { useLoginStatus } from '@hooks/useLoginStatus';
 
 const SignupPage: NextPageWithLayout = () => {
   const router = useRouter();
