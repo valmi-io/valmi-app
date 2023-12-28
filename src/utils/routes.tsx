@@ -20,7 +20,7 @@ export const isPublicSync = (pathname: string): boolean => {
 };
 
 export const isJitsuEnabled = () => {
-  return !isTrue(process.env.ENABLE_JITSU);
+  return isTrue(process.env.ENABLE_JITSU);
 };
 
 export const filterRoute = (routerQueryObj: any, route: any) => {
