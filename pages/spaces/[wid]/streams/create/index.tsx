@@ -210,6 +210,7 @@ const CreateStream = () => {
               cells={materialCells}
               onChange={({ errors, data }) => setData(data)}
             />
+            <pre>{JSON.stringify(data, null, 2)}</pre>
     </Box>;
   }
   return (
