@@ -21,12 +21,11 @@ import { Box, Card, Grid } from '@mui/material';
 import ErrorContainer from '../../../../../src/components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../../src/components/SkeletonLoader';
 import ratingControlTester from '../../../../../src/tmp/ratingControlTester';
-import RatingControl from '../../../../../src/tmp/RatingControl';
+import StreamKeysControl from '../../../../../src/tmp/StreamKeysControl';
 import { Generate, JsonSchema, TesterContext, UISchemaElement, rankWith } from '@jsonforms/core';
 import InputControl from '../../../../../src/tmp/InputControl';
 import InvisibleControl from '../../../../../src/tmp/InvisibleControl';
-
-const initialData = {};
+import { v4 as uuidv4 } from 'uuid';
 
 const invisibleProperties = ['id', 'workspaceId', 'type'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -50,9 +49,9 @@ const inputControlTester = (uischema: any, schema: JsonSchema, context: TesterCo
   //simple hack to get the control name. //TODO: find a better way
   const arr =  uischema.scope.split('/');
   const controlName = arr[arr.length - 1];
-  console.log(controlName);
+  // console.log(controlName);
   const dataType = schema?.properties?.[controlName]?.type;
-  console.log(dataType);
+  // console.log(dataType);
 
   if (dataType === 'string' || dataType === 'number')
     return true;
@@ -65,13 +64,13 @@ const renderers = [
       tester: rankWith(
       4000, //increase rank as needed
       apiKeysTester,
-    ), renderer: InvisibleControl
+    ), renderer: StreamKeysControl
   },
   {
     tester: rankWith(
       3000, //increase rank as needed
       invisiblePropertiesTester,
-    ), renderer: RatingControl
+    ), renderer: InvisibleControl
   },
   {
     tester: rankWith(
@@ -88,118 +87,24 @@ const CreateStream = () => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const { workspaceId = '' } = appState;
 
+  const initialData = {id: uuidv4(), type: 'stream', workspaceId: workspaceId, name: 'bond', domains: [], authorizedJavaScriptDomains: '', publicKeys: [], privateKeys: []};
+
   const [data, setData] = useState<any>(initialData);
 
 
   const {
-    data: schema2,
+    data: schema,
     isLoading,
     isSuccess,
     isError,
     error
   } = useStreamSchemaQuery(workspaceId);
 
-  const schema = {
-    "type": "object",
-    "properties": {
-        "id": {
-            "type": "string"
-        },
-        "type": {
-            "type": "string"
-        },
-        "workspaceId": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string"
-        },
-        "domains": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "authorizedJavaScriptDomains": {
-            "type": "string"
-        },
-        "publicKeys": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "plaintext": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "hash": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "hint": {
-                        "type": [
-                            "string",
-                            "null"
-                        ]
-                    },
-                    "createdAt": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "lastUsed": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "format": "date-time"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "id": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "id"
-                ],
-                "additionalProperties": false
-            }
-        },
-        "privateKeys": {
-            "type": "array",
-            "items": {
-                "$ref": "#/properties/publicKeys/items"
-            }
-        }
-    },
-    "required": [
-        "id",
-        "type",
-        "workspaceId",
-        "name"
-    ],
-    "additionalProperties": false,
-    "$schema": "http://json-schema.org/draft-07/schema#"
-};
-
 
   const PageContent = () => {
     //   const uiSchema = Generate.uiSchema(schema);
-    //   uiSchema.elements[7].options = {  detail : 'REGISTERED'
-    // };    console.log(uiSchema);
+    //   uiSchema.elements[7].options = {  detail : 'REGISTERED' };
+    //   console.log(uiSchema);
 
     return <Box margin={10}>
             <JsonForms

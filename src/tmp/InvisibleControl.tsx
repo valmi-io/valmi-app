@@ -10,7 +10,7 @@ const InvisibleControl = ({ data, handleChange, path }: InvisibleControlProps) =
 {
     console.log('InvisibleControl', data);
     return (
-        <><h1></h1></>
+        <><h1>**</h1></>
     );
 }
 
