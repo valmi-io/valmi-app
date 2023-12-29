@@ -99,3 +99,15 @@ export function isTrue(val) {
       return false;
   }
 }
+
+/*
+const searchParams = useSearchParams();
+const streamId = searchParams.get('streamId');
+
+console.log('streamId', streamId);
+console.log('router', router.query );
+
+
+const {selectAllStreams,selectStreamById} = getStreamSelectors(wid as string);
+const data = useSelector(state => selectStreamById(state, streamId));
+*/
