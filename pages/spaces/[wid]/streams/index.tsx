@@ -9,9 +9,9 @@
  * This component represents a page for displaying streams and creating new stream.
  */
 
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 
-import { Grid } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
@@ -23,6 +23,9 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
+import { useGetStreamsQuery } from '@store/api/streamApiSlice';
+import ErrorContainer from '@components/Error/ErrorContainer';
+import SkeletonLoader from '../../../../src/components/SkeletonLoader';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -34,6 +37,29 @@ const StreamsPage: NextPageWithLayout = () => {
   const handleCreateStreamOnClick = () => {
     router.push(`/spaces/${workspaceId}/streams/create`);
   };
+
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  } = useGetStreamsQuery(workspaceId);
+
+  const PageContent = () => {
+    console.log('data', data);
+    return <>
+    {
+      (data.ids as string[]).map((id) => {
+        return (
+          <div key={id}>
+            {data.entities[id].name}
+          </div>
+        )
+      })
+    }
+    </>;
+  }
 
   return (
     <PageLayout
@@ -51,6 +77,22 @@ const StreamsPage: NextPageWithLayout = () => {
       >
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}
+
+            <Card variant="outlined">
+              {/** Display error */}
+              {isError && <ErrorContainer error={error} />}
+
+              {/** Display trace error
+              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
+
+              {/** Display skeleton */}
+              <SkeletonLoader loading={isLoading} />
+
+              {/** Display page content */}
+              {!error && !isLoading && data && <PageContent />}
+            </Card>
+
+
         </Grid>
       </Grid>
     </PageLayout>
