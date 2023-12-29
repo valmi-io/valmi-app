@@ -4,7 +4,7 @@ import { Box, Card, Grid } from '@mui/material';
 import { MaterialTextControl } from './CustomMaterialTextControl';
 
 export const InputControl = (props: ControlProps) => {
-  console.log(props);
+  //console.log(props);
   return (
         <Card sx={{py: 10}}>
         <MaterialTextControl    {...props} />

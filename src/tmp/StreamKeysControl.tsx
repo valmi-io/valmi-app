@@ -10,9 +10,9 @@ interface StreamKeysControlProps {
 }
 
 const StreamKeysControl = ({ data, handleChange, path }: StreamKeysControlProps) => {
-  console.log('StreamKeysControl', data);
-  console.log('StreamKeysControl', handleChange);
-  console.log('StreamKeysControl', path);
+  // console.log('StreamKeysControl', data);
+  // console.log('StreamKeysControl', handleChange);
+  // console.log('StreamKeysControl', path);
   return (
   <>
           <IconButton onClick={()=>{data = [...data, data.length], handleChange(path, data)}} color={'primary'}>
