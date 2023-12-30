@@ -100,6 +100,10 @@ export function isTrue(val) {
   }
 }
 
+export function getBaseRoute(wid: string){
+  return `/spaces/${wid}`;
+}
+
 /*
 const searchParams = useSearchParams();
 const streamId = searchParams.get('streamId');

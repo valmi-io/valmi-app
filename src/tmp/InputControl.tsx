@@ -6,7 +6,7 @@ import { MaterialTextControl } from './CustomMaterialTextControl';
 export const InputControl = (props: ControlProps) => {
   //console.log(props);
   return (
-        <Card sx={{py: 10}}>
+        <Card sx={{py: 2}}>
         <MaterialTextControl    {...props} />
         </Card>
   );
