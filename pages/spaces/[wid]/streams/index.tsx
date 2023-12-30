@@ -11,11 +11,11 @@
 
 import { ReactElement, useEffect } from 'react';
 
-import { Card, Grid } from '@mui/material';
+import { Card, Grid, IconButton } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -26,15 +26,20 @@ import { RootState } from '@store/reducers';
 import { useGetStreamsQuery } from '@store/api/streamApiSlice';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
+import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import appIcons from '../../../../src/utils/icon-utils';
+import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const dispatch = useDispatch();
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateStreamOnClick = () => {
+  const handleCreateStreamOnClick = ({edit = false, streamId = ''}) => {
+    dispatch(setStreamFlowState({editing: edit, streamId: streamId}));
     router.push(`/spaces/${workspaceId}/streams/create`);
   };
 
@@ -54,6 +59,9 @@ const StreamsPage: NextPageWithLayout = () => {
         return (
           <div key={id}>
             {data.entities[id].name}
+            <IconButton onClick={()=>{handleCreateStreamOnClick({edit: true,streamId: id})}}>
+              <FontAwesomeIcon icon={appIcons.EDIT} />
+              </IconButton>
           </div>
         )
       })

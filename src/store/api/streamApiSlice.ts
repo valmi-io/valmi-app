@@ -10,7 +10,48 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: workspaceId => `/streams/workspaces/${workspaceId}/config/stream`,
       transformResponse: responseData => {
         return streamsAdapter.setAll(initialState, (responseData as { objects: any[] })?.objects??[])
+      },
+      providesTags: (result, error, workspaceId) =>{
+        //console.log(result);
+        const tags =  result?.ids
+        ? [
+            ...result.ids.map(( id : any) => ({ type: 'Stream' as const, id })),
+            { type: 'Stream' as const},
+          ]
+        : [{ type: 'Stream' as const}];
+        //console.log(tags);
+        return tags;
+   }}),
+
+    createStream: builder.mutation({
+      query: ({ workspaceId, stream }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/stream`,
+        method: 'POST',
+        body: stream,
+      }),
+      invalidatesTags: ['Stream'],
+    }),
+
+    editStream: builder.mutation({
+      query: ({ workspaceId, stream }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/stream/${stream.id}`,
+        method: 'PUT',
+        body: stream,
+      }),
+      invalidatesTags: (result, error, arg) =>
+      {
+        const tags = [{ type: 'Stream', id: arg.stream.id }];
+        //console.log(tags);
+        return tags;
       }
+    }),
+
+    deleteStream: builder.mutation({
+      query: ({ workspaceId, streamId }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/stream/${streamId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Stream', id: arg.streamId }],
     }),
 
     streamSchema: builder.query({
@@ -21,7 +62,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
 
 
 
-export const { useGetStreamsQuery, useStreamSchemaQuery } = extendedApiSlice ;
+export const { useGetStreamsQuery, useCreateStreamMutation, useEditStreamMutation, useDeleteStreamMutation, useStreamSchemaQuery } = extendedApiSlice;
 
 
 

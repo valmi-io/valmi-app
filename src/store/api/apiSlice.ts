@@ -47,6 +47,8 @@ const staggeredBaseQueryWithBailOut = retry(
 );
 // Define our single API slice object
 export const apiSlice = createApi({
+  tagTypes: ['Stream'],
+
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',
   // All of our requests will have URLs starting with '/api/v1'
