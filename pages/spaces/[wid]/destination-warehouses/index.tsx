@@ -24,31 +24,20 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
 
-const DestinationsPage: NextPageWithLayout = () => {
+const SaasToolsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateDestinationOnClick = () => {
-    router.push(`/spaces/${workspaceId}/cloud-warehouses/create`);
+  const handleCreateWarehouseOnClick = () => {
+    router.push(`/spaces/${workspaceId}/destination-warehouses/create`);
   };
 
   return (
-    <PageLayout
-      pageHeadTitle="Destinations"
-      title="Destinations"
-      buttonTitle="Destination"
-      handleButtonOnClick={handleCreateDestinationOnClick}
-    >
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+    <PageLayout pageHeadTitle="Warehouses" title="Destination Warehouses" buttonTitle="Warehouse" handleButtonOnClick={handleCreateWarehouseOnClick}>
+      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}
         </Grid>
@@ -57,8 +46,8 @@ const DestinationsPage: NextPageWithLayout = () => {
   );
 };
 
-DestinationsPage.getLayout = function getLayout(page: ReactElement) {
+SaasToolsPage.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default DestinationsPage;
+export default SaasToolsPage;

@@ -24,16 +24,8 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   const theme = useTheme();
 
   return (
-    <ListItemButton
-      onClick={() => onClick(item.path)}
-      className={currentRoute === item.id ? 'active' : ''}
-    >
-      {item.sidebarProps.icon && (
-        <FontAwesomeIcon
-          icon={item.sidebarProps.icon}
-          style={{ marginRight: theme.spacing(3) }}
-        />
-      )}
+    <ListItemButton onClick={() => onClick(item.path)} className={currentRoute === item.id ? 'active' : ''}>
+      {item.sidebarProps.icon && <FontAwesomeIcon icon={item.sidebarProps.icon} style={{ marginRight: theme.spacing(3) }} />}
 
       <Label variant="h5">{item.sidebarProps.displayText}</Label>
     </ListItemButton>

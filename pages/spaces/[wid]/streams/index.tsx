@@ -38,69 +38,53 @@ const StreamsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateStreamOnClick = ({edit = false, streamId = ''}) => {
-    dispatch(setStreamFlowState({editing: edit, streamId: streamId}));
+  const handleCreateStreamOnClick = ({ edit = false, streamId = '' }) => {
+    dispatch(setStreamFlowState({ editing: edit, streamId: streamId }));
     router.push(`/spaces/${workspaceId}/streams/create`);
   };
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    isError,
-    error
-  } = useGetStreamsQuery(workspaceId);
+  const { data, isLoading, isSuccess, isError, error } = useGetStreamsQuery(workspaceId);
 
   const PageContent = () => {
-    console.log('data', data);
-    return <>
-    {
-      (data.ids as string[]).map((id) => {
-        return (
-          <div key={id}>
-            {data.entities[id].name}
-            <IconButton onClick={()=>{handleCreateStreamOnClick({edit: true,streamId: id})}}>
-              <FontAwesomeIcon icon={appIcons.EDIT} />
+    return (
+      <>
+        {(data.ids as string[]).map((id) => {
+          return (
+            <div key={id}>
+              {data.entities[id].name}
+              <IconButton
+                onClick={() => {
+                  handleCreateStreamOnClick({ edit: true, streamId: id });
+                }}
+              >
+                <FontAwesomeIcon icon={appIcons.EDIT} />
               </IconButton>
-          </div>
-        )
-      })
-    }
-    </>;
-  }
+            </div>
+          );
+        })}
+      </>
+    );
+  };
 
   return (
-    <PageLayout
-      pageHeadTitle="Streams"
-      title="Streams"
-      buttonTitle="Stream"
-      handleButtonOnClick={handleCreateStreamOnClick}
-    >
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+    <PageLayout pageHeadTitle="Streams" title="Streams" buttonTitle="Stream" handleButtonOnClick={handleCreateStreamOnClick}>
+      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}
 
-            <Card variant="outlined">
-              {/** Display error */}
-              {isError && <ErrorContainer error={error} />}
+          <Card variant="outlined">
+            {/** Display error */}
+            {isError && <ErrorContainer error={error} />}
 
-              {/** Display trace error
+            {/** Display trace error
               {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
 
-              {/** Display skeleton */}
-              <SkeletonLoader loading={isLoading} />
+            {/** Display skeleton */}
+            <SkeletonLoader loading={isLoading} />
 
-              {/** Display page content */}
-              {!error && !isLoading && data && <PageContent />}
-            </Card>
-
-
+            {/** Display page content */}
+            {!error && !isLoading && data && <PageContent />}
+          </Card>
         </Grid>
       </Grid>
     </PageLayout>

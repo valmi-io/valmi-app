@@ -9,20 +9,16 @@ import React, { ReactElement } from 'react';
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-const CreateDestination = () => {
+const CreateWarehousePage = () => {
   return (
-    <PageLayout
-      pageHeadTitle={'Create destination'}
-      title={'Create a new destination'}
-      displayButton={false}
-    >
+    <PageLayout pageHeadTitle={'Create warehouse'} title={'Create a new warehouse'} displayButton={false}>
       <></>
     </PageLayout>
   );
 };
 
-CreateDestination.getLayout = function getLayout(page: ReactElement) {
+CreateWarehousePage.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default CreateDestination;
+export default CreateWarehousePage;

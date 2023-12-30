@@ -25,10 +25,7 @@ export type TSidebarRoute = {
 
 export type TSidebarRoutePropsOut = TSidebarRoute[];
 
-export const getSidebarRoutes = ({
-  workspaceId,
-  jitsuEnabled
-}: TSidebarPropsIn): TSidebarRoutePropsOut => {
+export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn): TSidebarRoutePropsOut => {
   const routes: TSidebarRoute[] = [
     jitsuEnabled && {
       id: 0,
@@ -81,6 +78,7 @@ export const getSidebarRoutes = ({
       },
       child: [
         {
+          // valmi
           id: 30,
           path: `/spaces/${workspaceId}/connections/destinations`,
           sidebarProps: {
@@ -88,9 +86,10 @@ export const getSidebarRoutes = ({
             icon: appIcons.DEST
           }
         },
+        // jitsu
         jitsuEnabled && {
           id: 31,
-          path: `/spaces/${workspaceId}/connections/destinations`,
+          path: `/spaces/${workspaceId}/destination-warehouses`,
           sidebarProps: {
             displayText: 'WAREHOUSES',
             icon: appIcons.DEST

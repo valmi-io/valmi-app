@@ -4,14 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -93,7 +86,7 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
       let item = routes[i];
       let currentPath = item.path?.split('/').slice(-1)[0].toLowerCase();
 
-      if (currentRoute === currentPath) {
+      if (currentRoute.toLowerCase() === currentPath) {
         activeIndex = item.id;
         break;
       } else if (item.child) {
@@ -129,19 +122,9 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   const sidebarItems = sidebarRoutes.map((route) => {
     if (!route) return null;
     return route.sidebarProps && route.child ? (
-      <SidebarItemCollapse
-        key={route.id}
-        item={route}
-        currentRoute={getActiveIndex(sidebarRoutes)}
-        onClick={handleItemOnClick}
-      />
+      <SidebarItemCollapse key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
     ) : (
-      <SidebarItem
-        key={route.id}
-        item={route}
-        currentRoute={getActiveIndex(sidebarRoutes)}
-        onClick={handleItemOnClick}
-      />
+      <SidebarItem key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
     );
   });
 
