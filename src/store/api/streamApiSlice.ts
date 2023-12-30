@@ -7,6 +7,10 @@ const initialState = streamsAdapter.getInitialState()
 const destinationsAdapter: any = createEntityAdapter()
 const initialDestinationsState = destinationsAdapter.getInitialState()
 
+
+const linksAdapter: any = createEntityAdapter()
+const initialLinksState = linksAdapter.getInitialState()
+
 export const extendedApiSlice = apiSlice.injectEndpoints({
   endpoints: builder => ({
     getStreams: builder.query({
@@ -65,6 +69,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: ({workspaceId, type}) => `/streams/workspaces/${workspaceId}/api/schema/destination/${type}`,
     }),
 
+    linkSchema: builder.query({
+      query: ({workspaceId, type}) => `/streams/workspaces/${workspaceId}/api/schema/link/${type}`,
+    }),
+
     // get destinations
     getDestinations: builder.query({
       query: workspaceId => `/streams/workspaces/${workspaceId}/config/destination`,
@@ -116,6 +124,46 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'Destination', id: arg.destinationId }],
     }),
+
+
+    // get links
+    getLinks: builder.query({
+      query: workspaceId => `/streams/workspaces/${workspaceId}/config/link`,
+      transformResponse: responseData => {
+        return linksAdapter.setAll(initialLinksState, (responseData as { links: any[] })?.links??[])
+      },
+      providesTags: (result, error, workspaceId) =>{
+        //console.log(result);
+        const tags =  result?.ids
+        ? [
+            ...result.ids.map(( id : any) => ({ type: 'Link' as const, id })),
+            { type: 'Link' as const},
+          ]
+        : [{ type: 'Link' as const}];
+        //console.log(tags);
+        return tags;
+      }
+    }),
+
+    //create link
+    createLink: builder.mutation({
+      query: ({ workspaceId, link }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/link`,
+        method: 'POST',
+        body: link,
+      }),
+      invalidatesTags: ['Link'],
+    }),
+
+    // delete link
+    deleteLink: builder.mutation({
+      query: ({ workspaceId, linkId }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/link/${linkId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Link', id: arg.linkId }],
+    }),
+
   })
 })
 
@@ -131,7 +179,12 @@ export const {
   useGetDestinationsQuery,
   useCreateDestinationMutation,
   useEditDestinationMutation,
-  useDeleteDestinationMutation
+  useDeleteDestinationMutation,
+
+  useGetLinksQuery,
+  useLinkSchemaQuery,
+  useCreateLinkMutation,
+  useDeleteLinkMutation,
 } = extendedApiSlice;
 
 
@@ -163,4 +216,18 @@ export const  getDestinationSelectors = ( workspaceId: string)=> {
   destinationsAdapter.getSelectors(state => getDestinationsData(state) ?? initialDestinationsState);
 
   return {selectAllDestinations, selectDestinationById};
+}
+
+export const  getLinkSelectors = ( workspaceId: string)=> {
+  const getLinksResult = extendedApiSlice.endpoints.getLinks.select(workspaceId)
+
+  const getLinksData = createSelector(
+    getLinksResult,
+    usersResult => usersResult.data
+  )
+
+  const { selectAll: selectAllLinks, selectById: selectLinkById } =
+  linksAdapter.getSelectors(state => getLinksData(state) ?? initialLinksState);
+
+  return {selectAllLinks, selectLinkById};
 }
