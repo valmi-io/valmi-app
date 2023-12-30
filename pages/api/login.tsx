@@ -12,10 +12,7 @@ type ResponseData = {
   success: boolean;
 };
 
-export default function accessTokenHandler(
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
-) {
+export default function accessTokenHandler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
   const { accessToken } = req.body;
 
   const cookieObj = {
@@ -25,7 +22,7 @@ export default function accessTokenHandler(
   res.setHeader(
     'Set-Cookie',
     cookie.serialize('AUTH', JSON.stringify(cookieObj), {
-      httpOnly: true,
+      // httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       sameSite: 'strict',

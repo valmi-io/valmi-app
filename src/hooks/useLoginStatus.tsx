@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getAccessToken } from '../../pages/api/utils';
+import cookie from 'react-cookies';
 
 export const useLoginStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,11 +13,12 @@ export const useLoginStatus = () => {
   useEffect(() => {
     const getLoginStatus = async () => {
       try {
-        const response = await getAccessToken();
-        const jsonData = await response.json();
+        // const response = await getAccessToken();
+        // const jsonData = await response.json();
 
-        const accessToken = jsonData.accessToken || '';
+        // const accessToken = jsonData.accessToken || '';
 
+        const accessToken = cookie.load('AUTH')?.accessToken ?? null;
         if (accessToken) {
           setIsLoggedIn(true);
         }

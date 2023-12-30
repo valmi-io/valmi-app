@@ -8,11 +8,8 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 
 import constants from '@constants/index';
-import {
-  getAccessToken,
-  logoutUser,
-  setTokenCookie
-} from '../../../pages/api/utils';
+import { logoutUser, setTokenCookie } from '../../../pages/api/utils';
+import cookie from 'react-cookies';
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -20,10 +17,7 @@ const staggeredBaseQueryWithBailOut = retry(
       baseUrl: constants.urls.API_URL,
       timeout: 60000, // 60 seconds
       prepareHeaders: async (headers, { getState }) => {
-        const response = await getAccessToken();
-        const jsonData = await response.json();
-
-        const accessToken = jsonData.accessToken || '';
+        const accessToken = cookie.load('AUTH')?.accessToken ?? '';
 
         if (accessToken) {
           headers.set('authorization', `Bearer ${accessToken}`);
@@ -174,9 +168,7 @@ export const apiSlice = createApi({
           }
         });
 
-        return result.data
-          ? { data: { resultData: result.data, queryId: queryId } }
-          : { error: { errorData: result.error, queryId: queryId } };
+        return result.data ? { data: { resultData: result.data, queryId: queryId } } : { error: { errorData: result.error, queryId: queryId } };
       }
     }),
 
@@ -188,9 +180,7 @@ export const apiSlice = createApi({
           url: `/workspaces/${workspaceId}/credentials/`
         });
 
-        return result.data
-          ? { data: { resultData: result.data, queryId: queryId } }
-          : { error: { errorData: result.error, queryId: queryId } };
+        return result.data ? { data: { resultData: result.data, queryId: queryId } } : { error: { errorData: result.error, queryId: queryId } };
       }
     }),
 
@@ -228,23 +218,13 @@ export const apiSlice = createApi({
           method: 'POST',
           body: syncPayload
         });
-        return createSync.data
-          ? { data: createSync.data }
-          : { error: createSync.error };
+        return createSync.data ? { data: createSync.data } : { error: createSync.error };
       }
     }),
 
     updateSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
-        const {
-          src,
-          dest,
-          schedule,
-          uiState,
-          syncName,
-          syncId = '',
-          workspaceId
-        } = arg;
+        const { src, dest, schedule, uiState, syncName, syncId = '', workspaceId } = arg;
 
         const sourceRes = await baseQuery({
           url: `/workspaces/${workspaceId}/sources/create`,
@@ -354,14 +334,7 @@ export const apiSlice = createApi({
 
     getSyncRunLogsById: builder.query({
       query: (arg) => {
-        const {
-          workspaceId,
-          syncId,
-          runId,
-          connector,
-          since = null,
-          before = null
-        } = arg;
+        const { workspaceId, syncId, runId, connector, since = null, before = null } = arg;
 
         let url = `workspaces/${workspaceId}/syncs/${syncId}/runs/${runId}/logs?connector=${connector}`;
 
