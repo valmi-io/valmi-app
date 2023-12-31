@@ -12,7 +12,7 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { getDestinationSelectors, getLinkSelectors, getStreamSelectors, useCreateDestinationMutation, useCreateLinkMutation, useCreateStreamMutation, useDeleteDestinationMutation, useDeleteLinkMutation, useDeleteStreamMutation, useDestinationSchemaQuery, useEditDestinationMutation, useEditLinkMutation, useEditStreamMutation, useGetStreamsQuery, useLinkSchemaQuery, useStreamSchemaQuery } from '@store/api/streamApiSlice';
+import { getDestinationSelectors, getLinkSelectors, getStreamSelectors, useCreateDestinationMutation, useCreateLinkMutation, useCreateStreamMutation, useDeleteDestinationMutation, useDeleteLinkMutation, useDeleteStreamMutation, useDestinationSchemaQuery, useEditDestinationMutation, useEditStreamMutation, useGetStreamsQuery, useLinkSchemaQuery, useStreamSchemaQuery } from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
 import { Box, Button, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';

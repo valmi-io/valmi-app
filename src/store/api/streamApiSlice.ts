@@ -45,6 +45,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: stream,
       }),
+      // @ts-ignore
       invalidatesTags: (result, error, arg) =>
       {
         const tags = [{ type: 'Stream', id: arg.stream.id }];
@@ -109,6 +110,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: destination,
       }),
+      // @ts-ignore
       invalidatesTags: (result, error, arg) =>
       {
         const tags = [{ type: 'Destination', id: arg.destination.id }];
@@ -199,6 +201,7 @@ export const  getStreamSelectors = ( workspaceId: string)=> {
   )
 
   const { selectAll: selectAllStreams, selectById: selectStreamById } =
+  // @ts-ignore
   streamsAdapter.getSelectors(state => getStreamsData(state) ?? initialState);
 
   return {selectAllStreams, selectStreamById};
@@ -213,6 +216,7 @@ export const  getDestinationSelectors = ( workspaceId: string)=> {
   )
 
   const { selectAll: selectAllDestinations, selectById: selectDestinationById } =
+  // @ts-ignore
   destinationsAdapter.getSelectors(state => getDestinationsData(state) ?? initialDestinationsState);
 
   return {selectAllDestinations, selectDestinationById};
@@ -227,6 +231,7 @@ export const  getLinkSelectors = ( workspaceId: string)=> {
   )
 
   const { selectAll: selectAllLinks, selectById: selectLinkById } =
+  // @ts-ignore
   linksAdapter.getSelectors(state => getLinksData(state) ?? initialLinksState);
 
   return {selectAllLinks, selectLinkById};

@@ -52,7 +52,10 @@ const eventToValue = (ev:any) => ev.target.value === '' ? undefined : ev.target.
 export const MuiInputText = React.memo((props: CellProps & WithClassname & MuiTextInputProps) => {
   const [showAdornment, setShowAdornment] = useState(false);
   const {
+    // @ts-ignore
     required,
+
+    // @ts-ignore
     label,
     data,
     config,

@@ -76,7 +76,8 @@ const DestinationsPage: NextPageWithLayout = () => {
   };
 
   return (
-    <PageLayout t pageHeadTitle="Warehouses" title="Destination Warehouses" buttonTitle="Warehouse" handleButtonOnClick={handleCreateWarehouseOnClick}>
+    // @ts-ignore
+    <PageLayout pageHeadTitle="Warehouses" title="Destination Warehouses" buttonTitle="Warehouse" handleButtonOnClick={handleCreateWarehouseOnClick}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}

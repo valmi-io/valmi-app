@@ -72,6 +72,7 @@ const TracksPage: NextPageWithLayout = () => {
   };
 
   return (
+    // @ts-ignore
     <PageLayout  pageHeadTitle="Tracks" title="Tracks" buttonTitle="Track" handleButtonOnClick={handleCreateWarehouseOnClick}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>

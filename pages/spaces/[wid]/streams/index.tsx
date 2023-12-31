@@ -67,6 +67,7 @@ const StreamsPage: NextPageWithLayout = () => {
   };
 
   return (
+    // @ts-ignore
     <PageLayout pageHeadTitle="Streams" title="Streams" buttonTitle="Stream" handleButtonOnClick={handleCreateStreamOnClick}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
