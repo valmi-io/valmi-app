@@ -9,7 +9,13 @@ import { JsonForms } from '@jsonforms/react';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
 import { useSelector } from 'react-redux';
-import { getDestinationSelectors, getLinkSelectors, useCreateLinkMutation, useDeleteLinkMutation, useLinkSchemaQuery } from '@store/api/streamApiSlice';
+import {
+  getDestinationSelectors,
+  getLinkSelectors,
+  useCreateLinkMutation,
+  useDeleteLinkMutation,
+  useLinkSchemaQuery
+} from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
 import { Box, Button, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';
@@ -106,7 +112,13 @@ const CreateTrack = ({ type, fromId, toId }: any) => {
   const destinationData = useSelector((state) => selectDestinationById(state, toId));
 
   // Getting schema for the object
-  const { data: schema, isLoading, isSuccess, isError, error } = useLinkSchemaQuery({ workspaceId, type: type ? type : destinationData.destinationType });
+  const {
+    data: schema,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  } = useLinkSchemaQuery({ workspaceId, type: type ? type : destinationData.destinationType });
 
   // Initialise data
   let initialData = {
@@ -121,12 +133,16 @@ const CreateTrack = ({ type, fromId, toId }: any) => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating Schema object
-  const [createObject, { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
-    useCreateLinkMutation();
+  const [
+    createObject,
+    { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
+  ] = useCreateLinkMutation();
 
   // Mutation for deleting Schema object
-  const [deleteObject, { data: deleteObjectData, isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
-    useDeleteLinkMutation();
+  const [
+    deleteObject,
+    { data: deleteObjectData, isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }
+  ] = useDeleteLinkMutation();
 
   useEffect(() => {
     if (isCreated || isDeleted) {
@@ -144,7 +160,7 @@ const CreateTrack = ({ type, fromId, toId }: any) => {
   };
 
   const handleDeleteStream = () => {
-    const payload = { workspaceId: workspaceId, linkId: linkId };
+    const payload = { workspaceId: workspaceId, linkId: linkId, fromId: fromId, toId: toId };
     deleteObject(payload);
   };
 
@@ -159,7 +175,7 @@ const CreateTrack = ({ type, fromId, toId }: any) => {
       <Box margin={1}>
         {editing && (
           <IconButton onClick={handleDeleteStream}>
-            <FontAwesomeIcon icon={appIcons.UPLOAD} />
+            <FontAwesomeIcon icon={appIcons.DELETE} />
           </IconButton>
         )}
         <JsonForms

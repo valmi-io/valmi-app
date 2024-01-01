@@ -19,7 +19,7 @@ const generateKey = () => {
   const plaintext = buffer.toString('hex');
   const hint = plaintext.substring(0, 3) + '*' + plaintext.substring(plaintext.length - 3);
 
-  console.log({ id, plaintext, hint });
+  // console.log({ id, plaintext, hint });
   return { id, plaintext, hint };
 };
 

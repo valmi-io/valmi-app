@@ -48,7 +48,6 @@ const StreamsPage: NextPageWithLayout = () => {
   const { data, isLoading, isSuccess, isError, error } = useGetStreamsQuery(workspaceId);
 
   const PageContent = () => {
-    console.log('is data empty:_', isDataEmpty(data));
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No streams found in this workspace'} />;
     }
@@ -74,7 +73,12 @@ const StreamsPage: NextPageWithLayout = () => {
 
   return (
     // @ts-ignore
-    <PageLayout pageHeadTitle="Streams" title="Streams" buttonTitle="Stream" handleButtonOnClick={handleCreateStreamOnClick}>
+    <PageLayout
+      pageHeadTitle="Streams"
+      title="Streams"
+      buttonTitle="Stream"
+      handleButtonOnClick={handleCreateStreamOnClick}
+    >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}

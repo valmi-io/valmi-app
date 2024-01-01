@@ -1,53 +1,49 @@
-import { createEntityAdapter, createSelector } from '@reduxjs/toolkit'
-import { apiSlice } from '../api/apiSlice'
+import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
+import { apiSlice } from '../api/apiSlice';
 
-const streamsAdapter: any = createEntityAdapter()
-const initialState = streamsAdapter.getInitialState()
+const streamsAdapter: any = createEntityAdapter();
+const initialState = streamsAdapter.getInitialState();
 
-const destinationsAdapter: any = createEntityAdapter()
-const initialDestinationsState = destinationsAdapter.getInitialState()
+const destinationsAdapter: any = createEntityAdapter();
+const initialDestinationsState = destinationsAdapter.getInitialState();
 
-
-const linksAdapter: any = createEntityAdapter()
-const initialLinksState = linksAdapter.getInitialState()
+const linksAdapter: any = createEntityAdapter();
+const initialLinksState = linksAdapter.getInitialState();
 
 export const extendedApiSlice = apiSlice.injectEndpoints({
-  endpoints: builder => ({
+  endpoints: (builder) => ({
     getStreams: builder.query({
-      query: workspaceId => `/streams/workspaces/${workspaceId}/config/stream`,
-      transformResponse: responseData => {
-        return streamsAdapter.setAll(initialState, (responseData as { objects: any[] })?.objects??[])
+      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/stream`,
+      transformResponse: (responseData) => {
+        return streamsAdapter.setAll(initialState, (responseData as { objects: any[] })?.objects ?? []);
       },
-      providesTags: (result, error, workspaceId) =>{
+      providesTags: (result, error, workspaceId) => {
         //console.log(result);
-        const tags =  result?.ids
-        ? [
-            ...result.ids.map(( id : any) => ({ type: 'Stream' as const, id })),
-            { type: 'Stream' as const},
-          ]
-        : [{ type: 'Stream' as const}];
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Stream' as const, id })), { type: 'Stream' as const }]
+          : [{ type: 'Stream' as const }];
         //console.log(tags);
         return tags;
-   }}),
+      }
+    }),
 
     createStream: builder.mutation({
       query: ({ workspaceId, stream }) => ({
         url: `/streams/workspaces/${workspaceId}/config/stream`,
         method: 'POST',
-        body: stream,
+        body: stream
       }),
-      invalidatesTags: ['Stream'],
+      invalidatesTags: ['Stream']
     }),
 
     editStream: builder.mutation({
       query: ({ workspaceId, stream }) => ({
         url: `/streams/workspaces/${workspaceId}/config/stream/${stream.id}`,
         method: 'PUT',
-        body: stream,
+        body: stream
       }),
       // @ts-ignore
-      invalidatesTags: (result, error, arg) =>
-      {
+      invalidatesTags: (result, error, arg) => {
         const tags = [{ type: 'Stream', id: arg.stream.id }];
         //console.log(tags);
         return tags;
@@ -57,37 +53,37 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
     deleteStream: builder.mutation({
       query: ({ workspaceId, streamId }) => ({
         url: `/streams/workspaces/${workspaceId}/config/stream/${streamId}`,
-        method: 'DELETE',
+        method: 'DELETE'
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Stream', id: arg.streamId }],
+      invalidatesTags: (result, error, arg) => [{ type: 'Stream', id: arg.streamId }]
     }),
 
     streamSchema: builder.query({
-      query: workspaceId => `/streams/workspaces/${workspaceId}/api/schema/stream`,
+      query: (workspaceId) => `/streams/workspaces/${workspaceId}/api/schema/stream`
     }),
 
     destinationSchema: builder.query({
-      query: ({workspaceId, type}) => `/streams/workspaces/${workspaceId}/api/schema/destination/${type}`,
+      query: ({ workspaceId, type }) => `/streams/workspaces/${workspaceId}/api/schema/destination/${type}`
     }),
 
     linkSchema: builder.query({
-      query: ({workspaceId, type}) => `/streams/workspaces/${workspaceId}/api/schema/link/${type}`,
+      query: ({ workspaceId, type }) => `/streams/workspaces/${workspaceId}/api/schema/link/${type}`
     }),
 
     // get destinations
     getDestinations: builder.query({
-      query: workspaceId => `/streams/workspaces/${workspaceId}/config/destination`,
-      transformResponse: responseData => {
-        return destinationsAdapter.setAll(initialDestinationsState, (responseData as { objects: any[] })?.objects??[])
+      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/destination`,
+      transformResponse: (responseData) => {
+        return destinationsAdapter.setAll(
+          initialDestinationsState,
+          (responseData as { objects: any[] })?.objects ?? []
+        );
       },
-      providesTags: (result, error, workspaceId) =>{
+      providesTags: (result, error, workspaceId) => {
         //console.log(result);
-        const tags =  result?.ids
-        ? [
-            ...result.ids.map(( id : any) => ({ type: 'Destination' as const, id })),
-            { type: 'Destination' as const},
-          ]
-        : [{ type: 'Destination' as const}];
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Destination' as const, id })), { type: 'Destination' as const }]
+          : [{ type: 'Destination' as const }];
         //console.log(tags);
         return tags;
       }
@@ -98,9 +94,9 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: ({ workspaceId, destination }) => ({
         url: `/streams/workspaces/${workspaceId}/config/destination`,
         method: 'POST',
-        body: destination,
+        body: destination
       }),
-      invalidatesTags: ['Destination'],
+      invalidatesTags: ['Destination']
     }),
 
     // edit destination
@@ -108,11 +104,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: ({ workspaceId, destination }) => ({
         url: `/streams/workspaces/${workspaceId}/config/destination/${destination.id}`,
         method: 'PUT',
-        body: destination,
+        body: destination
       }),
       // @ts-ignore
-      invalidatesTags: (result, error, arg) =>
-      {
+      invalidatesTags: (result, error, arg) => {
         const tags = [{ type: 'Destination', id: arg.destination.id }];
         return tags;
       }
@@ -122,26 +117,22 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
     deleteDestination: builder.mutation({
       query: ({ workspaceId, destinationId }) => ({
         url: `/streams/workspaces/${workspaceId}/config/destination/${destinationId}`,
-        method: 'DELETE',
+        method: 'DELETE'
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Destination', id: arg.destinationId }],
+      invalidatesTags: (result, error, arg) => [{ type: 'Destination', id: arg.destinationId }]
     }),
-
 
     // get links
     getLinks: builder.query({
-      query: workspaceId => `/streams/workspaces/${workspaceId}/config/link`,
-      transformResponse: responseData => {
-        return linksAdapter.setAll(initialLinksState, (responseData as { links: any[] })?.links??[])
+      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/link`,
+      transformResponse: (responseData) => {
+        return linksAdapter.setAll(initialLinksState, (responseData as { links: any[] })?.links ?? []);
       },
-      providesTags: (result, error, workspaceId) =>{
+      providesTags: (result, error, workspaceId) => {
         //console.log(result);
-        const tags =  result?.ids
-        ? [
-            ...result.ids.map(( id : any) => ({ type: 'Link' as const, id })),
-            { type: 'Link' as const},
-          ]
-        : [{ type: 'Link' as const}];
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Link' as const, id })), { type: 'Link' as const }]
+          : [{ type: 'Link' as const }];
         //console.log(tags);
         return tags;
       }
@@ -152,32 +143,32 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: ({ workspaceId, link }) => ({
         url: `/streams/workspaces/${workspaceId}/config/link`,
         method: 'POST',
-        body: link,
+        body: link
       }),
-      invalidatesTags: ['Link'],
+      invalidatesTags: ['Link']
     }),
 
     // delete link
     deleteLink: builder.mutation({
-      query: ({ workspaceId, linkId }) => ({
-        url: `/streams/workspaces/${workspaceId}/config/link/${linkId}`,
-        method: 'DELETE',
+      query: ({ workspaceId, fromId, toId, linkId }) => ({
+        url: `/streams/workspaces/${workspaceId}/config/link?fromId=${fromId}&toId=${toId}`,
+        method: 'DELETE'
       }),
-      invalidatesTags: (result, error, arg) => [{ type: 'Link', id: arg.linkId }],
-    }),
-
+      invalidatesTags: (result, error, arg) => [{ type: 'Link', id: arg.linkId }]
+    })
   })
-})
-
-
+});
 
 export const {
   useGetStreamsQuery,
+
   useCreateStreamMutation,
   useEditStreamMutation,
   useDeleteStreamMutation,
+
   useStreamSchemaQuery,
   useDestinationSchemaQuery,
+
   useGetDestinationsQuery,
   useCreateDestinationMutation,
   useEditDestinationMutation,
@@ -186,53 +177,42 @@ export const {
   useGetLinksQuery,
   useLinkSchemaQuery,
   useCreateLinkMutation,
-  useDeleteLinkMutation,
+  useDeleteLinkMutation
 } = extendedApiSlice;
 
-
-
 /* Getting selectors from the transformed response */
-export const  getStreamSelectors = ( workspaceId: string)=> {
-  const getStreamsResult = extendedApiSlice.endpoints.getStreams.select(workspaceId)
+export const getStreamSelectors = (workspaceId: string) => {
+  const getStreamsResult = extendedApiSlice.endpoints.getStreams.select(workspaceId);
 
-  const getStreamsData = createSelector(
-    getStreamsResult,
-    usersResult => usersResult.data
-  )
+  const getStreamsData = createSelector(getStreamsResult, (usersResult) => usersResult.data);
 
   const { selectAll: selectAllStreams, selectById: selectStreamById } =
-  // @ts-ignore
-  streamsAdapter.getSelectors(state => getStreamsData(state) ?? initialState);
+    // @ts-ignore
+    streamsAdapter.getSelectors((state) => getStreamsData(state) ?? initialState);
 
-  return {selectAllStreams, selectStreamById};
-}
+  return { selectAllStreams, selectStreamById };
+};
 
-export const  getDestinationSelectors = ( workspaceId: string)=> {
-  const getDestinationsResult = extendedApiSlice.endpoints.getDestinations.select(workspaceId)
+export const getDestinationSelectors = (workspaceId: string) => {
+  const getDestinationsResult = extendedApiSlice.endpoints.getDestinations.select(workspaceId);
 
-  const getDestinationsData = createSelector(
-    getDestinationsResult,
-    usersResult => usersResult.data
-  )
+  const getDestinationsData = createSelector(getDestinationsResult, (usersResult) => usersResult.data);
 
   const { selectAll: selectAllDestinations, selectById: selectDestinationById } =
-  // @ts-ignore
-  destinationsAdapter.getSelectors(state => getDestinationsData(state) ?? initialDestinationsState);
+    // @ts-ignore
+    destinationsAdapter.getSelectors((state) => getDestinationsData(state) ?? initialDestinationsState);
 
-  return {selectAllDestinations, selectDestinationById};
-}
+  return { selectAllDestinations, selectDestinationById };
+};
 
-export const  getLinkSelectors = ( workspaceId: string)=> {
-  const getLinksResult = extendedApiSlice.endpoints.getLinks.select(workspaceId)
+export const getLinkSelectors = (workspaceId: string) => {
+  const getLinksResult = extendedApiSlice.endpoints.getLinks.select(workspaceId);
 
-  const getLinksData = createSelector(
-    getLinksResult,
-    usersResult => usersResult.data
-  )
+  const getLinksData = createSelector(getLinksResult, (usersResult) => usersResult.data);
 
   const { selectAll: selectAllLinks, selectById: selectLinkById } =
-  // @ts-ignore
-  linksAdapter.getSelectors(state => getLinksData(state) ?? initialLinksState);
+    // @ts-ignore
+    linksAdapter.getSelectors((state) => getLinksData(state) ?? initialLinksState);
 
-  return {selectAllLinks, selectLinkById};
-}
+  return { selectAllLinks, selectLinkById };
+};
