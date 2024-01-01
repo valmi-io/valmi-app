@@ -25,10 +25,7 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
 
   const [isPromisePending, setIsPromisePending] = useState(false);
 
-  const contextValue = useMemo(
-    () => ({ isPromisePending, setIsPromisePending }),
-    [isPromisePending]
-  );
+  const contextValue = useMemo(() => ({ isPromisePending, setIsPromisePending }), [isPromisePending]);
 
   // Popover open handler
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -45,15 +42,12 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
       <PageTitle
         title={'Run History'}
         displayButton={true}
-        buttonTitle={getPageButtonTitle(
-          isPublicSync(getRouterPathname(query, url)),
-          syncRuns,
-          isPromisePending
-        )}
+        buttonTitle={getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), syncRuns, isPromisePending)}
         disabled={isPromisePending}
         onClick={handlePopoverOpen}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        linkurl={process.env.PUBLIC_SYNC_URL}
+        // linkurl={process.env.PUBLIC_SYNC_URL}
+        linkurl={'http://citus.mywavia.com:3001/'}
         isFetching={isPromisePending}
         displayStartIcon={false}
       />
@@ -62,13 +56,7 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
 
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
-          <SyncRunPopover
-            syncRuns={syncRuns}
-            isQueryPending={isPromisePending}
-            workspaceId={workspaceId}
-            syncId={syncId}
-            closePopover={handlePopoverClose}
-          />
+          <SyncRunPopover syncRuns={syncRuns} isQueryPending={isPromisePending} workspaceId={workspaceId} syncId={syncId} closePopover={handlePopoverClose} />
         </PopoverComponent>
       )}
     </SyncRunContext.Provider>
