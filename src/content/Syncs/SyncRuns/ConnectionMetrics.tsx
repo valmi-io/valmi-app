@@ -62,7 +62,7 @@ const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick }: Co
 
         <Button
           sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
-          variant={disableLogs ? 'text':'text'}
+          variant='text'
           size="small"
           onClick={() => onLogClick(syncRun, connection)}
         >
