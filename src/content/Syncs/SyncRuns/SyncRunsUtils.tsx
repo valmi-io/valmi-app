@@ -59,8 +59,14 @@ export const getConnectionStatus = (syncRun, connection) => {
 
     // check if connection object exists in syncRun object
     // if exists, return connection object status, otherwise return run_manager status
+
+    /*connectionStatus =
+      syncRun.extra[connection]?.status?.status || runManagerStatus;*/
+
+    // Hacking above code - Fix it nicely in the backend
     connectionStatus =
-      syncRun.extra[connection]?.status?.status || runManagerStatus;
+      syncRun.extra[connection]?.status?.status ||
+      (connectionStatus == 'stopped' ? connectionStatus : runManagerStatus);
   }
 
   return connectionStatus;
