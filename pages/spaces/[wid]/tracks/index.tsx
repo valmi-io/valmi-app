@@ -9,7 +9,7 @@
  * This component represents a page for displaying destinations and creating new destination.
  */
 
-import { ReactElement, useEffect } from 'react';
+import { ReactElement } from 'react';
 
 import { Card, Grid, IconButton } from '@mui/material';
 
@@ -23,15 +23,14 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
-import { useGetDestinationsQuery, useGetLinksQuery } from '@store/api/streamApiSlice';
+import { useGetLinksQuery } from '@store/api/streamApiSlice';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 import appIcons from '../../../../src/utils/icon-utils';
-import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
-import { getBaseRoute } from '../../../../src/utils/lib';
-import { setDestinationFlowState } from '../../../../src/store/reducers/destinationFlow';
+import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
 import { setTrackFlowState } from '../../../../src/store/reducers/trackFlow';
+import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
 
 const TracksPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -41,21 +40,24 @@ const TracksPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-
-  const handleCreateWarehouseOnClick = ({ edit = false, id = ""}) => {
-    dispatch(setTrackFlowState({ editing: edit, id: id}));
+  const handleCreateWarehouseOnClick = ({ edit = false, id = '' }) => {
+    dispatch(setTrackFlowState({ editing: edit, id: id }));
     router.push(`${getBaseRoute(workspaceId)}/tracks/create`);
   };
 
   const { data, isLoading, isSuccess, isError, error } = useGetLinksQuery(workspaceId);
 
   const PageContent = () => {
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No tracks found in this workspace'} />;
+    }
     return (
       <>
         {(data.ids as string[]).map((id) => {
           return (
             <div key={id}>
-              {data.entities[id].fromId}<br/>
+              {data.entities[id].fromId}
+              <br />
               {data.entities[id].toId}
               <IconButton
                 onClick={() => {
@@ -73,7 +75,7 @@ const TracksPage: NextPageWithLayout = () => {
 
   return (
     // @ts-ignore
-    <PageLayout  pageHeadTitle="Tracks" title="Tracks" buttonTitle="Track" handleButtonOnClick={handleCreateWarehouseOnClick}>
+    <PageLayout pageHeadTitle="Tracks" title="Tracks" buttonTitle="Track" handleButtonOnClick={handleCreateWarehouseOnClick}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           {/* Embed the Tracks component to display track data */}
@@ -102,4 +104,3 @@ TracksPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default TracksPage;
-

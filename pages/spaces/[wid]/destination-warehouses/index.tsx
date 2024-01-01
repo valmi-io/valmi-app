@@ -28,9 +28,9 @@ import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 import appIcons from '../../../../src/utils/icon-utils';
-import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
-import { getBaseRoute } from '../../../../src/utils/lib';
+import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
 import { setDestinationFlowState } from '../../../../src/store/reducers/destinationFlow';
+import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
 
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,14 +40,11 @@ const DestinationsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-
-  const handleCreateWarehouseOnClick = ({ edit = false, id ="", type="", supertype = "" }) => {
-    dispatch(setDestinationFlowState({ editing: edit, id: id, type:type, supertype: supertype }));
-    if (edit){
+  const handleCreateWarehouseOnClick = ({ edit = false, id = '', type = '', supertype = '' }) => {
+    dispatch(setDestinationFlowState({ editing: edit, id: id, type: type, supertype: supertype }));
+    if (edit) {
       router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/create/${type}`);
-    }
-    else
-    {
+    } else {
       router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/create`);
     }
   };
@@ -55,6 +52,9 @@ const DestinationsPage: NextPageWithLayout = () => {
   const { data, isLoading, isSuccess, isError, error } = useGetDestinationsQuery(workspaceId);
 
   const PageContent = () => {
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No destination warehouses found in this workspace'} />;
+    }
     return (
       <>
         {(data.ids as string[]).map((id) => {
@@ -106,4 +106,3 @@ DestinationsPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default DestinationsPage;
-

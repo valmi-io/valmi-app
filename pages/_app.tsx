@@ -42,6 +42,8 @@ import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
 import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
+import { RootState } from '../src/store/reducers';
+import { getRoute } from '../src/utils/lib';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -72,11 +74,7 @@ if (!isBugsnagClientInitialized()) {
   initializeBugsnag();
 }
 
-const MyApp: FC<AppPropsWithLayout> = ({
-  Component,
-  emotionCache = clientSideEmotionCache,
-  pageProps
-}) => {
+const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmotionCache, pageProps }) => {
   const store = useStore();
 
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -113,18 +111,14 @@ const MyApp: FC<AppPropsWithLayout> = ({
   }, []);
 
   useEffect(() => {
-    const appState: AppState = (store.getState() as any).appFlow.appState;
+    const appState: AppState = (store.getState() as RootState).appFlow.appState;
 
     const currentRouteInStore = appState.currentRoute;
-    const currentRoute = router.pathname.split('/').slice(-1)[0];
+    const currentRoute = getRoute(router.pathname);
 
-    if (
-      currentRoute !== 'create' &&
-      currentRoute !== 'callback' &&
-      currentRoute !== 'runs' &&
-      currentRoute !== 'logs' &&
-      currentRoute !== currentRouteInStore
-    ) {
+    const ignoreRoutes = ['create', 'callback', 'runs', 'logs', currentRouteInStore as string];
+
+    if (ignoreRoutes.indexOf(currentRoute) === -1) {
       dispatch(
         setAppState({
           ...appState,
@@ -138,18 +132,13 @@ const MyApp: FC<AppPropsWithLayout> = ({
     <PersistGate persistor={store.__persistor}>
       <CacheProvider value={emotionCache}>
         <Head>
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, shrink-to-fit=no"
-          />
+          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         </Head>
         <SidebarProvider>
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <CssBaseline />
-              <PostHogProvider client={posthog}>
-                {getLayout(<Component {...pageProps} />)}
-              </PostHogProvider>
+              <PostHogProvider client={posthog}>{getLayout(<Component {...pageProps} />)}</PostHogProvider>
             </LocalizationProvider>
           </ThemeProviderWrapper>
         </SidebarProvider>

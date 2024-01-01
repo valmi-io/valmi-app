@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -22,6 +22,7 @@ import { setAppState } from '@store/reducers/appFlow';
 
 import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
+import { getRoute } from '../../../../utils/lib';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -103,8 +104,8 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   const handleItemOnClick = useCallback(
     (path: string) => {
       // extracting current route from path
-      const currentRoute = path?.split('/').slice(-1)[0];
-      // update current route in redux store.
+      const currentRoute = getRoute(path);
+
       dispatch(
         setAppState({
           ...appState,
@@ -121,10 +122,15 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
   const sidebarItems = sidebarRoutes.map((route) => {
     if (!route) return null;
-    return route.sidebarProps && route.child ? (
-      <SidebarItemCollapse key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
-    ) : (
-      <SidebarItem key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
+
+    return (
+      <React.Fragment key={route.id}>
+        {route.sidebarProps && route.child ? (
+          <SidebarItemCollapse key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
+        ) : (
+          <SidebarItem key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
+        )}
+      </React.Fragment>
     );
   });
 

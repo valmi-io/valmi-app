@@ -10,17 +10,9 @@ import { Box } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
 import { FormObject, getInputField } from '@/utils/form-utils';
-import AuthenticationSubmitButton from './AuthenticationSubmitButton';
+import SubmitButton from '@components/SubmitButton';
 
-const AuthenticationForm = ({
-  fields,
-  control,
-  handleSubmit,
-  onSubmit,
-  isFetching,
-  data,
-  buttonText
-}) => {
+const AuthenticationForm = ({ fields, control, handleSubmit, onSubmit, isFetching, data, buttonText }) => {
   return (
     <Box
       component="form"
@@ -61,11 +53,7 @@ const AuthenticationForm = ({
         />
       ))}
       {/** Display submit button  */}
-      <AuthenticationSubmitButton
-        isFetching={isFetching}
-        data={data}
-        buttonText={buttonText}
-      />
+      <SubmitButton buttonType="submit" fullWidth={true} ariaLabel="form-submit" isFetching={isFetching} data={data} buttonText={buttonText} />
     </Box>
   );
 };

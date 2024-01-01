@@ -15,12 +15,7 @@ export const stringAvatar = (name: string) => {
 };
 
 export const capitalizeFirstLetter = (str) => {
-  return (
-    typeof str !== 'object' &&
-    str !== '' &&
-    str &&
-    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
-  );
+  return typeof str !== 'object' && str !== '' && str && str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
 export const checkIfPropExistsInObject = (obj, prop) => {
@@ -91,18 +86,25 @@ export const splitNumberByCommas = (number) => {
   return number.toLocaleString();
 };
 
-
 export function isTrue(val) {
   try {
-      return !!JSON.parse(val);
+    return !!JSON.parse(val);
   } catch {
-      return false;
+    return false;
   }
 }
 
-export function getBaseRoute(wid: string){
+export function getBaseRoute(wid: string) {
   return `/spaces/${wid}`;
 }
+
+export function getRoute(pathname: string) {
+  return pathname?.split('/').slice(-1)[0];
+}
+
+export const isDataEmpty = (data: any) => {
+  return (!data.ids || data.ids.length === 0) && (!data.entities || Object.entries(data.entities ?? {}).length === 0);
+};
 
 /*
 const searchParams = useSearchParams();

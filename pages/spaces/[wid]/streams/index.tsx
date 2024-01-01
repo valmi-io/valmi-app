@@ -29,6 +29,8 @@ import SkeletonLoader from '../../../../src/components/SkeletonLoader';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 import appIcons from '../../../../src/utils/icon-utils';
 import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
+import { isDataEmpty } from '../../../../src/utils/lib';
+import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -46,6 +48,10 @@ const StreamsPage: NextPageWithLayout = () => {
   const { data, isLoading, isSuccess, isError, error } = useGetStreamsQuery(workspaceId);
 
   const PageContent = () => {
+    console.log('is data empty:_', isDataEmpty(data));
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No streams found in this workspace'} />;
+    }
     return (
       <>
         {(data.ids as string[]).map((id) => {

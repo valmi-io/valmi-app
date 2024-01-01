@@ -25,28 +25,22 @@ interface ConnectionMetricsProps {
   onLogClick: (syncRun: any, connection: any) => void;
 }
 
-const ConnectionMetrics = ({
-  syncRun,
-  connection,
-  displayError,
-  onLogClick
-}: ConnectionMetricsProps) => {
+const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick }: ConnectionMetricsProps) => {
   let connectionStatus = getConnectionStatus(syncRun, connection);
 
-  let disableLogs = true;
+  // let disableLogs = true;
 
   if (connectionStatus === 'scheduled' || connectionStatus === 'running') {
     if (connection === 'dest') {
       connectionStatus = 'Delivering...';
     } else {
-      connectionStatus =
-        connectionStatus === 'scheduled'
-          ? 'Preparing Data...'
-          : 'Extracting Data...';
+      connectionStatus = connectionStatus === 'scheduled' ? 'Preparing Data...' : 'Extracting Data...';
     }
-  } else {
-    disableLogs = false;
   }
+
+  // else {
+  //   disableLogs = false;
+  // }
 
   const handleStatusOnClick = () => {
     displayError(syncRun, connection);
@@ -57,34 +51,20 @@ const ConnectionMetrics = ({
       {/** Connection status stack */}
       <Stack spacing={0.5} direction="row" alignItems="center">
         {/** Display connnection status */}
-        <Typography variant="body2">
-          {capitalizeFirstLetter(connectionStatus)}
-        </Typography>
+        <Typography variant="body2">{capitalizeFirstLetter(connectionStatus)}</Typography>
 
         {/** Display error icon if connection status is failed */}
-        {connectionStatus === 'failed' && (
-          <RunStatusIcon
-            status={connectionStatus}
-            tooltipTitle={''}
-            onClick={handleStatusOnClick}
-          />
-        )}
+        {connectionStatus === 'failed' && <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={handleStatusOnClick} />}
 
         {/** Display success icon if connection status is success */}
-        {connectionStatus === 'success' && (
-          <RunStatusIcon
-            status={connectionStatus}
-            tooltipTitle={''}
-            onClick={() => {}}
-          />
-        )}
+        {connectionStatus === 'success' && <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={() => {}} />}
         {/** Display Log button */}
 
         <Button
           sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
-          variant={disableLogs ? 'contained' : 'outlined'}
+          // variant={disableLogs ? 'contained' : 'outlined'}
+          variant="contained"
           size="small"
-          disabled={disableLogs}
           onClick={() => onLogClick(syncRun, connection)}
         >
           Logs
@@ -105,20 +85,13 @@ const ConnectionMetrics = ({
       <Stack spacing={1} direction="row" alignItems="center">
         {getConnectionMetrics(syncRun, connection).length > 0
           ? getConnectionMetrics(syncRun, connection).map((metrics, index) => (
-              <Stack
-                key={`metrics-${index}`}
-                direction="row"
-                spacing={0.5}
-                alignItems="center"
-              >
+              <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
                 <MetricChip
                   size="small"
                   label={`${capitalizeFirstLetter(metrics.key)}
                       `}
                 />
-                <Typography sx={{ fontSize: 12 }}>
-                  {splitNumberByCommas(metrics.value)}
-                </Typography>
+                <Typography sx={{ fontSize: 12 }}>{splitNumberByCommas(metrics.value)}</Typography>
               </Stack>
             ))
           : '-'}

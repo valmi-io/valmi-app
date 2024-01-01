@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { JsonForms } from '@jsonforms/react';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
@@ -12,7 +12,14 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { getStreamSelectors, useCreateStreamMutation, useDeleteStreamMutation, useEditStreamMutation, useGetStreamsQuery, useStreamSchemaQuery } from '@store/api/streamApiSlice';
+import {
+  getStreamSelectors,
+  useCreateStreamMutation,
+  useDeleteStreamMutation,
+  useEditStreamMutation,
+  useGetStreamsQuery,
+  useStreamSchemaQuery
+} from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
 import { Box, Button, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';
@@ -28,6 +35,7 @@ import { isTrue } from '../../../../../src/utils/lib';
 import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
 import FontAwesomeIcon from '../../../../../src/components/Icon/FontAwesomeIcon';
 import appIcons from '../../../../../src/utils/icon-utils';
+import SubmitButton from '../../../../../src/components/SubmitButton';
 
 const invisibleProperties = ['id', 'workspaceId', 'type'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -98,6 +106,8 @@ const jsonFormValidator = (schema: any, data: any) => {
 };
 
 const CreateStream = () => {
+  const router = useRouter();
+
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const { workspaceId = '' } = appState;
 
@@ -105,10 +115,10 @@ const CreateStream = () => {
   const { data: schema, isLoading, isSuccess, isError, error } = useStreamSchemaQuery(workspaceId);
 
   // Getting from redux to decide creating/editing
-  const {editing, streamId} = useSelector((state: RootState) => state.streamFlow);
+  const { editing, streamId } = useSelector((state: RootState) => state.streamFlow);
 
   // Getting stream selectors for editing case specifically - not useful for create case
-  const { selectAllStreams, selectStreamById } = getStreamSelectors(workspaceId as string);
+  const { selectStreamById } = getStreamSelectors(workspaceId as string);
   const streamData = useSelector((state) => selectStreamById(state, streamId));
 
   let initialData = {
@@ -129,28 +139,52 @@ const CreateStream = () => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating stream
-  const [createStream, { isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] = useCreateStreamMutation();
+  const [createStream, { data: createStreamData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
+    useCreateStreamMutation();
 
   // Mutation for editing stream
-  const [editStream, { isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] = useEditStreamMutation();
+  const [editStream, { data: editStreamData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] = useEditStreamMutation();
 
   // Mutation for deleting stream
   const [deleteStream, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] = useDeleteStreamMutation();
 
-  const PageContent = () => {
-    //   const uiSchema = Generate.uiSchema(schema);
-    //   uiSchema.elements[7].options = {  detail : 'REGISTERED' };
-    //   console.log(uiSchema);
+  useEffect(() => {
+    if (isCreated || isEdited || isDeleted) {
+      handleNavigationOnSuccess();
+    }
+  }, [isCreated, isEdited, isDeleted]);
 
+  const handleButtonOnClick = () => {
+    const payload = {
+      workspaceId: workspaceId,
+      stream: data
+    };
+    if (editing) {
+      editStream(payload);
+    } else {
+      createStream(payload);
+    }
+  };
+
+  const handleDeleteStream = () => {
+    const payload = { workspaceId: workspaceId, streamId: streamId };
+    deleteStream(payload);
+  };
+
+  const handleNavigationOnSuccess = () => {
+    router.back();
+  };
+
+  const PageContent = () => {
     const { valid, errors } = jsonFormValidator(schema, data);
 
     return (
       <Box margin={10}>
-        {editing &&
-          <IconButton onClick={()=>deleteStream({ workspaceId: workspaceId, streamId: streamId })}>
-                <FontAwesomeIcon icon={appIcons.UPLOAD} />
+        {editing && (
+          <IconButton onClick={handleDeleteStream}>
+            <FontAwesomeIcon icon={appIcons.DELETE} />
           </IconButton>
-        }
+        )}
         <JsonForms
           schema={schema}
           //uischema={uiSchema}
@@ -160,19 +194,20 @@ const CreateStream = () => {
           onChange={({ errors, data }) => setData(data)}
         />
         <pre>{JSON.stringify(data, null, 2)}</pre>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={isCreating || isEditing || !valid}
-          onClick={() => (editing ? editStream({ workspaceId: workspaceId, stream: data }) : createStream({ workspaceId: workspaceId, stream: data }))}
-        >
-          Submit{' '}
-        </Button>
+        <SubmitButton
+          buttonText={'Submit'}
+          data={createStreamData || editStreamData}
+          isFetching={isCreating || isEditing}
+          disabled={!valid}
+          onClick={handleButtonOnClick}
+        />
+
         <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
         <pre>{isCreateError && JSON.stringify(createError, null, 2)}</pre>
       </Box>
     );
   };
+
   return (
     <PageLayout pageHeadTitle={editing ? 'Edit Stream' : 'Create Stream'} title={editing ? 'Edit Stream' : 'Create a new Stream'} displayButton={false}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>

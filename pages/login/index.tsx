@@ -20,18 +20,11 @@ import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 import { useAuthenticationForm } from '@content/Authentication/useAuthenticationForm';
 import AuthenticationFormFooter from '@content/Authentication/AuthenticationFormFooter';
 import AuthenticationForm from '@content/Authentication/AuthenticationForm';
-import {
-  generateAuthenticationPayload,
-  generateLoginFormFields
-} from '@content/Authentication/AuthenticationFormUtils';
+import { generateAuthenticationPayload, generateLoginFormFields } from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
 import AlertComponent from '@components/Alert';
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '@components/Error/ErrorUtils';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
@@ -41,8 +34,8 @@ import { RootState } from '@store/reducers';
 
 import { initialiseAppState } from '@utils/login-utils';
 import { signinValidationSchema } from '@utils/validation-schema';
-import { useLoginStatus } from '../../src/hooks/useLoginStatus';
-import { signOutUser } from '../../src/utils/lib';
+import { useLoginStatus } from '@hooks/useLoginStatus';
+import { signOutUser } from '@utils/lib';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
@@ -52,8 +45,7 @@ const Login: NextPageWithLayout = () => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   // sign in query
-  const [loginAndFetchWorkSpaces, { isFetching }] =
-    useLazyLoginAndFetchWorkSpacesQuery();
+  const [loginAndFetchWorkSpaces, { isFetching }] = useLazyLoginAndFetchWorkSpacesQuery();
 
   // states
   const [alertMessage, setAlertMessage] = useState<string>('');
@@ -64,9 +56,7 @@ const Login: NextPageWithLayout = () => {
 
   const [userEmail, setUserEmail] = useState('');
 
-  const { control, handleSubmit } = useAuthenticationForm(
-    signinValidationSchema
-  );
+  const { control, handleSubmit } = useAuthenticationForm(signinValidationSchema);
 
   const { isLoggedIn } = useLoginStatus();
 
@@ -167,10 +157,7 @@ const Login: NextPageWithLayout = () => {
         <Stack sx={{ mt: 1 }}>
           <Stack spacing={2}>
             {/** Display footer */}
-            <AuthenticationFormFooter
-              href={'/signup'}
-              footerText={"Don't have an account? Sign up"}
-            />
+            <AuthenticationFormFooter href={'/signup'} footerText={"Don't have an account? Sign up"} />
           </Stack>
         </Stack>
       </AuthenticationLayout>

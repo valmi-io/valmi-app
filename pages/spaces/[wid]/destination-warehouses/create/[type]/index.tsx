@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { JsonForms } from '@jsonforms/react';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
@@ -12,22 +12,26 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import { getDestinationSelectors, getStreamSelectors, useCreateDestinationMutation, useCreateStreamMutation, useDeleteDestinationMutation, useDeleteStreamMutation, useDestinationSchemaQuery, useEditDestinationMutation, useEditStreamMutation, useGetStreamsQuery, useStreamSchemaQuery } from '@store/api/streamApiSlice';
+import {
+  getDestinationSelectors,
+  useCreateDestinationMutation,
+  useDeleteDestinationMutation,
+  useDestinationSchemaQuery,
+  useEditDestinationMutation
+} from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
-import { Box, Button, Card, Grid, IconButton } from '@mui/material';
+import { Box, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '@components/SkeletonLoader';
-import ratingControlTester from '../../../../../../src/tmp/ratingControlTester';
 import StreamKeysControl from '../../../../../../src/tmp/StreamKeysControl';
-import { Generate, JsonSchema, TesterContext, UISchemaElement, createAjv, rankWith } from '@jsonforms/core';
+import { JsonSchema, TesterContext, createAjv, rankWith } from '@jsonforms/core';
 import InputControl from '../../../../../../src/tmp/InputControl';
 import InvisibleControl from '../../../../../../src/tmp/InvisibleControl';
 import { v4 as uuidv4 } from 'uuid';
-import { useSearchParams } from 'next/navigation';
 import { isTrue } from '../../../../../../src/utils/lib';
-import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
 import FontAwesomeIcon from '../../../../../../src/components/Icon/FontAwesomeIcon';
 import appIcons from '../../../../../../src/utils/icon-utils';
+import SubmitButton from '../../../../../../src/components/SubmitButton';
 
 const invisibleProperties = ['id', 'workspaceId', 'type', 'provisioned', 'testConnectionError', 'destinationType'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -98,24 +102,24 @@ const jsonFormValidator = (schema: any, data: any) => {
 };
 
 const CreateDestinationXterior = () => {
-
   // Get type from router
   const router = useRouter();
   const { type } = router.query;
   if (!type) return <></>;
-  else return <CreateDestination  type={type}/>;
-
+  else return <CreateDestination type={type} />;
 };
 
-const CreateDestination = ({type} : any) => {
+const CreateDestination = ({ type }: any) => {
+  const router = useRouter();
+
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const { workspaceId = '' } = appState;
 
   // Getting schema for the object
-  const { data: schema, isLoading, isSuccess, isError, error } = useDestinationSchemaQuery({workspaceId, type});
+  const { data: schema, isLoading, isSuccess, isError, error } = useDestinationSchemaQuery({ workspaceId, type });
 
   // Getting from redux to decide creating/editing
-  const {editing, id: destinationId, type: xtype, supertype} = useSelector((state: RootState) => state.destinationFlow);
+  const { editing, id: destinationId, type: xtype, supertype } = useSelector((state: RootState) => state.destinationFlow);
 
   // Getting stream selectors for editing case specifically - not useful for create case
   const { selectAllDestinations, selectDestinationById } = getDestinationSelectors(workspaceId as string);
@@ -126,7 +130,7 @@ const CreateDestination = ({type} : any) => {
     type: 'destination',
     workspaceId: workspaceId,
     name: '',
-    destinationType: type, //Sorry for the confusion - our type is jitsu destinationType and our supertype is jitsu type
+    destinationType: type //Sorry for the confusion - our type is jitsu destinationType and our supertype is jitsu type
   };
 
   if (isTrue(editing)) {
@@ -136,28 +140,54 @@ const CreateDestination = ({type} : any) => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating Schema object
-  const [createObject, { isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] = useCreateDestinationMutation();
+  const [createObject, { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
+    useCreateDestinationMutation();
 
   // Mutation for editing Schema object
-  const [editObject, { isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] = useEditDestinationMutation();
+  const [editObject, { data: editObjectData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] =
+    useEditDestinationMutation();
 
   // Mutation for deleting Schema object
   const [deleteObject, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] = useDeleteDestinationMutation();
 
-  const PageContent = () => {
-    //   const uiSchema = Generate.uiSchema(schema);
-    //   uiSchema.elements[7].options = {  detail : 'REGISTERED' };
-    //   console.log(uiSchema);
+  useEffect(() => {
+    if (isCreated || isEdited || isDeleted) {
+      handleNavigationOnSuccess();
+    }
+  }, [isCreated, isEdited, isDeleted]);
 
+  const handleButtonOnClick = () => {
+    const payload = {
+      workspaceId: workspaceId,
+      destination: data
+    };
+
+    if (editing) {
+      editObject(payload);
+    } else {
+      createObject(payload);
+    }
+  };
+
+  const handleDeleteStream = () => {
+    const payload = { workspaceId: workspaceId, destinationId: destinationId };
+    deleteObject(payload);
+  };
+
+  const handleNavigationOnSuccess = () => {
+    router.push(`/spaces/${workspaceId}/destination-warehouses`);
+  };
+
+  const PageContent = () => {
     const { valid, errors } = jsonFormValidator(schema, data);
 
     return (
       <Box margin={10}>
-        {editing &&
-          <IconButton onClick={()=>deleteObject({ workspaceId: workspaceId,  destinationId: destinationId })}>
-                <FontAwesomeIcon icon={appIcons.UPLOAD} />
+        {editing && (
+          <IconButton onClick={handleDeleteStream}>
+            <FontAwesomeIcon icon={appIcons.DELETE} />
           </IconButton>
-        }
+        )}
         <JsonForms
           schema={schema}
           //uischema={uiSchema}
@@ -167,21 +197,25 @@ const CreateDestination = ({type} : any) => {
           onChange={({ errors, data }) => setData(data)}
         />
         <pre>{JSON.stringify(data, null, 2)}</pre>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={isCreating || isEditing || !valid}
-          onClick={() => (editing ? editObject({ workspaceId: workspaceId, destination: data }) : createObject({ workspaceId: workspaceId, destination: data }))}
-        >
-          Submit{' '}
-        </Button>
+        <SubmitButton
+          buttonText={'Submit'}
+          data={createObjectData || editObjectData}
+          isFetching={isCreating || isEditing}
+          disabled={!valid}
+          onClick={handleButtonOnClick}
+        />
+
         <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
         <pre>{isCreateError && JSON.stringify(createError, null, 2)}</pre>
       </Box>
     );
   };
   return (
-    <PageLayout pageHeadTitle={editing ? 'Edit Destination' : 'Create Destination'} title={editing ? 'Edit Destination' : 'Create a new Destination'} displayButton={false}>
+    <PageLayout
+      pageHeadTitle={editing ? 'Edit Destination' : 'Create Destination'}
+      title={editing ? 'Edit Destination' : 'Create a new Destination'}
+      displayButton={false}
+    >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           <Card variant="outlined">
