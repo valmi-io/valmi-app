@@ -23,7 +23,6 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
-import { useGetLinksQuery } from '@store/api/streamApiSlice';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
@@ -31,6 +30,9 @@ import appIcons from '../../../../src/utils/icon-utils';
 import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
 import { setTrackFlowState } from '../../../../src/store/reducers/trackFlow';
 import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
+import { ErrorStatusText } from '../../../../src/components/Error';
+import { useFetch } from '../../../../src/hooks/useFetch';
+import { useGetLinksQuery } from '../../../../src/store/api/streamApiSlice';
 
 const TracksPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,12 +42,12 @@ const TracksPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
+  const { data, isLoading, traceError, error } = useFetch({ query: useGetLinksQuery(workspaceId) });
+
   const handleCreateWarehouseOnClick = ({ edit = false, id = '' }) => {
     dispatch(setTrackFlowState({ editing: edit, id: id }));
     router.push(`${getBaseRoute(workspaceId)}/tracks/create`);
   };
-
-  const { data, isLoading, isSuccess, isError, error } = useGetLinksQuery(workspaceId);
 
   const PageContent = () => {
     if (isDataEmpty(data)) {
@@ -74,18 +76,20 @@ const TracksPage: NextPageWithLayout = () => {
   };
 
   return (
-    // @ts-ignore
-    <PageLayout pageHeadTitle="Tracks" title="Tracks" buttonTitle="Track" handleButtonOnClick={handleCreateWarehouseOnClick}>
+    <PageLayout
+      pageHeadTitle="Tracks"
+      title="Tracks"
+      buttonTitle="Track"
+      handleButtonOnClick={() => handleCreateWarehouseOnClick({ edit: false, id: '' })}
+    >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          {/* Embed the Tracks component to display track data */}
-
           <Card variant="outlined">
             {/** Display error */}
-            {isError && <ErrorContainer error={error} />}
+            {error && <ErrorContainer error={error} />}
 
-            {/** Display trace error
-              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
+            {/** Display trace error*/}
+            {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
             {/** Display skeleton */}
             <SkeletonLoader loading={isLoading} />

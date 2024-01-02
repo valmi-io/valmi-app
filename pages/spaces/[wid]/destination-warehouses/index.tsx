@@ -11,7 +11,7 @@
 
 import { ReactElement, useEffect } from 'react';
 
-import { Card, Grid, IconButton } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
@@ -23,14 +23,15 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
-import { useGetDestinationsQuery } from '@store/api/streamApiSlice';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
-import appIcons from '../../../../src/utils/icon-utils';
 import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
 import { setDestinationFlowState } from '../../../../src/store/reducers/destinationFlow';
 import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
+import DestinationsTable from '../../../../src/content/DestinationWarehouses/DestinationsTable';
+import { ErrorStatusText } from '../../../../src/components/Error';
+import { useFetch } from '../../../../src/hooks/useFetch';
+import { useGetDestinationsQuery } from '../../../../src/store/api/streamApiSlice';
 
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,7 +41,9 @@ const DestinationsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateWarehouseOnClick = ({ edit = false, id = '', type = '', supertype = '' }) => {
+  const { data, isLoading, traceError, error } = useFetch({ query: useGetDestinationsQuery(workspaceId) });
+
+  const handleButtonOnClick = ({ edit = false, id = '', type = '', supertype = '' }) => {
     dispatch(setDestinationFlowState({ editing: edit, id: id, type: type, supertype: supertype }));
     if (edit) {
       router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/create/${type}`);
@@ -49,45 +52,34 @@ const DestinationsPage: NextPageWithLayout = () => {
     }
   };
 
-  const { data, isLoading, isSuccess, isError, error } = useGetDestinationsQuery(workspaceId);
-
   const PageContent = () => {
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No destination warehouses found in this workspace'} />;
     }
     return (
-      <>
-        {(data.ids as string[]).map((id) => {
-          return (
-            <div key={id}>
-              {data.entities[id].name}
-              <IconButton
-                onClick={() => {
-                  handleCreateWarehouseOnClick({ edit: true, id: id, type: data.entities[id].destinationType, supertype: data.entities[id].type });
-                }}
-              >
-                <FontAwesomeIcon icon={appIcons.EDIT} />
-              </IconButton>
-            </div>
-          );
-        })}
-      </>
+      <DestinationsTable
+        key={`destinationstable-${workspaceId}`}
+        data={data}
+        handleButtonOnClick={handleButtonOnClick}
+      />
     );
   };
 
   return (
-    // @ts-ignore
-    <PageLayout pageHeadTitle="Warehouses" title="Destination Warehouses" buttonTitle="Warehouse" handleButtonOnClick={handleCreateWarehouseOnClick}>
+    <PageLayout
+      pageHeadTitle="Warehouses"
+      title="Destination Warehouses"
+      buttonTitle="Warehouse"
+      handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
+    >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          {/* Embed the Tracks component to display track data */}
-
           <Card variant="outlined">
             {/** Display error */}
-            {isError && <ErrorContainer error={error} />}
+            {error && <ErrorContainer error={error} />}
 
-            {/** Display trace error
-              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
+            {/* Display trace error */}
+            {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
             {/** Display skeleton */}
             <SkeletonLoader loading={isLoading} />

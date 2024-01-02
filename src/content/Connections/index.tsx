@@ -43,39 +43,30 @@ const Connections = (props: ConnectionLayoutProps) => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   /** Redux store */
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
   const { workspaceId = '' } = appState;
 
-  const { connectionsError, filteredConnectionsData, isFetching, traceError } =
-    useFilteredConnectionsData(workspaceId, connectionType);
+  const { connectionsError, filteredConnectionsData, isFetching, traceError } = useFilteredConnectionsData(
+    workspaceId,
+    connectionType
+  );
 
   useEffect(() => {
     // initialising connection_flow state.
     initialiseConnectionFlowState(dispatch, connection_flow, connectionType);
   }, []);
 
-  const displayContent = () => {
+  const PageContent = () => {
     if (filteredConnectionsData.length > 0) {
       // Display connections when connections data length > 0
-      return (
-        <ConnectionsTable
-          connections={filteredConnectionsData}
-          connectionType={connectionType}
-        />
-      );
+      return <ConnectionsTable connections={filteredConnectionsData} connectionType={connectionType} />;
     }
 
     {
       /** Display empty component */
     }
-    return (
-      <ListEmptyComponent
-        description={'No connections found in this workspace'}
-      />
-    );
+    return <ListEmptyComponent description={'No connections found in this workspace'} />;
   };
 
   const navigateToCreateConnectionsPage = () => {
@@ -100,13 +91,7 @@ const Connections = (props: ConnectionLayoutProps) => {
       handleButtonOnClick={navigateToCreateConnectionsPage}
     >
       <Paper variant="outlined">
-        <Grid
-          container
-          direction="row"
-          justifyContent="center"
-          alignItems="stretch"
-          spacing={3}
-        >
+        <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
           {/* Display Connection based on connection_type */}
           <Grid item xs={12}>
             <Card>
@@ -120,10 +105,7 @@ const Connections = (props: ConnectionLayoutProps) => {
               <SkeletonLoader loading={isFetching} />
 
               {/** Display Page Content */}
-              {!connectionsError &&
-                !isFetching &&
-                filteredConnectionsData &&
-                displayContent()}
+              {!connectionsError && !isFetching && filteredConnectionsData && <PageContent />}
             </Card>
           </Grid>
         </Grid>

@@ -11,7 +11,7 @@
 
 import { ReactElement, useEffect } from 'react';
 
-import { Card, Grid, IconButton } from '@mui/material';
+import { Card, Grid } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
@@ -23,14 +23,15 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
-import { useGetStreamsQuery } from '@store/api/streamApiSlice';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '../../../../src/components/SkeletonLoader';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
-import appIcons from '../../../../src/utils/icon-utils';
 import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
 import { isDataEmpty } from '../../../../src/utils/lib';
 import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
+import StreamsTable from '../../../../src/content/Streams/StreamsTable';
+import { ErrorStatusText } from '../../../../src/components/Error';
+import { useFetch } from '../../../../src/hooks/useFetch';
+import { useGetStreamsQuery } from '../../../../src/store/api/streamApiSlice';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,55 +41,35 @@ const StreamsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = appState;
 
-  const handleCreateStreamOnClick = ({ edit = false, streamId = '' }) => {
+  const { data, isLoading, traceError, error } = useFetch({ query: useGetStreamsQuery(workspaceId) });
+
+  const handleButtonOnClick = ({ edit = false, streamId = '' }) => {
     dispatch(setStreamFlowState({ editing: edit, streamId: streamId }));
     router.push(`/spaces/${workspaceId}/streams/create`);
   };
-
-  const { data, isLoading, isSuccess, isError, error } = useGetStreamsQuery(workspaceId);
 
   const PageContent = () => {
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No streams found in this workspace'} />;
     }
-    return (
-      <>
-        {(data.ids as string[]).map((id) => {
-          return (
-            <div key={id}>
-              {data.entities[id].name}
-              <IconButton
-                onClick={() => {
-                  handleCreateStreamOnClick({ edit: true, streamId: id });
-                }}
-              >
-                <FontAwesomeIcon icon={appIcons.EDIT} />
-              </IconButton>
-            </div>
-          );
-        })}
-      </>
-    );
+    return <StreamsTable key={`streamstable-${workspaceId}`} data={data} handleButtonOnClick={handleButtonOnClick} />;
   };
 
   return (
-    // @ts-ignore
     <PageLayout
       pageHeadTitle="Streams"
       title="Streams"
       buttonTitle="Stream"
-      handleButtonOnClick={handleCreateStreamOnClick}
+      handleButtonOnClick={() => handleButtonOnClick({ edit: false, streamId: '' })}
     >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          {/* Embed the Tracks component to display track data */}
-
           <Card variant="outlined">
             {/** Display error */}
-            {isError && <ErrorContainer error={error} />}
+            {error && <ErrorContainer error={error} />}
 
-            {/** Display trace error
-              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
+            {/** Display trace error*/}
+            {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
             {/** Display skeleton */}
             <SkeletonLoader loading={isLoading} />

@@ -8,7 +8,7 @@ import React from 'react';
 import { Icon, Stack, TableCell, TableRow, useTheme } from '@mui/material';
 import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
 import { TableColumnProps } from '@utils/table-utils';
-import appIcons, { IAppIcons } from '../../utils/icon-utils';
+import appIcons, { IAppIcons } from '@utils/icon-utils';
 
 type TTableHeaderProps = {
   columns: TableColumnProps[];
@@ -19,7 +19,7 @@ type TTableHeaderProps = {
  * Responsible for rendering Table header.
  */
 
-const TableHeader = ({ columns, connectionType }: TTableHeaderProps) => {
+const TableHeader = ({ columns, connectionType = '' }: TTableHeaderProps) => {
   const theme = useTheme();
   return (
     <TableRow>
@@ -29,16 +29,10 @@ const TableHeader = ({ columns, connectionType }: TTableHeaderProps) => {
             <Stack direction="row" alignItems="center">
               {column.icon &&
                 (column.muiIcon ? (
-                  <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>
-                    {column.icon}
-                  </Icon>
+                  <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>{column.icon}</Icon>
                 ) : (
                   <FontAwesomeIcon
-                    icon={
-                      column.icon === 'CUSTOM'
-                        ? appIcons[connectionType as keyof IAppIcons]
-                        : column.icon
-                    }
+                    icon={column.icon === 'CUSTOM' ? appIcons[connectionType as keyof IAppIcons] : column.icon}
                     style={{ marginRight: theme.spacing(1) }}
                   />
                 ))}

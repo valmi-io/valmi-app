@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Thursday, May 25th 2023, 11:19:04 am
@@ -9,12 +7,13 @@
 import { Card } from '@mui/material';
 
 import SyncsTable from '@content/Syncs/SyncsPage/SyncsTable';
-import { useSyncs } from '@/content/Syncs/SyncsPage/useSyncs';
 
 import { ErrorStatusText } from '@components/Error';
 import ListEmptyComponent from '@components/ListEmptyComponent';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '@components/SkeletonLoader';
+import { useFetch } from '../../../hooks/useFetch';
+import { useFetchSyncsQuery } from '../../../store/api/apiSlice';
 
 type SyncsProps = {
   workspaceId: string;
@@ -32,7 +31,14 @@ type SyncsProps = {
  */
 
 const Syncs = ({ workspaceId = '' }: SyncsProps) => {
-  const { data: syncs, isFetching, traceError, error } = useSyncs(workspaceId);
+  const {
+    data: syncs,
+    error,
+    isFetching,
+    traceError
+  } = useFetch({
+    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+  });
 
   const PageContent = () => {
     if (syncs.length > 0) {
@@ -41,9 +47,7 @@ const Syncs = ({ workspaceId = '' }: SyncsProps) => {
     }
 
     // Display empty component
-    return (
-      <ListEmptyComponent description={'No syncs found in this workspace'} />
-    );
+    return <ListEmptyComponent description={'No syncs found in this workspace'} />;
   };
 
   return (
