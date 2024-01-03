@@ -24,7 +24,7 @@ import { JsonSchema, TesterContext, createAjv, rankWith } from '@jsonforms/core'
 import InputControl from '../../../tmp/InputControl';
 import InvisibleControl from '../../../tmp/InvisibleControl';
 import { isTrue } from '@utils/lib';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import appIcons from '@utils/icon-utils';
 import { _ } from 'numeral';
 import Ajv from 'ajv';
@@ -175,7 +175,7 @@ const CreateTrack = ({ type, fromId, toId }: any) => {
       <Box margin={1}>
         {editing && (
           <IconButton onClick={handleDeleteStream}>
-            <FontAwesomeIcon icon={appIcons.DELETE} />
+            <CustomIcon icon={appIcons.DELETE} />
           </IconButton>
         )}
         <JsonForms

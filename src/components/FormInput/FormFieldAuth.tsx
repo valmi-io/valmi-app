@@ -16,7 +16,7 @@ import { ErrorStatusText } from '@components/Error';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 const Item = styled(Box)(({ theme }) => ({
@@ -41,13 +41,7 @@ const getOAuthProvider = (oAuthProvider: any) => {
 };
 
 const FormFieldAuth = (props: any) => {
-  const {
-    label,
-    onClick,
-    oAuthProvider,
-    hasOAuthAuthorized,
-    oauth_error = ''
-  } = props;
+  const { label, onClick, oAuthProvider, hasOAuthAuthorized, oauth_error = '' } = props;
 
   return (
     <>
@@ -58,21 +52,15 @@ const FormFieldAuth = (props: any) => {
             display: 'flex',
             alignItems: 'center',
             padding: getOAuthProvider(oAuthProvider) !== 'google' ? 1 : 0,
-            borderRadius:
-              getOAuthProvider(oAuthProvider) !== 'google' ? 0.5 : 0,
+            borderRadius: getOAuthProvider(oAuthProvider) !== 'google' ? 0.5 : 0,
             height: 50,
             backgroundColor: getOauthColorCode({
               oAuth: getOAuthProvider(oAuthProvider)
             }),
-            boxShadow:
-              getOAuthProvider(oAuthProvider) === 'hubspot'
-                ? '0px 0px 3px rgba(0, 0, 0, 0.4)'
-                : 0,
+            boxShadow: getOAuthProvider(oAuthProvider) === 'hubspot' ? '0px 0px 3px rgba(0, 0, 0, 0.4)' : 0,
             width: '100%'
           }}
-          onClick={() =>
-            onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })
-          }
+          onClick={() => onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })}
         >
           {getOAuthProvider(oAuthProvider) === 'google' ? (
             <Box
@@ -110,10 +98,7 @@ const FormFieldAuth = (props: any) => {
           <Typography
             variant="body1"
             sx={{
-              color:
-                getOAuthProvider(oAuthProvider) === 'hubspot'
-                  ? 'black'
-                  : 'white'
+              color: getOAuthProvider(oAuthProvider) === 'hubspot' ? 'black' : 'white'
             }}
           >
             {' '}
@@ -124,7 +109,7 @@ const FormFieldAuth = (props: any) => {
         </Box>
         {hasOAuthAuthorized && (
           <IconButton color={'primary'}>
-            <FontAwesomeIcon icon={faCheckCircle} />
+            <CustomIcon icon={faCheckCircle} />
           </IconButton>
         )}
       </Item>

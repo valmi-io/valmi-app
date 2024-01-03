@@ -13,23 +13,22 @@ import ConnectorLayout from '@layouts/ConnectorLayout';
 import ConnectorsList from '@content/ConnectionFlow/Connectors/ConnectorsList';
 
 import SkeletonLoader from '@components/SkeletonLoader';
-import ErrorComponent from '@components/Error';
+import ErrorComponent, { ErrorStatusText } from '@components/Error';
 
 import { RootState } from '@store/reducers';
 import { useFetchConnectorsQuery } from '@store/api/apiSlice';
 
 import constants from '@constants/index';
+import { useFetch } from '@/hooks/useFetch';
 
 const Connectors = () => {
-  const flowState = useSelector(
-    (state: RootState) => state.connectionFlow.flowState
-  );
+  const flowState = useSelector((state: RootState) => state.connectionFlow.flowState);
   const { connection_type = '' } = flowState;
   // connectors query
-  const { data, isLoading, isError, error } = useFetchConnectorsQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
+
+  const { data, isLoading, error, traceError } = useFetch({
+    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
+  });
 
   const [filteredData, setFilteredData] = useState<any>([]);
 
@@ -42,12 +41,18 @@ const Connectors = () => {
   }, [data]);
 
   return (
-    <ConnectorLayout
-      title={constants.connections.SELECT_CONNECTOR_LAYOUT_TITLE}
-    >
-      {isError && <ErrorComponent error={error} />}
+    <ConnectorLayout title={constants.connections.SELECT_CONNECTOR_LAYOUT_TITLE}>
+      {/** Display error */}
+      {error && <ErrorComponent error={error} />}
+
+      {/* Display trace error */}
+      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+      {/** Display skeleton */}
       <SkeletonLoader loading={isLoading} />
-      {!isLoading && data && <ConnectorsList data={filteredData} />}
+
+      {/** Display page content */}
+      {!error && !isLoading && data && <ConnectorsList data={filteredData} />}
     </ConnectorLayout>
   );
 };

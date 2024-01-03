@@ -27,7 +27,7 @@ import MappingCard from '@content/SyncFlow/Mapping/MappingCard';
 
 import SelectDropdown from '@components/SelectDropdown';
 import { StackLayout } from '@components/Layouts/Layouts';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import { ErrorStatusText } from '@components/Error';
 
 import { RootState } from '@store/reducers';
@@ -44,20 +44,11 @@ const Mapping = () => {
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  let {
-    isEditableFlow = false,
-    sourceCatalog,
-    destinationCatalog,
-    extra = null
-  } = flowState;
+  let { isEditableFlow = false, sourceCatalog, destinationCatalog, extra = null } = flowState;
 
   const {
-    source: {
-      credential: { connector_type: sourceConnectionType = '' } = {}
-    } = {},
-    destination: {
-      credential: { connector_type: destinationConnectionType = '' } = {}
-    } = {}
+    source: { credential: { connector_type: sourceConnectionType = '' } = {} } = {},
+    destination: { credential: { connector_type: destinationConnectionType = '' } = {} } = {}
   } = extra || {};
 
   const { label: sourceTableName = '' } = sourceCatalog || {};
@@ -72,33 +63,19 @@ const Mapping = () => {
     <StackLayout spacing={2}>
       {/** Source -  Destination */}
       {isEditableFlow && (
-        <Stack
-          display="flex"
-          direction="row"
-          alignItems="flex-start"
-          justifyContent="space-between"
-        >
+        <Stack display="flex" direction="row" alignItems="flex-start" justifyContent="space-between">
           <Stack display="flex" direction="row" alignItems="center" spacing={3}>
-            <ConnectionCard
-              connectionType={sourceConnectionType}
-              connectionTitle={sourceTableName}
-            />
+            <ConnectionCard connectionType={sourceConnectionType} connectionTitle={sourceTableName} />
 
             {/* right arrow icon */}
-            <FontAwesomeIcon icon={appIcons.ARROW_RIGHT} />
+            <CustomIcon icon={appIcons.ARROW_RIGHT} />
 
-            <ConnectionCard
-              connectionType={destinationConnectionType}
-              connectionTitle={destinationObjectName}
-            />
+            <ConnectionCard connectionType={destinationConnectionType} connectionTitle={destinationObjectName} />
           </Stack>
           {/** Schedule */}
         </Stack>
       )}
-      <MappingCard
-        icon={<MoveDownIcon sx={{ mr: 1 }} />}
-        label="Select a Sync Mode"
-      >
+      <MappingCard icon={<MoveDownIcon sx={{ mr: 1 }} />} label="Select a Sync Mode">
         {/** Source supported sync modes */}
         <BoxLayout>
           <SelectDropdown
@@ -106,9 +83,7 @@ const Mapping = () => {
             value={getSelectedSourceMode(flowState)}
             disabled={isEditableFlow}
             onChange={(event, key) => {
-              saveToStore(
-                saveSelectedSourceMode(flowState, event.target.value)
-              );
+              saveToStore(saveSelectedSourceMode(flowState, event.target.value));
             }}
           >
             {getSourceModes(sourceCatalog).map((option: any, index: any) => {
@@ -131,22 +106,17 @@ const Mapping = () => {
               saveToStore(saveDestinationMode(flowState, event.target.value));
             }}
           >
-            {getDestinationModes(flowState, destinationCatalog).map(
-              (option: any, index: any) => {
-                return (
-                  <MenuItem key={'_valkey' + index} value={option}>
-                    {option}
-                  </MenuItem>
-                );
-              }
-            )}
+            {getDestinationModes(flowState, destinationCatalog).map((option: any, index: any) => {
+              return (
+                <MenuItem key={'_valkey' + index} value={option}>
+                  {option}
+                </MenuItem>
+              );
+            })}
           </SelectDropdown>
-          {getSelectedSourceMode(flowState) !== '' &&
-            getDestinationModes(flowState, destinationCatalog).length < 1 && (
-              <ErrorStatusText>
-                {'Incompatible supported modes'}
-              </ErrorStatusText>
-            )}
+          {getSelectedSourceMode(flowState) !== '' && getDestinationModes(flowState, destinationCatalog).length < 1 && (
+            <ErrorStatusText>{'Incompatible supported modes'}</ErrorStatusText>
+          )}
         </BoxLayout>
       </MappingCard>
 
@@ -171,10 +141,7 @@ const Mapping = () => {
 
       {/** Display Templated field mapping when selected destination sync mode has templated_fields  */}
       {getSelectedDestinationMode(flowState) !== '' &&
-        showTemplatedMappings(
-          flowState,
-          getSelectedDestinationMode(flowState)
-        ) && (
+        showTemplatedMappings(flowState, getSelectedDestinationMode(flowState)) && (
           <BoxLayout>
             <TemplatedFieldsContainer />
           </BoxLayout>

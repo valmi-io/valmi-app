@@ -5,23 +5,16 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '@components/Error/ErrorUtils';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
-import {
-  faCheckCircle,
-  faCircleExclamation
-} from '@fortawesome/free-solid-svg-icons';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
+import CustomIcon from '@components/Icon/CustomIcon';
+import { faCheckCircle, faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 export const getIcon = (type) => {
   let className = faCircleExclamation;
   if (type === 'success') {
     className = faCheckCircle;
   }
-  return <FontAwesomeIcon icon={className} />;
+  return <CustomIcon icon={className} />;
 };
 
 export const getRunStatus = (syncRun) => {
@@ -54,8 +47,7 @@ export const getConnectionStatus = (syncRun, connection) => {
   let connectionStatus = getConnectionPipelineStatus(syncRun, connection);
   // check if run_manager exists in syncRun object
   if (checkIfRunManagerExists(syncRun)) {
-    const runManagerStatus =
-      syncRun.extra.run_manager.status.status || connectionStatus;
+    const runManagerStatus = syncRun.extra.run_manager.status.status || connectionStatus;
 
     // check if connection object exists in syncRun object
     // if exists, return connection object status, otherwise return run_manager status
@@ -73,27 +65,14 @@ export const getConnectionStatus = (syncRun, connection) => {
 };
 
 export const checkIfRunManagerExists = (syncRun) => {
-  if (
-    !syncRun.extra ||
-    !syncRun.extra.run_manager ||
-    !syncRun.extra.run_manager.status
-  )
-    return false;
+  if (!syncRun.extra || !syncRun.extra.run_manager || !syncRun.extra.run_manager.status) return false;
   return true;
 };
 
-export const getConnectionPipelineStatus = (
-  syncRun: any,
-  connection: string
-): string => {
+export const getConnectionPipelineStatus = (syncRun: any, connection: string): string => {
   let connectionStatus = syncRun.status ?? 'status';
-  if (
-    !!syncRun.extra &&
-    syncRun.extra[connection] &&
-    syncRun.extra[connection].status
-  ) {
-    connectionStatus =
-      syncRun.extra[connection].status.status ?? connectionStatus;
+  if (!!syncRun.extra && syncRun.extra[connection] && syncRun.extra[connection].status) {
+    connectionStatus = syncRun.extra[connection].status.status ?? connectionStatus;
   }
   return connectionStatus;
 };
@@ -137,12 +116,7 @@ export const getCurrentSyncRun = (syncRuns) => {
 };
 
 // sync run network handler
-export const syncRunNetworkHandler = async (
-  query,
-  payload,
-  responseHandler,
-  errorHandler
-) => {
+export const syncRunNetworkHandler = async (query, payload, responseHandler, errorHandler) => {
   try {
     const data = await query(payload).unwrap();
     if (hasErrorsInData(data)) {
@@ -160,11 +134,7 @@ export const syncRunNetworkHandler = async (
   }
 };
 
-export const getPageButtonTitle = (
-  isPublicSync,
-  syncRuns,
-  isPromisePending
-) => {
+export const getPageButtonTitle = (isPublicSync, syncRuns, isPromisePending) => {
   if (isPublicSync) return 'LIVE DATA';
   return hasRunningSyncs(syncRuns)
     ? isPromisePending
@@ -175,11 +145,7 @@ export const getPageButtonTitle = (
     : 'START SYNC';
 };
 
-export const generateStartSyncPayload = (
-  workspaceId = '',
-  syncId = '',
-  fullRefresh = false
-) => {
+export const generateStartSyncPayload = (workspaceId = '', syncId = '', fullRefresh = false) => {
   const payload = {
     workspaceId: workspaceId,
     syncId: syncId,
@@ -190,11 +156,7 @@ export const generateStartSyncPayload = (
   return payload;
 };
 
-export const generateStopSyncPayload = (
-  workspaceId = '',
-  syncId = '',
-  runId = ''
-) => {
+export const generateStopSyncPayload = (workspaceId = '', syncId = '', runId = '') => {
   const payload = {
     workspaceId: workspaceId,
     syncId: syncId,

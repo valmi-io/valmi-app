@@ -6,14 +6,15 @@
 
 import React, { ReactElement, useState } from 'react';
 
+import { useSelector } from 'react-redux';
+import { Card, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
+
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { getLinkSelectors, useGetDestinationsQuery, useGetStreamsQuery } from '../../../../../src/store/api/streamApiSlice';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../src/store/reducers';
-import { Card, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
-import SkeletonLoader from '../../../../../src/components/SkeletonLoader';
-import CreateTrack from '../../../../../src/content/Tracks/CreateTrack';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import CreateTrack from '@/content/Tracks/CreateTrack';
+import { getLinkSelectors, useGetStreamsQuery, useGetDestinationsQuery } from '@/store/api/streamApiSlice';
+import { RootState } from '@/store/reducers';
 
 const CreateTrackXterior = () => {
   const appState = useSelector((state: RootState) => state.appFlow.appState);

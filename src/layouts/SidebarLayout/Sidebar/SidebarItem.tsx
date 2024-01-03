@@ -7,7 +7,7 @@
 import { memo } from 'react';
 
 import { ListItemButton, Typography, styled, useTheme } from '@mui/material';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
 const Label = styled(Typography)(({ theme }) => ({
@@ -25,7 +25,7 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
 
   return (
     <ListItemButton onClick={() => onClick(item.path)} className={currentRoute === item.id ? 'active' : ''}>
-      {item.sidebarProps.icon && <FontAwesomeIcon icon={item.sidebarProps.icon} style={{ marginRight: theme.spacing(3) }} />}
+      {item.sidebarProps.icon && <CustomIcon icon={item.sidebarProps.icon} style={{ marginRight: theme.spacing(3) }} />}
 
       <Label variant="h5">{item.sidebarProps.displayText}</Label>
     </ListItemButton>

@@ -5,7 +5,7 @@
  */
 
 import { Box, Stack, Typography, styled } from '@mui/material';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import { faUnsplash } from '@fortawesome/free-brands-svg-icons';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
@@ -27,11 +27,8 @@ const ListEmptyComponent = (props: ListEmptyComponentProps) => {
   return (
     <BoxLayout>
       <Stack spacing={3} alignItems="center">
-        <FontAwesomeIcon icon={faUnsplash} style={{ fontSize: 80 }} />
-        <Typography
-          sx={{ color: (theme) => theme.colors.alpha.black[50] }}
-          variant="body1"
-        >
+        <CustomIcon icon={faUnsplash} style={{ fontSize: 80 }} />
+        <Typography sx={{ color: (theme) => theme.colors.alpha.black[50] }} variant="body1">
           {description}
         </Typography>
       </Stack>

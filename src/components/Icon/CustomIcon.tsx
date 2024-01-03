@@ -5,18 +5,18 @@
  */
 
 import * as React from 'react';
-import { FontAwesomeIcon as FAIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-type FontAwesomeIconProps = {
+type CustomIconProps = {
   icon: any;
   style?: React.CSSProperties;
 };
 
-const FontAwesomeIcon = (props: FontAwesomeIconProps) => {
+const CustomIcon = (props: CustomIconProps) => {
   const { icon, style } = props;
 
   return (
-    <FAIcon
+    <FontAwesomeIcon
       icon={icon}
       style={{
         boxSizing: 'content-box',
@@ -27,4 +27,4 @@ const FontAwesomeIcon = (props: FontAwesomeIconProps) => {
   );
 };
 
-export default FontAwesomeIcon;
+export default CustomIcon;

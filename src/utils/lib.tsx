@@ -102,6 +102,16 @@ export function getRoute(pathname: string) {
   return pathname?.split('/').slice(-1)[0];
 }
 
+export const getBrowserRoute = (path: string) => {
+  const route = path.split('/');
+
+  const widIndex = route.indexOf('[wid]');
+  if (widIndex !== -1) {
+    return { route: route[widIndex + 1], subRoute: route[widIndex + 2] };
+  }
+  return { route: '', subRoute: '' };
+};
+
 export const isDataEmpty = (data: any) => {
   return (!data.ids || data.ids.length === 0) && (!data.entities || Object.entries(data.entities ?? {}).length === 0);
 };

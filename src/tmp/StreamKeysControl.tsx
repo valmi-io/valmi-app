@@ -1,10 +1,10 @@
 // @ts-nocheck
 import React from 'react';
-import { faCheckCircle, faCrosshairs, faPlus, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCrosshairs, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Button, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
+import CustomIcon from '@/components/Icon/CustomIcon';
 
 interface StreamKeysControlProps {
   data: any;
@@ -27,6 +27,7 @@ const StreamKeysControl = ({ data, handleChange, path }: StreamKeysControlProps)
   // console.log('StreamKeysControl', data);
   // console.log('StreamKeysControl', handleChange);
   // console.log('StreamKeysControl', path);
+
   return (
     <>
       <IconButton
@@ -35,7 +36,7 @@ const StreamKeysControl = ({ data, handleChange, path }: StreamKeysControlProps)
         }}
         color={'primary'}
       >
-        <FontAwesomeIcon icon={faPlusCircle} />
+        <CustomIcon icon={faPlusCircle} />
       </IconButton>
 
       {data.map((item: any, index: number) => (
@@ -47,7 +48,7 @@ const StreamKeysControl = ({ data, handleChange, path }: StreamKeysControlProps)
             }}
             color={'error'}
           >
-            <FontAwesomeIcon icon={faCrosshairs} />
+            <CustomIcon icon={faCrosshairs} />
           </IconButton>
         </React.Fragment>
       ))}

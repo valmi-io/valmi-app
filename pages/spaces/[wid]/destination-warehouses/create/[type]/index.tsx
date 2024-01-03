@@ -8,6 +8,8 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import { JsonForms } from '@jsonforms/react';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
+import { v4 as uuidv4 } from 'uuid';
+
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
@@ -23,15 +25,14 @@ import { RootState } from '@store/reducers';
 import { Box, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '@components/SkeletonLoader';
-import StreamKeysControl from '../../../../../../src/tmp/StreamKeysControl';
 import { JsonSchema, TesterContext, createAjv, rankWith } from '@jsonforms/core';
-import InputControl from '../../../../../../src/tmp/InputControl';
-import InvisibleControl from '../../../../../../src/tmp/InvisibleControl';
-import { v4 as uuidv4 } from 'uuid';
-import { isTrue } from '../../../../../../src/utils/lib';
-import FontAwesomeIcon from '../../../../../../src/components/Icon/FontAwesomeIcon';
-import appIcons from '../../../../../../src/utils/icon-utils';
-import SubmitButton from '../../../../../../src/components/SubmitButton';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import SubmitButton from '@/components/SubmitButton';
+import InputControl from '@/tmp/InputControl';
+import InvisibleControl from '@/tmp/InvisibleControl';
+import StreamKeysControl from '@/tmp/StreamKeysControl';
+import appIcons from '@/utils/icon-utils';
+import { isTrue } from '@/utils/lib';
 
 const invisibleProperties = ['id', 'workspaceId', 'type', 'provisioned', 'testConnectionError', 'destinationType'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -119,7 +120,12 @@ const CreateDestination = ({ type }: any) => {
   const { data: schema, isLoading, isSuccess, isError, error } = useDestinationSchemaQuery({ workspaceId, type });
 
   // Getting from redux to decide creating/editing
-  const { editing, id: destinationId, type: xtype, supertype } = useSelector((state: RootState) => state.destinationFlow);
+  const {
+    editing,
+    id: destinationId,
+    type: xtype,
+    supertype
+  } = useSelector((state: RootState) => state.destinationFlow);
 
   // Getting stream selectors for editing case specifically - not useful for create case
   const { selectAllDestinations, selectDestinationById } = getDestinationSelectors(workspaceId as string);
@@ -140,15 +146,20 @@ const CreateDestination = ({ type }: any) => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating Schema object
-  const [createObject, { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
-    useCreateDestinationMutation();
+  const [
+    createObject,
+    { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
+  ] = useCreateDestinationMutation();
 
   // Mutation for editing Schema object
-  const [editObject, { data: editObjectData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] =
-    useEditDestinationMutation();
+  const [
+    editObject,
+    { data: editObjectData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }
+  ] = useEditDestinationMutation();
 
   // Mutation for deleting Schema object
-  const [deleteObject, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] = useDeleteDestinationMutation();
+  const [deleteObject, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
+    useDeleteDestinationMutation();
 
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
@@ -185,7 +196,7 @@ const CreateDestination = ({ type }: any) => {
       <Box margin={10}>
         {editing && (
           <IconButton onClick={handleDeleteStream}>
-            <FontAwesomeIcon icon={appIcons.DELETE} />
+            <CustomIcon icon={appIcons.DELETE} />
           </IconButton>
         )}
         <JsonForms
@@ -213,7 +224,7 @@ const CreateDestination = ({ type }: any) => {
   return (
     <PageLayout
       pageHeadTitle={editing ? 'Edit Destination' : 'Create Destination'}
-      title={editing ? 'Edit Destination' : 'Create a new Destination'}
+      title={editing ? 'Edit destination' : 'Create a new destination'}
       displayButton={false}
     >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>

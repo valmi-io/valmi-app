@@ -12,30 +12,27 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   getStreamSelectors,
   useCreateStreamMutation,
   useDeleteStreamMutation,
   useEditStreamMutation,
-  useGetStreamsQuery,
   useStreamSchemaQuery
 } from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
 import { Box, Button, Card, Grid, IconButton } from '@mui/material';
 import ErrorContainer from '@components/Error/ErrorContainer';
 import SkeletonLoader from '@components/SkeletonLoader';
-import ratingControlTester from '../../../../../src/tmp/ratingControlTester';
-import StreamKeysControl from '../../../../../src/tmp/StreamKeysControl';
-import { Generate, JsonSchema, TesterContext, UISchemaElement, createAjv, rankWith } from '@jsonforms/core';
-import InputControl from '../../../../../src/tmp/InputControl';
-import InvisibleControl from '../../../../../src/tmp/InvisibleControl';
-import { v4 as uuidv4 } from 'uuid';
-import { useSearchParams } from 'next/navigation';
-import { isTrue } from '../../../../../src/utils/lib';
-import { staticGenerationAsyncStorage } from 'next/dist/client/components/static-generation-async-storage';
-import FontAwesomeIcon from '../../../../../src/components/Icon/FontAwesomeIcon';
-import appIcons from '../../../../../src/utils/icon-utils';
-import SubmitButton from '../../../../../src/components/SubmitButton';
+import { Generate, JsonSchema, TesterContext, createAjv, rankWith } from '@jsonforms/core';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import SubmitButton from '@/components/SubmitButton';
+import InputControl from '@/tmp/InputControl';
+import InvisibleControl from '@/tmp/InvisibleControl';
+import StreamKeysControl from '@/tmp/StreamKeysControl';
+import appIcons from '@/utils/icon-utils';
+import { isTrue } from '@/utils/lib';
 
 const invisibleProperties = ['id', 'workspaceId', 'type'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -139,14 +136,20 @@ const CreateStream = () => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating stream
-  const [createStream, { data: createStreamData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
-    useCreateStreamMutation();
+  const [
+    createStream,
+    { data: createStreamData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
+  ] = useCreateStreamMutation();
 
   // Mutation for editing stream
-  const [editStream, { data: editStreamData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] = useEditStreamMutation();
+  const [
+    editStream,
+    { data: editStreamData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }
+  ] = useEditStreamMutation();
 
   // Mutation for deleting stream
-  const [deleteStream, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] = useDeleteStreamMutation();
+  const [deleteStream, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
+    useDeleteStreamMutation();
 
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
@@ -182,7 +185,7 @@ const CreateStream = () => {
       <Box margin={10}>
         {editing && (
           <IconButton onClick={handleDeleteStream}>
-            <FontAwesomeIcon icon={appIcons.DELETE} />
+            <CustomIcon icon={appIcons.DELETE} />
           </IconButton>
         )}
         <JsonForms
@@ -209,7 +212,11 @@ const CreateStream = () => {
   };
 
   return (
-    <PageLayout pageHeadTitle={editing ? 'Edit Stream' : 'Create Stream'} title={editing ? 'Edit Stream' : 'Create a new Stream'} displayButton={false}>
+    <PageLayout
+      pageHeadTitle={editing ? 'Edit Stream' : 'Create Stream'}
+      title={editing ? 'Edit Stream' : 'Create a new Stream'}
+      displayButton={false}
+    >
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           <Card variant="outlined">

@@ -9,7 +9,7 @@
  * This component represents a page for displaying streams and creating new stream.
  */
 
-import { ReactElement, useEffect } from 'react';
+import { ReactElement } from 'react';
 
 import { Card, Grid } from '@mui/material';
 
@@ -24,14 +24,14 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
 import ErrorContainer from '@components/Error/ErrorContainer';
-import SkeletonLoader from '../../../../src/components/SkeletonLoader';
-import { setStreamFlowState } from '../../../../src/store/reducers/streamFlow';
-import { isDataEmpty } from '../../../../src/utils/lib';
-import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
-import StreamsTable from '../../../../src/content/Streams/StreamsTable';
-import { ErrorStatusText } from '../../../../src/components/Error';
-import { useFetch } from '../../../../src/hooks/useFetch';
-import { useGetStreamsQuery } from '../../../../src/store/api/streamApiSlice';
+import { useGetStreamsQuery } from '@/store/api/streamApiSlice';
+import { useFetch } from '@/hooks/useFetch';
+import { setStreamFlowState } from '@/store/reducers/streamFlow';
+import { ErrorStatusText } from '@/components/Error';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import StreamsTable from '@/content/Streams/StreamsTable';
+import { isDataEmpty } from '@/utils/lib';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();

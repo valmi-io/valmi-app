@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useCallback, useContext, useMemo } from 'react';
+import React, { memo, useCallback, useContext, useEffect, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -22,7 +22,8 @@ import { setAppState } from '@store/reducers/appFlow';
 
 import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
-import { getRoute } from '../../../../utils/lib';
+import { AppState } from '@/store/store';
+import { getBrowserRoute, getRoute } from '@/utils/lib';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -73,45 +74,82 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
   const { closeSidebar } = useContext(SidebarContext);
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { currentRoute = '' } = appState;
+
+  useEffect(() => {
+    const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
+
+    const connectionRoutes = ['warehouses', 'destinations'];
+
+    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations'];
+
+    if (!browserSubRoute && browserRoute !== currentRoute && browserRoute !== 'connections') {
+      // Handle non-sub-route case
+      handleRouteChange(browserRoute);
+    } else if (browserSubRoute && subRoutes.includes(browserSubRoute)) {
+      // Handle sub-routes
+      if (browserRoute !== currentRoute) {
+        if (browserRoute !== 'connections') {
+          // Handle non-connections route
+          handleRouteChange(browserRoute);
+        } else if (connectionRoutes.includes(browserSubRoute) && browserSubRoute !== currentRoute) {
+          // Handle connections route with valid sub-route
+          handleRouteChange(browserSubRoute);
+        } else if (!connectionRoutes.includes(currentRoute)) {
+          // Handle create | callback route
+          handleRouteChange(connectionRoutes[0]);
+        }
+      }
+    }
+  }, [router.pathname]);
 
   const sidebarRoutes = useMemo(() => {
     return getSidebarRoutes({ workspaceId, jitsuEnabled: isJitsuEnabled() });
   }, [workspaceId, isJitsuEnabled()]);
 
-  const getActiveIndex = (routes: TSidebarRoute[]): number => {
-    let activeIndex = -1;
-    for (let i = 0; i < routes.length; i++) {
-      let item = routes[i];
-      let currentPath = item.path?.split('/').slice(-1)[0].toLowerCase();
+  const findPathInRoutes = (routes: TSidebarRoute[], pathToCheck: string) => {
+    for (const route of routes) {
+      let currentPath: string = route.path?.split('/').slice(-1)[0].toLowerCase();
 
-      if (currentRoute.toLowerCase() === currentPath) {
-        activeIndex = item.id;
-        break;
-      } else if (item.child) {
-        activeIndex = getActiveIndex(item.child);
-        if (activeIndex !== -1) {
-          break;
+      if (currentPath.toLowerCase() === pathToCheck) {
+        return { found: true, id: route.id }; // Found the path in top-level routes
+      }
+      if (route.child) {
+        const foundInChildren: any = findPathInRoutes(route.child, pathToCheck);
+
+        if (foundInChildren.found) {
+          return foundInChildren; // Found the path in children
         }
       }
     }
-
-    return activeIndex;
+    return { found: false }; // Path not found in this branch
   };
+
+  const handleRouteChange = (route: string) => {
+    dispatch(
+      setAppState({
+        ...appState,
+        currentRoute: route
+      })
+    );
+  };
+
+  const activeIndex = useMemo(() => {
+    let currentStorePath = currentRoute;
+
+    const { found, id = 0 } = findPathInRoutes(sidebarRoutes, currentStorePath);
+
+    return id;
+  }, [currentRoute, sidebarRoutes]);
 
   const handleItemOnClick = useCallback(
     (path: string) => {
       // extracting current route from path
       const currentRoute = getRoute(path);
+      handleRouteChange(currentRoute);
 
-      dispatch(
-        setAppState({
-          ...appState,
-          currentRoute: currentRoute
-        })
-      );
       // Navigate to route based on the name of the list item
       router.push(path);
       // Close the sidebar
@@ -126,9 +164,9 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
     return (
       <React.Fragment key={route.id}>
         {route.sidebarProps && route.child ? (
-          <SidebarItemCollapse key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
+          <SidebarItemCollapse key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
         ) : (
-          <SidebarItem key={route.id} item={route} currentRoute={getActiveIndex(sidebarRoutes)} onClick={handleItemOnClick} />
+          <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
         )}
       </React.Fragment>
     );

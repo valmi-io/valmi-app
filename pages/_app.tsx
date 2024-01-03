@@ -7,7 +7,7 @@
 
 import React, { FC, ReactElement, ReactNode, useEffect } from 'react';
 
-import { useDispatch, useStore } from 'react-redux';
+import { useStore } from 'react-redux';
 
 import { PersistGate } from 'redux-persist/integration/react';
 
@@ -35,15 +35,12 @@ import createEmotionCache from 'src/createEmotionCache';
 
 import { SidebarProvider } from '@contexts/SidebarContext';
 
-import { AppDispatch, AppState, wrapper } from '@store/store';
-import { setAppState } from '@store/reducers/appFlow';
+import { wrapper } from '@store/store';
 
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
 import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
-import { RootState } from '../src/store/reducers';
-import { getRoute } from '../src/utils/lib';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -59,15 +56,15 @@ type AppPropsWithLayout = AppProps & {
 };
 
 // Check that PostHog is client-side (used to handle Next.js SSR)
-if (typeof window !== 'undefined') {
-  posthog.init(process.env.POSTHOG_KEY as string, {
-    api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
-    // Enable debug mode in development
-    loaded: (posthog) => {
-      if (process.env.NODE_ENV === 'development') posthog.debug();
-    }
-  });
-}
+// if (typeof window !== 'undefined') {
+//   posthog.init(process.env.POSTHOG_KEY as string, {
+//     api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
+//     // Enable debug mode in development
+//     loaded: (posthog) => {
+//       if (process.env.NODE_ENV === 'development') posthog.debug();
+//     }
+//   });
+// }
 
 // Bugsnag configuration
 if (!isBugsnagClientInitialized()) {
@@ -80,8 +77,6 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
   const getLayout = Component.getLayout ?? ((page) => page);
   const router = useRouter();
 
-  const dispatch = useDispatch<AppDispatch>();
-
   useEffect(() => {
     const handleRouteChange = ({ shallow }: { shallow: boolean }) => {
       if (!shallow) {
@@ -91,7 +86,7 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
 
     // Track page views
     const handleRouteComplete = () => {
-      posthog?.capture('$pageview');
+      // posthog?.capture('$pageview');
 
       NProgress.done();
     };
@@ -110,24 +105,6 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
     };
   }, []);
 
-  useEffect(() => {
-    const appState: AppState = (store.getState() as RootState).appFlow.appState;
-
-    const currentRouteInStore = appState.currentRoute;
-    const currentRoute = getRoute(router.pathname);
-
-    const ignoreRoutes = ['create', 'callback', 'runs', 'logs', currentRouteInStore as string];
-
-    if (ignoreRoutes.indexOf(currentRoute) === -1) {
-      dispatch(
-        setAppState({
-          ...appState,
-          currentRoute: currentRoute
-        })
-      );
-    }
-  }, [router.pathname]);
-
   return (
     <PersistGate persistor={store.__persistor}>
       <CacheProvider value={emotionCache}>
@@ -138,7 +115,9 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <CssBaseline />
-              <PostHogProvider client={posthog}>{getLayout(<Component {...pageProps} />)}</PostHogProvider>
+              {/* <PostHogProvider client={posthog}> */}
+              {getLayout(<Component {...pageProps} />)}
+              {/* </PostHogProvider> */}
             </LocalizationProvider>
           </ThemeProviderWrapper>
         </SidebarProvider>

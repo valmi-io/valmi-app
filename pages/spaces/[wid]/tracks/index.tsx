@@ -5,8 +5,8 @@
  */
 
 /*
- * Destinations Page Component
- * This component represents a page for displaying destinations and creating new destination.
+ * Tracks Page Component
+ * This component represents a page for displaying tracks and creating new track.
  */
 
 import { ReactElement } from 'react';
@@ -24,15 +24,15 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
 import ErrorContainer from '@components/Error/ErrorContainer';
-import SkeletonLoader from '../../../../src/components/SkeletonLoader';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
-import appIcons from '../../../../src/utils/icon-utils';
-import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
-import { setTrackFlowState } from '../../../../src/store/reducers/trackFlow';
-import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
-import { ErrorStatusText } from '../../../../src/components/Error';
-import { useFetch } from '../../../../src/hooks/useFetch';
-import { useGetLinksQuery } from '../../../../src/store/api/streamApiSlice';
+import { ErrorStatusText } from '@/components/Error';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import { useFetch } from '@/hooks/useFetch';
+import { useGetLinksQuery } from '@/store/api/streamApiSlice';
+import { setTrackFlowState } from '@/store/reducers/trackFlow';
+import appIcons from '@/utils/icon-utils';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
+import CustomIcon from '@/components/Icon/CustomIcon';
 
 const TracksPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -66,7 +66,7 @@ const TracksPage: NextPageWithLayout = () => {
                   handleCreateWarehouseOnClick({ edit: true, id: id });
                 }}
               >
-                <FontAwesomeIcon icon={appIcons.EDIT} />
+                <CustomIcon icon={appIcons.EDIT} />
               </IconButton>
             </div>
           );

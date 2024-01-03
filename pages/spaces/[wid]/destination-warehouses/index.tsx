@@ -9,7 +9,7 @@
  * This component represents a page for displaying destinations and creating new destination.
  */
 
-import { ReactElement, useEffect } from 'react';
+import { ReactElement } from 'react';
 
 import { Card, Grid } from '@mui/material';
 
@@ -24,14 +24,14 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
 import ErrorContainer from '@components/Error/ErrorContainer';
-import SkeletonLoader from '../../../../src/components/SkeletonLoader';
-import { getBaseRoute, isDataEmpty } from '../../../../src/utils/lib';
-import { setDestinationFlowState } from '../../../../src/store/reducers/destinationFlow';
-import ListEmptyComponent from '../../../../src/components/ListEmptyComponent';
-import DestinationsTable from '../../../../src/content/DestinationWarehouses/DestinationsTable';
-import { ErrorStatusText } from '../../../../src/components/Error';
-import { useFetch } from '../../../../src/hooks/useFetch';
-import { useGetDestinationsQuery } from '../../../../src/store/api/streamApiSlice';
+import { ErrorStatusText } from '@/components/Error';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import DestinationsTable from '@/content/DestinationWarehouses/DestinationsTable';
+import { useFetch } from '@/hooks/useFetch';
+import { useGetDestinationsQuery } from '@/store/api/streamApiSlice';
+import { setDestinationFlowState } from '@/store/reducers/destinationFlow';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();

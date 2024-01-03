@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { Icon, Stack, TableCell, TableRow, useTheme } from '@mui/material';
-import FontAwesomeIcon from '@components/Icon/FontAwesomeIcon';
+import CustomIcon from '@components/Icon/CustomIcon';
 import { TableColumnProps } from '@utils/table-utils';
 import appIcons, { IAppIcons } from '@utils/icon-utils';
 
@@ -31,7 +31,7 @@ const TableHeader = ({ columns, connectionType = '' }: TTableHeaderProps) => {
                 (column.muiIcon ? (
                   <Icon sx={{ marginRight: (theme) => theme.spacing(1) }}>{column.icon}</Icon>
                 ) : (
-                  <FontAwesomeIcon
+                  <CustomIcon
                     icon={column.icon === 'CUSTOM' ? appIcons[connectionType as keyof IAppIcons] : column.icon}
                     style={{ marginRight: theme.spacing(1) }}
                   />

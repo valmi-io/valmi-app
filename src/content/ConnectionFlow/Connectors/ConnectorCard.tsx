@@ -20,7 +20,7 @@ interface ConnectorCardProps {
   selectedConnectorType: string;
 }
 
-const Item = styled(Paper)(({ theme }) => ({
+export const ConnectorItem = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
 
   display: 'flex',
@@ -33,27 +33,19 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center'
 }));
 
-const ConnectorCard = ({
-  item,
-  handleConnectorOnClick,
-  selectedConnectorType
-}: ConnectorCardProps) => {
+const ConnectorCard = ({ item, handleConnectorOnClick, selectedConnectorType }: ConnectorCardProps) => {
   const connectorType = item.type.split('_').slice(1).join('_');
 
   return (
     <Grid item xs={2} sm={4} md={4}>
       <Paper sx={{ borderRadius: 2, mx: 10 }} variant="outlined">
-        <Item
+        <ConnectorItem
           sx={{
             borderRadius: 2,
             backgroundColor: (theme) =>
-              selectedConnectorType === item.type
-                ? theme.colors.primary.main
-                : darken(theme.colors.alpha.white[5], 1),
+              selectedConnectorType === item.type ? theme.colors.primary.main : darken(theme.colors.alpha.white[5], 1),
             color: (theme) =>
-              selectedConnectorType === item.type
-                ? theme.palette.success.contrastText
-                : theme.palette.text.secondary
+              selectedConnectorType === item.type ? theme.palette.success.contrastText : theme.palette.text.secondary
           }}
           onClick={() => handleConnectorOnClick(item)}
         >
@@ -64,7 +56,7 @@ const ConnectorCard = ({
             style={{ marginBottom: '14px' }}
           />
           {item.display_name}
-        </Item>
+        </ConnectorItem>
       </Paper>
     </Grid>
   );
