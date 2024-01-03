@@ -6,23 +6,17 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
-import { Card, styled } from '@mui/material';
+import { useTheme } from '@mui/material';
 
 import SyncRunsTable from '@content/Syncs/SyncRuns/SyncRunsTable';
 
-import { ErrorStatusText } from '@components/Error';
-import SkeletonLoader from '@components/SkeletonLoader';
 import ListEmptyComponent from '@components/ListEmptyComponent';
-import ErrorContainer from '@components/Error/ErrorContainer';
 import AlertComponent from '@components/Alert';
 
 import { useSyncRuns } from './useSyncRuns';
 import SyncRunsHeader from './SyncRunsHeader';
 import { SyncRunRootContext } from '@contexts/Contexts';
-
-const CustomizedCard = styled(Card)(({ theme }) => ({
-  marginTop: theme.spacing(4)
-}));
+import ContentLayout from '@/layouts/ContentLayout';
 
 /**
  * Responsible for displaying `Runs` page and its components.
@@ -33,6 +27,7 @@ const CustomizedCard = styled(Card)(({ theme }) => ({
  */
 
 const SyncRuns = ({ syncId, workspaceId }: any) => {
+  const theme = useTheme();
   // alert dialog states
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
@@ -89,16 +84,13 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    * Context - which can be accessed by children down the UI Tree.
    * @returns updateLastSync, handleAlertDialog.
    */
-  const rootContextValue = useMemo(
-    () => ({ updateLastSync, handleAlertDialog }),
-    [updateLastSync]
-  );
+  const rootContextValue = useMemo(() => ({ updateLastSync, handleAlertDialog }), [updateLastSync]);
 
   /**
    * Responsible for displaying Runs Table and EmptyRuns.
    * @returns Runs, Empty Component based on data.
    */
-  const displayPageContent = () => {
+  const PageContent = () => {
     if (syncRuns.length > 0) {
       return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} />;
     }
@@ -108,32 +100,19 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
 
   return (
     <SyncRunRootContext.Provider value={rootContextValue}>
-      <SyncRunsHeader
-        workspaceId={workspaceId}
-        syncId={syncId}
-        syncRuns={syncRuns}
+      <SyncRunsHeader workspaceId={workspaceId} syncId={syncId} syncRuns={syncRuns} />
+
+      <AlertComponent open={alertDialog} onClose={handleAlertClose} message={alertMessage} isError={isErrorAlert} />
+
+      <ContentLayout
+        key={`syncsRunsPage-${syncId}`}
+        error={error}
+        PageContent={<PageContent />}
+        displayComponent={!error && !isLoading && syncRuns}
+        isLoading={isLoading}
+        traceError={traceError}
+        cardStyles={{ marginTop: theme.spacing(4) }}
       />
-
-      <AlertComponent
-        open={alertDialog}
-        onClose={handleAlertClose}
-        message={alertMessage}
-        isError={isErrorAlert}
-      />
-
-      <CustomizedCard variant="outlined">
-        {/** Display Errors */}
-        {error && <ErrorContainer error={error} />}
-
-        {/** Display Trace Error */}
-        {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
-
-        {/** Display Skeleton */}
-        <SkeletonLoader loading={isLoading} />
-
-        {/** Display Content */}
-        {!error && !isLoading && syncRuns && displayPageContent()}
-      </CustomizedCard>
     </SyncRunRootContext.Provider>
   );
 };

@@ -5,8 +5,10 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { logoutUser } from '@/pagesapi/utils';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
-import { logoutUser } from '../../pages/api/utils';
+
+import { v4 as uuidv4 } from 'uuid';
 
 export const stringAvatar = (name: string) => {
   return {
@@ -114,6 +116,10 @@ export const getBrowserRoute = (path: string) => {
 
 export const isDataEmpty = (data: any) => {
   return (!data.ids || data.ids.length === 0) && (!data.entities || Object.entries(data.entities ?? {}).length === 0);
+};
+
+export const generateUUID = () => {
+  return uuidv4();
 };
 
 /*

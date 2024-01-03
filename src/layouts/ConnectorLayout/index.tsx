@@ -5,19 +5,20 @@
  */
 
 import { Box, CardHeader } from '@mui/material';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 interface layoutProps {
   children: React.ReactNode;
   title: string;
+  layoutStyles?: CSSProperties;
 }
 
-const ConnectorLayout = ({ title, children }: layoutProps) => {
+const ConnectorLayout = ({ title, children, layoutStyles }: layoutProps) => {
   return (
     <Box sx={{ width: '100%' }}>
       <CardHeader title={title} />
       {/* <Divider /> */}
-      <Box sx={{ m: 1 }}>
+      <Box sx={{ m: 1 }} style={layoutStyles}>
         {/* Content */}
         {children}
       </Box>

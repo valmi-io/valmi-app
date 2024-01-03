@@ -11,8 +11,6 @@
 
 import { ReactElement } from 'react';
 
-import { Card, Grid } from '@mui/material';
-
 import { useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,17 +19,14 @@ import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-
 import { RootState } from '@store/reducers';
-import ErrorContainer from '@components/Error/ErrorContainer';
 import { useGetStreamsQuery } from '@/store/api/streamApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import { setStreamFlowState } from '@/store/reducers/streamFlow';
-import { ErrorStatusText } from '@/components/Error';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import SkeletonLoader from '@/components/SkeletonLoader';
 import StreamsTable from '@/content/Streams/StreamsTable';
 import { isDataEmpty } from '@/utils/lib';
+import ContentLayout from '@/layouts/ContentLayout';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -62,23 +57,14 @@ const StreamsPage: NextPageWithLayout = () => {
       buttonTitle="Stream"
       handleButtonOnClick={() => handleButtonOnClick({ edit: false, streamId: '' })}
     >
-      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
-          <Card variant="outlined">
-            {/** Display error */}
-            {error && <ErrorContainer error={error} />}
-
-            {/** Display trace error*/}
-            {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
-
-            {/** Display skeleton */}
-            <SkeletonLoader loading={isLoading} />
-
-            {/** Display page content */}
-            {!error && !isLoading && data && <PageContent />}
-          </Card>
-        </Grid>
-      </Grid>
+      <ContentLayout
+        key={`streamsPage`}
+        error={error}
+        PageContent={<PageContent />}
+        displayComponent={!error && !isLoading && data}
+        isLoading={isLoading}
+        traceError={traceError}
+      />
     </PageLayout>
   );
 };

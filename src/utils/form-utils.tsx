@@ -7,6 +7,7 @@
 
 import FormFieldPassword from '@components/FormInput/FormFieldPasword';
 import FormFieldText from '@components/FormInput/FormFieldText';
+import Ajv from 'ajv';
 
 export type FormObject = {
   label: string;
@@ -163,4 +164,87 @@ export const getPasswordField = () => {
     disabled: false,
     fieldType: 'password'
   });
+};
+
+// jsonforms input control tester
+export const inputControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
+  if (uischema.type !== 'Control') return false;
+  //simple hack to get the control name. //TODO: find a better way
+  const arr = uischema.scope.split('/');
+  const controlName = arr[arr.length - 1];
+
+  const dataType = schema?.properties?.[controlName]?.type;
+
+  const isEnumType = schema?.properties?.[controlName]?.enum;
+  if (isEnumType) return false;
+  if (dataType === 'string' || dataType === 'number') return true;
+  return false;
+};
+
+// jsonforms dropdown control tester
+export const dropdownControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
+  if (uischema.type !== 'Control') return false;
+  //simple hack to get the control name. //TODO: find a better way
+  const arr = uischema.scope.split('/');
+  const controlName = arr[arr.length - 1];
+
+  const isEnumType = schema?.properties?.[controlName]?.enum;
+
+  return isEnumType ? true : false;
+};
+
+// jsonforms invisible control tester
+export const invisibleControlTester = (
+  uischema: any,
+  schema: JsonSchema,
+  context: TesterContext,
+  invisibleProperties: any[]
+) => {
+  if (uischema.type !== 'Control') return false;
+  return invisibleProperties.some((prop) => uischema.scope.endsWith(prop));
+};
+
+export const jsonFormValidator = (schema: any, data: any) => {
+  const ajv = new Ajv({
+    useDefaults: true
+  });
+
+  const validate = ajv.compile(schema);
+
+  const valid = validate(data);
+
+  if (!valid) {
+    return {
+      valid: false,
+      errors: (validate as any).errors.map((error: any) => {
+        return {
+          message: error.message,
+          path: error.dataPath
+        };
+      })
+    };
+  }
+  return { valid: true, errors: [] };
+
+  // const ajv = createAjv({ useDefaults: true });
+  // const validate = ajv.compile(schema);
+
+  // console.log('json form validator:-', schema);
+
+  // const valid = validate(data);
+
+  // console.log('is form valid:_', valid);
+
+  // if (!valid) {
+  //   return {
+  //     valid: false,
+  //     errors: (validate as any).errors.map((error: any) => {
+  //       return {
+  //         message: error.message,
+  //         path: error.dataPath
+  //       };
+  //     })
+  //   };
+  // }
+  // return { valid: true, errors: [] };
 };

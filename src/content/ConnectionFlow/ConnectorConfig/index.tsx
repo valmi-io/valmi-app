@@ -12,7 +12,6 @@ import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material';
 
 import { getOAuthParams } from 'pages/auth/callback';
@@ -38,12 +37,7 @@ import { AppDispatch } from '@store/store';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
 import { useLazyFetchConnectorSpecQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
-
-const Layout = styled(Box)(({}) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between'
-}));
+import FormLayout from '@/layouts/FormLayout';
 
 const Form = styled(Box)(({}) => ({
   display: 'flex',
@@ -73,9 +67,7 @@ const ConnectorConfig = ({
 
   const { workspaceId = '' } = appState;
 
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
   const {
     flowState: {
@@ -96,8 +88,7 @@ const ConnectorConfig = ({
   {
     /* query for connector configuration */
   }
-  const [fetchConnectorConfig, { data, isFetching, isError, error }] =
-    useLazyFetchConnectorSpecQuery();
+  const [fetchConnectorConfig, { data, isFetching, isError, error }] = useLazyFetchConnectorSpecQuery();
 
   useEffect(() => {
     if (selected_connector) {
@@ -199,9 +190,8 @@ const ConnectorConfig = ({
     reader.readAsText(file);
   };
 
-  const displayFields = (data) => {
+  const FormFields = ({ data }) => {
     const fields = data ? processFields(data) : [];
-    //const fields = mockJson ? processFields(mockJson) : [];
 
     return (
       <Form>
@@ -212,9 +202,7 @@ const ConnectorConfig = ({
           onSubmit={onSubmit}
           hasAuthorizedOAuth={hasAuthorizedOAuth(oauth_params)}
           oauth_error={oauth_error}
-          selectedConnector={
-            selected_connector ? selected_connector.display_name : ''
-          }
+          selectedConnector={selected_connector ? selected_connector.display_name : ''}
           selected_file={selected_file ? selected_file?.name : ''}
           fileInputRef={fileInputRef}
           handleUploadButtonClick={handleUploadButtonClick}
@@ -225,10 +213,8 @@ const ConnectorConfig = ({
     );
   };
 
-  const displayInstructions = (data) => {
-    const connectorDocumentationUrl = data
-      ? getConnectorDocumentationUrl(data)
-      : '';
+  const InstructionsContent = (data) => {
+    const connectorDocumentationUrl = data ? getConnectorDocumentationUrl(data) : '';
     const title = 'Connector Documentation';
     const linkText = selected_connector ? selected_connector.display_name : '';
     return (
@@ -242,11 +228,7 @@ const ConnectorConfig = ({
   };
 
   return (
-    <ConnectorLayout
-      title={`Connect to ${
-        selected_connector ? selected_connector.display_name : 'connector'
-      }`}
-    >
+    <ConnectorLayout title={`Connect to ${selected_connector ? selected_connector.display_name : 'connector'}`}>
       {/** Display Errors */}
       {isError && <ErrorComponent error={error} />}
 
@@ -258,19 +240,20 @@ const ConnectorConfig = ({
 
       {/** Display Content */}
       {!isFetching && data && (
-        <Layout>
-          {/* display fields */}
-          {displayFields(data)}
-          <Divider sx={{ m: 0.5 }} orientation="vertical" />
-          {/* Display Instructions content */}
-          <Box
-            sx={{
-              width: '40%'
-            }}
-          >
-            {displayInstructions(data)}
-          </Box>
-        </Layout>
+        <FormLayout formFields={<FormFields data={data} />} instructions={<InstructionsContent />} />
+        // <Layout>
+        //   {/* display fields */}
+        //   {displayFields(data)}
+        //   <Divider sx={{ m: 0.5 }} orientation="vertical" />
+        //   {/* Display Instructions content */}
+        //   <Box
+        //     sx={{
+        //       width: '40%'
+        //     }}
+        //   >
+        //     {displayInstructions(data)}
+        //   </Box>
+        // </Layout>
       )}
     </ConnectorLayout>
   );

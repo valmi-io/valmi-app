@@ -11,8 +11,6 @@
 
 import { ReactElement } from 'react';
 
-import { Card, Grid } from '@mui/material';
-
 import { useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,15 +21,13 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
-import ErrorContainer from '@components/Error/ErrorContainer';
-import { ErrorStatusText } from '@/components/Error';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import SkeletonLoader from '@/components/SkeletonLoader';
 import DestinationsTable from '@/content/DestinationWarehouses/DestinationsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetDestinationsQuery } from '@/store/api/streamApiSlice';
 import { setDestinationFlowState } from '@/store/reducers/destinationFlow';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
+import ContentLayout from '@/layouts/ContentLayout';
 
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -72,23 +68,14 @@ const DestinationsPage: NextPageWithLayout = () => {
       buttonTitle="Warehouse"
       handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
     >
-      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
-          <Card variant="outlined">
-            {/** Display error */}
-            {error && <ErrorContainer error={error} />}
-
-            {/* Display trace error */}
-            {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
-
-            {/** Display skeleton */}
-            <SkeletonLoader loading={isLoading} />
-
-            {/** Display page content */}
-            {!error && !isLoading && data && <PageContent />}
-          </Card>
-        </Grid>
-      </Grid>
+      <ContentLayout
+        key={`destinationsWarehousesPage`}
+        error={error}
+        PageContent={<PageContent />}
+        displayComponent={!error && !isLoading && data}
+        isLoading={isLoading}
+        traceError={traceError}
+      />
     </PageLayout>
   );
 };

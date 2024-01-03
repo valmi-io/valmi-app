@@ -7,7 +7,7 @@
 import { useEffect } from 'react';
 
 import { useRouter } from 'next/router';
-import { Card, Grid, Paper } from '@mui/material';
+import { Paper } from '@mui/material';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -17,14 +17,12 @@ import { useFilteredConnectionsData } from '@content/Connections/useFilteredConn
 import ConnectionsTable from '@content/Connections/ConnectionsTable';
 
 import ListEmptyComponent from '@components/ListEmptyComponent';
-import ErrorContainer from '@components/Error/ErrorContainer';
-import { ErrorStatusText } from '@components/Error';
-import SkeletonLoader from '@components/SkeletonLoader';
 
 import { RootState } from '@store/reducers';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 import { initialiseConnectionFlowState } from '@utils/connection-utils';
+import ContentLayout from '@/layouts/ContentLayout';
 
 type ConnectionLayoutProps = {
   pageHeadTitle: string;
@@ -90,25 +88,15 @@ const Connections = (props: ConnectionLayoutProps) => {
       buttonTitle={buttonTitle}
       handleButtonOnClick={navigateToCreateConnectionsPage}
     >
-      <Paper variant="outlined">
-        <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-          {/* Display Connection based on connection_type */}
-          <Grid item xs={12}>
-            <Card>
-              {/** Display Errors */}
-              {connectionsError && <ErrorContainer error={connectionsError} />}
-
-              {/** Display Trace Error */}
-              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
-
-              {/** Display Skeleton */}
-              <SkeletonLoader loading={isFetching} />
-
-              {/** Display Page Content */}
-              {!connectionsError && !isFetching && filteredConnectionsData && <PageContent />}
-            </Card>
-          </Grid>
-        </Grid>
+      <Paper>
+        <ContentLayout
+          key={`connectionsPage-${connectionType}`}
+          error={connectionsError}
+          PageContent={<PageContent />}
+          displayComponent={!connectionsError && !isFetching && filteredConnectionsData}
+          isLoading={isFetching}
+          traceError={traceError}
+        />
       </Paper>
     </PageLayout>
   );

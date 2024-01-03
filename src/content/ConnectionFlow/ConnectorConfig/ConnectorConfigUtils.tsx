@@ -21,15 +21,11 @@ export const processFields = (data: any) => {
         const name = key;
         const label = properties[key].title ? properties[key].title : key;
         const type = properties[key].type ? properties[key].type : 'Type';
-        const description = properties[key].description
-          ? properties[key].description
-          : '';
+        const description = properties[key].description ? properties[key].description : '';
         const enumFlag = !!properties[key].enum;
         const isSecretKey = !!properties[key].airbyte_secret;
         const enumValue = properties[key].enum || null;
-        const isOAuth =
-          label.startsWith('Authentication') &&
-          !isObjectEmpty(authSpecification);
+        const isOAuth = label.startsWith('Authentication') && !isObjectEmpty(authSpecification);
 
         const oAuthProvider = !authProvider.trim() ? 'provider' : authProvider;
         const isRequired = required.includes(key);
@@ -78,11 +74,7 @@ export const processFields = (data: any) => {
     fieldType: 'string'
   });
 
-  const connectorFieldsArr = [
-    { ...connectorTypeField },
-    { ...connectorNameField },
-    ...fieldsArr
-  ];
+  const connectorFieldsArr = [{ ...connectorTypeField }, { ...connectorNameField }, ...fieldsArr];
 
   return connectorFieldsArr;
 };

@@ -4,14 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  Box,
-  CardHeader,
-  Divider,
-  Link,
-  Typography,
-  styled
-} from '@mui/material';
+import { Box, CardHeader, Divider, Link, Typography, styled } from '@mui/material';
 
 const InstructionsBox = styled(Box)(({}) => ({
   display: 'flex',
@@ -44,12 +37,7 @@ const Instructions = (props: InstructionsProps) => {
       <Divider />
       <InstructionsText variant="body1">
         Refer to step-by-step instructions to setup a{' '}
-        <Link
-          href={documentationUrl}
-          target="_blank"
-          rel="noreferrer"
-          underline="always"
-        >
+        <Link href={documentationUrl} target="_blank" rel="noreferrer" underline="always">
           {linkText}
         </Link>
         {type !== 'sync' && <> {'connection.'}</>}

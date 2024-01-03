@@ -1,11 +1,16 @@
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Wednesday, January 3rd 2024, 5:00:31 pm
+ * Author: Nagendra S @ valmi.io
+ */
+
 import { ControlProps, isDescriptionHidden } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
-import { MaterialTextControl } from './CustomMaterialTextControl';
+import { Card, FormControl, FormHelperText, Hidden, MenuItem, TextField } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
 
-export const InputControl = (props: ControlProps) => {
+export const FormSelectControl = (props: ControlProps) => {
   const [focused, onFocus, onBlur] = useFocus();
   const {
     data,
@@ -43,7 +48,6 @@ export const InputControl = (props: ControlProps) => {
   return (
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
-        {/* <MaterialTextControl {...props} /> */}
         {visible && (
           <FormControl
             fullWidth={!appliedUiSchemaOptions.trim}
@@ -54,18 +58,24 @@ export const InputControl = (props: ControlProps) => {
           >
             <TextField
               label={label}
+              select={true}
               required={required}
-              value={inputText}
               disabled={!enabled}
-              title={schema.title}
-              error={!isValid}
-              placeholder={schema.placeholder}
+              value={inputText}
               onChange={onChange}
-              fullWidth
               InputLabelProps={{
                 shrink: true
               }}
-            />
+            >
+              {schema.enum?.map((item: string) => {
+                return (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                );
+              })}
+            </TextField>
+
             <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>
@@ -75,4 +85,4 @@ export const InputControl = (props: ControlProps) => {
   );
 };
 
-export default withJsonFormsControlProps(InputControl);
+export default withJsonFormsControlProps(FormSelectControl);

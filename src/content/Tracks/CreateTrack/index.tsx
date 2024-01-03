@@ -30,6 +30,7 @@ import { _ } from 'numeral';
 import Ajv from 'ajv';
 import { useRouter } from 'next/router';
 import SubmitButton from '../../../components/SubmitButton';
+import { jsonFormValidator } from '@/utils/form-utils';
 
 const invisibleProperties = ['fromId', 'toId', 'functions', 'batchSize'];
 const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
@@ -67,24 +68,6 @@ const renderers = [
     renderer: InputControl
   }
 ];
-
-const jsonFormValidator = (schema: any, data: any) => {
-  const ajv = createAjv({ useDefaults: true });
-  const validate = ajv.compile(schema);
-  const valid = validate(data);
-  if (!valid) {
-    return {
-      valid: false,
-      errors: (validate as any).errors.map((error: any) => {
-        return {
-          message: error.message,
-          path: error.dataPath
-        };
-      })
-    };
-  }
-  return { valid: true, errors: [] };
-};
 
 const jsonFormRemoveAdditionalFields = (schema: any, data: any) => {
   const ajv = new Ajv({ removeAdditional: 'all' });

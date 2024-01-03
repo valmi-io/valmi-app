@@ -6,9 +6,7 @@
 
 import React, { ReactElement, useEffect, useState } from 'react';
 import { JsonForms } from '@jsonforms/react';
-import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
-
-import { v4 as uuidv4 } from 'uuid';
+import { materialCells } from '@jsonforms/material-renderers';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
@@ -22,85 +20,18 @@ import {
   useEditDestinationMutation
 } from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
-import { Box, Card, Grid, IconButton } from '@mui/material';
-import ErrorContainer from '@components/Error/ErrorContainer';
-import SkeletonLoader from '@components/SkeletonLoader';
-import { JsonSchema, TesterContext, createAjv, rankWith } from '@jsonforms/core';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import SubmitButton from '@/components/SubmitButton';
-import InputControl from '@/tmp/InputControl';
-import InvisibleControl from '@/tmp/InvisibleControl';
-import StreamKeysControl from '@/tmp/StreamKeysControl';
 import appIcons from '@/utils/icon-utils';
-import { isTrue } from '@/utils/lib';
-
-const invisibleProperties = ['id', 'workspaceId', 'type', 'provisioned', 'testConnectionError', 'destinationType'];
-const invisiblePropertiesTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
-  if (uischema.type !== 'Control') return false;
-  return invisibleProperties.some((prop) => uischema.scope.endsWith(prop));
-};
-
-const apiKeys = ['publicKeys', 'privateKeys'];
-const apiKeysTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
-  if (uischema.type !== 'Control') return false;
-  return apiKeys.some((prop) => uischema.scope.endsWith(prop));
-};
-
-const inputControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
-  if (uischema.type !== 'Control') return false;
-  //simple hack to get the control name. //TODO: find a better way
-  const arr = uischema.scope.split('/');
-  const controlName = arr[arr.length - 1];
-  // console.log(controlName);
-  const dataType = schema?.properties?.[controlName]?.type;
-  // console.log(dataType);
-
-  if (dataType === 'string' || dataType === 'number') return true;
-  return false;
-};
-
-const renderers = [
-  ...materialRenderers,
-  {
-    tester: rankWith(
-      4000, //increase rank as needed
-      apiKeysTester
-    ),
-    renderer: StreamKeysControl
-  },
-  {
-    tester: rankWith(
-      3000, //increase rank as needed
-      invisiblePropertiesTester
-    ),
-    renderer: InvisibleControl
-  },
-  {
-    tester: rankWith(
-      2000, //increase rank as needed
-      inputControlTester
-    ),
-    renderer: InputControl
-  }
-];
-
-const jsonFormValidator = (schema: any, data: any) => {
-  const ajv = createAjv({ useDefaults: true });
-  const validate = ajv.compile(schema);
-  const valid = validate(data);
-  if (!valid) {
-    return {
-      valid: false,
-      errors: (validate as any).errors.map((error: any) => {
-        return {
-          message: error.message,
-          path: error.dataPath
-        };
-      })
-    };
-  }
-  return { valid: true, errors: [] };
-};
+import { generateUUID, isTrue } from '@/utils/lib';
+import { jsonFormValidator } from '@/utils/form-utils';
+import { createDestinationCustomRenderers } from '@/content/DestinationWarehouses/DestinationUtils';
+import { useFetch } from '@/hooks/useFetch';
+import ContentLayout from '@/layouts/ContentLayout';
+import ConnectorLayout from '@/layouts/ConnectorLayout';
+import Instructions from '@/components/Instructions';
+import FormLayout, { FormContainer } from '@/layouts/FormLayout';
 
 const CreateDestinationXterior = () => {
   // Get type from router
@@ -117,7 +48,12 @@ const CreateDestination = ({ type }: any) => {
   const { workspaceId = '' } = appState;
 
   // Getting schema for the object
-  const { data: schema, isLoading, isSuccess, isError, error } = useDestinationSchemaQuery({ workspaceId, type });
+  const {
+    data: schema,
+    isLoading,
+    traceError,
+    error
+  } = useFetch({ query: useDestinationSchemaQuery({ workspaceId, type }) });
 
   // Getting from redux to decide creating/editing
   const {
@@ -132,7 +68,7 @@ const CreateDestination = ({ type }: any) => {
   const destinationData = useSelector((state) => selectDestinationById(state, destinationId));
 
   let initialData = {
-    id: uuidv4(),
+    id: generateUUID(),
     type: 'destination',
     workspaceId: workspaceId,
     name: '',
@@ -189,61 +125,74 @@ const CreateDestination = ({ type }: any) => {
     router.push(`/spaces/${workspaceId}/destination-warehouses`);
   };
 
-  const PageContent = () => {
+  const FormFields = () => {
     const { valid, errors } = jsonFormValidator(schema, data);
-
     return (
-      <Box margin={10}>
+      <FormContainer>
         {editing && (
-          <IconButton onClick={handleDeleteStream}>
-            <CustomIcon icon={appIcons.DELETE} />
-          </IconButton>
+          <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <Tooltip title={'Delete warehouse'}>
+              <IconButton disabled={isDeleting} onClick={handleDeleteStream}>
+                <CustomIcon icon={appIcons.DELETE} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         )}
         <JsonForms
           schema={schema}
-          //uischema={uiSchema}
           data={data}
-          renderers={renderers}
+          renderers={createDestinationCustomRenderers}
           cells={materialCells}
           onChange={({ errors, data }) => setData(data)}
         />
         <pre>{JSON.stringify(data, null, 2)}</pre>
-        <SubmitButton
-          buttonText={'Submit'}
-          data={createObjectData || editObjectData}
-          isFetching={isCreating || isEditing}
-          disabled={!valid}
-          onClick={handleButtonOnClick}
-        />
+        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <SubmitButton
+            buttonText={'Submit'}
+            data={createObjectData || editObjectData}
+            isFetching={isCreating || isEditing}
+            disabled={!valid}
+            onClick={handleButtonOnClick}
+          />
+        </Box>
 
         <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
         <pre>{isCreateError && JSON.stringify(createError, null, 2)}</pre>
-      </Box>
+      </FormContainer>
     );
   };
+
+  const InstructionsContent = () => {
+    const documentationUrl = 'https://www.valmi.io/docs/overview';
+    const title = 'Destination warehouses';
+    const linkText = 'Destination-warehouses';
+
+    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;
+  };
+
+  const PageContent = () => {
+    return (
+      <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
+        {/** Display Content */}
+        <FormLayout formFields={<FormFields />} instructions={<InstructionsContent />} />
+      </ConnectorLayout>
+    );
+  };
+
   return (
     <PageLayout
       pageHeadTitle={editing ? 'Edit Destination' : 'Create Destination'}
       title={editing ? 'Edit destination' : 'Create a new destination'}
       displayButton={false}
     >
-      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
-          <Card variant="outlined">
-            {/** Display error */}
-            {isError && <ErrorContainer error={error} />}
-
-            {/** Display trace error
-              {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}*/}
-
-            {/** Display skeleton */}
-            <SkeletonLoader loading={isLoading} />
-
-            {/** Display page content */}
-            {!error && !isLoading && schema && <PageContent />}
-          </Card>
-        </Grid>
-      </Grid>
+      <ContentLayout
+        key={`createDestination${type}`}
+        error={error}
+        PageContent={<PageContent />}
+        displayComponent={!error && !isLoading && schema}
+        isLoading={isLoading}
+        traceError={traceError}
+      />
     </PageLayout>
   );
 };

@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Wednesday, January 3rd 2024, 5:16:00 pm
+ * Author: Nagendra S @ valmi.io
+ */
+
 import { ControlProps, isDescriptionHidden } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
-import { MaterialTextControl } from './CustomMaterialTextControl';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
+// import { MaterialTextControl } from '@/tmp/CustomMaterialTextControl';
 
-export const InputControl = (props: ControlProps) => {
+export const FormInputControl = (props: ControlProps) => {
   const [focused, onFocus, onBlur] = useFocus();
   const {
     data,
@@ -75,4 +81,4 @@ export const InputControl = (props: ControlProps) => {
   );
 };
 
-export default withJsonFormsControlProps(InputControl);
+export default withJsonFormsControlProps(FormInputControl);
