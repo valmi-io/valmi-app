@@ -99,14 +99,14 @@ const CreateTrackXterior = () => {
     const title = 'Tracks';
     const linkText = 'tracks.';
 
-    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;
+    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'track'} />;
   };
 
   const PageContent = () => {
     return (
       <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
         {/** Display Content */}
-        <FormLayout formFields={<FormFields />} instructions={<InstructionsContent />} />
+        <FormLayout formComp={<FormFields />} instructionsComp={<InstructionsContent />} />
       </ConnectorLayout>
     );
   };

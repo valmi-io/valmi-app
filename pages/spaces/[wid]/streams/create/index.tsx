@@ -5,8 +5,6 @@
  */
 
 import React, { ReactElement, useEffect, useState } from 'react';
-import { JsonForms } from '@jsonforms/react';
-import { materialCells } from '@jsonforms/material-renderers';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
@@ -21,18 +19,17 @@ import {
   useStreamSchemaQuery
 } from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import CustomIcon from '@/components/Icon/CustomIcon';
-import SubmitButton from '@/components/SubmitButton';
-import appIcons from '@/utils/icon-utils';
 import { generateUUID, isTrue } from '@/utils/lib';
-import { jsonFormValidator } from '@/utils/form-utils';
 import { useFetch } from '@/hooks/useFetch';
 import { createStreamCustomRenderers } from '@/content/Streams/StreamsUtils';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
-import Instructions from '@/components/Instructions';
-import FormLayout, { FormContainer } from '@/layouts/FormLayout';
+
+import FormLayout from '@/layouts/FormLayout';
+import DestinationFormControl from '@/content/DestinationWarehouses/DestinationFormControl';
+import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
+import { JsonFormsCore } from '@jsonforms/core';
+import { FormStatus } from '@/utils/form-utils';
 
 const CreateStream = () => {
   const router = useRouter();
@@ -65,31 +62,37 @@ const CreateStream = () => {
     initialData = streamData;
   }
 
-  const [data, setData] = useState<any>(initialData);
-
   // Mutation for creating stream
-  const [
-    createStream,
-    { data: createStreamData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
-  ] = useCreateStreamMutation();
+  const [createStream, { isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
+    useCreateStreamMutation();
 
   // Mutation for editing stream
-  const [
-    editStream,
-    { data: editStreamData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }
-  ] = useEditStreamMutation();
+  const [editStream, { isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] =
+    useEditStreamMutation();
 
   // Mutation for deleting stream
   const [deleteStream, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
     useDeleteStreamMutation();
 
+  const [data, setData] = useState<any>(initialData);
+
+  const [status, setStatus] = useState<FormStatus>('empty');
+
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
+      setStatus('success');
       handleNavigationOnSuccess();
     }
   }, [isCreated, isEdited, isDeleted]);
 
-  const handleButtonOnClick = () => {
+  useEffect(() => {
+    if (isCreateError || isEditError) {
+      setStatus('error');
+    }
+  }, [isCreateError, isEditError]);
+
+  const handleSubmit = () => {
+    setStatus('submitting');
     const payload = {
       workspaceId: workspaceId,
       stream: data
@@ -101,7 +104,7 @@ const CreateStream = () => {
     }
   };
 
-  const handleDeleteStream = () => {
+  const handleDelete = () => {
     const payload = { workspaceId: workspaceId, streamId: streamId };
     deleteStream(payload);
   };
@@ -110,59 +113,31 @@ const CreateStream = () => {
     router.back();
   };
 
-  const FormFields = () => {
-    const { valid, errors } = jsonFormValidator(schema, data);
-
-    return (
-      <FormContainer>
-        {editing && (
-          <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <Tooltip title={'Delete stream'}>
-              <IconButton disabled={isDeleting} onClick={handleDeleteStream}>
-                <CustomIcon icon={appIcons.DELETE} />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        )}
-        <JsonForms
-          schema={schema}
-          data={data}
-          renderers={createStreamCustomRenderers}
-          cells={materialCells}
-          onChange={({ errors, data }) => {
-            setData(data);
-          }}
-        />
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <SubmitButton
-            buttonText={'Submit'}
-            data={createStreamData || editStreamData}
-            isFetching={isCreating || isEditing}
-            disabled={!valid}
-            onClick={handleButtonOnClick}
-          />
-        </Box>
-
-        <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
-        <pre>{isCreateError && JSON.stringify(createError, null, 2)}</pre>
-      </FormContainer>
-    );
-  };
-
-  const InstructionsContent = () => {
-    const documentationUrl = 'https://www.valmi.io/docs/overview';
-    const title = 'Streams';
-    const linkText = 'streams.';
-
-    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;
+  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setData(data);
   };
 
   const PageContent = () => {
     return (
       <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
         {/** Display Content */}
-        <FormLayout formFields={<FormFields />} instructions={<InstructionsContent />} />
+        <FormLayout
+          formComp={
+            <DestinationFormControl
+              key={`StreamFormControl`}
+              deleteTooltip="Delete stream"
+              editing={!!editing}
+              onDelete={handleDelete}
+              onFormChange={handleFormChange}
+              onSubmitClick={handleSubmit}
+              isDeleting={isDeleting}
+              status={status}
+              error={createError || editError}
+              jsonFormsProps={{ data: data, schema: schema, renderers: createStreamCustomRenderers }}
+            />
+          }
+          instructionsComp={<DestinationInstructions key={`StreamInstructions`} data={schema} type="stream" />}
+        />
       </ConnectorLayout>
     );
   };

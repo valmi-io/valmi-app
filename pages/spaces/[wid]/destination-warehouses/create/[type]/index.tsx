@@ -5,8 +5,6 @@
  */
 
 import React, { ReactElement, useEffect, useState } from 'react';
-import { JsonForms } from '@jsonforms/react';
-import { materialCells } from '@jsonforms/material-renderers';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
@@ -20,18 +18,16 @@ import {
   useEditDestinationMutation
 } from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import CustomIcon from '@/components/Icon/CustomIcon';
-import SubmitButton from '@/components/SubmitButton';
-import appIcons from '@/utils/icon-utils';
 import { generateUUID, isTrue } from '@/utils/lib';
-import { jsonFormValidator } from '@/utils/form-utils';
-import { createDestinationCustomRenderers } from '@/content/DestinationWarehouses/DestinationUtils';
 import { useFetch } from '@/hooks/useFetch';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
-import Instructions from '@/components/Instructions';
-import FormLayout, { FormContainer } from '@/layouts/FormLayout';
+import FormLayout from '@/layouts/FormLayout';
+import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
+import DestinationFormControl from '@/content/DestinationWarehouses/DestinationFormControl';
+import { createDestinationCustomRenderers } from '@/content/DestinationWarehouses/DestinationUtils';
+import { JsonFormsCore } from '@jsonforms/core';
+import { FormStatus } from '@/utils/form-utils';
 
 const CreateDestinationXterior = () => {
   // Get type from router
@@ -79,31 +75,37 @@ const CreateDestination = ({ type }: any) => {
     initialData = destinationData;
   }
 
-  const [data, setData] = useState<any>(initialData);
-
   // Mutation for creating Schema object
-  const [
-    createObject,
-    { data: createObjectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
-  ] = useCreateDestinationMutation();
+  const [createObject, { isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
+    useCreateDestinationMutation();
 
   // Mutation for editing Schema object
-  const [
-    editObject,
-    { data: editObjectData, isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }
-  ] = useEditDestinationMutation();
+  const [editObject, { isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] =
+    useEditDestinationMutation();
 
   // Mutation for deleting Schema object
   const [deleteObject, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
     useDeleteDestinationMutation();
 
+  const [data, setData] = useState<any>(initialData);
+
+  const [status, setStatus] = useState<FormStatus>('empty');
+
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
+      setStatus('success');
       handleNavigationOnSuccess();
     }
   }, [isCreated, isEdited, isDeleted]);
 
-  const handleButtonOnClick = () => {
+  useEffect(() => {
+    if (isCreateError || isEditError) {
+      setStatus('error');
+    }
+  }, [isCreateError, isEditError]);
+
+  const handleSubmit = () => {
+    setStatus('submitting');
     const payload = {
       workspaceId: workspaceId,
       destination: data
@@ -116,7 +118,7 @@ const CreateDestination = ({ type }: any) => {
     }
   };
 
-  const handleDeleteStream = () => {
+  const handleDelete = () => {
     const payload = { workspaceId: workspaceId, destinationId: destinationId };
     deleteObject(payload);
   };
@@ -125,56 +127,31 @@ const CreateDestination = ({ type }: any) => {
     router.push(`/spaces/${workspaceId}/destination-warehouses`);
   };
 
-  const FormFields = () => {
-    const { valid, errors } = jsonFormValidator(schema, data);
-    return (
-      <FormContainer>
-        {editing && (
-          <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <Tooltip title={'Delete warehouse'}>
-              <IconButton disabled={isDeleting} onClick={handleDeleteStream}>
-                <CustomIcon icon={appIcons.DELETE} />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        )}
-        <JsonForms
-          schema={schema}
-          data={data}
-          renderers={createDestinationCustomRenderers}
-          cells={materialCells}
-          onChange={({ errors, data }) => setData(data)}
-        />
-        <pre>{JSON.stringify(data, null, 2)}</pre>
-        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <SubmitButton
-            buttonText={'Submit'}
-            data={createObjectData || editObjectData}
-            isFetching={isCreating || isEditing}
-            disabled={!valid}
-            onClick={handleButtonOnClick}
-          />
-        </Box>
-
-        <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
-        <pre>{isCreateError && JSON.stringify(createError, null, 2)}</pre>
-      </FormContainer>
-    );
-  };
-
-  const InstructionsContent = () => {
-    const documentationUrl = 'https://www.valmi.io/docs/overview';
-    const title = 'Destination warehouses';
-    const linkText = 'Destination-warehouses';
-
-    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;
+  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setData(data);
   };
 
   const PageContent = () => {
     return (
       <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
         {/** Display Content */}
-        <FormLayout formFields={<FormFields />} instructions={<InstructionsContent />} />
+        <FormLayout
+          formComp={
+            <DestinationFormControl
+              key={`DestinationFormControl`}
+              deleteTooltip="Delete warehouse"
+              editing={!!editing}
+              onDelete={handleDelete}
+              onFormChange={handleFormChange}
+              onSubmitClick={handleSubmit}
+              isDeleting={isDeleting}
+              status={status}
+              error={createError || editError}
+              jsonFormsProps={{ data: data, schema: schema, renderers: createDestinationCustomRenderers }}
+            />
+          }
+          instructionsComp={<DestinationInstructions key={`DestinatonInstructions`} data={schema} type="destination" />}
+        />
       </ConnectorLayout>
     );
   };

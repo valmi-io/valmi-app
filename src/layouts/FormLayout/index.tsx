@@ -7,8 +7,8 @@
 import { styled, Box, Divider, Stack } from '@mui/material';
 
 interface layoutProps {
-  formFields?: React.ReactNode;
-  instructions?: React.ReactNode;
+  formComp?: JSX.Element;
+  instructionsComp?: JSX.Element;
 }
 
 export const FormContainer = styled(Stack)(({}) => ({
@@ -22,11 +22,12 @@ const Layout = styled(Box)(({}) => ({
   justifyContent: 'space-between'
 }));
 
-const FormLayout = ({ formFields, instructions }: layoutProps) => {
+const FormLayout = ({ formComp: FormComp, instructionsComp: InstructionsComp }: layoutProps) => {
   return (
     <Layout>
       {/* display fields */}
-      {formFields}
+
+      {FormComp && FormComp}
 
       <Divider sx={{ m: 0.5 }} orientation="vertical" />
       {/* Display Instructions content */}
@@ -35,7 +36,7 @@ const FormLayout = ({ formFields, instructions }: layoutProps) => {
           width: '40%'
         }}
       >
-        {instructions}
+        {InstructionsComp && InstructionsComp}
       </Box>
     </Layout>
   );

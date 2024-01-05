@@ -28,11 +28,7 @@ import {
   isConnectorRequiresOAuth
 } from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '@components/Error/ErrorUtils';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 import AlertComponent from '@components/Alert';
 import HorizontalLinearStepper from '@components/Stepper';
 
@@ -69,9 +65,7 @@ const ConnectionFlow = () => {
   /** Redux store */
   const user = useSelector((state: RootState) => state.user.user);
 
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
   const {
     flowState: {
@@ -122,11 +116,7 @@ const ConnectionFlow = () => {
       step_components = step_components.splice(1);
     }
 
-    return (
-      <React.Fragment key={step_components[currentStep].key}>
-        {step_components[currentStep]}
-      </React.Fragment>
-    );
+    return <React.Fragment key={step_components[currentStep].key}>{step_components[currentStep]}</React.Fragment>;
   };
 
   const onSubmit = (values: any) => {
@@ -161,10 +151,7 @@ const ConnectionFlow = () => {
       setCreatingConnection(true);
 
       // connection payload
-      const payload = generateConnectionPayload(
-        connection_flow.flowState,
-        user
-      );
+      const payload = generateConnectionPayload(connection_flow.flowState, user);
 
       let connectionUrl = `/workspaces/${workspaceId}/credentials/create`;
 
@@ -193,10 +180,7 @@ const ConnectionFlow = () => {
         isErrorAlert = true;
         displayAlertDialog(traceError, isErrorAlert);
       } else {
-        displayAlertDialog(
-          `Connection ${isEditableFlow ? 'updated' : 'created'} successfully`,
-          isErrorAlert
-        );
+        displayAlertDialog(`Connection ${isEditableFlow ? 'updated' : 'created'} successfully`, isErrorAlert);
         router.push(`/spaces/${workspaceId}/connections/${currentRoute}`);
       }
       setCreatingConnection(false);
@@ -228,25 +212,17 @@ const ConnectionFlow = () => {
 
   const displaySubmitButton = (isFetching: boolean) => {
     let endIcon = null;
-    endIcon = isFetching && (
-      <CircularProgress size={16} sx={{ color: 'white' }} />
-    );
+    endIcon = isFetching && <CircularProgress size={16} sx={{ color: 'white' }} />;
 
     return (
       <Button
         endIcon={endIcon}
         variant="contained"
         type={currentStep === (isEditableFlow ? 0 : 1) ? 'submit' : 'button'}
-        onClick={
-          currentStep === (isEditableFlow ? 0 : 1)
-            ? handleSubmit(onSubmit)
-            : handleNext
-        }
+        onClick={currentStep === (isEditableFlow ? 0 : 1) ? handleSubmit(onSubmit) : handleNext}
         disabled={!enableNext(connection_flow)}
       >
-        {currentStep === connectionSteps.length - 1
-          ? getConnectionButtonName(isEditableFlow)
-          : 'Next'}
+        {currentStep === connectionSteps.length - 1 ? getConnectionButtonName(isEditableFlow) : 'Next'}
       </Button>
     );
   };
@@ -257,12 +233,7 @@ const ConnectionFlow = () => {
       title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
       displayButton={false}
     >
-      <AlertComponent
-        open={alertDialog}
-        onClose={handleClose}
-        message={alertMessage}
-        isError={isErrorAlert}
-      />
+      <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
       {/** Stepper */}
       <HorizontalLinearStepper activeStep={currentStep} steps={connectionSteps}>
         {/* Component returned based on active step */}
