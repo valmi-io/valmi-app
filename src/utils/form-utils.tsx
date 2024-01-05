@@ -248,3 +248,5 @@ export const jsonFormValidator = (schema: any, data: any) => {
   // }
   // return { valid: true, errors: [] };
 };
+
+export type FormStatus = 'submitting' | 'success' | 'error' | 'empty';

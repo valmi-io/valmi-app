@@ -25,7 +25,7 @@ type InstructionsProps = {
   documentationUrl?: string;
   title?: string;
   linkText?: string;
-  type?: any;
+  type?: 'connection' | 'sync' | 'stream' | 'destination' | 'track';
 };
 
 const Instructions = (props: InstructionsProps) => {
@@ -40,7 +40,7 @@ const Instructions = (props: InstructionsProps) => {
         <Link href={documentationUrl} target="_blank" rel="noreferrer" underline="always">
           {linkText}
         </Link>
-        {type !== 'sync' && <> {'connection.'}</>}
+        {type && type === 'connection' && <> {'connection.'}</>}
       </InstructionsText>
     </InstructionsBox>
   );

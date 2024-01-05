@@ -10,16 +10,7 @@ import { useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Box,
-  Button,
-  CardActions,
-  CircularProgress,
-  Divider,
-  Paper,
-  Stack,
-  styled
-} from '@mui/material';
+import { Box, Button, CardActions, CircularProgress, Divider, Paper, Stack, styled } from '@mui/material';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
@@ -39,17 +30,10 @@ import { isMappingStep } from '@content/SyncFlow/Mapping/mappingManagement';
 
 import HorizontalLinearStepper from '@components/Stepper';
 import Instructions from '@components/Instructions';
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '@components/Error/ErrorUtils';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 import AlertComponent from '@components/Alert';
 
-import {
-  useLazyAddSyncQuery,
-  useLazyUpdateSyncQuery
-} from '@store/api/apiSlice';
+import { useLazyAddSyncQuery, useLazyUpdateSyncQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
 import { RootState } from '@store/reducers';
 
@@ -108,11 +92,7 @@ const SyncFlow = () => {
     if (isEditableFlow) step_components = step_components.slice(2);
     let modified_step = currentStep;
     if (step_components.length > syncFlowSteps.length) modified_step += 1;
-    return (
-      <React.Fragment key={step_components[modified_step].key}>
-        {step_components[modified_step]}
-      </React.Fragment>
-    );
+    return <React.Fragment key={step_components[modified_step].key}>{step_components[modified_step]}</React.Fragment>;
   };
 
   const handleBack = () => {
@@ -156,10 +136,7 @@ const SyncFlow = () => {
         displayAlertDialog(traceError, isErrorAlert);
         setIsFetchingQuery(false);
       } else {
-        displayAlertDialog(
-          `Sync ${isEditableFlow ? 'updated' : 'created'} successfully`,
-          isErrorAlert
-        );
+        displayAlertDialog(`Sync ${isEditableFlow ? 'updated' : 'created'} successfully`, isErrorAlert);
         setIsFetchingQuery(false);
         router.push(`/spaces/${workspaceId}/syncs`);
       }
@@ -187,14 +164,7 @@ const SyncFlow = () => {
     const documentationUrl = constants.docs.syncs;
     const title = 'Sync Documentation';
     const linkText = 'sync';
-    return (
-      <Instructions
-        documentationUrl={documentationUrl}
-        title={title}
-        linkText={linkText}
-        type={'sync'}
-      />
-    );
+    return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;
   };
 
   const getButtonName = (flowState: any) => {
@@ -206,17 +176,10 @@ const SyncFlow = () => {
 
   const displaySubmitButton = (isFetching: boolean) => {
     let endIcon = null;
-    endIcon = isLastStepInSyncFlow(flowState) && isFetching && (
-      <CircularProgress size={16} sx={{ color: 'white' }} />
-    );
+    endIcon = isLastStepInSyncFlow(flowState) && isFetching && <CircularProgress size={16} sx={{ color: 'white' }} />;
 
     return (
-      <Button
-        endIcon={endIcon}
-        variant="contained"
-        onClick={handleNext}
-        disabled={!enableNext(flowState)}
-      >
+      <Button endIcon={endIcon} variant="contained" onClick={handleNext} disabled={!enableNext(flowState)}>
         {getButtonName(flowState)}
       </Button>
     );
@@ -228,23 +191,13 @@ const SyncFlow = () => {
       title={flowState.length ? 'Edit sync' : 'Create a new sync'}
       displayButton={false}
     >
-      <AlertComponent
-        open={alertDialog}
-        onClose={handleClose}
-        message={alertMessage}
-        isError={isErrorAlert}
-      />
+      <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
       {/** Stepper */}
       <HorizontalLinearStepper activeStep={currentStep} steps={syncFlowSteps}>
         {/* Component returned based on active step */}
         <Paper variant="outlined">
-          <Stack
-            direction="row"
-            divider={<Divider orientation="vertical" flexItem />}
-          >
-            <Box sx={{ width: '100%' }}>
-              {initialised && getSectionComponent()}
-            </Box>
+          <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
+            <Box sx={{ width: '100%' }}>{initialised && getSectionComponent()}</Box>
 
             <InstructionsLayout>{displayInstructions()}</InstructionsLayout>
           </Stack>

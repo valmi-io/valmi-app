@@ -9,7 +9,6 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
-// import { MaterialTextControl } from '@/tmp/CustomMaterialTextControl';
 
 export const FormInputControl = (props: ControlProps) => {
   const [focused, onFocus, onBlur] = useFocus();
@@ -39,17 +38,20 @@ export const FormInputControl = (props: ControlProps) => {
     appliedUiSchemaOptions.showUnfocusedDescription
   );
 
+  // delay in milliseconds
+  // input gets disabled & displays error after this delay.
+  let timeout = 3000;
+
   const eventToValue = (ev: any) => (ev.target.value === '' ? undefined : ev.target.value);
 
   const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
   const secondFormHelperText = showDescription && !isValid ? errors : null;
 
-  const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue);
+  const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue, timeout);
 
   return (
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
-        {/* <MaterialTextControl {...props} /> */}
         {visible && (
           <FormControl
             fullWidth={!appliedUiSchemaOptions.trim}
@@ -65,7 +67,6 @@ export const FormInputControl = (props: ControlProps) => {
               disabled={!enabled}
               title={schema.title}
               error={!isValid}
-              placeholder={schema.placeholder}
               onChange={onChange}
               fullWidth
               InputLabelProps={{

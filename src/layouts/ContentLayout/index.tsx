@@ -14,7 +14,7 @@ interface layoutProps {
   isLoading?: boolean;
   error?: any;
   traceError?: any;
-  PageContent: React.ReactNode;
+  PageContent: JSX.Element;
   displayComponent?: boolean;
   cardStyles?: CSSProperties;
 }
@@ -41,7 +41,7 @@ const ContentLayout = ({
           <SkeletonLoader loading={isLoading} />
 
           {/** Display page content */}
-          {displayComponent && PageContent}
+          {displayComponent && PageContent && PageContent}
         </Card>
       </Grid>
     </Grid>
