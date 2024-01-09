@@ -1,18 +1,17 @@
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, January 5th 2024, 10:05:52 am
+ * Created Date: Friday, January 5th 2024, 6:21:59 pm
  * Author: Nagendra S @ valmi.io
  */
 
 import CustomIcon from '@/components/Icon/CustomIcon';
 import SubmitButton from '@/components/SubmitButton';
 import { FormContainer } from '@/layouts/FormLayout';
-import { FormStatus, jsonFormValidator } from '@/utils/form-utils';
+import { FormStatus, jsonFormRemoveAdditionalFields, jsonFormValidator } from '@/utils/form-utils';
 import appIcons from '@/utils/icon-utils';
 import { materialCells } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import { Tooltip, IconButton } from '@mui/material';
-import { Box } from '@mui/material';
+import { Tooltip, IconButton, Box } from '@mui/material';
 
 type JsonFormsProps = {
   schema: any;
@@ -20,7 +19,7 @@ type JsonFormsProps = {
   renderers?: any;
 };
 
-type DestinationFormContrlProps = {
+type FormControlComponentProps = {
   jsonFormsProps: JsonFormsProps;
   editing: boolean;
   deleteTooltip: string;
@@ -30,9 +29,11 @@ type DestinationFormContrlProps = {
   error?: any;
   onFormChange: any;
   onSubmitClick: () => void;
+  removeAdditionalFields?: boolean;
+  containerStyles?: React.CSSProperties;
 };
 
-const DestinationFormControl = ({
+const FormControlComponent = ({
   jsonFormsProps,
   deleteTooltip = '',
   editing,
@@ -41,13 +42,18 @@ const DestinationFormControl = ({
   onFormChange,
   status,
   error,
+  removeAdditionalFields = false,
+  containerStyles,
   onSubmitClick
-}: DestinationFormContrlProps) => {
+}: FormControlComponentProps) => {
   const { data, schema, renderers } = jsonFormsProps;
-  const { valid, errors } = jsonFormValidator(schema, data);
+
+  const { valid, errors } = removeAdditionalFields
+    ? jsonFormValidator(schema, jsonFormRemoveAdditionalFields(schema, data))
+    : jsonFormValidator(schema, data);
 
   return (
-    <FormContainer>
+    <FormContainer style={containerStyles}>
       {editing && (
         <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
           <Tooltip title={deleteTooltip}>
@@ -77,4 +83,4 @@ const DestinationFormControl = ({
   );
 };
 
-export default DestinationFormControl;
+export default FormControlComponent;

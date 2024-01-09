@@ -15,6 +15,14 @@ export interface AlertComponentProps {
   isError?: boolean;
 }
 
+export type AlertStatus = 'empty' | 'success' | 'error';
+
+export type AlertType = {
+  message: string;
+  show: boolean;
+  type: AlertStatus;
+};
+
 const AlertComponent = ({
   open,
   onClose,
@@ -31,10 +39,7 @@ const AlertComponent = ({
           <Stack>
             <Typography variant="body2" color="text.error">
               If user is not activated,{' '}
-              <span
-                onClick={onButtonClick}
-                style={{ textDecoration: 'underline', cursor: 'pointer' }}
-              >
+              <span onClick={onButtonClick} style={{ textDecoration: 'underline', cursor: 'pointer' }}>
                 resend activation link
               </span>
               <span>{'.'}</span>

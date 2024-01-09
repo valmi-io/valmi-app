@@ -29,9 +29,9 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
   const routes: TSidebarRoute[] = [
     jitsuEnabled && {
       id: 0,
-      path: `/spaces/${workspaceId}/tracks`,
+      path: `/spaces/${workspaceId}/events`,
       sidebarProps: {
-        displayText: 'TRACK',
+        displayText: 'EVENTS',
         icon: appIcons.TRACK
       }
     },

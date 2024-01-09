@@ -31,9 +31,7 @@ const SidebarWrapper = styled(Box)(
 const Sidebar = () => {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
-  const workspaceId = useSelector(
-    (state: RootState) => state.appFlow.appState.workspaceId
-  );
+  const workspaceId = useSelector((state: RootState) => state.appFlow.appState.workspaceId);
 
   const theme = useTheme();
 
@@ -48,12 +46,8 @@ const Sidebar = () => {
           position: 'fixed',
           left: 0,
           top: 0,
-          background:
-            theme.palette.mode === 'dark'
-              ? theme.colors.alpha.white[100]
-              : theme.colors.alpha.black[100],
-          boxShadow:
-            theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
+          background: theme.palette.mode === 'dark' ? theme.colors.alpha.white[100] : theme.colors.alpha.black[100],
+          boxShadow: theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
         }}
       >
         <Box mt={2}>
@@ -86,10 +80,7 @@ const Sidebar = () => {
       >
         <SidebarWrapper
           sx={{
-            background:
-              theme.palette.mode === 'dark'
-                ? theme.colors.alpha.white[100]
-                : theme.colors.alpha.black[100]
+            background: theme.palette.mode === 'dark' ? theme.colors.alpha.white[100] : theme.colors.alpha.black[100]
           }}
         >
           <Box mt={3}>
