@@ -193,15 +193,10 @@ export const dropdownControlTester = (uischema: any, schema: JsonSchema, context
   return isEnumType ? true : false;
 };
 
-// jsonforms invisible control tester
-export const invisibleControlTester = (
-  uischema: any,
-  schema: JsonSchema,
-  context: TesterContext,
-  invisibleProperties: any[]
-) => {
+// jsonforms custom control tester
+export const customControlTester = (uischema: any, schema: JsonSchema, context: TesterContext, fields: any[]) => {
   if (uischema.type !== 'Control') return false;
-  return invisibleProperties.some((prop) => uischema.scope.endsWith(prop));
+  return fields.some((prop) => uischema.scope.endsWith(prop));
 };
 
 export const jsonFormValidator = (schema: any, data: any) => {
@@ -247,6 +242,15 @@ export const jsonFormValidator = (schema: any, data: any) => {
   //   };
   // }
   // return { valid: true, errors: [] };
+};
+
+export const jsonFormRemoveAdditionalFields = (schema: any, data: any) => {
+  const ajv = new Ajv({ removeAdditional: 'all' });
+
+  const validate = ajv.compile(schema);
+  let xdata = { ...data };
+  validate(xdata);
+  return xdata;
 };
 
 export type FormStatus = 'submitting' | 'success' | 'error' | 'empty';

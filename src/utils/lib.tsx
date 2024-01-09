@@ -56,7 +56,7 @@ export const getTimeDifference = (fromDate, toDate) => {
 };
 
 export const isObject = (value) => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !isArray(value);
 };
 
 export const isObjectEmpty = (obj: Record<string, any>): boolean => {
@@ -120,6 +120,10 @@ export const isDataEmpty = (data: any) => {
 
 export const generateUUID = () => {
   return uuidv4();
+};
+
+export const isArray = (val) => {
+  return Array.isArray(val);
 };
 
 /*

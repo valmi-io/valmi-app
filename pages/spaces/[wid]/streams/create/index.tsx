@@ -21,7 +21,6 @@ import {
 import { RootState } from '@store/reducers';
 import { generateUUID, isTrue } from '@/utils/lib';
 import { useFetch } from '@/hooks/useFetch';
-import { createStreamCustomRenderers } from '@/content/Streams/StreamsUtils';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 
@@ -30,6 +29,9 @@ import DestinationFormControl from '@/content/DestinationWarehouses/DestinationF
 import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus } from '@/utils/form-utils';
+import { getCustomRenderers } from '@/utils/form-customRenderers';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 
 const CreateStream = () => {
   const router = useRouter();
@@ -76,7 +78,20 @@ const CreateStream = () => {
 
   const [data, setData] = useState<any>(initialData);
 
+  // form state
   const [status, setStatus] = useState<FormStatus>('empty');
+
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
+
+  const invisibleFields = ['id', 'workspaceId', 'type'];
+
+  // customJsonRenderers
+  const customRenderers = getCustomRenderers({ invisibleFields: invisibleFields });
 
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
@@ -86,10 +101,18 @@ const CreateStream = () => {
   }, [isCreated, isEdited, isDeleted]);
 
   useEffect(() => {
-    if (isCreateError || isEditError) {
+    if (isCreateError || isEditError || isDeleteError) {
       setStatus('error');
+
+      // extract errors from createError || editError || deleteError objects
+      const errors = getErrorsInErrorObject(createError || editError || deleteError);
+
+      const { message = '' } = errors || {};
+
+      // open alert dialog
+      handleAlertOpen({ message: message || deleteError, alertType: 'error' as AlertStatus });
     }
-  }, [isCreateError, isEditError]);
+  }, [isCreateError, isEditError, isDeleteError]);
 
   const handleSubmit = () => {
     setStatus('submitting');
@@ -117,6 +140,28 @@ const CreateStream = () => {
     setData(data);
   };
 
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
+  };
+
   const PageContent = () => {
     return (
       <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
@@ -133,7 +178,7 @@ const CreateStream = () => {
               isDeleting={isDeleting}
               status={status}
               error={createError || editError}
-              jsonFormsProps={{ data: data, schema: schema, renderers: createStreamCustomRenderers }}
+              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
             />
           }
           instructionsComp={<DestinationInstructions key={`StreamInstructions`} data={schema} type="stream" />}
@@ -148,6 +193,12 @@ const CreateStream = () => {
       title={editing ? 'Edit Stream' : 'Create a new Stream'}
       displayButton={false}
     >
+      <AlertComponent
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        isError={alertState.type === 'error'}
+      />
       <ContentLayout
         key={`createStream`}
         error={error}

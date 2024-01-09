@@ -25,9 +25,11 @@ import ConnectorLayout from '@/layouts/ConnectorLayout';
 import FormLayout from '@/layouts/FormLayout';
 import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
 import DestinationFormControl from '@/content/DestinationWarehouses/DestinationFormControl';
-import { createDestinationCustomRenderers } from '@/content/DestinationWarehouses/DestinationUtils';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus } from '@/utils/form-utils';
+import { getCustomRenderers } from '@/utils/form-customRenderers';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 
 const CreateDestinationXterior = () => {
   // Get type from router
@@ -89,7 +91,20 @@ const CreateDestination = ({ type }: any) => {
 
   const [data, setData] = useState<any>(initialData);
 
+  // form state
   const [status, setStatus] = useState<FormStatus>('empty');
+
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
+
+  const invisibleFields = ['id', 'workspaceId', 'type', 'provisioned', 'testConnectionError', 'destinationType'];
+
+  // customJsonRenderers
+  const customRenderers = getCustomRenderers({ invisibleFields: invisibleFields });
 
   useEffect(() => {
     if (isCreated || isEdited || isDeleted) {
@@ -99,10 +114,18 @@ const CreateDestination = ({ type }: any) => {
   }, [isCreated, isEdited, isDeleted]);
 
   useEffect(() => {
-    if (isCreateError || isEditError) {
+    if (isCreateError || isEditError || isDeleteError) {
       setStatus('error');
+
+      // extract errors from createError || deleteError object
+      const errors = getErrorsInErrorObject(createError || editError || deleteError);
+
+      const { message = '' } = errors || {};
+
+      // open alert dialog
+      handleAlertOpen({ message: message || deleteError, alertType: 'error' as AlertStatus });
     }
-  }, [isCreateError, isEditError]);
+  }, [isCreateError, isEditError, isDeleteError]);
 
   const handleSubmit = () => {
     setStatus('submitting');
@@ -131,6 +154,28 @@ const CreateDestination = ({ type }: any) => {
     setData(data);
   };
 
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
+  };
+
   const PageContent = () => {
     return (
       <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
@@ -147,7 +192,7 @@ const CreateDestination = ({ type }: any) => {
               isDeleting={isDeleting}
               status={status}
               error={createError || editError}
-              jsonFormsProps={{ data: data, schema: schema, renderers: createDestinationCustomRenderers }}
+              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
             />
           }
           instructionsComp={<DestinationInstructions key={`DestinatonInstructions`} data={schema} type="destination" />}
@@ -162,6 +207,12 @@ const CreateDestination = ({ type }: any) => {
       title={editing ? 'Edit destination' : 'Create a new destination'}
       displayButton={false}
     >
+      <AlertComponent
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        isError={alertState.type === 'error'}
+      />
       <ContentLayout
         key={`createDestination${type}`}
         error={error}
