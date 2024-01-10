@@ -10,12 +10,13 @@ import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 
-import { TableCellComponent, TableCellWithEditButton } from '@components/Table/TableCellComponent';
+import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
 
 import TableHeader from '@components/Table/TableHeader';
 import { StreamTableColumns } from './StreamTableColumns';
 import { TData } from '@utils/typings.d';
 import { ConnectionType } from '../Connections/ConnectionModel';
+import { ImageSize } from '@/components/ImageComponent';
 
 interface IStreamsTableProps {
   data: TData;
@@ -37,10 +38,17 @@ const StreamsTable = ({ data, handleButtonOnClick }: IStreamsTableProps) => {
             {(data.ids as string[]).map((id) => {
               const name = data.entities[id].name;
               const type = data.entities[id].type;
+              const streamType = 'chrome';
+
               return (
                 <TableRow hover key={id}>
                   <TableCellComponent text={name} />
-                  <TableCellComponent text={type} />
+                  <TableCellWithImage
+                    title={type}
+                    src={`/connectors/${streamType.toLowerCase()}.svg`}
+                    size={ImageSize.small}
+                  />
+
                   <TableCellWithEditButton
                     tooltip={'Edit stream'}
                     onClick={() => handleButtonOnClick({ edit: true, streamId: id })}

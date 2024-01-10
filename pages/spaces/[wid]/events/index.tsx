@@ -11,11 +11,11 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import { Box, Card, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, Tooltip } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -26,18 +26,17 @@ import { RootState } from '@store/reducers';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetDestinationsQuery, useGetLinksQuery, useGetStreamsQuery } from '@/store/api/streamApiSlice';
-import { setTrackFlowState } from '@/store/reducers/trackFlow';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
 import Image from 'next/image';
 
 import Xarrow, { Xwrapper } from 'react-xarrows';
+import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 
 const EventsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const dispatch = useDispatch();
 
   const { workspaceId = '' } = appState;
 
@@ -64,11 +63,6 @@ const EventsPage: NextPageWithLayout = () => {
     traceError: linksTraceError,
     error: linksError
   } = useFetch({ query: useGetLinksQuery(workspaceId) });
-
-  const handleCreateWarehouseOnClick = ({ edit = false, id = '' }) => {
-    dispatch(setTrackFlowState({ editing: edit, id: id }));
-    router.push(`${getBaseRoute(workspaceId)}/events/create`);
-  };
 
   const [eventState, setEventState] = useState<{ isLoading: boolean; traceError: any; error: any }>({
     isLoading: false,
@@ -175,6 +169,10 @@ const EventsPage: NextPageWithLayout = () => {
     return lines;
   };
 
+  const handleLogoOnClick = () => {
+    router.push(`${getBaseRoute(workspaceId)}/events/connections`);
+  };
+
   const PageContent = () => {
     if (isDataEmpty(links)) {
       return <ListEmptyComponent description={'No events found in this workspace'} />;
@@ -191,7 +189,7 @@ const EventsPage: NextPageWithLayout = () => {
         <Xwrapper>
           <Stack spacing={2} style={{ display: 'flex', width: '100%' }}>
             {streams.ids.map((id: string) => {
-              return <ConnectionItem key={`stream-${id}`} item={streams.entities[id] ?? {}} />;
+              return <ConnectionItem key={`stream-${id}`} item={streams.entities[id] ?? {}} connectionType="STREAM" />;
             })}
           </Stack>
 
@@ -204,20 +202,30 @@ const EventsPage: NextPageWithLayout = () => {
             }}
           >
             {/* Branding logo */}
-            <Image
-              // ref={logoRef}
-              id="logo"
-              priority={true}
-              src="/images/valmi_logo_no_text.svg"
-              alt="Logo"
-              width={50}
-              height={50}
-            />
+
+            <Tooltip title="connections">
+              <Image
+                id="logo"
+                priority={true}
+                src="/images/valmi_logo_no_text.svg"
+                alt="Logo"
+                width={50}
+                height={50}
+                onClick={handleLogoOnClick}
+                style={{ cursor: 'pointer' }}
+              />
+            </Tooltip>
           </Stack>
 
           <Stack spacing={2} style={{ display: 'flex', width: '100%' }}>
             {destinations.ids.map((id: string) => {
-              return <ConnectionItem key={`destination-${id}`} item={destinations.entities[id] ?? {}} />;
+              return (
+                <ConnectionItem
+                  key={`destination-${id}`}
+                  item={destinations.entities[id] ?? {}}
+                  connectionType="DESTINATION"
+                />
+              );
             })}
           </Stack>
 
@@ -228,8 +236,10 @@ const EventsPage: NextPageWithLayout = () => {
     );
   };
 
-  const ConnectionItem = ({ item }: { item: any }) => {
-    const { id = '', name = '' } = item;
+  const ConnectionItem = ({ item, connectionType }: { item: any; connectionType: 'STREAM' | 'DESTINATION' }) => {
+    const { id = '', name = '', destinationType = '', type = '' } = item;
+
+    const connectortype = connectionType === 'STREAM' ? 'chrome' : destinationType;
 
     return (
       <Card
@@ -251,18 +261,19 @@ const EventsPage: NextPageWithLayout = () => {
           cursor: 'pointer'
         }}
       >
-        <Typography>{name}</Typography>
+        <ImageComponent
+          title={name}
+          src={`/connectors/${connectortype.toLowerCase()}.svg`}
+          size={ImageSize.small}
+          alt={`connectionIcon`}
+          style={{ marginRight: '10px' }}
+        />
       </Card>
     );
   };
 
   return (
-    <PageLayout
-      pageHeadTitle="Events"
-      title="Events"
-      buttonTitle="Connection"
-      handleButtonOnClick={() => handleCreateWarehouseOnClick({ edit: false, id: '' })}
-    >
+    <PageLayout pageHeadTitle="Events" title="Events" buttonTitle="Connection" displayButton={false}>
       <ContentLayout
         key={`eventsPage`}
         error={streamsError ?? destinationsError ?? linksError}
@@ -271,7 +282,6 @@ const EventsPage: NextPageWithLayout = () => {
         isLoading={eventState.isLoading}
         traceError={streamsTraceError || destinationsTraceError || linksTraceError}
       />
-      {/* <ArrowExample /> */}
     </PageLayout>
   );
 };

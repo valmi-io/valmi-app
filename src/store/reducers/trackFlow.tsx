@@ -10,20 +10,20 @@ import { HYDRATE } from 'next-redux-wrapper';
 import { PayloadAction } from '@reduxjs/toolkit';
 
 type TrackState = {
-    editing: boolean | null | undefined;
-    id: string | null | undefined;
+  editing: boolean | null | undefined;
+  id: string | null | undefined;
 };
 
 const initialState: TrackState = {
   editing: false,
-  id: '',
+  id: ''
 };
 
 export const trackFlowSlice = createSlice({
   name: 'trackFlow',
   initialState,
   reducers: {
-    setTrackFlowState(state, action: PayloadAction<{}>) {
+    setEventFlowState(state, action: PayloadAction<{}>) {
       state.editing = action.payload.editing;
       state.id = action.payload.id;
     }
@@ -38,6 +38,6 @@ export const trackFlowSlice = createSlice({
   }
 });
 
-export const { setTrackFlowState } = trackFlowSlice.actions;
+export const { setEventFlowState } = trackFlowSlice.actions;
 
 export default trackFlowSlice.reducer;

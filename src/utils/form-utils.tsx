@@ -199,6 +199,19 @@ export const customControlTester = (uischema: any, schema: JsonSchema, context: 
   return fields.some((prop) => uischema.scope.endsWith(prop));
 };
 
+// jsonforms input control tester
+export const arrayControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
+  if (uischema.type !== 'Control') return false;
+  //simple hack to get the control name. //TODO: find a better way
+  const arr = uischema.scope.split('/');
+  const controlName = arr[arr.length - 1];
+
+  const dataType = schema?.properties?.[controlName]?.type;
+
+  if (dataType === 'array') return true;
+  return false;
+};
+
 export const jsonFormValidator = (schema: any, data: any) => {
   const ajv = new Ajv({
     useDefaults: true
