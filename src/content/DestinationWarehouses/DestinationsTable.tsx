@@ -15,8 +15,8 @@ import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from 
 import TableHeader from '@components/Table/TableHeader';
 import { DestinationTableColumns } from './DestinationTableColumns';
 import { TData } from '@utils/typings.d';
-import { ImageSize } from '../../components/ImageComponent';
-import { ConnectionType } from '../Connections/ConnectionModel';
+import { ConnectionType } from '@/content/Connections/ConnectionModel';
+import { ImageSize } from '@/components/ImageComponent';
 
 type ButtonProps = {
   edit: boolean;
@@ -27,10 +27,11 @@ type ButtonProps = {
 
 interface IDestinationsTableProps {
   data: TData;
+  id: string | string[];
   handleButtonOnClick: ({ edit, id, supertype, type }: ButtonProps) => void;
 }
 
-const DestinationsTable = ({ data, handleButtonOnClick }: IDestinationsTableProps) => {
+const DestinationsTable = ({ data, handleButtonOnClick, id: queryId }: IDestinationsTableProps) => {
   return (
     <>
       {/* Destinations Table*/}
@@ -46,8 +47,10 @@ const DestinationsTable = ({ data, handleButtonOnClick }: IDestinationsTableProp
               const name = data.entities[id].name;
               const type = data.entities[id].destinationType;
               const superType = data.entities[id].type;
+              const destinationId = data.entities[id].id;
+              const selected = destinationId === queryId;
               return (
-                <TableRow hover key={id}>
+                <TableRow hover key={id} selected={selected}>
                   <TableCellComponent text={name} />
                   <TableCellWithImage
                     title={type}

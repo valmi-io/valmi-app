@@ -24,12 +24,12 @@ import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 import FormLayout from '@/layouts/FormLayout';
 import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
-import DestinationFormControl from '@/content/DestinationWarehouses/DestinationFormControl';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
+import FormControlComponent from '@/components/FormControlComponent';
 
 const CreateDestinationXterior = () => {
   // Get type from router
@@ -182,7 +182,7 @@ const CreateDestination = ({ type }: any) => {
         {/** Display Content */}
         <FormLayout
           formComp={
-            <DestinationFormControl
+            <FormControlComponent
               key={`DestinationFormControl`}
               deleteTooltip="Delete warehouse"
               editing={!!editing}
@@ -193,9 +193,17 @@ const CreateDestination = ({ type }: any) => {
               status={status}
               error={createError || editError}
               jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+              removeAdditionalFields={false}
             />
           }
-          instructionsComp={<DestinationInstructions key={`DestinatonInstructions`} data={schema} type="destination" />}
+          instructionsComp={
+            <DestinationInstructions
+              key={`DestinatonInstructions`}
+              destinationType={type}
+              data={schema}
+              type="destination"
+            />
+          }
         />
       </ConnectorLayout>
     );

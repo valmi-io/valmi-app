@@ -4,11 +4,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import FormArrayControl from '@/components/FormInput/FormArrayControl';
 import FormEmptyControl from '@/components/FormInput/FormEmptyControl';
 import FormInputControl from '@/components/FormInput/FormInputControl';
 import FormSelectControl from '@/components/FormInput/FormSelectControl';
 import StreamKeysControl from '@/tmp/StreamKeysControl';
-import { inputControlTester, customControlTester, dropdownControlTester } from '@/utils/form-utils';
+import { inputControlTester, customControlTester, dropdownControlTester, arrayControlTester } from '@/utils/form-utils';
 import { isArray } from '@/utils/lib';
 import { rankWith } from '@jsonforms/core';
 import { materialRenderers } from '@jsonforms/material-renderers';
@@ -52,6 +53,13 @@ export const getCustomRenderers = ({ invisibleFields }: CustomRenderersProps) =>
         dropdownControlTester
       ),
       renderer: FormSelectControl
+    },
+    {
+      tester: rankWith(
+        3000, //increase rank as needed
+        arrayControlTester
+      ),
+      renderer: FormArrayControl
     }
   ];
 };

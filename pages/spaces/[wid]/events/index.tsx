@@ -11,7 +11,7 @@
 
 import { ReactElement, useEffect, useState } from 'react';
 
-import { Box, Card, Stack, Tooltip } from '@mui/material';
+import { Box, Card, Stack, Tooltip, Typography, useTheme } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
@@ -26,17 +26,23 @@ import { RootState } from '@store/reducers';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetDestinationsQuery, useGetLinksQuery, useGetStreamsQuery } from '@/store/api/streamApiSlice';
-import { getBaseRoute, isDataEmpty } from '@/utils/lib';
+import { connectorTypes, getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
 import Image from 'next/image';
 
 import Xarrow, { Xwrapper } from 'react-xarrows';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import { AppState } from '@/store/store';
+import { extStreams } from '@/constants/extDestinations';
+
+type EventConnectionType = 'STREAM' | 'DESTINATION';
 
 const EventsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const theme = useTheme();
+
+  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
@@ -139,7 +145,16 @@ const EventsPage: NextPageWithLayout = () => {
   };
 
   const LineArrow = ({ from, to, selected = false }: { from: string; to: string; selected?: boolean }) => {
-    return <Xarrow lineColor={selected ? 'red' : ''} key={`stream${from + to}`} start={from} end={to} />;
+    return (
+      <Xarrow
+        showHead={false}
+        lineColor={selected ? theme.colors.primary.main : theme.colors.primary.lighter}
+        strokeWidth={5}
+        key={`stream${from + to}`}
+        start={from}
+        end={to}
+      />
+    );
   };
 
   const getLines = () => {
@@ -173,6 +188,14 @@ const EventsPage: NextPageWithLayout = () => {
     router.push(`${getBaseRoute(workspaceId)}/events/connections`);
   };
 
+  const handleConnectionOnClick = ({ connectionType, id }: { connectionType: EventConnectionType; id: string }) => {
+    if (connectionType === 'STREAM') {
+      router.push(`${getBaseRoute(workspaceId)}/streams?id=${id}`);
+    } else if (connectionType === 'DESTINATION') {
+      router.push(`${getBaseRoute(workspaceId)}/destination-warehouses?id=${id}`);
+    }
+  };
+
   const PageContent = () => {
     if (isDataEmpty(links)) {
       return <ListEmptyComponent description={'No events found in this workspace'} />;
@@ -187,7 +210,8 @@ const EventsPage: NextPageWithLayout = () => {
         }}
       >
         <Xwrapper>
-          <Stack spacing={2} style={{ display: 'flex', width: '100%' }}>
+          <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
+            <Typography variant="body1">{'Streams'}</Typography>
             {streams.ids.map((id: string) => {
               return <ConnectionItem key={`stream-${id}`} item={streams.entities[id] ?? {}} connectionType="STREAM" />;
             })}
@@ -217,7 +241,8 @@ const EventsPage: NextPageWithLayout = () => {
             </Tooltip>
           </Stack>
 
-          <Stack spacing={2} style={{ display: 'flex', width: '100%' }}>
+          <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
+            <Typography variant="body1">{'Destinations'}</Typography>
             {destinations.ids.map((id: string) => {
               return (
                 <ConnectionItem
@@ -236,10 +261,10 @@ const EventsPage: NextPageWithLayout = () => {
     );
   };
 
-  const ConnectionItem = ({ item, connectionType }: { item: any; connectionType: 'STREAM' | 'DESTINATION' }) => {
+  const ConnectionItem = ({ item, connectionType }: { item: any; connectionType: EventConnectionType }) => {
     const { id = '', name = '', destinationType = '', type = '' } = item;
 
-    const connectortype = connectionType === 'STREAM' ? 'chrome' : destinationType;
+    const connectortype = connectionType === 'STREAM' ? extStreams.browser.type : destinationType;
 
     return (
       <Card
@@ -253,13 +278,19 @@ const EventsPage: NextPageWithLayout = () => {
         }}
         variant="outlined"
         id={id}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 2,
-          borderColor: 'black',
-          padding: 10,
-          cursor: 'pointer'
+        sx={{
+          pl: 2,
+          borderWidth: onHoverState.id === id ? 2 : 1,
+          borderColor: (theme) => (onHoverState.id === id ? theme.colors.primary.main : 'black')
         }}
+        style={{
+          borderRadius: 5,
+          display: 'flex',
+          height: 62,
+          cursor: 'pointer',
+          alignItems: 'center'
+        }}
+        onClick={() => handleConnectionOnClick({ connectionType, id })}
       >
         <ImageComponent
           title={name}
@@ -281,6 +312,7 @@ const EventsPage: NextPageWithLayout = () => {
         displayComponent={!eventState.error && !eventState.isLoading && links}
         isLoading={eventState.isLoading}
         traceError={streamsTraceError || destinationsTraceError || linksTraceError}
+        cardVariant={false}
       />
     </PageLayout>
   );

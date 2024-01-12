@@ -31,6 +31,8 @@ import ContentLayout from '@/layouts/ContentLayout';
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
+  const { id = '' } = router.query;
+
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const dispatch = useDispatch();
 
@@ -47,7 +49,9 @@ const StreamsPage: NextPageWithLayout = () => {
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No streams found in this workspace'} />;
     }
-    return <StreamsTable key={`streamstable-${workspaceId}`} data={data} handleButtonOnClick={handleButtonOnClick} />;
+    return (
+      <StreamsTable key={`streamstable-${workspaceId}`} id={id} data={data} handleButtonOnClick={handleButtonOnClick} />
+    );
   };
 
   return (

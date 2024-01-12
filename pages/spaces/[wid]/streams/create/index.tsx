@@ -25,13 +25,13 @@ import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 
 import FormLayout from '@/layouts/FormLayout';
-import DestinationFormControl from '@/content/DestinationWarehouses/DestinationFormControl';
 import DestinationInstructions from '@/content/DestinationWarehouses/DestinationInstructions';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
+import FormControlComponent from '@/components/FormControlComponent';
 
 const CreateStream = () => {
   const router = useRouter();
@@ -168,7 +168,7 @@ const CreateStream = () => {
         {/** Display Content */}
         <FormLayout
           formComp={
-            <DestinationFormControl
+            <FormControlComponent
               key={`StreamFormControl`}
               deleteTooltip="Delete stream"
               editing={!!editing}
@@ -179,6 +179,7 @@ const CreateStream = () => {
               status={status}
               error={createError || editError}
               jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+              removeAdditionalFields={false}
             />
           }
           instructionsComp={<DestinationInstructions key={`StreamInstructions`} data={schema} type="stream" />}

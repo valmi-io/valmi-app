@@ -17,13 +17,15 @@ import { StreamTableColumns } from './StreamTableColumns';
 import { TData } from '@utils/typings.d';
 import { ConnectionType } from '../Connections/ConnectionModel';
 import { ImageSize } from '@/components/ImageComponent';
+import { extStreams } from '@/constants/extDestinations';
 
 interface IStreamsTableProps {
   data: TData;
+  id: string | string[];
   handleButtonOnClick: ({ edit, streamId }: { edit: boolean; streamId: string }) => void;
 }
 
-const StreamsTable = ({ data, handleButtonOnClick }: IStreamsTableProps) => {
+const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableProps) => {
   return (
     <>
       {/* Streams Table*/}
@@ -38,10 +40,14 @@ const StreamsTable = ({ data, handleButtonOnClick }: IStreamsTableProps) => {
             {(data.ids as string[]).map((id) => {
               const name = data.entities[id].name;
               const type = data.entities[id].type;
-              const streamType = 'chrome';
+
+              const streamId = data.entities[id].id;
+              const streamType = extStreams.browser.type;
+
+              const selected = streamId === queryId;
 
               return (
-                <TableRow hover key={id}>
+                <TableRow hover key={id} selected={selected}>
                   <TableCellComponent text={name} />
                   <TableCellWithImage
                     title={type}

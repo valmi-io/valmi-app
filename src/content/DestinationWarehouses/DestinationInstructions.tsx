@@ -10,15 +10,20 @@ import { memo } from 'react';
 type InstructionsProps = {
   data: any; // schema
   type: 'stream' | 'destination';
+  destinationType?: string;
 };
 
-const DestinationInstructions = ({ data, type }: InstructionsProps) => {
+const DestinationInstructions = ({ data, type, destinationType }: InstructionsProps) => {
   // TODO: documentation url changes based on schema.
-  const documentationUrl = data ? 'https://www.valmi.io/docs/overview' : 'https://www.valmi.io/docs/overview';
+
+  const documentationUrl =
+    type === 'destination'
+      ? `https://www.valmi.io/docs/events/destinations/warehouses${destinationType}`
+      : 'https://www.valmi.io/docs/events/sources/streams/default';
 
   const title = type === 'destination' ? 'Destination warehouses' : 'Streams';
 
-  const linkText = type === 'destination' ? 'Destination-warehouses' : 'streams.';
+  const linkText = type === 'destination' ? 'destination-warehouses' : 'streams.';
 
   return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={type} />;
 };

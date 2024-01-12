@@ -17,6 +17,7 @@ interface layoutProps {
   PageContent: JSX.Element;
   displayComponent?: boolean;
   cardStyles?: CSSProperties;
+  cardVariant?: boolean;
 }
 
 const ContentLayout = ({
@@ -25,12 +26,13 @@ const ContentLayout = ({
   isLoading = false,
   traceError,
   displayComponent = false,
-  cardStyles
+  cardStyles,
+  cardVariant = true
 }: layoutProps) => {
   return (
     <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
       <Grid item xs={12}>
-        <Card variant="outlined" style={cardStyles}>
+        <Card variant={cardVariant ? 'outlined' : undefined} style={cardStyles}>
           {/** Display error */}
           {error && <ErrorContainer error={error} />}
 

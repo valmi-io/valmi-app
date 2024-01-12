@@ -4,14 +4,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import CustomIcon from '@/components/Icon/CustomIcon';
 import SubmitButton from '@/components/SubmitButton';
 import { FormContainer } from '@/layouts/FormLayout';
 import { FormStatus, jsonFormRemoveAdditionalFields, jsonFormValidator } from '@/utils/form-utils';
-import appIcons from '@/utils/icon-utils';
 import { materialCells } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import { Tooltip, IconButton, Box } from '@mui/material';
+import { Box } from '@mui/material';
 
 type JsonFormsProps = {
   schema: any;
@@ -53,32 +51,31 @@ const FormControlComponent = ({
     : jsonFormValidator(schema, data);
 
   return (
-    <FormContainer style={containerStyles}>
-      {editing && (
-        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <Tooltip title={deleteTooltip}>
-            <Box component="span">
-              <IconButton disabled={isDeleting} onClick={onDelete}>
-                <CustomIcon icon={appIcons.DELETE} />
-              </IconButton>
-            </Box>
-          </Tooltip>
-        </Box>
-      )}
+    <FormContainer>
       <JsonForms schema={schema} data={data} renderers={renderers} cells={materialCells} onChange={onFormChange} />
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+
+      <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: editing ? 'space-between' : 'flex-end' }}>
+        {editing && (
+          <SubmitButton
+            buttonText={'Delete'}
+            data={status === 'success'}
+            isFetching={isDeleting}
+            disabled={isDeleting}
+            color="error"
+            onClick={onDelete}
+          />
+        )}
         <SubmitButton
           buttonText={'Submit'}
           data={status === 'success'}
           isFetching={status === 'submitting'}
-          disabled={!valid || status === 'submitting'}
+          disabled={!valid || status === 'submitting' || isDeleting}
           onClick={onSubmitClick}
         />
       </Box>
 
-      <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
-      <pre>{status === 'error' && JSON.stringify(error, null, 2)}</pre>
+      {/* <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
+      <pre>{status === 'error' && JSON.stringify(error, null, 2)}</pre> */}
     </FormContainer>
   );
 };

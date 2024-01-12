@@ -32,6 +32,8 @@ import ContentLayout from '@/layouts/ContentLayout';
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
+  const { id = '' } = router.query;
+
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const dispatch = useDispatch();
 
@@ -56,6 +58,7 @@ const DestinationsPage: NextPageWithLayout = () => {
       <DestinationsTable
         key={`destinationstable-${workspaceId}`}
         data={data}
+        id={id}
         handleButtonOnClick={handleButtonOnClick}
       />
     );

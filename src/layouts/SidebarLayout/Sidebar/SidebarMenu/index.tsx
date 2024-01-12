@@ -24,6 +24,7 @@ import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
 import { AppState } from '@/store/store';
 import { getBrowserRoute, getRoute } from '@/utils/lib';
+import SidebarNestedItem from '@/layouts/SidebarLayout/Sidebar/SidebarNestedItem';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -83,17 +84,22 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
     const connectionRoutes = ['warehouses', 'destinations'];
 
-    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations'];
+    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations', 'connections'];
 
     if (!browserSubRoute && browserRoute !== currentRoute && browserRoute !== 'connections') {
       // Handle non-sub-route case
       handleRouteChange(browserRoute);
     } else if (browserSubRoute && subRoutes.includes(browserSubRoute)) {
       // Handle sub-routes
+
       if (browserRoute !== currentRoute) {
         if (browserRoute !== 'connections') {
-          // Handle non-connections route
-          handleRouteChange(browserRoute);
+          if (browserRoute === 'events' && browserSubRoute === 'connections') {
+            handleRouteChange(browserSubRoute);
+          } else {
+            // Handle non-connections route
+            handleRouteChange(browserRoute);
+          }
         } else if (connectionRoutes.includes(browserSubRoute) && browserSubRoute !== currentRoute) {
           // Handle connections route with valid sub-route
           handleRouteChange(browserSubRoute);
@@ -101,6 +107,8 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
           // Handle create | callback route
           handleRouteChange(connectionRoutes[0]);
         }
+      } else if (browserRoute === 'events' && browserSubRoute === 'connections') {
+        handleRouteChange(browserSubRoute);
       }
     }
   }, [router.pathname]);
@@ -148,6 +156,7 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
     (path: string) => {
       // extracting current route from path
       const currentRoute = getRoute(path);
+
       handleRouteChange(currentRoute);
 
       // Navigate to route based on the name of the list item
@@ -163,11 +172,39 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
     return (
       <React.Fragment key={route.id}>
-        {route.sidebarProps && route.child ? (
-          <SidebarItemCollapse key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
-        ) : (
-          <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
-        )}
+        {route.sidebarProps ? (
+          <>
+            {route.child ? (
+              <SidebarItemCollapse key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+            ) : (
+              <>
+                {route.subRoutes ? (
+                  <>
+                    <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+                    {route.subRoutes.map((routeId) => {
+                      const nestedRoute: any = sidebarRoutes.find((route) => Number(route.id) === Number(routeId));
+
+                      return (
+                        <SidebarNestedItem
+                          key={nestedRoute.id}
+                          item={nestedRoute}
+                          currentRoute={activeIndex}
+                          onClick={handleItemOnClick}
+                        />
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {!route.subRoute && (
+                      <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        ) : null}
       </React.Fragment>
     );
   });

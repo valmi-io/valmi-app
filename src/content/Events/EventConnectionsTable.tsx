@@ -17,6 +17,7 @@ import { TData } from '@utils/typings.d';
 import { ImageSize } from '@components/ImageComponent';
 
 import { EventConnectionsTableColumns } from '@/content/Events/EventConnectionsTableColumns';
+import { extStreams } from '@/constants/extDestinations';
 
 type ButtonProps = {
   edit: boolean;
@@ -60,17 +61,20 @@ const EventConnectionsTable = ({ data, streams, destinations, handleButtonOnClic
               const stream = getConnectionObj({ id: fromId, data: streams });
               const destination = getConnectionObj({ id: toId, data: destinations });
 
-              const streamType = 'chrome';
-              const destinationType = destination.destinationType;
+              const streamType = extStreams.browser.type;
+
+              const { destinationType = '' } = destination ?? {};
 
               return (
                 <TableRow hover key={id}>
                   <TableCellWithImage
+                    alt="streamIcon"
                     title={stream.name}
                     src={`/connectors/${streamType.toLowerCase()}.svg`}
                     size={ImageSize.small}
                   />
                   <TableCellWithImage
+                    alt="destinationIcon"
                     title={destination.name}
                     src={`/connectors/${destinationType.toLowerCase()}.svg`}
                     size={ImageSize.small}

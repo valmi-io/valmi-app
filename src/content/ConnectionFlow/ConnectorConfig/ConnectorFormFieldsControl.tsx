@@ -10,19 +10,14 @@ import {
   hasAuthorizedOAuth
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import ConnectorFormFields from '@/content/ConnectionFlow/ConnectorConfig/ConnectorFormFields';
+import { FormContainer } from '@/layouts/FormLayout';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { RootState } from '@/store/reducers';
 import { setConnectionFlow } from '@/store/reducers/connectionFlow';
 import { generateConfigFromSpec } from '@/utils/connection-utils';
-import { Box, styled } from '@mui/material';
 import { useRouter } from 'next/router';
 import { ChangeEvent, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
-const Form = styled(Box)(({}) => ({
-  display: 'flex',
-  width: '50%'
-}));
 
 const ConnectorFormFieldsControl = (props: any) => {
   const { data, control, handleSubmit, onSubmit, formValues, resetForm, setValue } = props;
@@ -110,7 +105,7 @@ const ConnectorFormFieldsControl = (props: any) => {
   };
 
   return (
-    <Form>
+    <FormContainer>
       <ConnectorFormFields
         fields={fields}
         control={control}
@@ -125,7 +120,7 @@ const ConnectorFormFieldsControl = (props: any) => {
         handleFileChange={handleFileChange}
         handleOAuthButtonClick={handleOAuthButtonClick}
       />
-    </Form>
+    </FormContainer>
   );
 };
 

@@ -21,6 +21,8 @@ export type TSidebarRoute = {
   path: string;
   sidebarProps: TSidebarRouteProps;
   child?: TSidebarRoute[];
+  subRoutes?: string[];
+  subRoute?: boolean;
 };
 
 export type TSidebarRoutePropsOut = TSidebarRoute[];
@@ -33,7 +35,8 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'EVENTS',
         icon: appIcons.TRACK
-      }
+      },
+      subRoutes: [4]
     },
     {
       id: 1,
@@ -96,6 +99,15 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
           }
         }
       ]
+    },
+    {
+      id: 4,
+      path: `/spaces/${workspaceId}/events/connections`,
+      sidebarProps: {
+        displayText: 'CONNECTIONS',
+        icon: appIcons.CONNECTION
+      },
+      subRoute: true
     }
   ].filter(Boolean) as TSidebarRoute[];
 

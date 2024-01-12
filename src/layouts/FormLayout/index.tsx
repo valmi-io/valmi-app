@@ -13,32 +13,24 @@ interface layoutProps {
 
 export const FormContainer = styled(Stack)(({}) => ({
   display: 'flex',
-  width: '50%'
-}));
-
-const Layout = styled(Box)(({}) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between'
+  width: '100%'
 }));
 
 const FormLayout = ({ formComp: FormComp, instructionsComp: InstructionsComp }: layoutProps) => {
   return (
-    <Layout>
-      {/* display fields */}
+    <Stack direction="row" divider={<Divider orientation="vertical" flexItem />}>
+      <Box sx={{ width: '100%', px: 1 }}>
+        {/* display fields */} {FormComp && FormComp}
+      </Box>
 
-      {FormComp && FormComp}
-
-      <Divider sx={{ m: 0.5 }} orientation="vertical" />
-      {/* Display Instructions content */}
       <Box
         sx={{
-          width: '40%'
+          px: 1
         }}
       >
         {InstructionsComp && InstructionsComp}
       </Box>
-    </Layout>
+    </Stack>
   );
 };
 
