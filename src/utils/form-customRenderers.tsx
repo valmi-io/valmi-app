@@ -8,7 +8,7 @@ import FormArrayControl from '@/components/FormInput/FormArrayControl';
 import FormEmptyControl from '@/components/FormInput/FormEmptyControl';
 import FormInputControl from '@/components/FormInput/FormInputControl';
 import FormSelectControl from '@/components/FormInput/FormSelectControl';
-import StreamKeysControl from '@/tmp/StreamKeysControl';
+import StreamKeysControl from '@/components/FormInput/StreamKeysControl';
 import { inputControlTester, customControlTester, dropdownControlTester, arrayControlTester } from '@/utils/form-utils';
 import { isArray } from '@/utils/lib';
 import { rankWith } from '@jsonforms/core';

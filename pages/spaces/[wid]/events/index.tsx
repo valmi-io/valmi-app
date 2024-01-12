@@ -233,8 +233,8 @@ const EventsPage: NextPageWithLayout = () => {
                 priority={true}
                 src="/images/valmi_logo_no_text.svg"
                 alt="Logo"
-                width={50}
-                height={50}
+                width={60}
+                height={60}
                 onClick={handleLogoOnClick}
                 style={{ cursor: 'pointer' }}
               />
@@ -280,8 +280,8 @@ const EventsPage: NextPageWithLayout = () => {
         id={id}
         sx={{
           pl: 2,
-          borderWidth: onHoverState.id === id ? 2 : 1,
-          borderColor: (theme) => (onHoverState.id === id ? theme.colors.primary.main : 'black')
+          borderWidth: onHoverState.id === id ? 2 : 0.5,
+          borderColor: (theme) => (onHoverState.id === id ? theme.colors.primary.main : theme.palette.divider)
         }}
         style={{
           borderRadius: 5,

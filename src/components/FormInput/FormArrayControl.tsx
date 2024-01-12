@@ -117,7 +117,7 @@ const NonEmptyCellComponent = React.memo(function NonEmptyCellComponent({
   isValid
 }: NonEmptyCellComponentProps) {
   return (
-    <Stack style={{ display: 'flex', flexDirection: 'row' }}>
+    <Stack style={{ display: 'flex', flexDirection: 'column' }}>
       {schema.properties ? (
         <DispatchCell
           schema={Resolve.schema(schema, `#/properties/${encode(propName)}`, rootSchema)}
@@ -227,44 +227,60 @@ const NonEmptyRowComponent = ({
 
   return (
     <Stack key={childPath}>
-      <Stack style={{ display: 'flex', flexDirection: 'row' }} spacing={2}>
-        <Box style={{ width: '100%' }}>{generateCells(NonEmptyCell, schema, childPath, enabled, cells)}</Box>
-        {enabled && (
-          <Stack
-            style={{
-              display: 'flex',
-              flexDirection: 'row'
-            }}
-          >
-            {showSortButtons ? (
-              <Fragment>
-                <Grid item>
-                  <IconButton aria-label={translations.upAriaLabel} onClick={moveUp} disabled={!enableUp} size="large">
-                    <ArrowUpward />
-                  </IconButton>
-                </Grid>
-                <Grid item>
-                  <IconButton
-                    aria-label={translations.downAriaLabel}
-                    onClick={moveDown}
-                    disabled={!enableDown}
-                    size="large"
-                  >
-                    <ArrowDownward />
-                  </IconButton>
-                </Grid>
-              </Fragment>
-            ) : null}
-
-            <IconButton
-              aria-label={translations.removeAriaLabel}
-              onClick={() => openDeleteDialog(childPath, rowIndex)}
-              size="large"
+      <Stack style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} spacing={2}>
+        <Box
+          sx={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            mx: 1.5
+          }}
+        >
+          {generateCells(NonEmptyCell, schema, childPath, enabled, cells)}
+        </Box>
+        <Box>
+          {enabled && (
+            <Stack
+              style={{
+                display: 'flex',
+                flexDirection: 'row'
+              }}
             >
-              <DeleteIcon />
-            </IconButton>
-          </Stack>
-        )}
+              {showSortButtons ? (
+                <Fragment>
+                  <Grid item>
+                    <IconButton
+                      aria-label={translations.upAriaLabel}
+                      onClick={moveUp}
+                      disabled={!enableUp}
+                      size="large"
+                    >
+                      <ArrowUpward />
+                    </IconButton>
+                  </Grid>
+                  <Grid item>
+                    <IconButton
+                      aria-label={translations.downAriaLabel}
+                      onClick={moveDown}
+                      disabled={!enableDown}
+                      size="large"
+                    >
+                      <ArrowDownward />
+                    </IconButton>
+                  </Grid>
+                </Fragment>
+              ) : null}
+
+              <IconButton
+                aria-label={translations.removeAriaLabel}
+                onClick={() => openDeleteDialog(childPath, rowIndex)}
+                size="large"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Stack>
+          )}
+        </Box>
       </Stack>
     </Stack>
   );

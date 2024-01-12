@@ -8,7 +8,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
+import TableRow, { TableRowProps } from '@mui/material/TableRow';
 
 import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
 
@@ -17,6 +17,7 @@ import { DestinationTableColumns } from './DestinationTableColumns';
 import { TData } from '@utils/typings.d';
 import { ConnectionType } from '@/content/Connections/ConnectionModel';
 import { ImageSize } from '@/components/ImageComponent';
+import { styled } from '@mui/material';
 
 type ButtonProps = {
   edit: boolean;
@@ -24,6 +25,12 @@ type ButtonProps = {
   type: string;
   supertype: string;
 };
+
+const CustomizedTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
+  '&.Mui-selected': {
+    backgroundColor: theme.colors.alpha.black[5]
+  }
+}));
 
 interface IDestinationsTableProps {
   data: TData;
@@ -50,7 +57,7 @@ const DestinationsTable = ({ data, handleButtonOnClick, id: queryId }: IDestinat
               const destinationId = data.entities[id].id;
               const selected = destinationId === queryId;
               return (
-                <TableRow hover key={id} selected={selected}>
+                <CustomizedTableRow hover key={id} selected={selected}>
                   <TableCellComponent text={name} />
                   <TableCellWithImage
                     title={type}
@@ -68,7 +75,7 @@ const DestinationsTable = ({ data, handleButtonOnClick, id: queryId }: IDestinat
                       })
                     }
                   />
-                </TableRow>
+                </CustomizedTableRow>
               );
             })}
           </TableBody>

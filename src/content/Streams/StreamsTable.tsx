@@ -8,7 +8,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
+import TableRow, { TableRowProps } from '@mui/material/TableRow';
 
 import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
 
@@ -18,12 +18,19 @@ import { TData } from '@utils/typings.d';
 import { ConnectionType } from '../Connections/ConnectionModel';
 import { ImageSize } from '@/components/ImageComponent';
 import { extStreams } from '@/constants/extDestinations';
+import { styled } from '@mui/material';
 
 interface IStreamsTableProps {
   data: TData;
   id: string | string[];
   handleButtonOnClick: ({ edit, streamId }: { edit: boolean; streamId: string }) => void;
 }
+
+const CustomizedTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
+  '&.Mui-selected': {
+    backgroundColor: theme.colors.alpha.black[5]
+  }
+}));
 
 const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableProps) => {
   return (
@@ -47,7 +54,7 @@ const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableP
               const selected = streamId === queryId;
 
               return (
-                <TableRow hover key={id} selected={selected}>
+                <CustomizedTableRow hover key={id} selected={selected}>
                   <TableCellComponent text={name} />
                   <TableCellWithImage
                     title={type}
@@ -59,7 +66,7 @@ const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableP
                     tooltip={'Edit stream'}
                     onClick={() => handleButtonOnClick({ edit: true, streamId: id })}
                   />
-                </TableRow>
+                </CustomizedTableRow>
               );
             })}
           </TableBody>
