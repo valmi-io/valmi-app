@@ -22,7 +22,8 @@ import {
   faTrash,
   faCopy,
   faPlus,
-  faLink
+  faLink,
+  faWater
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -47,6 +48,7 @@ export interface IAppIcons {
   CLIPBOARD: IconDefinition;
   ADD: IconDefinition;
   CONNECTION: IconDefinition;
+  STREAM: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -69,7 +71,8 @@ const appIcons: IAppIcons = {
   DELETE: { ...faTrash },
   CLIPBOARD: { ...faCopy },
   ADD: { ...faPlus },
-  CONNECTION: { ...faLink }
+  CONNECTION: { ...faLink },
+  STREAM: { ...faWater }
 };
 
 export default appIcons;

@@ -36,7 +36,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
         displayText: 'EVENTS',
         icon: appIcons.TRACK
       },
-      subRoutes: [4]
+      subRoutes: [2, 3, 4]
     },
     {
       id: 1,
@@ -44,68 +44,53 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'ACTIVATE',
         icon: appIcons.SYNC
-      }
+      },
+      subRoutes: [5, 6]
     },
+
     {
       id: 2,
-      path: '',
-      sidebarProps: {
-        displayText: 'SOURCES',
-        icon: null
-      },
-      child: [
-        jitsuEnabled && {
-          id: 20,
-          path: `/spaces/${workspaceId}/streams`,
-          sidebarProps: {
-            displayText: 'STREAMS',
-            icon: appIcons.SRC
-          }
-        },
-        {
-          id: 21,
-          path: `/spaces/${workspaceId}/connections/warehouses`,
-          sidebarProps: {
-            displayText: 'WAREHOUSES',
-            icon: appIcons.SRC
-          }
-        }
-      ]
-    },
-    {
-      id: 3,
-      path: '',
-      sidebarProps: {
-        displayText: 'DESTINATIONS',
-        icon: null
-      },
-      child: [
-        {
-          // valmi
-          id: 30,
-          path: `/spaces/${workspaceId}/connections/destinations`,
-          sidebarProps: {
-            displayText: 'SaaS TOOLS',
-            icon: appIcons.DEST
-          }
-        },
-        // jitsu
-        jitsuEnabled && {
-          id: 31,
-          path: `/spaces/${workspaceId}/destination-warehouses`,
-          sidebarProps: {
-            displayText: 'WAREHOUSES',
-            icon: appIcons.DEST
-          }
-        }
-      ]
-    },
-    {
-      id: 4,
       path: `/spaces/${workspaceId}/events/connections`,
       sidebarProps: {
         displayText: 'CONNECTIONS',
         icon: appIcons.CONNECTION
+      },
+      subRoute: true
+    },
+    jitsuEnabled && {
+      id: 3,
+      path: `/spaces/${workspaceId}/streams`,
+      sidebarProps: {
+        displayText: 'STREAMS',
+        icon: appIcons.STREAM
+      },
+      subRoute: true
+    },
+    jitsuEnabled && {
+      id: 4,
+      path: `/spaces/${workspaceId}/destination-warehouses`,
+      sidebarProps: {
+        displayText: 'WAREHOUSES',
+        icon: appIcons.SRC
+      },
+      subRoute: true
+    },
+    {
+      id: 5,
+      path: `/spaces/${workspaceId}/connections/warehouses`,
+      sidebarProps: {
+        displayText: 'WAREHOUSES',
+        icon: appIcons.SRC
+      },
+      subRoute: true
+    },
+    {
+      // valmi
+      id: 6,
+      path: `/spaces/${workspaceId}/connections/destinations`,
+      sidebarProps: {
+        displayText: 'DESTINATIONS',
+        icon: appIcons.DEST
       },
       subRoute: true
     }
