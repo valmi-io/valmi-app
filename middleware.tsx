@@ -28,8 +28,9 @@ export function middleware(request: NextRequest) {
     } else {
       // user is not authenticated
       // checking if pathname is a protected route.
+
       if (!publicRoutes.includes(pathName)) {
-        if (!isUserActivateRoute(pathName)) {
+        if (!isUserActivateRoute(pathName) && !isResetPasswordRoute(pathName)) {
           return NextResponse.rewrite(new URL('/login', request.url));
         }
       }
@@ -40,6 +41,16 @@ export function middleware(request: NextRequest) {
 const isUserActivateRoute = (pathname: string): boolean => {
   if (pathname.startsWith('/activate')) {
     // checking if pathname is  /activate/[uid]/[tid]
+    if (pathname.split('/').length !== 4) return false;
+
+    return true;
+  }
+  return false;
+};
+
+const isResetPasswordRoute = (pathname: string): boolean => {
+  if (pathname.startsWith('/reset_password')) {
+    // checking if pathname is  /reset_password/[uid]/[tid]
     if (pathname.split('/').length !== 4) return false;
 
     return true;

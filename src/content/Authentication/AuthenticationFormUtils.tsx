@@ -1,11 +1,10 @@
-import { setAppState } from '@store/reducers/appFlow';
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Wednesday, October 18th 2023, 7:13:03 pm
+ * Author: Nagendra S @ valmi.io
+ */
 
-import {
-  getEmailField,
-  getPasswordField,
-  getUsernameField
-} from '@utils/form-utils';
-import { useRouter } from 'next/router';
+import { getEmailField, getPasswordField, getUsernameField } from '@utils/form-utils';
 
 {
   /** Generate sign up form fields */
@@ -30,4 +29,12 @@ export const generateAuthenticationPayload = (values: any) => {
     payload[key] = values[key];
   }
   return payload;
+};
+
+export const generateResetPasswordFields = () => {
+  return [getEmailField()];
+};
+
+export const generateConfirmPasswordResetFields = () => {
+  return [getPasswordField()];
 };

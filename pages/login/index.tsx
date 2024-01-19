@@ -20,7 +20,10 @@ import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 import { useAuthenticationForm } from '@content/Authentication/useAuthenticationForm';
 import AuthenticationFormFooter from '@content/Authentication/AuthenticationFormFooter';
 import AuthenticationForm from '@content/Authentication/AuthenticationForm';
-import { generateAuthenticationPayload, generateLoginFormFields } from '@content/Authentication/AuthenticationFormUtils';
+import {
+  generateAuthenticationPayload,
+  generateLoginFormFields
+} from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
 import AlertComponent from '@components/Alert';
@@ -157,7 +160,11 @@ const Login: NextPageWithLayout = () => {
         <Stack sx={{ mt: 1 }}>
           <Stack spacing={2}>
             {/** Display footer */}
-            <AuthenticationFormFooter href={'/signup'} footerText={"Don't have an account? Sign up"} />
+            <AuthenticationFormFooter
+              isLoginPage={true}
+              href={'/signup'}
+              footerText={"Don't have an account? Sign up"}
+            />
           </Stack>
         </Stack>
       </AuthenticationLayout>

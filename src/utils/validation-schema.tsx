@@ -18,3 +18,11 @@ export const signinValidationSchema = yup.object({
   password: yup.string().required()
   // .min(8, 'Password must be at least 8 characters')
 });
+
+export const resetPasswordValidationSchema = yup.object({
+  email: yup.string().required().email('Invalid email address')
+});
+
+export const confirmPasswordResetValidationSchema = yup.object({
+  password: yup.string().required()
+});

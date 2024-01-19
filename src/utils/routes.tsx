@@ -10,7 +10,9 @@ export const publicRoutes = [
   '/login',
   '/signup',
   '/activate',
-  '/activate/[uid]/[tid]'
+  '/activate/[uid]/[tid]',
+  '/reset_password',
+  '/reset_password/[uid]/[tid]'
 ];
 
 export const isPublicSync = (pathname: string): boolean => {
@@ -32,18 +34,13 @@ export const filterRoute = (routerQueryObj: any, route: any) => {
   return route;
 };
 
-export const getRouterPathname = (
-  routerQueryObj: any,
-  pathname: string
-): string => {
+export const getRouterPathname = (routerQueryObj: any, pathname: string): string => {
   const valuesAfterWid = pathname.split('/').slice(1);
   let modifiedPathname = '';
 
   if (valuesAfterWid.length > 0) {
     for (let i = 0; i < valuesAfterWid.length; i++) {
-      modifiedPathname = modifiedPathname.concat(
-        `/${filterRoute(routerQueryObj, valuesAfterWid[i])}`
-      );
+      modifiedPathname = modifiedPathname.concat(`/${filterRoute(routerQueryObj, valuesAfterWid[i])}`);
     }
   } else {
     modifiedPathname = pathname;

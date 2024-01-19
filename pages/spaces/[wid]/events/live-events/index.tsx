@@ -77,6 +77,7 @@ const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id:
     } else if (type === 'bulker_batch.all') {
       return <BulkerEventsTable key={`bulkerEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />;
     }
+    return null;
   };
 
   return (

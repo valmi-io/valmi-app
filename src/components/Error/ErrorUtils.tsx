@@ -8,7 +8,7 @@ import { checkIfPropExistsInObject, isObjectEmpty } from '@utils/lib';
 
 export const hasErrorsInData = (data: any) => {
   // checking if data has any trace errors.
-  if (data.hasOwnProperty('trace')) return true;
+  if (data && data.hasOwnProperty('trace')) return true;
   return false;
 };
 
@@ -25,9 +25,7 @@ export const getErrorsInData = (data: any) => {
 export const getErrorsInErrorObject = (error: any) => {
   if (error && error.hasOwnProperty('name')) {
     if (error.name === 'AbortError') {
-      const errorMessage = checkIfPropExistsInObject(error, 'message')
-        ? error.message
-        : error.name;
+      const errorMessage = checkIfPropExistsInObject(error, 'message') ? error.message : error.name;
       return {
         status: errorMessage,
         message: errorMessage

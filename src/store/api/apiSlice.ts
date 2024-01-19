@@ -90,6 +90,28 @@ export const apiSlice = createApi({
       }
     }),
 
+    resetPassword: builder.query({
+      // The URL for the request is '/api/v1/users/reset_password//'
+      query: (arg) => {
+        return {
+          url: '/users/reset_password/',
+          method: 'POST',
+          body: arg
+        };
+      }
+    }),
+
+    confirmPasswordReset: builder.query({
+      // The URL for the request is '/api/v1/users/reset_password_confirm/'
+      query: (arg) => {
+        return {
+          url: '/users/reset_password_confirm/',
+          method: 'POST',
+          body: arg
+        };
+      }
+    }),
+
     loginAndFetchWorkSpaces: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const user = await baseQuery({
@@ -365,6 +387,8 @@ export const {
   useLazySignupUserQuery,
   useLazyActivateUserQuery,
   useLazyResendActivationTokenQuery,
+  useLazyResetPasswordQuery,
+  useLazyConfirmPasswordResetQuery,
   useLazyDiscoverConnectorQuery,
   useFetchCredentialsQuery,
   useLazyFetchCredentialsQuery,
