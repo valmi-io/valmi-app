@@ -65,9 +65,9 @@ const StreamKeysControl = (props: ControlProps) => {
 
         let writeKey = '';
         if (item.plaintext) {
-          writeKey = `${item.id}:${item.plaintext}:${item.hint}`;
+          writeKey = `${item.id}:${item.plaintext}`;
         } else {
-          writeKey = `${item.id}:*******${item.hint.slice(-1)}`;
+          writeKey = `${item.id}:${item.hint?.slice(0, 2) + '******' + item.hint?.slice(-2)}`;
         }
 
         return (

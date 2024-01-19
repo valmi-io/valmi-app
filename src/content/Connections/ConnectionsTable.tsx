@@ -28,7 +28,7 @@ import { ConnectionModel } from '@content/Connections/ConnectionModel';
 
 import {
   TableCellComponent,
-  TableCellWithEditButton,
+  TableCellWithActionButton,
   TableCellWithImage
 } from '@components/Table/TableCellComponent';
 import { ImageSize } from '@components/ImageComponent';
@@ -52,16 +52,11 @@ const BoxLayout = styled(Box)(({}) => ({
   alignItems: 'center'
 }));
 
-const ConnectionsTable: FC<ConnectionsTableProps> = ({
-  connections,
-  connectionType
-}) => {
+const ConnectionsTable: FC<ConnectionsTableProps> = ({ connections, connectionType }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   /** Redux store */
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
   const { flowState: {} = {} } = connection_flow;
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
@@ -120,10 +115,7 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
         <Table>
           {/* Connections Table Columns */}
           <TableHead>
-            <TableHeader
-              columns={ConnectionColumns}
-              connectionType={connectionType}
-            />
+            <TableHeader columns={ConnectionColumns} connectionType={connectionType} />
           </TableHead>
           {/* Connections Table Body */}
           <TableBody>
@@ -131,15 +123,13 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({
               return (
                 <TableRow hover key={connection.id}>
                   <TableCellComponent text={connection.name} />
-                  <TableCell>
-                    {userAccountTableCell(connection.account)}
-                  </TableCell>
+                  <TableCell>{userAccountTableCell(connection.account)}</TableCell>
                   <TableCellWithImage
                     title={connection.display_name}
                     src={`/connectors/${connection.type.toLowerCase()}.svg`}
                     size={ImageSize.small}
                   />
-                  <TableCellWithEditButton
+                  <TableCellWithActionButton
                     tooltip={'Edit connection'}
                     onClick={() => handleEditConnectionClick(connection)}
                   />

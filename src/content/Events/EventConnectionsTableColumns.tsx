@@ -25,5 +25,6 @@ export const EventConnectionsTableColumns: TableColumnProps[] = [
     icon: appIcons.DEST
   },
 
-  { id: '3', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
+  { id: '3', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] },
+  { id: '4', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
 ];

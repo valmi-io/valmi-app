@@ -6,6 +6,7 @@
 
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
+import LanguageIcon from '@mui/icons-material/Language';
 
 import {
   faArrowRight,
@@ -23,7 +24,9 @@ import {
   faCopy,
   faPlus,
   faLink,
-  faWater
+  faWater,
+  faSliders,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -49,6 +52,9 @@ export interface IAppIcons {
   ADD: IconDefinition;
   CONNECTION: IconDefinition;
   STREAM: IconDefinition;
+  LIVE_EVENTS: IconDefinition;
+  ARROW_LEFT: IconDefinition;
+  BROWSER: React.ReactElement;
 }
 
 const appIcons: IAppIcons = {
@@ -72,7 +78,10 @@ const appIcons: IAppIcons = {
   CLIPBOARD: { ...faCopy },
   ADD: { ...faPlus },
   CONNECTION: { ...faLink },
-  STREAM: { ...faWater }
+  STREAM: { ...faWater },
+  LIVE_EVENTS: { ...faSliders },
+  ARROW_LEFT: { ...faArrowLeft },
+  BROWSER: <LanguageIcon />
 };
 
 export default appIcons;

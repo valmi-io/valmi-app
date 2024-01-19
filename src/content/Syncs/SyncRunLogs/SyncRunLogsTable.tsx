@@ -1,4 +1,3 @@
-//@ts-nocheck
 /*
  * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
  * Created Date: Monday, August 21st 2023, 11:33:57 am
@@ -8,7 +7,6 @@
 import { useState } from 'react';
 
 import {
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -19,7 +17,6 @@ import {
   Typography,
   styled
 } from '@mui/material';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 
 import {
   SyncRunLogsTableProps,
@@ -27,12 +24,13 @@ import {
   syncRunLogColumns
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
-import Popup from '@components/Popup';
+import Modal from '@/components/Modal';
 
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 import TableHeader from '@components/Table/TableHeader';
+import { copy } from '@/utils/lib';
 
-const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
+export const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {
     padding: '6px 12px',
     lineHeight: '1'
@@ -43,7 +41,7 @@ const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   }
 }));
 
-const LogMessage = styled(Typography)(({}) => ({
+export const LogMessage = styled(Typography)(({}) => ({
   maxWidth: TABLE_COLUMN_SIZES[10],
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -57,6 +55,7 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleRowOnClick = (rowData: any) => {
+    //@ts-ignore
     setSelectedRowData(rowData, null, 2);
     setCopied(false);
     setDialogOpen(true);
@@ -65,7 +64,7 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
   const handleCopyToClipboard = () => {
     if (selectedRowData) {
       setCopied(true);
-      navigator.clipboard.writeText(JSON.stringify(selectedRowData));
+      copy(selectedRowData);
     }
   };
 
@@ -87,21 +86,13 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
               syncRunLogs.length > 0 &&
               syncRunLogs.map((runLog: any, index: any) => {
                 return (
-                  <CustomizedTableRow
-                    onClick={() => handleRowOnClick(runLog)}
-                    hover
-                    key={`log_key ${index}`}
-                  >
+                  <CustomizedTableRow onClick={() => handleRowOnClick(runLog)} hover key={`log_key ${index}`}>
                     <TableCell>
-                      <Typography variant="subtitle1">
-                        {getMessageTimestamp(runLog.timestamp)}
-                      </Typography>
+                      <Typography variant="subtitle1">{getMessageTimestamp(runLog.timestamp)}</Typography>
                     </TableCell>
 
                     <TableCell>
-                      <LogMessage variant="subtitle1">
-                        {runLog.message}
-                      </LogMessage>
+                      <LogMessage variant="subtitle1">{runLog.message}</LogMessage>
                     </TableCell>
                   </CustomizedTableRow>
                 );
@@ -110,21 +101,17 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
         </Table>
       </TableContainer>
 
-      <Popup
+      <Modal
+        title="Run Details"
         open={isDialogOpen}
         onClose={handleCloseDialog}
+        handleCopy={handleCopyToClipboard}
         data={selectedRowData}
+        copy={true}
+        isCopied={copied}
       >
-        <Button
-          variant="text"
-          color="primary"
-          style={{ alignSelf: 'end' }}
-          onClick={handleCopyToClipboard}
-          startIcon={<FileCopyIcon />}
-        >
-          {copied ? 'Copied' : 'Copy'}
-        </Button>
-      </Popup>
+        <></>
+      </Modal>
     </>
   );
 };

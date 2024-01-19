@@ -10,7 +10,11 @@ import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow, { TableRowProps } from '@mui/material/TableRow';
 
-import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
+import {
+  TableCellComponent,
+  TableCellWithActionButton,
+  TableCellWithImage
+} from '@components/Table/TableCellComponent';
 
 import TableHeader from '@components/Table/TableHeader';
 import { StreamTableColumns } from './StreamTableColumns';
@@ -23,7 +27,8 @@ import { styled } from '@mui/material';
 interface IStreamsTableProps {
   data: TData;
   id: string | string[];
-  handleButtonOnClick: ({ edit, streamId }: { edit: boolean; streamId: string }) => void;
+  onEditClick: ({ edit, streamId }: { edit: boolean; streamId: string }) => void;
+  onLiveEventsClick: ({ streamId }: { streamId: string }) => void;
 }
 
 const CustomizedTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
@@ -32,7 +37,7 @@ const CustomizedTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
   }
 }));
 
-const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableProps) => {
+const StreamsTable = ({ data, onEditClick, onLiveEventsClick, id: queryId }: IStreamsTableProps) => {
   return (
     <>
       {/* Streams Table*/}
@@ -62,9 +67,15 @@ const StreamsTable = ({ data, handleButtonOnClick, id: queryId }: IStreamsTableP
                     size={ImageSize.small}
                   />
 
-                  <TableCellWithEditButton
+                  <TableCellWithActionButton
+                    actionType="EDIT"
                     tooltip={'Edit stream'}
-                    onClick={() => handleButtonOnClick({ edit: true, streamId: id })}
+                    onClick={() => onEditClick({ edit: true, streamId: id })}
+                  />
+                  <TableCellWithActionButton
+                    actionType="LIVE_EVENTS"
+                    tooltip={'Live events'}
+                    onClick={() => onLiveEventsClick({ streamId: id })}
                   />
                 </CustomizedTableRow>
               );

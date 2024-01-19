@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 
-import { TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
+import { TableCellWithActionButton, TableCellWithImage } from '@components/Table/TableCellComponent';
 
 import TableHeader from '@components/Table/TableHeader';
 import { TData } from '@utils/typings.d';
@@ -28,7 +28,8 @@ interface IConnectionsTableProps {
   data: TData;
   streams: TData;
   destinations: TData;
-  handleButtonOnClick: ({ edit, id }: ButtonProps) => void;
+  onEditClick: ({ edit, id }: ButtonProps) => void;
+  onLiveEventsClick: ({ id }: { id: string }) => void;
 }
 
 const getConnectionObj = ({ id, data }: { id: string; data: TData }) => {
@@ -42,7 +43,13 @@ const getConnectionObj = ({ id, data }: { id: string; data: TData }) => {
   return {};
 };
 
-const EventConnectionsTable = ({ data, streams, destinations, handleButtonOnClick }: IConnectionsTableProps) => {
+const EventConnectionsTable = ({
+  data,
+  streams,
+  destinations,
+  onEditClick,
+  onLiveEventsClick
+}: IConnectionsTableProps) => {
   return (
     <>
       {/* EventConnections Table*/}
@@ -79,11 +86,20 @@ const EventConnectionsTable = ({ data, streams, destinations, handleButtonOnClic
                     src={`/connectors/${destinationType.toLowerCase()}.svg`}
                     size={ImageSize.small}
                   />
-                  <TableCellWithEditButton
+                  <TableCellWithActionButton
                     tooltip={'Edit connection'}
                     onClick={() =>
-                      handleButtonOnClick({
+                      onEditClick({
                         edit: true,
+                        id: id
+                      })
+                    }
+                  />
+                  <TableCellWithActionButton
+                    actionType="LIVE_EVENTS"
+                    tooltip={'Live events'}
+                    onClick={() =>
+                      onLiveEventsClick({
                         id: id
                       })
                     }

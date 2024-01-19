@@ -40,7 +40,7 @@ export const FormInputControl = (props: ControlProps) => {
 
   // delay in milliseconds
   // input gets disabled & displays error after this delay.
-  let timeout = 3000;
+  let timeout = 1000;
 
   const eventToValue = (ev: any) => (ev.target.value === '' ? undefined : ev.target.value);
 

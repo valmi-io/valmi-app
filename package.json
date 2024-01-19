@@ -60,6 +60,7 @@
     "react-custom-scrollbars-2": "4.4.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
+    "react-json-view": "^1.21.3",
     "react-redux": "^8.0.5",
     "react-xarrows": "^2.0.2",
     "redux-persist": "^6.0.0",

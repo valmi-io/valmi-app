@@ -10,7 +10,11 @@ import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow, { TableRowProps } from '@mui/material/TableRow';
 
-import { TableCellComponent, TableCellWithEditButton, TableCellWithImage } from '@components/Table/TableCellComponent';
+import {
+  TableCellComponent,
+  TableCellWithActionButton,
+  TableCellWithImage
+} from '@components/Table/TableCellComponent';
 
 import TableHeader from '@components/Table/TableHeader';
 import { DestinationTableColumns } from './DestinationTableColumns';
@@ -64,7 +68,7 @@ const DestinationsTable = ({ data, handleButtonOnClick, id: queryId }: IDestinat
                     src={`/connectors/${type.toLowerCase()}.svg`}
                     size={ImageSize.small}
                   />
-                  <TableCellWithEditButton
+                  <TableCellWithActionButton
                     tooltip={'Edit destination'}
                     onClick={() =>
                       handleButtonOnClick({

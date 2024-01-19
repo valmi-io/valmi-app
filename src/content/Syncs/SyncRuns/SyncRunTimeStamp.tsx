@@ -5,10 +5,7 @@
  */
 
 import React from 'react';
-import {
-  convertUTCDateToLocalDate,
-  getTimeDifference
-} from '../../../utils/lib';
+import { convertUTCDateToLocalDate, getFormattedUTC, getTimeDifference } from '@utils/lib';
 import { isSyncRunning } from './SyncRunsUtils';
 import { Box } from '@mui/material';
 
@@ -18,12 +15,7 @@ interface SyncRunTimeStampProps {
 const SyncRunTimeStamp = ({ syncRun }: SyncRunTimeStampProps) => {
   const runStartedAt = convertUTCDateToLocalDate(new Date(syncRun.run_at));
 
-  const runStartedAtDisplay =
-    runStartedAt.toDateString() +
-    ' ' +
-    runStartedAt.getHours().toString().padStart(2, '0') +
-    ':' +
-    runStartedAt.getMinutes().toString().padStart(2, '0');
+  const runStartedAtDisplay = getFormattedUTC(syncRun.run_at);
 
   let runEndAt = null;
 

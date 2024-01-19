@@ -126,14 +126,18 @@ export const isArray = (val) => {
   return Array.isArray(val);
 };
 
-/*
-const searchParams = useSearchParams();
-const streamId = searchParams.get('streamId');
+export const copy = (val) => {
+  navigator.clipboard.writeText(JSON.stringify(val, null, 4));
+};
 
-console.log('streamId', streamId);
-console.log('router', router.query );
+export const getFormattedUTC = (date: any) => {
+  const timestamp = convertUTCDateToLocalDate(new Date(date));
 
-
-const {selectAllStreams,selectStreamById} = getStreamSelectors(wid as string);
-const data = useSelector(state => selectStreamById(state, streamId));
-*/
+  const timestampDisplay =
+    timestamp.toDateString() +
+    ' ' +
+    timestamp.getHours().toString().padStart(2, '0') +
+    ':' +
+    timestamp.getMinutes().toString().padStart(2, '0');
+  return timestampDisplay;
+};

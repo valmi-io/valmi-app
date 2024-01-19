@@ -106,23 +106,7 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   const customRenderers = getCustomRenderers({ invisibleFields: invisibleFields });
 
   useEffect(() => {
-    if (objectData) {
-      console.log('object data:_');
-    }
-  }, [objectData]);
-
-  console.log('is creating:_', isCreating);
-
-  console.log('daa:_', objectData);
-
-  console.log('error:_', createError);
-
-  console.log('Is created:_', isCreated);
-  console.log('isCreateError:_', isCreateError);
-
-  useEffect(() => {
     if (isCreated || isDeleted) {
-      console.log('success...............');
       setStatus('success');
       handleNavigationOnSuccess();
     }
@@ -130,7 +114,6 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
 
   useEffect(() => {
     if (isCreateError || isDeleteError) {
-      console.log('error...............');
       setStatus('error');
       // extract errors from createError || deleteError object
       const errors = getErrorsInErrorObject(createError || deleteError);
@@ -143,7 +126,6 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   }, [isCreateError, isDeleteError]);
 
   const handleSubmit = () => {
-    console.log('submitting...............');
     setStatus('submitting');
     let ndata = jsonFormRemoveAdditionalFields(schema, data);
     if (editing) {
@@ -160,7 +142,6 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   };
 
   const handleNavigationOnSuccess = () => {
-    console.log('handle navigation on success');
     router.back();
   };
 

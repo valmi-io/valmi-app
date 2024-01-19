@@ -5,11 +5,10 @@
  */
 
 import { IconButton, TableCell, Tooltip, Typography } from '@mui/material';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 
-import ImageComponent, {
-  ImageComponentProps
-} from '@components/ImageComponent';
+import ImageComponent, { ImageComponentProps } from '@components/ImageComponent';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
 
 interface TableCellProps {
   text: string;
@@ -17,9 +16,12 @@ interface TableCellProps {
 
 interface TableCellWithImageProps extends ImageComponentProps {}
 
-interface TableCellWithEditButtonProps {
+interface TableCellWithActionButtonProps {
   tooltip: string;
   onClick: () => void;
+  style?: React.CSSProperties;
+  align?: 'center' | 'right' | 'left';
+  actionType?: 'EDIT' | 'LIVE_EVENTS';
 }
 
 export const TableCellComponent = ({ text }: TableCellProps) => {
@@ -32,31 +34,23 @@ export const TableCellComponent = ({ text }: TableCellProps) => {
   );
 };
 
-export const TableCellWithImage = ({
-  size,
-  src,
-  alt,
-  title
-}: TableCellWithImageProps) => {
+export const TableCellWithImage = ({ size, src, alt, title }: TableCellWithImageProps) => {
   return (
     <TableCell>
-      <ImageComponent
-        size={size}
-        src={src}
-        alt={alt ? alt : 'icon'}
-        style={{ marginRight: '10px' }}
-        title={title}
-      />
+      <ImageComponent size={size} src={src} alt={alt ? alt : 'icon'} style={{ marginRight: '10px' }} title={title} />
     </TableCell>
   );
 };
 
-export const TableCellWithEditButton = ({
+export const TableCellWithActionButton = ({
   tooltip,
-  onClick
-}: TableCellWithEditButtonProps) => {
+  onClick,
+  style,
+  align = 'center',
+  actionType = 'EDIT'
+}: TableCellWithActionButtonProps) => {
   return (
-    <TableCell align="center">
+    <TableCell align={align} style={style}>
       <Tooltip title={tooltip}>
         <IconButton
           sx={{
@@ -69,7 +63,8 @@ export const TableCellWithEditButton = ({
           size="small"
           onClick={onClick}
         >
-          <EditTwoToneIcon fontSize="small" />
+          <CustomIcon icon={appIcons[actionType]} />
+          {/* <EditTwoToneIcon fontSize="small" /> */}
         </IconButton>
       </Tooltip>
     </TableCell>

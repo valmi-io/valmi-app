@@ -10,14 +10,18 @@ import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { Box, Typography, Icon, styled } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
 
 const BackIcon = styled(Icon)(({ theme }) => ({
+  display: 'flex',
   marginRight: theme.spacing(1),
   color: blackColor,
-  cursor: 'pointer'
+  cursor: 'pointer',
+  justifyContent: 'center',
+  alignItems: 'center'
 }));
 
 const HeaderTitle = () => {
@@ -55,20 +59,22 @@ const HeaderTitle = () => {
   };
 
   return (
-    <Box display="flex" alignItems="center">
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <BackIcon onClick={handleBack}>
-        <ArrowBackIcon />
+        <CustomIcon icon={appIcons.ARROW_LEFT} />
       </BackIcon>
-      <Breadcrumbs separator={'/'} aria-label="breadcrumb">
-        {valuesAfterWid.length > 0 &&
-          valuesAfterWid.map((route, index) => {
-            return (
-              <Typography key={`breadcrumb-${index}`} variant="body2">
-                {filterRoute(route)}
-              </Typography>
-            );
-          })}
-      </Breadcrumbs>
+      <Box>
+        <Breadcrumbs separator={'/'} aria-label="breadcrumb">
+          {valuesAfterWid.length > 0 &&
+            valuesAfterWid.map((route, index) => {
+              return (
+                <Typography key={`breadcrumb-${index}`} variant="body2">
+                  {filterRoute(route)}
+                </Typography>
+              );
+            })}
+        </Breadcrumbs>
+      </Box>
     </Box>
   );
 };

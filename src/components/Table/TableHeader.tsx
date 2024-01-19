@@ -23,9 +23,9 @@ const TableHeader = ({ columns, connectionType = '' }: TTableHeaderProps) => {
   const theme = useTheme();
   return (
     <TableRow>
-      {columns.map((column: any) => {
+      {columns.map((column: any, index) => {
         return (
-          <TableCell key={column.id} align={column.align}>
+          <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
             <Stack direction="row" alignItems="center">
               {column.icon &&
                 (column.muiIcon ? (

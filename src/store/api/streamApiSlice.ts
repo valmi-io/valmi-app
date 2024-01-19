@@ -10,6 +10,9 @@ const initialDestinationsState = destinationsAdapter.getInitialState();
 const linksAdapter: any = createEntityAdapter();
 const initialLinksState = linksAdapter.getInitialState();
 
+const logsAdapter: any = createEntityAdapter();
+const initialLogsState = logsAdapter.getInitialState();
+
 export const extendedApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getStreams: builder.query({
@@ -18,11 +21,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         return streamsAdapter.setAll(initialState, (responseData as { objects: any[] })?.objects ?? []);
       },
       providesTags: (result, error, workspaceId) => {
-        //console.log(result);
         const tags = result?.ids
           ? [...result.ids.map((id: any) => ({ type: 'Stream' as const, id })), { type: 'Stream' as const }]
           : [{ type: 'Stream' as const }];
-        //console.log(tags);
+
         return tags;
       }
     }),
@@ -45,7 +47,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       // @ts-ignore
       invalidatesTags: (result, error, arg) => {
         const tags = [{ type: 'Stream', id: arg.stream.id }];
-        //console.log(tags);
+
         return tags;
       }
     }),
@@ -80,11 +82,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         );
       },
       providesTags: (result, error, workspaceId) => {
-        //console.log(result);
         const tags = result?.ids
           ? [...result.ids.map((id: any) => ({ type: 'Destination' as const, id })), { type: 'Destination' as const }]
           : [{ type: 'Destination' as const }];
-        //console.log(tags);
+
         return tags;
       }
     }),
@@ -129,11 +130,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         return linksAdapter.setAll(initialLinksState, (responseData as { links: any[] })?.links ?? []);
       },
       providesTags: (result, error, workspaceId) => {
-        //console.log(result);
         const tags = result?.ids
           ? [...result.ids.map((id: any) => ({ type: 'Link' as const, id })), { type: 'Link' as const }]
           : [{ type: 'Link' as const }];
-        //console.log(tags);
+
         return tags;
       }
     }),
@@ -155,6 +155,22 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'Link', id: arg.linkId }]
+    }),
+
+    // get logs
+    getLogs: builder.query({
+      query: ({ workspaceId, eventType, eventId }) =>
+        `/streams/workspaces/${workspaceId}/events/${eventType}/${eventId}/logs`,
+      transformResponse: (responseData) => {
+        return logsAdapter.setAll(initialLogsState, responseData);
+      },
+      providesTags: (result, error, workspaceId) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Log' as const, id })), { type: 'Log' as const }]
+          : [{ type: 'Log' as const }];
+
+        return tags;
+      }
     })
   })
 });
@@ -177,7 +193,9 @@ export const {
   useGetLinksQuery,
   useLinkSchemaQuery,
   useCreateLinkMutation,
-  useDeleteLinkMutation
+  useDeleteLinkMutation,
+
+  useGetLogsQuery
 } = extendedApiSlice;
 
 /* Getting selectors from the transformed response */

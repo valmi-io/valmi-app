@@ -41,7 +41,7 @@ const staggeredBaseQueryWithBailOut = retry(
 );
 // Define our single API slice object
 export const apiSlice = createApi({
-  tagTypes: ['Stream', 'Destination', 'Link'],
+  tagTypes: ['Stream', 'Destination', 'Link', 'Log'],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',
@@ -168,7 +168,9 @@ export const apiSlice = createApi({
           }
         });
 
-        return result.data ? { data: { resultData: result.data, queryId: queryId } } : { error: { errorData: result.error, queryId: queryId } };
+        return result.data
+          ? { data: { resultData: result.data, queryId: queryId } }
+          : { error: { errorData: result.error, queryId: queryId } };
       }
     }),
 
@@ -180,7 +182,9 @@ export const apiSlice = createApi({
           url: `/workspaces/${workspaceId}/credentials/`
         });
 
-        return result.data ? { data: { resultData: result.data, queryId: queryId } } : { error: { errorData: result.error, queryId: queryId } };
+        return result.data
+          ? { data: { resultData: result.data, queryId: queryId } }
+          : { error: { errorData: result.error, queryId: queryId } };
       }
     }),
 

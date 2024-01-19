@@ -25,24 +25,29 @@ import { useFetch } from '@/hooks/useFetch';
 import { setStreamFlowState } from '@/store/reducers/streamFlow';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import StreamsTable from '@/content/Streams/StreamsTable';
-import { isDataEmpty } from '@/utils/lib';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
+import { AppState } from '@/store/store';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const { id = '' } = router.query;
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
   const dispatch = useDispatch();
 
   const { workspaceId = '' } = appState;
 
   const { data, isLoading, traceError, error } = useFetch({ query: useGetStreamsQuery(workspaceId) });
 
-  const handleButtonOnClick = ({ edit = false, streamId = '' }) => {
+  const handleEditClick = ({ edit = false, streamId = '' }) => {
     dispatch(setStreamFlowState({ editing: edit, streamId: streamId }));
-    router.push(`/spaces/${workspaceId}/streams/create`);
+    router.push(`${getBaseRoute(workspaceId)}/streams/create`);
+  };
+
+  const handleLiveEventsClick = ({ streamId = '' }) => {
+    router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${streamId}&type=incoming.all`);
   };
 
   const PageContent = () => {
@@ -50,7 +55,13 @@ const StreamsPage: NextPageWithLayout = () => {
       return <ListEmptyComponent description={'No streams found in this workspace'} />;
     }
     return (
-      <StreamsTable key={`streamstable-${workspaceId}`} id={id} data={data} handleButtonOnClick={handleButtonOnClick} />
+      <StreamsTable
+        key={`streamstable-${workspaceId}`}
+        id={id}
+        data={data}
+        onEditClick={handleEditClick}
+        onLiveEventsClick={handleLiveEventsClick}
+      />
     );
   };
 
@@ -59,7 +70,7 @@ const StreamsPage: NextPageWithLayout = () => {
       pageHeadTitle="Streams"
       title="Streams"
       buttonTitle="Stream"
-      handleButtonOnClick={() => handleButtonOnClick({ edit: false, streamId: '' })}
+      handleButtonOnClick={() => handleEditClick({ edit: false, streamId: '' })}
     >
       <ContentLayout
         key={`streamsPage`}

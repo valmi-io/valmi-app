@@ -98,9 +98,13 @@ const EventConnectionsPage: NextPageWithLayout = () => {
     }
   }, [streamsTraceError, destinationsTraceError, linksTraceError]);
 
-  const handleButtonOnClick = ({ edit = false, id = '' }) => {
+  const handleEditClick = ({ edit = false, id = '' }) => {
     dispatch(setEventFlowState({ editing: edit, id: id }));
     router.push(`${getBaseRoute(workspaceId)}/events/create`);
+  };
+
+  const handleLiveEventsClick = ({ id = '' }) => {
+    router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${id}&type=bulker_batch.all`);
   };
 
   const PageContent = () => {
@@ -114,7 +118,8 @@ const EventConnectionsPage: NextPageWithLayout = () => {
         data={links}
         streams={streams}
         destinations={destinations}
-        handleButtonOnClick={handleButtonOnClick}
+        onEditClick={handleEditClick}
+        onLiveEventsClick={handleLiveEventsClick}
       />
     );
   };
@@ -124,7 +129,7 @@ const EventConnectionsPage: NextPageWithLayout = () => {
       pageHeadTitle="Connections"
       title="Connections"
       buttonTitle="Connection"
-      handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '' })}
+      handleButtonOnClick={() => handleEditClick({ edit: false, id: '' })}
     >
       <ContentLayout
         key={`eventConnectionsPage`}
