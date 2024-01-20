@@ -26,12 +26,7 @@ import {
 } from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
-import AlertComponent from '@components/Alert';
-import {
-  hasErrorsInData,
-  getErrorsInData,
-  getErrorsInErrorObject
-} from '@components/Error/ErrorUtils';
+import AlertComponent, { AlertStatus, AlertType } from '@components/Alert';
 
 import { useLazySignupUserQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
@@ -40,6 +35,7 @@ import { RootState } from '@store/reducers';
 
 import { signupValidationSchema } from '@utils/validation-schema';
 import { useLoginStatus } from '@hooks/useLoginStatus';
+import { queryHandler } from '@/services';
 
 const SignupPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -50,18 +46,18 @@ const SignupPage: NextPageWithLayout = () => {
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  // states
-  const [alertMessage, setAlertMessage] = useState<string>('');
-  const [alertDialog, showAlertDialog] = useState(false);
-  const [isErrorAlert, setIsErrorAlert] = useState(false);
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
 
   const [userData, setUserData] = useState(null);
 
   const [userEmail, setUserEmail] = useState('');
 
-  const { control, handleSubmit } = useAuthenticationForm(
-    signupValidationSchema
-  );
+  const { control, handleSubmit } = useAuthenticationForm(signupValidationSchema);
 
   const { isLoggedIn } = useLoginStatus();
 
@@ -71,12 +67,6 @@ const SignupPage: NextPageWithLayout = () => {
     }
   }, [isLoggedIn]);
 
-  const displayAlertDialog = (message: any, isError: any) => {
-    showAlertDialog(true);
-    setIsErrorAlert(isError);
-    setAlertMessage(message);
-  };
-
   const onSubmit = (values: any) => {
     setUserData(null);
     {
@@ -85,53 +75,62 @@ const SignupPage: NextPageWithLayout = () => {
     const payload = generateAuthenticationPayload(values);
     setUserEmail(values['email']);
 
-    signupHandler(payload);
+    signupHandler({ query: signupUser, payload: payload });
   };
 
-  const signupHandler = async (payload: any) => {
-    try {
-      const data: any = await signupUser(payload).unwrap();
-
-      let isErrorAlert = false;
-      if (hasErrorsInData(data)) {
-        const traceError = getErrorsInData(data);
-        isErrorAlert = true;
-        displayAlertDialog(traceError, isErrorAlert);
-      } else {
-        displayAlertDialog('Signed up successfully', isErrorAlert);
-        setUserData(data);
-        const { is_active = false, email = '' } = data || {};
-        let isLoggedIn = false;
-        let emailSentDialog = false;
-        if (is_active) {
-          isLoggedIn = true;
-        } else {
-          emailSentDialog = true;
-        }
-        dispatch(
-          setAppState({
-            ...appState,
-            loginFlowState: {
-              isLoggedIn: isLoggedIn,
-              userEmail: email,
-              emailSentDialog: emailSentDialog,
-              resendActivationLink: false
-            }
-          })
-        );
-        router.push('/activate');
-      }
-    } catch (error) {
-      const errors = getErrorsInErrorObject(error);
-      const { message = 'unknown' } = errors || {};
-      const isErrorAlert = true;
-      displayAlertDialog(message, isErrorAlert);
+  const successCb = (data: any) => {
+    handleAlertOpen({ message: 'Signed up successfully', alertType: 'success' as AlertStatus });
+    setUserData(data);
+    const { is_active = false, email = '' } = data || {};
+    let isLoggedIn = false;
+    let emailSentDialog = false;
+    if (is_active) {
+      isLoggedIn = true;
+    } else {
+      emailSentDialog = true;
     }
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: {
+          isLoggedIn: isLoggedIn,
+          userEmail: email,
+          emailSentDialog: emailSentDialog,
+          resendActivationLink: false
+        }
+      })
+    );
+    router.push('/activate');
   };
 
-  const handleClose = () => {
-    setAlertMessage('');
-    showAlertDialog(false);
+  const errorCb = (error: any) => {
+    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
+  };
+
+  const signupHandler = async ({ query, payload }: { query: any; payload: any }) => {
+    await queryHandler({ query, payload, successCb, errorCb });
+  };
+
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
   };
 
   const resendActivationLinkHandler = () => {
@@ -152,18 +151,16 @@ const SignupPage: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Signup" />
+
       <AlertComponent
-        open={alertDialog}
-        onClose={handleClose}
-        message={alertMessage}
-        displayButton={
-          alertMessage === 'user with this email address already exists.'
-            ? true
-            : false
-        }
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        isError={alertState.type === 'error'}
+        displayButton={alertState.message === 'user with this email address already exists.' ? true : false}
         onButtonClick={resendActivationLinkHandler}
-        isError={isErrorAlert}
       />
+
       {/** Page layout*/}
       <AuthenticationLayout>
         {/** Display Signup form */}
@@ -179,10 +176,7 @@ const SignupPage: NextPageWithLayout = () => {
         <Stack sx={{ mt: 1 }}>
           <Stack spacing={2}>
             {/** Display footer */}
-            <AuthenticationFormFooter
-              href={'/login'}
-              footerText={'Already have an account? Sign in'}
-            />
+            <AuthenticationFormFooter href={'/login'} footerText={'Already have an account? Sign in'} />
           </Stack>
         </Stack>
       </AuthenticationLayout>

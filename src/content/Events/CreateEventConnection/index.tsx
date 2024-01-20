@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import {
@@ -27,8 +27,8 @@ import { useFetch } from '@/hooks/useFetch';
 import { ErrorStatusText } from '@/components/Error';
 import FormControlComponent from '@/components/FormControlComponent';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
-import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
+import { queryHandler } from '@/services';
 
 export type LinkStateType = {
   fromId: string;
@@ -81,14 +81,10 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   const [data, setData] = useState<any>(initialData);
 
   // Mutation for creating Schema object
-  const [
-    createObject,
-    { data: objectData, isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }
-  ] = useCreateLinkMutation();
+  const [createObject, { error: createError }] = useCreateLinkMutation();
 
   // Mutation for deleting Schema object
-  const [deleteObject, { isLoading: isDeleting, isSuccess: isDeleted, isError: isDeleteError, error: deleteError }] =
-    useDeleteLinkMutation();
+  const [deleteObject, { isLoading: isDeleting, error: deleteError }] = useDeleteLinkMutation();
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
@@ -105,40 +101,34 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: invisibleFields });
 
-  useEffect(() => {
-    if (isCreated || isDeleted) {
-      setStatus('success');
-      handleNavigationOnSuccess();
-    }
-  }, [isCreated, isDeleted]);
-
-  useEffect(() => {
-    if (isCreateError || isDeleteError) {
-      setStatus('error');
-      // extract errors from createError || deleteError object
-      const errors = getErrorsInErrorObject(createError || deleteError);
-
-      const { message = '' } = errors || {};
-
-      // open alert dialog
-      handleAlertOpen({ message: message || deleteError, alertType: 'error' as AlertStatus });
-    }
-  }, [isCreateError, isDeleteError]);
-
   const handleSubmit = () => {
     setStatus('submitting');
     let ndata = jsonFormRemoveAdditionalFields(schema, data);
     if (editing) {
       ndata = { ...ndata, id: linkId };
     }
-    const payload = { workspaceId: workspaceId, link: ndata };
+    const payload = { workspaceId: workspaceId, link: ndata, editing: editing };
 
-    createObject(payload);
+    connectionQueryHandler({ query: createObject, payload: payload });
+  };
+
+  const successCb = (data: any) => {
+    setStatus('success');
+    handleNavigationOnSuccess();
+  };
+
+  const errorCb = (error: any) => {
+    setStatus('error');
+    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
+  };
+
+  const connectionQueryHandler = async ({ query, payload }: { query: any; payload: any }) => {
+    await queryHandler({ query, payload, successCb, errorCb });
   };
 
   const handleDelete = () => {
     const payload = { workspaceId: workspaceId, linkId: linkId, fromId: fromId, toId: toId };
-    deleteObject(payload);
+    connectionQueryHandler({ query: deleteObject, payload: payload });
   };
 
   const handleNavigationOnSuccess = () => {

@@ -9,10 +9,10 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 export const useAuthenticationForm = (validationSchema: any) => {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, watch } = useForm({
     defaultValues: {},
     resolver: yupResolver(validationSchema)
   });
 
-  return { control, handleSubmit };
+  return { control, handleSubmit, watch };
 };

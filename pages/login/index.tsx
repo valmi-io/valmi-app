@@ -26,8 +26,7 @@ import {
 } from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
-import AlertComponent from '@components/Alert';
-import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
+import AlertComponent, { AlertStatus, AlertType } from '@components/Alert';
 
 import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
@@ -39,6 +38,7 @@ import { initialiseAppState } from '@utils/login-utils';
 import { signinValidationSchema } from '@utils/validation-schema';
 import { useLoginStatus } from '@hooks/useLoginStatus';
 import { signOutUser } from '@utils/lib';
+import { queryHandler } from '@/services';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
@@ -50,10 +50,12 @@ const Login: NextPageWithLayout = () => {
   // sign in query
   const [loginAndFetchWorkSpaces, { isFetching }] = useLazyLoginAndFetchWorkSpacesQuery();
 
-  // states
-  const [alertMessage, setAlertMessage] = useState<string>('');
-  const [alertDialog, showAlertDialog] = useState(false);
-  const [isErrorAlert, setIsErrorAlert] = useState(false);
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
 
   const [loginData, setLoginData] = useState(null);
 
@@ -71,52 +73,55 @@ const Login: NextPageWithLayout = () => {
     }
   }, [isLoggedIn]);
 
-  const displayAlertDialog = (message: any, isError: any) => {
-    showAlertDialog(true);
-    setIsErrorAlert(isError);
-    setAlertMessage(message);
-  };
-
   const onSubmit = (values: any) => {
     {
       /** Generate login payload */
     }
     const payload = generateAuthenticationPayload(values);
     setUserEmail(values['email']);
-    loginHandler(payload);
+    loginHandler({ query: loginAndFetchWorkSpaces, payload: payload });
   };
 
-  const loginHandler = async (payload: any) => {
-    try {
-      const data: any = await loginAndFetchWorkSpaces(payload).unwrap();
+  const successCb = (data: any) => {
+    handleAlertOpen({ message: 'Signed in successfully', alertType: 'success' as AlertStatus });
+    setLoginData(data);
+    // store user data in redux.
+    dispatch(setUserData(data));
 
-      let isErrorAlert = false;
-      if (hasErrorsInData(data)) {
-        const traceError = getErrorsInData(data);
-        isErrorAlert = true;
-        displayAlertDialog(traceError, isErrorAlert);
-      } else {
-        displayAlertDialog('Signed in successfully', isErrorAlert);
-        setLoginData(data);
-        // store user data in redux.
-        dispatch(setUserData(data));
-
-        const workspaceID = data.organizations[0].workspaces[0].id;
-        // initialise appState
-        initialiseAppState(dispatch, workspaceID);
-        router.push(`/spaces/${workspaceID}/syncs`);
-      }
-    } catch (error) {
-      const errors = getErrorsInErrorObject(error);
-      const { message = 'unknown' } = errors || {};
-      const isErrorAlert = true;
-      displayAlertDialog(message, isErrorAlert);
-    }
+    const workspaceID = data.organizations[0].workspaces[0].id;
+    // initialise appState
+    initialiseAppState(dispatch, workspaceID);
+    router.push(`/spaces/${workspaceID}/syncs`);
   };
 
-  const handleClose = () => {
-    setAlertMessage('');
-    showAlertDialog(false);
+  const errorCb = (error: any) => {
+    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
+  };
+
+  const loginHandler = async ({ query, payload }: { query: any; payload: any }) => {
+    await queryHandler({ query, payload, successCb, errorCb });
+  };
+
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
   };
 
   const resendActivationLinkHandler = () => {
@@ -137,14 +142,16 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
+
       <AlertComponent
-        open={alertDialog}
-        onClose={handleClose}
-        message={alertMessage}
-        displayButton={alertMessage === 'Unauthorized' ? true : false}
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        isError={alertState.type === 'error'}
+        displayButton={alertState.message === 'Unauthorized' ? true : false}
         onButtonClick={resendActivationLinkHandler}
-        isError={isErrorAlert}
       />
+
       {/** Page layout */}
       <AuthenticationLayout>
         {/** Display form */}

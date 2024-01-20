@@ -41,19 +41,17 @@ const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id:
 
   const { workspaceId = '' } = appState;
 
-  const { data, isLoading, traceError, error } = useFetch({
-    query: useGetLogsQuery({ workspaceId: workspaceId, eventType: type, eventId: id })
+  const { data, isLoading, isFetching, traceError, error } = useFetch({
+    query: useGetLogsQuery({ workspaceId: workspaceId, eventType: type, eventId: id }, { pollingInterval: 5000 })
   });
 
-  const [selectedRowData, setSelectedRowData] = useState<any>(null);
+  const [selectedRowData, setSelectedRowData] = useState<null | string>(null);
   const [isDialogOpen, setDialogOpen] = useState(false);
 
   const [copied, setCopied] = useState(false);
 
   const handleRowOnClick = ({ data }: any) => {
-    //@ts-ignore
-
-    setSelectedRowData(data, null, 2);
+    setSelectedRowData(data);
     setCopied(false);
     setDialogOpen(true);
   };
@@ -73,9 +71,23 @@ const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id:
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No data.'} />;
     } else if (type === 'incoming.all') {
-      return <IncomingEventsTable key={`incomingEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />;
+      return (
+        <IncomingEventsTable
+          key={`incomingEventsTable-${id}`}
+          data={data}
+          onRowClick={handleRowOnClick}
+          isFetching={isFetching}
+        />
+      );
     } else if (type === 'bulker_batch.all') {
-      return <BulkerEventsTable key={`bulkerEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />;
+      return (
+        <BulkerEventsTable
+          key={`bulkerEventsTable-${id}`}
+          data={data}
+          onRowClick={handleRowOnClick}
+          isFetching={isFetching}
+        />
+      );
     }
     return null;
   };
@@ -95,7 +107,7 @@ const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id:
         open={isDialogOpen}
         onClose={handleCloseDialog}
         handleCopy={handleCopyToClipboard}
-        data={JSON.parse(selectedRowData)}
+        data={JSON.parse(selectedRowData as string)}
         copy={true}
         isCopied={copied}
       />

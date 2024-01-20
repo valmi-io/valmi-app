@@ -20,16 +20,16 @@ import AuthenticationForm from '@/content/Authentication/AuthenticationForm';
 import { generateResetPasswordFields } from '@/content/Authentication/AuthenticationFormUtils';
 import { useAuthenticationForm } from '@/content/Authentication/useAuthenticationForm';
 import { resetPasswordValidationSchema } from '@/utils/validation-schema';
-import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import { FormStatus } from '@/utils/form-utils';
 import { Box, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
+import { queryHandler } from '@/services';
 
 const ResetPasswordPage: NextPageWithLayout = () => {
   // reset password query
   const [resetPassword, { isFetching }] = useLazyResetPasswordQuery();
 
-  const { control, handleSubmit } = useAuthenticationForm(resetPasswordValidationSchema);
+  const { control, handleSubmit, watch } = useAuthenticationForm(resetPasswordValidationSchema);
 
   // alert state
   const [alertState, setAlertState] = useState<AlertType>({
@@ -57,45 +57,32 @@ const ResetPasswordPage: NextPageWithLayout = () => {
     handleResetPassword(payload);
   };
 
+  const successCb = (data: any) => {
+    const { email = '' }: { [key: string]: any } = watch();
+
+    handleAlertOpen({ message: 'Email sent', alertType: 'success' });
+
+    const title = 'Reset Password Link Sent!';
+    const description = `We have sent a confirmation email to <strong>${email}</strong>. Please click on the link to continue.`;
+
+    setFormState((state) => ({
+      ...state,
+      status: 'success',
+      title: title,
+      description: description
+    }));
+  };
+
+  const errorCb = (error: any) => {
+    setFormState((state) => ({
+      ...state,
+      status: 'error'
+    }));
+    handleAlertOpen({ message: error, alertType: 'error' });
+  };
+
   const handleResetPassword = async (payload: any) => {
-    const { email = '' } = payload ?? {};
-
-    try {
-      const data: any = await resetPassword(payload).unwrap();
-
-      let isErrorAlert = false;
-      if (hasErrorsInData(data)) {
-        setFormState((state) => ({
-          ...state,
-          status: 'error'
-        }));
-
-        const traceError = getErrorsInData(data);
-        isErrorAlert = true;
-        handleAlertOpen({ message: traceError, alertType: 'error' });
-      } else {
-        handleAlertOpen({ message: 'Email sent', alertType: 'success' });
-
-        const title = 'Reset Password Link Sent!';
-        const description = `We have sent a confirmation email to <strong>${email}</strong>. Please click on the link to continue.`;
-
-        setFormState((state) => ({
-          ...state,
-          status: 'success',
-          title: title,
-          description: description
-        }));
-      }
-    } catch (error) {
-      setFormState((state) => ({
-        ...state,
-        status: 'error'
-      }));
-      const errors = getErrorsInErrorObject(error);
-      const { message = 'unknown' } = errors || {};
-
-      handleAlertOpen({ message: message, alertType: 'error' });
-    }
+    await queryHandler({ query: resetPassword, payload: payload, successCb, errorCb });
   };
 
   /**

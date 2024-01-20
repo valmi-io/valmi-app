@@ -34,9 +34,13 @@ export const convertDurationToMinutesOrHours = (milliseconds) => {
   return minutes + ' ' + capitalizeFirstLetter(MIN) + (minutes > 1 ? 's' : '');
 };
 
-export const convertUTCDateToLocalDate = (date) => {
+export const convertUTCDateToLocalDate = (date, offset = true) => {
   const newDate = new Date(date);
-  newDate.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+  if (offset) {
+    newDate.setMinutes(newDate.getMinutes() - newDate.getTimezoneOffset());
+  }
+
   return newDate;
 };
 
@@ -130,8 +134,8 @@ export const copy = (val) => {
   navigator.clipboard.writeText(JSON.stringify(val, null, 4));
 };
 
-export const getFormattedUTC = (date: any) => {
-  const timestamp = convertUTCDateToLocalDate(new Date(date));
+export const getFormattedUTC = (date: any, offset = true) => {
+  const timestamp = convertUTCDateToLocalDate(new Date(date), offset);
 
   const timestampDisplay =
     timestamp.toDateString() +

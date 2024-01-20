@@ -17,10 +17,12 @@ import appIcons from '@/utils/icon-utils';
 import { CustomizedTableRow, LogMessage } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
 import { Chip, TableCell, Typography, styled } from '@mui/material';
 import { getFormattedUTC } from '@/utils/lib';
+import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 
 interface IBulkerEventsTableProps {
   data: TData;
   onRowClick: ({ data }: { data: any }) => void;
+  isFetching?: boolean;
 }
 
 const columns: TableColumnProps[] = [
@@ -57,47 +59,50 @@ export const StyledChip = styled(Chip)(({ theme }) => ({
   borderRadius: 4
 }));
 
-const BulkerEventsTable = ({ data, onRowClick }: IBulkerEventsTableProps) => {
+const BulkerEventsTable = ({ data, onRowClick, isFetching = true }: IBulkerEventsTableProps) => {
   return (
-    <TableContainer>
-      <Table>
-        {/* Live events Columns */}
-        <TableHead>
-          <TableHeader columns={columns} />
-        </TableHead>
-        {/* Live events Body */}
-        <TableBody>
-          {(data.ids as string[]).map((id) => {
-            const item = data.entities[id];
-            const timestamp = item.date;
-            const message = JSON.stringify(item);
+    <>
+      <TableContainer>
+        <Table>
+          {/* Live events Columns */}
+          <TableHead>
+            <TableHeader columns={columns} />
+          </TableHead>
+          {/* Live events Body */}
+          <TableBody>
+            {(data.ids as string[]).map((id) => {
+              const item = data.entities[id];
+              const timestamp = item.date;
+              const message = JSON.stringify(item);
 
-            const { content = {} } = item ?? {};
+              const { content = {} } = item ?? {};
 
-            const { status = '', representation: { name: tableName = '' } = {} } = content;
+              const { status = '', representation: { name: tableName = '' } = {} } = content;
 
-            return (
-              <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${id}`}>
-                <TableCell>
-                  <Typography variant="subtitle1">{getFormattedUTC(timestamp)}</Typography>
-                </TableCell>
-                <TableCell>
-                  <StyledChip color={'secondary'} label={status} />
-                </TableCell>
+              return (
+                <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${id}`}>
+                  <TableCell>
+                    <Typography variant="subtitle1">{getFormattedUTC(timestamp, false)}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <StyledChip color={'secondary'} label={status} />
+                  </TableCell>
 
-                <TableCell>
-                  <Typography variant="subtitle1">{tableName}</Typography>
-                </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle1">{tableName}</Typography>
+                  </TableCell>
 
-                <TableCell>
-                  <LogMessage variant="subtitle1">{message}</LogMessage>
-                </TableCell>
-              </CustomizedTableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                  <TableCell>
+                    <LogMessage variant="subtitle1">{message}</LogMessage>
+                  </TableCell>
+                </CustomizedTableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <EventsFooter isFetching={isFetching} />
+    </>
   );
 };
 

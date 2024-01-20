@@ -17,10 +17,12 @@ import appIcons from '@/utils/icon-utils';
 import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
 import { Chip, TableCell, Typography, styled, useTheme } from '@mui/material';
 import { getFormattedUTC } from '@/utils/lib';
+import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 
 interface IIncomingEventsTableProps {
   data: TData;
   onRowClick: ({ data }: { data: any }) => void;
+  isFetching?: boolean;
 }
 
 const columns: TableColumnProps[] = [
@@ -58,58 +60,61 @@ export const StyledChip = styled(Chip)(({ theme }) => ({
   backgroundColor: '#B497FF'
 }));
 
-const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) => {
+const IncomingEventsTable = ({ data, onRowClick, isFetching = false }: IIncomingEventsTableProps) => {
   const theme = useTheme();
   return (
-    <TableContainer>
-      <Table>
-        {/* Live events Columns */}
-        <TableHead>
-          <TableHeader columns={columns} />
-        </TableHead>
-        {/* Live events Body */}
-        <TableBody>
-          {(data.ids as string[]).map((id) => {
-            const item = data.entities[id];
+    <>
+      <TableContainer>
+        <Table>
+          {/* Live events Columns */}
+          <TableHead>
+            <TableHeader columns={columns} />
+          </TableHead>
+          {/* Live events Body */}
+          <TableBody>
+            {(data.ids as string[]).map((id) => {
+              const item = data.entities[id];
 
-            const timestamp = item.date;
-            const message = JSON.stringify(item);
+              const timestamp = item.date;
+              const message = JSON.stringify(item);
 
-            const body = JSON.parse(item.content?.body || {});
+              const body = JSON.parse(item.content?.body || {});
 
-            const { httpPayload = {} } = body ?? {};
+              const { httpPayload = {} } = body ?? {};
 
-            const { context = {} } = httpPayload;
+              const { context = {} } = httpPayload;
 
-            const { page: { host = '' } = {} } = context;
+              const { page: { host = '' } = {} } = context;
 
-            const email = context?.traits?.email || httpPayload?.traits?.email;
+              const email = context?.traits?.email || httpPayload?.traits?.email;
 
-            const type = httpPayload?.type;
+              const type = httpPayload?.type;
 
-            return (
-              <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${id}`}>
-                <TableCell>
-                  <Typography variant="subtitle1">{getFormattedUTC(timestamp)}</Typography>
-                </TableCell>
+              return (
+                <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${id}`}>
+                  <TableCell>
+                    <Typography variant="subtitle1">{getFormattedUTC(timestamp, false)}</Typography>
+                  </TableCell>
 
-                <TableCell>
-                  <StyledChip size="small" label={type} style={{ backgroundColor: theme.colors.secondary.main }} />
-                </TableCell>
+                  <TableCell>
+                    <StyledChip size="small" label={type} style={{ backgroundColor: theme.colors.secondary.main }} />
+                  </TableCell>
 
-                <TableCell>
-                  <StyledChip size="small" label={host} />
-                </TableCell>
+                  <TableCell>
+                    <StyledChip size="small" label={host} />
+                  </TableCell>
 
-                <TableCell>
-                  <Typography variant="subtitle1">{email}</Typography>
-                </TableCell>
-              </CustomizedTableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                  <TableCell>
+                    <Typography variant="subtitle1">{email}</Typography>
+                  </TableCell>
+                </CustomizedTableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <EventsFooter isFetching={isFetching} />
+    </>
   );
 };
 
