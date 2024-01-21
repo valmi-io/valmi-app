@@ -22,7 +22,6 @@ import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 interface IBulkerEventsTableProps {
   data: TData;
   onRowClick: ({ data }: { data: any }) => void;
-  isFetching?: boolean;
 }
 
 const columns: TableColumnProps[] = [
@@ -59,7 +58,7 @@ export const StyledChip = styled(Chip)(({ theme }) => ({
   borderRadius: 4
 }));
 
-const BulkerEventsTable = ({ data, onRowClick, isFetching = true }: IBulkerEventsTableProps) => {
+const BulkerEventsTable = ({ data, onRowClick }: IBulkerEventsTableProps) => {
   return (
     <>
       <TableContainer>
@@ -101,7 +100,6 @@ const BulkerEventsTable = ({ data, onRowClick, isFetching = true }: IBulkerEvent
           </TableBody>
         </Table>
       </TableContainer>
-      <EventsFooter isFetching={isFetching} />
     </>
   );
 };

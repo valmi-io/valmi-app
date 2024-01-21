@@ -27,6 +27,7 @@ import { AppState } from '@/store/store';
 import Modal from '@/components/Modal';
 import IncomingEventsTable from '@/content/Events/LiveEvents/IncomingEventsTable';
 import BulkerEventsTable from '@/content/Events/LiveEvents/BulkerEventsTable';
+import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 
 const LiveEventsPageLayout = () => {
   // Get type from router
@@ -72,21 +73,17 @@ const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id:
       return <ListEmptyComponent description={'No data.'} />;
     } else if (type === 'incoming.all') {
       return (
-        <IncomingEventsTable
-          key={`incomingEventsTable-${id}`}
-          data={data}
-          onRowClick={handleRowOnClick}
-          isFetching={isFetching}
-        />
+        <>
+          <IncomingEventsTable key={`incomingEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />
+          <EventsFooter isFetching={isFetching} />
+        </>
       );
     } else if (type === 'bulker_batch.all') {
       return (
-        <BulkerEventsTable
-          key={`bulkerEventsTable-${id}`}
-          data={data}
-          onRowClick={handleRowOnClick}
-          isFetching={isFetching}
-        />
+        <>
+          <BulkerEventsTable key={`bulkerEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />
+          <EventsFooter isFetching={isFetching} />
+        </>
       );
     }
     return null;

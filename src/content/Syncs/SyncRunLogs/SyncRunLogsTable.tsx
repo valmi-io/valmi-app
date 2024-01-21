@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useState } from 'react';
+import { memo } from 'react';
 
 import {
   Table,
@@ -24,11 +24,9 @@ import {
   syncRunLogColumns
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
-import Modal from '@/components/Modal';
-
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 import TableHeader from '@components/Table/TableHeader';
-import { copy } from '@/utils/lib';
+import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 
 export const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {
@@ -48,28 +46,13 @@ export const LogMessage = styled(Typography)(({}) => ({
   textOverflow: 'ellipsis'
 }));
 
-const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
-  const [selectedRowData, setSelectedRowData] = useState<unknown>(null);
-  const [isDialogOpen, setDialogOpen] = useState(false);
-
-  const [copied, setCopied] = useState(false);
-
-  const handleRowOnClick = (rowData: any) => {
-    //@ts-ignore
-    setSelectedRowData(rowData, null, 2);
-    setCopied(false);
-    setDialogOpen(true);
+const SyncRunLogsTable = ({ data, onRowClick }: SyncRunLogsTableProps) => {
+  const getTimestamp = (log: any) => {
+    return log[0];
   };
 
-  const handleCopyToClipboard = () => {
-    if (selectedRowData) {
-      setCopied(true);
-      copy(selectedRowData);
-    }
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const getMessage = (log: any) => {
+    return log[1];
   };
 
   return (
@@ -82,38 +65,28 @@ const SyncRunLogsTable = ({ syncRunLogs }: SyncRunLogsTableProps) => {
           </TableHead>
           {/* Logs Table Body */}
           <TableBody>
-            {syncRunLogs &&
-              syncRunLogs.length > 0 &&
-              syncRunLogs.map((runLog: any, index: any) => {
+            {data.ids.map((id: any) => {
+              const item = data.entities[id];
+
+              return item.logs?.map((log: any, index: string) => {
                 return (
-                  <CustomizedTableRow onClick={() => handleRowOnClick(runLog)} hover key={`log_key ${index}`}>
+                  <CustomizedTableRow key={`log_key ${index}`} onClick={() => onRowClick({ data: log })} hover>
                     <TableCell>
-                      <Typography variant="subtitle1">{getMessageTimestamp(runLog.timestamp)}</Typography>
+                      <Typography variant="subtitle1">{getMessageTimestamp(getTimestamp(log))}</Typography>
                     </TableCell>
 
                     <TableCell>
-                      <LogMessage variant="subtitle1">{runLog.message}</LogMessage>
+                      <LogMessage variant="subtitle1">{getMessage(log)}</LogMessage>
                     </TableCell>
                   </CustomizedTableRow>
                 );
-              })}
+              });
+            })}
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Modal
-        title="Run Details"
-        open={isDialogOpen}
-        onClose={handleCloseDialog}
-        handleCopy={handleCopyToClipboard}
-        data={selectedRowData}
-        copy={true}
-        isCopied={copied}
-      >
-        <></>
-      </Modal>
     </>
   );
 };
 
-export default SyncRunLogsTable;
+export default memo(SyncRunLogsTable);

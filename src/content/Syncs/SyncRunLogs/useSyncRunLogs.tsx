@@ -36,8 +36,7 @@ export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
   const [payload, setPayload] = useState<any>(null);
 
   // Sync run logs query
-  const [getSyncRunLogs, { data, isError, error }] =
-    useLazyGetSyncRunLogsByIdQuery();
+  const [getSyncRunLogs, { data, isError, error, isLoading, isFetching }] = useLazyGetSyncRunLogsByIdQuery();
 
   // This useEffect will fetch logs when the router is ready and the dependencies change.
   useEffect(() => {
@@ -48,6 +47,7 @@ export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
       since: since,
       props: logProps
     });
+
     getSyncRunLogs(payload ?? initialPayload);
 
     // fetchLogs({ since: since, props: logProps });
@@ -67,5 +67,5 @@ export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
     sendErrorToBugsnag(traceError || error);
   }
 
-  return { data, traceError, error, fetchLogs };
+  return { data, traceError, isLoading, isFetching, error, fetchLogs };
 };

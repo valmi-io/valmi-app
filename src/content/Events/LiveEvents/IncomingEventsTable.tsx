@@ -22,7 +22,6 @@ import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 interface IIncomingEventsTableProps {
   data: TData;
   onRowClick: ({ data }: { data: any }) => void;
-  isFetching?: boolean;
 }
 
 const columns: TableColumnProps[] = [
@@ -60,7 +59,7 @@ export const StyledChip = styled(Chip)(({ theme }) => ({
   backgroundColor: '#B497FF'
 }));
 
-const IncomingEventsTable = ({ data, onRowClick, isFetching = false }: IIncomingEventsTableProps) => {
+const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) => {
   const theme = useTheme();
   return (
     <>
@@ -113,7 +112,7 @@ const IncomingEventsTable = ({ data, onRowClick, isFetching = false }: IIncoming
           </TableBody>
         </Table>
       </TableContainer>
-      <EventsFooter isFetching={isFetching} />
+      {/* <EventsFooter isFetching={isFetching} /> */}
     </>
   );
 };

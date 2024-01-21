@@ -172,7 +172,9 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         return tags;
       }
     })
-  })
+  }),
+  //@ts-ignore
+  overrideExisting: module.hot?.status() === 'apply'
 });
 
 export const {

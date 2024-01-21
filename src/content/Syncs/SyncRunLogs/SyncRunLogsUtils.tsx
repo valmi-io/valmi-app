@@ -4,6 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { TData } from '@/utils/typings.d';
 import appIcons from '@utils/icon-utils';
 import { TABLE_COLUMN_SIZES, TableColumnProps } from '@utils/table-utils';
 
@@ -32,7 +33,8 @@ export type LogPayload = {
 };
 
 export type SyncRunLogsTableProps = {
-  syncRunLogs: any;
+  data: TData;
+  onRowClick: ({ data }: { data: any }) => void;
 };
 
 /**
