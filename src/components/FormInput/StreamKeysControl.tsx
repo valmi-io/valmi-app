@@ -24,11 +24,11 @@ const generateKey = () => {
 };
 
 const StreamKeysControl = (props: ControlProps) => {
-  let { data, handleChange, path, label } = props;
+  let { data = [], handleChange, path = '', label = '' } = props;
 
   const [itemId, setItemId] = useState<string>('');
 
-  const isEmpty = data.length === 0;
+  const isEmpty = data?.length === 0;
 
   const handleCopyToClipboard = (str: string, itemId: string) => {
     setItemId(itemId);

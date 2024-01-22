@@ -13,11 +13,14 @@ import Paper from '@mui/material/Paper';
 import { ConnectorModel } from '@content/Connections/ConnectionModel';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
+import { EventSourceType } from '@/constants/extDestinations';
 
 interface ConnectorCardProps {
-  item: ConnectorModel;
-  handleConnectorOnClick: (data: ConnectorModel) => void;
-  selectedConnectorType: string;
+  item: ConnectorModel | EventSourceType;
+  handleConnectorOnClick: (data: any) => void;
+  selected?: boolean;
+  src: string;
+  displayName: string;
 }
 
 export const ConnectorItem = styled(Paper)(({ theme }) => ({
@@ -33,29 +36,26 @@ export const ConnectorItem = styled(Paper)(({ theme }) => ({
   textAlign: 'center'
 }));
 
-const ConnectorCard = ({ item, handleConnectorOnClick, selectedConnectorType }: ConnectorCardProps) => {
-  const connectorType = item.type.split('_').slice(1).join('_');
-
+const ConnectorCard = ({
+  item,
+  handleConnectorOnClick,
+  selected = false,
+  src = '',
+  displayName = ''
+}: ConnectorCardProps) => {
   return (
-    <Grid item xs={2} sm={4} md={4}>
+    <Grid item xs={'auto'} sm={4} md={4}>
       <Paper sx={{ borderRadius: 2, mx: 10 }} variant="outlined">
         <ConnectorItem
           sx={{
             borderRadius: 2,
-            backgroundColor: (theme) =>
-              selectedConnectorType === item.type ? theme.colors.primary.main : darken(theme.colors.alpha.white[5], 1),
-            color: (theme) =>
-              selectedConnectorType === item.type ? theme.palette.success.contrastText : theme.palette.text.secondary
+            backgroundColor: (theme) => (selected ? theme.colors.primary.main : darken(theme.colors.alpha.white[5], 1)),
+            color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary)
           }}
           onClick={() => handleConnectorOnClick(item)}
         >
-          <ImageComponent
-            src={`/connectors/${connectorType.toLowerCase()}.svg`}
-            alt="connector"
-            size={ImageSize.large}
-            style={{ marginBottom: '14px' }}
-          />
-          {item.display_name}
+          <ImageComponent src={src} alt="connector" size={ImageSize.large} style={{ marginBottom: '14px' }} />
+          {displayName}
         </ConnectorItem>
       </Paper>
     </Grid>

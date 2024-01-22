@@ -26,15 +26,9 @@ interface ConnectorListProps {
 const ConnectorsList = ({ data }: ConnectorListProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
-  const {
-    selected_connector = null,
-    steps = 0,
-    currentStep = 0
-  } = connection_flow.flowState;
+  const { selected_connector = null, steps = 0, currentStep = 0 } = connection_flow.flowState;
 
   useEffect(() => {
     // initialize connector selection state
@@ -58,21 +52,25 @@ const ConnectorsList = ({ data }: ConnectorListProps) => {
 
   return (
     <>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 2 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
-      >
+      <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
         {/* connectors */}
         {data.map((item) => {
+          const connectorType = item.type.split('_').slice(1).join('_');
+          let selected = false;
+          if (selected_connector) {
+            selected = selected_connector.type === item.type ? true : false;
+          }
+          const displayName = item.display_name;
+          const src = `/connectors/${connectorType.toLowerCase()}.svg`;
+
           return (
             <ConnectorCard
               key={item.type}
               item={item}
               handleConnectorOnClick={handleConnectorOnClick}
-              selectedConnectorType={
-                selected_connector ? selected_connector.type : ''
-              }
+              selected={selected}
+              src={src}
+              displayName={displayName}
             />
           );
         })}

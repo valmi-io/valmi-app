@@ -1,19 +1,34 @@
-export const extDestinations = {
+export interface EventSourceType {
+  display_name: string;
+  type: string;
+  icon: string;
+}
+
+type Destinations = {
+  postgres: EventSourceType;
+  snowflake: EventSourceType;
+};
+
+type Streams = {
+  browser: EventSourceType;
+};
+
+export const extDestinations: Destinations = {
   postgres: {
-    name: 'Postgres',
+    display_name: 'Postgres',
     type: 'postgres',
     icon: 'postgres'
   },
   snowflake: {
-    name: 'Snowflake',
+    display_name: 'Snowflake',
     type: 'snowflake',
     icon: 'snowflake'
   }
 };
 
-export const extStreams = {
+export const extStreams: Streams = {
   browser: {
-    name: 'Browser',
+    display_name: 'Browser',
     type: 'browser',
     icon: 'browser'
   }

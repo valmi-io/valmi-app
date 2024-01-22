@@ -13,10 +13,10 @@ interface layoutProps {
   layoutStyles?: CSSProperties;
 }
 
-const ConnectorLayout = ({ title, children, layoutStyles }: layoutProps) => {
+const ConnectorLayout = ({ title = '', children, layoutStyles }: layoutProps) => {
   return (
     <Box sx={{ width: '100%' }}>
-      <CardHeader title={title} />
+      {title ? <CardHeader title={title} /> : null}
       {/* <Divider /> */}
       <Box sx={{ m: 1 }} style={layoutStyles}>
         {/* Content */}

@@ -4,63 +4,81 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { Grid, Paper, darken } from '@mui/material';
-import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import { extDestinations } from '@/constants/extDestinations';
+import { Box, Grid, Paper, useTheme } from '@mui/material';
+import { EventSourceType, extDestinations } from '@/constants/extDestinations';
 import { getBaseRoute } from '@/utils/lib';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
-import { ConnectorItem } from '@/content/ConnectionFlow/Connectors/ConnectorCard';
+import ConnectorCard from '@/content/ConnectionFlow/Connectors/ConnectorCard';
+import SubmitButton from '@/components/SubmitButton';
 
 const CreateWarehousePage = () => {
+  const theme = useTheme();
   const router = useRouter();
 
   const { wid } = router.query;
 
-  const handleItemOnClick = (type: string) => {
-    router.push(`${getBaseRoute(wid as string)}/destination-warehouses/create/${type}`);
+  const [selectedType, setSelectedType] = useState<string>('');
+
+  const handleItemOnClick = ({ type }: EventSourceType) => {
+    setSelectedType(type);
+  };
+
+  const onSubmitClick = () => {
+    router.push(`${getBaseRoute(wid as string)}/destination-warehouses/create/${selectedType}`);
   };
 
   return (
-    <PageLayout pageHeadTitle={'Create Destination'} title={'Create a new destination'} displayButton={false}>
-      <ConnectorLayout title={''}>
-        {/** Display page content */}
-        <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-          {
-            // Loop over extDestinations and display the icon
-            Object.entries(extDestinations).map(([key, extDestination]) => {
-              const { name, type, icon } = extDestination;
-              return (
-                <Grid key={key} item xs={2} sm={4} md={4}>
-                  <Paper sx={{ borderRadius: 2, mx: 10 }} variant="outlined">
-                    <ConnectorItem
-                      sx={{
-                        borderRadius: 2,
-                        backgroundColor: (theme) => darken(theme.colors.alpha.white[5], 1),
-                        color: (theme) => theme.palette.text.secondary
-                      }}
-                      onClick={() => handleItemOnClick(type)}
-                    >
-                      <ImageComponent
-                        src={`/connectors/${icon}.svg`}
-                        alt="connector"
-                        size={ImageSize.large}
-                        style={{ marginBottom: '14px' }}
-                      />
-                      {name}
-                    </ConnectorItem>
-                  </Paper>
-                </Grid>
-              );
-            })
-          }
-        </Grid>
-      </ConnectorLayout>
+    <PageLayout pageHeadTitle={'Select warehouse'} title={'Select warehouse'} displayButton={false}>
+      <Paper variant="outlined">
+        <ConnectorLayout title={''} layoutStyles={{ margin: theme.spacing(3) }}>
+          {/** Display page content */}
+          <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+            {
+              // Loop over extDestinations and display the icon
+              Object.entries(extDestinations).map(([key, extDestination]) => {
+                const { display_name, type, icon }: EventSourceType = extDestination;
+                let selected = selectedType === type ? true : false;
+
+                const displayName = display_name;
+                const src = `/connectors/${icon}.svg`;
+
+                return (
+                  <ConnectorCard
+                    key={type}
+                    item={extDestination}
+                    handleConnectorOnClick={handleItemOnClick}
+                    selected={selected}
+                    src={src}
+                    displayName={displayName}
+                  />
+                );
+              })
+            }
+          </Grid>
+        </ConnectorLayout>
+        <Box
+          sx={{
+            margin: (theme) => theme.spacing(2),
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-end'
+          }}
+        >
+          <SubmitButton
+            buttonText={'Next'}
+            data={null}
+            isFetching={false}
+            disabled={!selectedType}
+            onClick={onSubmitClick}
+          />
+        </Box>
+      </Paper>
     </PageLayout>
   );
 };

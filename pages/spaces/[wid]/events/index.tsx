@@ -26,7 +26,7 @@ import { RootState } from '@store/reducers';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetDestinationsQuery, useGetLinksQuery, useGetStreamsQuery } from '@/store/api/streamApiSlice';
-import { connectorTypes, getBaseRoute, isDataEmpty } from '@/utils/lib';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
 import Image from 'next/image';
 
@@ -198,7 +198,27 @@ const EventsPage: NextPageWithLayout = () => {
 
   const PageContent = () => {
     if (isDataEmpty(links)) {
-      return <ListEmptyComponent description={'No events found in this workspace'} />;
+      let description = '';
+
+      let connectionType = '';
+
+      if (!streams || streams.ids?.length === 0) {
+        description = 'Create your first stream';
+        connectionType = 'STREAM';
+      } else if (!destinations || destinations.ids?.length === 0) {
+        connectionType = 'DESTINATION';
+        description = 'Create your first warehouse';
+      }
+
+      const handleOnClick = () => {
+        if (connectionType === 'STREAM') {
+          router.push(`${getBaseRoute(workspaceId)}/streams`);
+        } else if (connectionType === 'DESTINATION') {
+          router.push(`${getBaseRoute(workspaceId)}/destination-warehouses`);
+        }
+      };
+
+      return <ListEmptyComponent description={description} onClick={handleOnClick} buttonTitle={connectionType} />;
     }
 
     return (
@@ -312,7 +332,7 @@ const EventsPage: NextPageWithLayout = () => {
         displayComponent={!eventState.error && !eventState.isLoading && links}
         isLoading={eventState.isLoading}
         traceError={streamsTraceError || destinationsTraceError || linksTraceError}
-        cardVariant={false}
+        cardVariant={links?.ids?.length <= 0 ? true : false}
       />
     </PageLayout>
   );

@@ -53,7 +53,7 @@ const CreateStream = () => {
     id: generateUUID(),
     type: 'stream',
     workspaceId: workspaceId,
-    name: '',
+    name: null,
     domains: [],
     authorizedJavaScriptDomains: '',
     publicKeys: [],
@@ -133,7 +133,7 @@ const CreateStream = () => {
   };
 
   const handleNavigationOnSuccess = () => {
-    router.back();
+    router.push(`/spaces/${workspaceId}/streams`);
   };
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
@@ -164,7 +164,7 @@ const CreateStream = () => {
 
   const PageContent = () => {
     return (
-      <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
+      <ConnectorLayout title={''}>
         {/** Display Content */}
         <FormLayout
           formComp={

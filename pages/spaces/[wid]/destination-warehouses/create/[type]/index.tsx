@@ -178,7 +178,7 @@ const CreateDestination = ({ type }: any) => {
 
   const PageContent = () => {
     return (
-      <ConnectorLayout title={''} layoutStyles={{ marginTop: 0 }}>
+      <ConnectorLayout title={''}>
         {/** Display Content */}
         <FormLayout
           formComp={
