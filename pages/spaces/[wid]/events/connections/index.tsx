@@ -104,7 +104,21 @@ const EventConnectionsPage: NextPageWithLayout = () => {
   };
 
   const handleLiveEventsClick = ({ id = '' }) => {
-    router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${id}&type=bulker_batch.all`);
+    const queryArgs = {
+      activeView: 'bulker_batch.all',
+      viewState: {
+        bulker: {
+          actorId: id as string
+        }
+      }
+    };
+
+    router.push({
+      pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
+      query: { query: JSON.stringify(queryArgs) }
+    });
+
+    // router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${id}&type=bulker_batch.all`);
   };
 
   const PageContent = () => {

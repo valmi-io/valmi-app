@@ -17,49 +17,51 @@ import { materialRenderers } from '@jsonforms/material-renderers';
 const apiKeys = ['publicKeys', 'privateKeys'];
 
 type CustomRenderersProps = {
-  invisibleFields: string[];
+  invisibleFields?: string[];
 };
 
-export const getCustomRenderers = ({ invisibleFields }: CustomRenderersProps) => {
-  return [
+export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProps) => {
+  const renderers = [
     ...materialRenderers,
     {
       tester: rankWith(
-        4000, //increase rank as needed
+        4000, // Increase rank as needed
         (uiSchema, schema, context) => customControlTester(uiSchema, schema, context, apiKeys)
       ),
       renderer: StreamKeysControl
     },
-
-    isArray(invisibleFields) &&
-      invisibleFields.length && {
-        tester: rankWith(
-          3000, //increase rank as needed
-          (uiSchema, schema, context) => customControlTester(uiSchema, schema, context, invisibleFields)
-        ),
-        renderer: FormEmptyControl
-      },
-
     {
       tester: rankWith(
-        2000, //increase rank as needed
+        2000, // Increase rank as needed
         inputControlTester
       ),
       renderer: FormInputControl
     },
     {
       tester: rankWith(
-        2000, //increase rank as needed
+        2000, // Increase rank as needed
         dropdownControlTester
       ),
       renderer: FormSelectControl
     },
     {
       tester: rankWith(
-        3000, //increase rank as needed
+        3000, // Increase rank as needed
         arrayControlTester
       ),
       renderer: FormArrayControl
     }
   ];
+
+  if (isArray(invisibleFields) && invisibleFields.length > 0) {
+    renderers.push({
+      tester: rankWith(
+        3000, // Increase rank as needed
+        (uiSchema, schema, context) => customControlTester(uiSchema, schema, context, invisibleFields)
+      ),
+      renderer: FormEmptyControl
+    });
+  }
+
+  return renderers;
 };

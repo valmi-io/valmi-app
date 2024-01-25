@@ -70,9 +70,8 @@ const EventsPage: NextPageWithLayout = () => {
     error: linksError
   } = useFetch({ query: useGetLinksQuery(workspaceId) });
 
-  const [eventState, setEventState] = useState<{ isLoading: boolean; traceError: any; error: any }>({
+  const [eventState, setEventState] = useState<{ isLoading: boolean; error: any }>({
     isLoading: false,
-    traceError: null,
     error: null
   });
 
@@ -100,15 +99,6 @@ const EventsPage: NextPageWithLayout = () => {
       }));
     }
   }, [streamsError, destinationsError, linksError]);
-
-  useEffect(() => {
-    if (streamsTraceError || destinationsTraceError || linksTraceError) {
-      setEventState((eventState) => ({
-        ...eventState,
-        traceError: streamsTraceError || destinationsTraceError || linksTraceError
-      }));
-    }
-  }, [streamsTraceError, destinationsTraceError, linksTraceError]);
 
   const linkConnections = ({ links, streams, destinations }: { links: any; streams: any; destinations: any }) => {
     return getLines().map((line, idx) => (

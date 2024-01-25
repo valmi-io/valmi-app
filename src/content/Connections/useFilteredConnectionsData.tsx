@@ -21,14 +21,12 @@ const getConnectorConfig = (connector: any) => {
   return config;
 };
 
-export const useFilteredConnectionsData = (
-  workspaceId: string,
-  connectionType: string
-) => {
+export const useFilteredConnectionsData = (workspaceId: string, connectionType: string) => {
   const {
     data: connectionsData,
     connectionsError,
     isFetching,
+    isLoading,
     traceError
   } = useConnectionsData(workspaceId);
 
@@ -38,11 +36,11 @@ export const useFilteredConnectionsData = (
     const filteredConnections = connectionsData
       .filter((connector: any) => {
         const connectorType = connector.connector_type.split('_')[0];
-        return connectionType === connectorType;
+        return connectionType ? connectionType === connectorType : true;
       })
       .map(getConnectorConfig);
     return filteredConnections;
   }, [connectionsData]);
 
-  return { filteredConnectionsData, connectionsError, isFetching, traceError };
+  return { filteredConnectionsData, connectionsError, isLoading, isFetching, traceError };
 };

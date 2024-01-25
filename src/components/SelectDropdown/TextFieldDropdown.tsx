@@ -15,15 +15,18 @@ type TextFieldDropdownProps = {
   value: any;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   primaryKey: string;
+  valueKey?: string;
   data?: any[];
   dataNormalized?: {
     ids: string[];
     entities: any;
   };
+  styles?: React.CSSProperties;
 };
 
 const TextFieldDropdown = ({
   primaryKey = '',
+  valueKey = '',
   data = [],
   dataNormalized,
   label = '',
@@ -31,7 +34,8 @@ const TextFieldDropdown = ({
   fullWidth,
   disabled,
   value,
-  onChange
+  onChange,
+  styles = {}
 }: TextFieldDropdownProps) => {
   return (
     <TextField
@@ -46,6 +50,7 @@ const TextFieldDropdown = ({
       InputLabelProps={{
         shrink: true
       }}
+      style={styles}
     >
       {dataNormalized &&
         dataNormalized.ids.map((id) => {
@@ -58,7 +63,7 @@ const TextFieldDropdown = ({
       {!dataNormalized &&
         data.map((item) => {
           return (
-            <MenuItem key={item} value={item}>
+            <MenuItem key={item.id} value={item[valueKey] ? item[valueKey] : item}>
               {item[primaryKey] ?? item}
             </MenuItem>
           );

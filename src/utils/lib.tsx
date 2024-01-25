@@ -145,3 +145,21 @@ export const getFormattedUTC = (date: any, offset = true) => {
     timestamp.getMinutes().toString().padStart(2, '0');
   return timestampDisplay;
 };
+
+export function flattenObjectValuesToArray<T>(obj: Record<string, T[]>): T[] {
+  const result: T[] = [];
+
+  Object.values(obj).forEach((value) => {
+    result.push(...value);
+  });
+
+  return result;
+}
+
+export function findIntersection(arr1: any[], arr2: any[], property: string) {
+  return arr1.filter((item1) => arr2.some((item2) => item1[property] === item2));
+}
+
+export function findUniqueElements(arr1: any[], arr2: any[], property: string) {
+  return arr1.filter((item1) => !arr2.some((item2) => item1[property] === item2));
+}

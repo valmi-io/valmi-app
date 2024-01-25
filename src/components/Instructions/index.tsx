@@ -25,7 +25,7 @@ type InstructionsProps = {
   documentationUrl?: string;
   title?: string;
   linkText?: string;
-  type?: 'connection' | 'sync' | 'stream' | 'destination' | 'track';
+  type?: 'connection' | 'sync' | 'stream' | 'destination' | 'track' | 'oauth';
 };
 
 const Instructions = (props: InstructionsProps) => {

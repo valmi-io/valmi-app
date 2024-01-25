@@ -10,17 +10,15 @@ import TableHead from '@mui/material/TableHead';
 import TableContainer from '@mui/material/TableContainer';
 
 import TableHeader from '@components/Table/TableHeader';
-import { TData } from '@utils/typings.d';
 
 import { TABLE_COLUMN_SIZES, TableColumnProps } from '@/utils/table-utils';
 import appIcons from '@/utils/icon-utils';
 import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
-import { Chip, TableCell, Typography, styled, useTheme } from '@mui/material';
+import { Chip, Paper, TableCell, Typography, styled, useTheme } from '@mui/material';
 import { getFormattedUTC } from '@/utils/lib';
-import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 
 interface IIncomingEventsTableProps {
-  data: TData;
+  data: any;
   onRowClick: ({ data }: { data: any }) => void;
 }
 
@@ -63,16 +61,16 @@ const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) =>
   const theme = useTheme();
   return (
     <>
-      <TableContainer>
-        <Table>
+      <TableContainer component={Paper}>
+        <Table size="small">
           {/* Live events Columns */}
           <TableHead>
             <TableHeader columns={columns} />
           </TableHead>
           {/* Live events Body */}
           <TableBody>
-            {(data.ids as string[]).map((id) => {
-              const item = data.entities[id];
+            {data.map((item: any) => {
+              // const item = data.entities[id];
 
               const timestamp = item.date;
               const message = JSON.stringify(item);
@@ -88,9 +86,8 @@ const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) =>
               const email = context?.traits?.email || httpPayload?.traits?.email;
 
               const type = httpPayload?.type;
-
               return (
-                <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${id}`}>
+                <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${item.id}`}>
                   <TableCell>
                     <Typography variant="subtitle1">{getFormattedUTC(timestamp, false)}</Typography>
                   </TableCell>
@@ -112,7 +109,6 @@ const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) =>
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <EventsFooter isFetching={isFetching} /> */}
     </>
   );
 };

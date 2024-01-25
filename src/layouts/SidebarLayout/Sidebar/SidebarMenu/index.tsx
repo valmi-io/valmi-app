@@ -84,7 +84,7 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
     const connectionRoutes = ['warehouses', 'destinations'];
 
-    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations', 'connections'];
+    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations', 'connections', 'live-events'];
 
     if (!browserSubRoute && browserRoute !== currentRoute && browserRoute !== 'connections') {
       // Handle non-sub-route case

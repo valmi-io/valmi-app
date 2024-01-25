@@ -9,7 +9,7 @@
  * This component represents a page for displaying live events.
  */
 
-import { ReactElement, useState } from 'react';
+import { ReactElement, SyntheticEvent } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -18,96 +18,80 @@ import { useSelector } from 'react-redux';
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { RootState } from '@store/reducers';
-import { useGetLogsQuery } from '@/store/api/streamApiSlice';
-import { useFetch } from '@/hooks/useFetch';
-import ListEmptyComponent from '@/components/ListEmptyComponent';
-import { copy, isDataEmpty } from '@/utils/lib';
-import ContentLayout from '@/layouts/ContentLayout';
+import { getBaseRoute } from '@/utils/lib';
 import { AppState } from '@/store/store';
-import Modal from '@/components/Modal';
-import IncomingEventsTable from '@/content/Events/LiveEvents/IncomingEventsTable';
-import BulkerEventsTable from '@/content/Events/LiveEvents/BulkerEventsTable';
-import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
+import LiveEventTabs, { eventTypes } from '@/content/Events/LiveEvents/LiveEventTabs';
 
 const LiveEventsPageLayout = () => {
   // Get type from router
   const router = useRouter();
-  const { type, id } = router.query;
-  if (!type && !id) return <></>;
-  else return <LiveEventsPage type={type} id={id} />;
+
+  const { query } = router.query;
+  if (!query) return <></>;
+  else return <LiveEventsPage type={''} id={''} query={query} />;
 };
 
-const LiveEventsPage = ({ type, id }: { type: string | string[] | undefined; id: string | string[] | undefined }) => {
+const LiveEventsPage = ({
+  type,
+  id,
+  query
+}: {
+  type: string | string[] | undefined;
+  id: string | string[] | undefined;
+  query: string | string[] | undefined;
+}) => {
+  const router = useRouter();
   const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
-  const { data, isLoading, isFetching, traceError, error } = useFetch({
-    query: useGetLogsQuery({ workspaceId: workspaceId, eventType: type, eventId: id }, { pollingInterval: 5000 })
-  });
+  const handleOnChange = (event: SyntheticEvent, newValue: number) => {
+    const type = eventTypes[newValue];
 
-  const [selectedRowData, setSelectedRowData] = useState<null | string>(null);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+    let queryState = JSON.parse(query as string);
 
-  const [copied, setCopied] = useState(false);
-
-  const handleRowOnClick = ({ data }: any) => {
-    setSelectedRowData(data);
-    setCopied(false);
-    setDialogOpen(true);
-  };
-
-  const handleCopyToClipboard = () => {
-    if (selectedRowData) {
-      setCopied(true);
-      copy(selectedRowData);
-    }
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
-
-  const PageContent = () => {
-    if (isDataEmpty(data)) {
-      return <ListEmptyComponent description={'No data.'} />;
+    if (type === 'bulker_batch.all') {
+      if (!queryState.viewState.bulker) {
+        queryState = {
+          ...queryState,
+          viewState: {
+            ...queryState.viewState,
+            bulker: {
+              actorId: ''
+            }
+          }
+        };
+      }
     } else if (type === 'incoming.all') {
-      return (
-        <>
-          <IncomingEventsTable key={`incomingEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />
-          <EventsFooter isFetching={isFetching} />
-        </>
-      );
-    } else if (type === 'bulker_batch.all') {
-      return (
-        <>
-          <BulkerEventsTable key={`bulkerEventsTable-${id}`} data={data} onRowClick={handleRowOnClick} />
-          <EventsFooter isFetching={isFetching} />
-        </>
-      );
+      if (!queryState.viewState.incoming) {
+        queryState = {
+          ...queryState,
+
+          viewState: {
+            ...queryState.viewState,
+            incoming: {
+              actorId: ''
+            }
+          }
+        };
+      }
     }
-    return null;
+
+    queryState['activeView'] = type;
+
+    router.push(
+      {
+        pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
+        query: { query: JSON.stringify(queryState) }
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   return (
     <PageLayout pageHeadTitle="LiveEvents" title="Live Events" displayButton={false}>
-      <ContentLayout
-        key={`liveEventsPage-${workspaceId}-${type}`}
-        error={error}
-        PageContent={<PageContent />}
-        displayComponent={!error && !isLoading && data}
-        isLoading={isLoading}
-        traceError={traceError}
-      />
-      <Modal
-        title="Event Details"
-        open={isDialogOpen}
-        onClose={handleCloseDialog}
-        handleCopy={handleCopyToClipboard}
-        data={JSON.parse(selectedRowData as string)}
-        copy={true}
-        isCopied={copied}
-      />
+      <LiveEventTabs state={JSON.parse(query as string)} onChange={handleOnChange} />
     </PageLayout>
   );
 };

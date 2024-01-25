@@ -7,6 +7,7 @@
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 import LanguageIcon from '@mui/icons-material/Language';
+import AppsIcon from '@mui/icons-material/Apps';
 
 import {
   faArrowRight,
@@ -26,7 +27,8 @@ import {
   faLink,
   faWater,
   faSliders,
-  faArrowLeft
+  faArrowLeft,
+  faWaveSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -55,6 +57,7 @@ export interface IAppIcons {
   LIVE_EVENTS: IconDefinition;
   ARROW_LEFT: IconDefinition;
   BROWSER: React.ReactElement;
+  APPS: React.ReactElement;
 }
 
 const appIcons: IAppIcons = {
@@ -79,9 +82,10 @@ const appIcons: IAppIcons = {
   ADD: { ...faPlus },
   CONNECTION: { ...faLink },
   STREAM: { ...faWater },
-  LIVE_EVENTS: { ...faSliders },
+  LIVE_EVENTS: { ...faWaveSquare },
   ARROW_LEFT: { ...faArrowLeft },
-  BROWSER: <LanguageIcon />
+  BROWSER: <LanguageIcon />,
+  APPS: <AppsIcon />
 };
 
 export default appIcons;

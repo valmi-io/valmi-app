@@ -17,7 +17,7 @@ import { sendErrorToBugsnag } from '@lib/bugsnag';
 export const useConnectionsData = (workspaceId: string) => {
   const [connectionsError, setConnectionsError] = useState<any>(null);
 
-  const { data, isFetching, isError, error } = useFetchCredentialsQuery(
+  const { data, isFetching, isLoading, isError, error } = useFetchCredentialsQuery(
     {
       workspaceId,
       queryId: 0
@@ -43,6 +43,7 @@ export const useConnectionsData = (workspaceId: string) => {
     data: data ? data?.resultData : [],
     isFetching,
     traceError,
+    isLoading,
     connectionsError
   };
 };

@@ -47,7 +47,20 @@ const StreamsPage: NextPageWithLayout = () => {
   };
 
   const handleLiveEventsClick = ({ streamId = '' }) => {
-    router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${streamId}&type=incoming.all`);
+    const queryArgs = {
+      activeView: 'incoming.all',
+      viewState: {
+        incoming: {
+          actorId: streamId as string
+        }
+      }
+    };
+
+    router.push({
+      pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
+      query: { query: JSON.stringify(queryArgs) }
+    });
+    // router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${streamId}&type=incoming.all`);
   };
 
   const PageContent = () => {

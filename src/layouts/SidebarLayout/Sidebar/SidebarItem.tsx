@@ -6,7 +6,7 @@
 
 import { memo } from 'react';
 
-import { ListItemButton, Typography, styled, useTheme } from '@mui/material';
+import { Icon, ListItemButton, Typography, styled, useTheme } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
@@ -23,11 +23,17 @@ export type TSidebarItemProps = {
 const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   const theme = useTheme();
 
-  return (
-    <ListItemButton onClick={() => onClick(item.path)} className={currentRoute === item.id ? 'active' : ''}>
-      {item.sidebarProps.icon && <CustomIcon icon={item.sidebarProps.icon} style={{ marginRight: theme.spacing(3) }} />}
+  const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
-      <Label variant="h5">{item.sidebarProps.displayText}</Label>
+  return (
+    <ListItemButton onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
+      {icon &&
+        (muiIcon ? (
+          <Icon style={{ marginRight: theme.spacing(3) }}>{icon}</Icon>
+        ) : (
+          <CustomIcon icon={icon} style={{ marginRight: theme.spacing(3) }} />
+        ))}
+      <Label variant="h5">{displayText}</Label>
     </ListItemButton>
   );
 };

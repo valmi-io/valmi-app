@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Created Date: Saturday, January 20th 2024, 4:41:18 pm
+ * Author: Nagendra S @ valmi.io
+ */
+
 import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 import { apiSlice } from '../api/apiSlice';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query';
 
 const streamsAdapter: any = createEntityAdapter();
 const initialState = streamsAdapter.getInitialState();
@@ -159,8 +166,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
 
     // get logs
     getLogs: builder.query({
-      query: ({ workspaceId, eventType, eventId }) =>
-        `/streams/workspaces/${workspaceId}/events/${eventType}/${eventId}/logs`,
+      query: ({ workspaceId, eventType, actorId }) =>
+        `/streams/workspaces/${workspaceId}/events/${eventType}/${actorId}/logs`,
       transformResponse: (responseData) => {
         return logsAdapter.setAll(initialLogsState, responseData);
       },
@@ -170,6 +177,77 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
           : [{ type: 'Log' as const }];
 
         return tags;
+      }
+    }),
+
+    getStreamLogs: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        const { workspaceId, eventType, actorId } = arg;
+        // get list of streams
+        const streams = await baseQuery(`/streams/workspaces/${workspaceId}/config/stream`);
+        if (streams.error) return { error: streams.error as FetchBaseQueryError };
+
+        let newActorId = '';
+
+        //@ts-ignore
+        if (!actorId && streams.data.objects.length > 0) {
+          //@ts-ignore
+          newActorId = streams.data.objects[0].id;
+        }
+
+        let logsQuery = `/streams/workspaces/${workspaceId}/events/${eventType}/${actorId || newActorId}/logs`;
+
+        const logs = await baseQuery(logsQuery);
+
+        if (logs.data) {
+          return {
+            data: {
+              streams: streams.data,
+              logs: logs.data
+            }
+          };
+        }
+        return { error: logs.error as FetchBaseQueryError };
+      }
+    }),
+
+    getConnectionLogs: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        const { workspaceId, actorId, eventType } = arg;
+        // get list of streams
+        const streams = await baseQuery(`/streams/workspaces/${workspaceId}/config/stream`);
+        if (streams.error) return { error: streams.error as FetchBaseQueryError };
+
+        // get list of destinations
+        const destinations = await baseQuery(`/streams/workspaces/${workspaceId}/config/destination`);
+        if (destinations.error) return { error: destinations.error as FetchBaseQueryError };
+
+        // get list of links
+        const links = await baseQuery(`/streams/workspaces/${workspaceId}/config/link`);
+        if (links.error) return { error: links.error as FetchBaseQueryError };
+
+        let newActorId = '';
+
+        //@ts-ignore
+        if (!actorId && links.data.links.length > 0) {
+          //@ts-ignore
+          newActorId = links.data.links[0].id;
+        }
+
+        let logsQuery = `/streams/workspaces/${workspaceId}/events/${eventType}/${actorId || newActorId}/logs`;
+
+        const logs = await baseQuery(logsQuery);
+
+        return logs.data
+          ? {
+              data: {
+                streams: streams.data,
+                destinations: destinations.data,
+                links: links.data,
+                logs: logs.data
+              }
+            }
+          : { error: logs.error };
       }
     })
   }),
@@ -197,7 +275,10 @@ export const {
   useCreateLinkMutation,
   useDeleteLinkMutation,
 
-  useGetLogsQuery
+  useGetLogsQuery,
+
+  useLazyGetConnectionLogsQuery,
+  useLazyGetStreamLogsQuery
 } = extendedApiSlice;
 
 /* Getting selectors from the transformed response */
