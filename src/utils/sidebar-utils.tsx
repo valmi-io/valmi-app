@@ -14,6 +14,7 @@ type TSidebarPropsIn = {
 type TSidebarRouteProps = {
   displayText: string;
   icon: any;
+  muiIcon?: boolean;
 };
 
 export type TSidebarRoute = {
@@ -94,6 +95,15 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       },
       subRoute: true
     }
+    // {
+    //   id: 7,
+    //   path: `/spaces/${workspaceId}/oauth-apps`,
+    //   sidebarProps: {
+    //     displayText: 'CONFIGURE APPS',
+    //     icon: appIcons.APPS,
+    //     muiIcon: true
+    //   }
+    // }
   ].filter(Boolean) as TSidebarRoute[];
 
   return routes;

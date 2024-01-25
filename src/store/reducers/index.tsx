@@ -14,6 +14,7 @@ import { appFlow } from '@store/reducers/appFlow';
 import { streamFlowSlice } from '@store/reducers/streamFlow';
 import { destinationFlowSlice } from '@store/reducers/destinationFlow';
 import { trackFlowSlice } from './trackFlow';
+import { oAuthFlowSlice } from '@/store/reducers/oAuthFlow';
 
 const rootReducer = combineReducers({
   [appFlow.name]: appFlow.reducer,
@@ -21,9 +22,10 @@ const rootReducer = combineReducers({
   [connectionFlow.name]: connectionFlow.reducer,
   [syncFlow.name]: syncFlow.reducer,
   [streamFlowSlice.name]: streamFlowSlice.reducer,
+  [oAuthFlowSlice.name]: oAuthFlowSlice.reducer,
   [destinationFlowSlice.name]: destinationFlowSlice.reducer,
   [trackFlowSlice.name]: trackFlowSlice.reducer,
-  [apiSlice.reducerPath]: apiSlice.reducer,
+  [apiSlice.reducerPath]: apiSlice.reducer
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
