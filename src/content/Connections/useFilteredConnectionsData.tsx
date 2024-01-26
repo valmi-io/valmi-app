@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 /*
- * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
+ * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
  * Created Date: Tuesday, October 17th 2023, 3:34:09 pm
  * Author: Nagendra S @ valmi.io
  */
