@@ -107,9 +107,10 @@ const Modal = (props: PopupProps) => {
                       {isObject(value) ? (
                         <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
                           <Typography variant="subtitle1">{`${key}:`}</Typography>
+
                           <DynamicReactJson
                             name={false}
-                            src={value ?? {}}
+                            src={(value as {}) ?? {}}
                             enableClipboard={false}
                             displayObjectSize={false}
                             displayDataTypes={false}
