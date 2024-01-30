@@ -6,13 +6,29 @@
 
 import * as React from 'react';
 
-import { Box, Button, Divider, Drawer, Icon, Stack, Typography, styled, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  Icon,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  Typography,
+  styled
+} from '@mui/material';
 
 import dynamic from 'next/dynamic';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { blackColor } from '@/theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import appIcons from '@/utils/icon-utils';
+import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
+import { isObject } from '@/utils/lib';
 
 type PopupProps = {
   open: boolean;
@@ -45,8 +61,9 @@ const StackLayout = styled(Stack)(({ theme }) => ({
 }));
 
 const Modal = (props: PopupProps) => {
-  const theme = useTheme();
   const { open, onClose, title, data, children, handleCopy, copy, isCopied } = props;
+
+  const dataEntries = Object.entries(data ?? {});
 
   return (
     <Drawer
@@ -78,14 +95,41 @@ const Modal = (props: PopupProps) => {
       </StackLayout>
       <Divider />
 
-      <DynamicReactJson
-        style={{ padding: theme.spacing(2) }}
-        src={data}
-        enableClipboard={false}
-        displayObjectSize={false}
-        displayDataTypes={false}
-        collapsed={false}
-      />
+      <TableContainer component={Paper}>
+        <Table size="small">
+          {/* Live events Body */}
+          <TableBody>
+            {dataEntries.map(([key, value]) => {
+              return (
+                <CustomizedTableRow key={`log_key ${key}`}>
+                  <TableCell>
+                    <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                      {isObject(value) ? (
+                        <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+                          <Typography variant="subtitle1">{`${key}:`}</Typography>
+                          <DynamicReactJson
+                            name={false}
+                            src={value ?? {}}
+                            enableClipboard={false}
+                            displayObjectSize={false}
+                            displayDataTypes={false}
+                            collapsed={false}
+                          />
+                        </Stack>
+                      ) : (
+                        <>
+                          <Typography variant="subtitle1">{`${key}:`}</Typography>
+                          <Typography sx={{ fontWeight: 500 }} variant="subtitle2">{`${value}`}</Typography>
+                        </>
+                      )}
+                    </Stack>
+                  </TableCell>
+                </CustomizedTableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {children && children}
     </Drawer>

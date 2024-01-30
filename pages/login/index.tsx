@@ -69,6 +69,7 @@ const Login: NextPageWithLayout = () => {
     if (isLoggedIn) {
       router.push('/');
     } else {
+      dispatch({ type: 'RESET_STORE' });
       signOutUser(router);
     }
   }, [isLoggedIn]);

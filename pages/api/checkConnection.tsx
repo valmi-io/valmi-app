@@ -19,7 +19,7 @@ const checkConnection = async (req: NextApiRequest, res: NextApiResponse) => {
   // query
   url = `${getBaseUrl()}${url}`;
 
-  const bearerToken = getAccessTokenCookie(req) || '';
+  const bearerToken = (await getAccessTokenCookie(req)) || '';
 
   try {
     const response = await axios.post(url, payload, {

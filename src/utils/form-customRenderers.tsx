@@ -56,7 +56,7 @@ export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProp
   if (isArray(invisibleFields) && invisibleFields.length > 0) {
     renderers.push({
       tester: rankWith(
-        3000, // Increase rank as needed
+        5000, // Increase rank as needed
         (uiSchema, schema, context) => customControlTester(uiSchema, schema, context, invisibleFields)
       ),
       renderer: FormEmptyControl

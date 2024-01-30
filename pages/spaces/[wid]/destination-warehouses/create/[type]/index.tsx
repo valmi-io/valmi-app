@@ -69,7 +69,7 @@ const CreateDestination = ({ type }: any) => {
     id: generateUUID(),
     type: 'destination',
     workspaceId: workspaceId,
-    name: '',
+    name: undefined,
     destinationType: type //Sorry for the confusion - our type is jitsu destinationType and our supertype is jitsu type
   };
 

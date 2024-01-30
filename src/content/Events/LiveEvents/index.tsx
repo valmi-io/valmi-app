@@ -204,30 +204,22 @@ const LiveEvents = ({
       email: context?.traits?.email || event?.traits?.email,
       userId: event?.userId,
       ingestType: ingestPayload.ingestType,
+      host: context?.page?.host,
       messageId: ingestPayload.messageId,
       originDomain: ingestPayload.origin?.domain || '',
-
       writeKey: ingestPayload.writeKey,
-      httpHeaders: ingestPayload.httpHeaders,
-
+      event: event.event ?? '',
       status: ev.content.status,
       error: ev.content.error,
-
-      ingestPayload: ingestPayload,
-
-      event: event,
-      context: context,
-
-      host: context?.page?.host,
       pageURL: context?.page?.url,
       pagePath: context?.page?.path,
       pageTitle: context?.page?.title,
-
       anonymousId: event?.anonymousId,
-
+      destinations: [...(ev.content.asyncDestinations ?? []), ...(ev.content.tags ?? [])],
       referringDomain: context?.page?.referring_domain,
-
-      destinations: [...(ev.content.asyncDestinations ?? []), ...(ev.content.tags ?? [])]
+      httpHeaders: ingestPayload.httpHeaders,
+      ingestPayload: ingestPayload,
+      context: context
     };
   };
 

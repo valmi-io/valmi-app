@@ -13,11 +13,7 @@ import axios from 'axios';
 import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 
-import {
-  getErrorsInData,
-  getErrorsInErrorObject,
-  hasErrorsInData
-} from '@components/Error/ErrorUtils';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
@@ -27,13 +23,20 @@ const Item = styled(Box)(({}) => ({
   alignItems: 'center'
 }));
 
-const ConnectionTest = () => {
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+type ConnectionTestProps = {
+  handleFormStatus: (isFetching: boolean) => void;
+};
 
-  const { connector_config = {}, selected_connector = null } =
-    connection_flow.flowState;
+type ConnectionTestState = {
+  error: string;
+  status: string;
+  isFetching: boolean;
+};
+
+const ConnectionTest = ({ handleFormStatus }: ConnectionTestProps) => {
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
+
+  const { connector_config = {}, selected_connector = null } = connection_flow.flowState;
 
   const dispatch = useDispatch();
 
@@ -41,9 +44,11 @@ const ConnectionTest = () => {
 
   const { workspaceId = '' } = appState;
 
-  const [connectionErrorMsg, setConnectionErrorMsg] = useState<string>('');
-  const [connectionStatus, setConnectionStatus] = useState<string>('');
-  const [checkingConnection, setCheckingConnection] = useState<boolean>(true);
+  const [connectionTestState, setConnectionTestState] = useState<ConnectionTestState>({
+    error: '',
+    status: '',
+    isFetching: true
+  });
 
   useEffect(() => {
     if (connector_config) {
@@ -51,20 +56,13 @@ const ConnectionTest = () => {
         config: connector_config
       };
       const type = selected_connector ? selected_connector.type : '';
-      checkConnectionConfig(
-        `/workspaces/${workspaceId}/connectors/${type}/check`,
-        'POST',
-        config
-      );
+      checkConnectionConfig(`/workspaces/${workspaceId}/connectors/${type}/check`, 'POST', config);
     }
   }, []);
 
-  const checkConnectionConfig = async (
-    url: string,
-    method: string,
-    data: any
-  ) => {
+  const checkConnectionConfig = async (url: string, method: string, data: any) => {
     try {
+      handleFormStatus(true);
       const response = await axios.post('/api/checkConnection', {
         url,
         method,
@@ -73,14 +71,26 @@ const ConnectionTest = () => {
       const result = response.data;
       if (hasErrorsInData(result)) {
         const error = getErrorsInData(result);
-        setConnectionStatus('FAILED');
-        setConnectionErrorMsg(error);
+
+        setConnectionTestState((state) => ({
+          ...state,
+          status: 'FAILED',
+          error: error
+        }));
       } else {
-        if (result.connectionStatus.status === 'FAILED') {
-          setConnectionStatus(result.connectionStatus.status);
-          setConnectionErrorMsg(result.connectionStatus.message);
+        const { connectionStatus: { status = '', message = '' } = {} } = result ?? {};
+        if (status === 'FAILED') {
+          setConnectionTestState((state) => ({
+            ...state,
+            status: status,
+            error: message
+          }));
         } else {
-          setConnectionStatus(result.connectionStatus.status);
+          setConnectionTestState((state) => ({
+            ...state,
+            status: status
+          }));
+
           dispatch(
             setConnectionFlow({
               ...connection_flow.flowState,
@@ -89,60 +99,62 @@ const ConnectionTest = () => {
           );
         }
       }
-      setCheckingConnection(false);
     } catch (error: any) {
       // Handle any errors that occur during the API request
       const errors = getErrorsInErrorObject(error.response);
 
       const { message = '' } = errors || {};
-      setCheckingConnection(false);
-      setConnectionStatus('FAILED');
-      setConnectionErrorMsg(message);
+
+      setConnectionTestState((state) => ({
+        ...state,
+        status: 'FAILED',
+        error: message
+      }));
+    } finally {
+      handleFormStatus(false);
+      setConnectionTestState((state) => ({
+        ...state,
+        isFetching: false
+      }));
     }
   };
 
-  const checkConnectionStatus = (
-    connectionStatus: any,
-    connectionErrorMsg: string
-  ) => {
-    let connectionMessage;
-    let success;
-    if (connectionStatus === 'FAILED') {
-      connectionMessage = connectionErrorMsg;
-      success = false;
-    } else {
-      connectionMessage = 'Test success';
-      success = true;
+  const PageContent = () => {
+    const { isFetching } = connectionTestState;
+
+    if (isFetching) {
+      return <Loader />;
     }
-
-    return (
-      <Item>
-        {success ? (
-          <CheckOutlined color="primary" sx={{ mx: 1 }} />
-        ) : (
-          <ErrorOutline color="error" sx={{ mx: 1 }} />
-        )}
-        <p>{connectionMessage}</p>
-      </Item>
-    );
-  };
-
-  const diplayConnectionLoading = () => {
-    return (
-      <Item>
-        <CircularProgress size={20} sx={{ mx: 1 }} />
-        <p>Testing connection...</p>
-      </Item>
-    );
+    return <ConnectionTestResult data={connectionTestState} />;
   };
 
   return (
     <>
-      {checkingConnection && diplayConnectionLoading()}
-      {!checkingConnection &&
-        checkConnectionStatus(connectionStatus, connectionErrorMsg)}
+      <PageContent />
     </>
   );
 };
 
 export default ConnectionTest;
+
+const Loader = () => {
+  return (
+    <Item>
+      <CircularProgress size={20} sx={{ mx: 1 }} />
+      <p>Testing connection...</p>
+    </Item>
+  );
+};
+
+const ConnectionTestResult = ({ data: { error, status } }: { data: ConnectionTestState }) => {
+  return (
+    <Item>
+      {status === 'FAILED' ? (
+        <ErrorOutline color="error" sx={{ mx: 1 }} />
+      ) : (
+        <CheckOutlined color="primary" sx={{ mx: 1 }} />
+      )}
+      <p>{status === 'FAILED' ? error : 'Test success'}</p>
+    </Item>
+  );
+};

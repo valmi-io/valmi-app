@@ -17,7 +17,6 @@ import {
   faLocationPin,
   faMessage,
   faPen,
-  faRotate,
   faUpload,
   faUser,
   faChartGantt,
@@ -26,7 +25,7 @@ import {
   faPlus,
   faLink,
   faWater,
-  faSliders,
+  faBolt,
   faArrowLeft,
   faWaveSquare
 } from '@fortawesome/free-solid-svg-icons';
@@ -65,7 +64,7 @@ const appIcons: IAppIcons = {
   DEST: { ...faLocationPin },
   WAREHOUSE: { ...faDatabase },
   DESTINATION: { ...faLocationPin },
-  SYNC: { ...faRotate },
+  SYNC: { ...faBolt },
   STATUS: <ToggleOnIcon />,
   STARTED_AT: { ...faClock },
   NAME: <AbcIcon />,

@@ -8,8 +8,8 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 
 import constants from '@constants/index';
-import { logoutUser, setTokenCookie } from '../../../pages/api/utils';
-import cookie from 'react-cookies';
+import { getCookie, setCookie } from '@/lib/cookies';
+import { signOutUser } from '@/utils/lib';
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -17,7 +17,7 @@ const staggeredBaseQueryWithBailOut = retry(
       baseUrl: constants.urls.API_URL,
       timeout: 60000, // 60 seconds
       prepareHeaders: async (headers, { getState }) => {
-        const accessToken = cookie.load('AUTH')?.accessToken ?? '';
+        const accessToken = (await getCookie('AUTH')?.accessToken) ?? '';
 
         if (accessToken) {
           headers.set('authorization', `Bearer ${accessToken}`);
@@ -127,18 +127,27 @@ export const apiSlice = createApi({
         const accessToken = user.data.auth_token;
 
         /**
-         * Setting http-only cookie
+         * Set accesstoken in cookie
          * */
-        const response = await setTokenCookie(accessToken);
 
-        if (response.status === 200) {
+        const cookieObj = {
+          accessToken
+        };
+
+        const result = await setCookie('AUTH', JSON.stringify(cookieObj), {
+          maxAge: 60 * 60 * 24 * 7, // 1 week
+          // sameSite: 'none',
+          path: '/'
+        });
+
+        if (result.success) {
           const result = await baseQuery('/spaces/');
 
           if (result.error) {
             if (result.error?.data?.detail === 'Unauthorized') {
+              // check if "AUTH" cookie exists
               // destroy auth token
-              const response = await logoutUser();
-              const jsonData = await response.json();
+              signOutUser();
             }
             return { error: result.error };
           }

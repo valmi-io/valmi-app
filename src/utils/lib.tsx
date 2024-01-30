@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { logoutUser } from '@/pagesapi/utils';
+import { setCookie } from '@/lib/cookies';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -80,8 +80,11 @@ export const getConnectorImage = (connectorType) => {
 
 export const signOutUser = async (router) => {
   try {
-    const response = await logoutUser();
-    const jsonData = await response.json();
+    setCookie('AUTH', '', {
+      expires: new Date(0),
+      sameSite: 'strict',
+      path: '/'
+    });
   } catch (err) {
   } finally {
     router.replace('/login');

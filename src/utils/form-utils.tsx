@@ -7,6 +7,7 @@
 
 import FormFieldPassword from '@components/FormInput/FormFieldPasword';
 import FormFieldText from '@components/FormInput/FormFieldText';
+import { createAjv } from '@jsonforms/core';
 import Ajv from 'ajv';
 
 export type FormObject = {
@@ -213,10 +214,7 @@ export const arrayControlTester = (uischema: any, schema: JsonSchema, context: T
 };
 
 export const jsonFormValidator = (schema: any, data: any) => {
-  const ajv = new Ajv({
-    useDefaults: true
-  });
-
+  const ajv = createAjv({ useDefaults: true });
   const validate = ajv.compile(schema);
 
   const valid = validate(data);
@@ -233,28 +231,6 @@ export const jsonFormValidator = (schema: any, data: any) => {
     };
   }
   return { valid: true, errors: [] };
-
-  // const ajv = createAjv({ useDefaults: true });
-  // const validate = ajv.compile(schema);
-
-  // console.log('json form validator:-', schema);
-
-  // const valid = validate(data);
-
-  // console.log('is form valid:_', valid);
-
-  // if (!valid) {
-  //   return {
-  //     valid: false,
-  //     errors: (validate as any).errors.map((error: any) => {
-  //       return {
-  //         message: error.message,
-  //         path: error.dataPath
-  //       };
-  //     })
-  //   };
-  // }
-  // return { valid: true, errors: [] };
 };
 
 export const jsonFormRemoveAdditionalFields = (schema: any, data: any) => {

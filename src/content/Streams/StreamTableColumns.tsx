@@ -13,7 +13,7 @@ import appIcons from '@utils/icon-utils';
 
 export const StreamTableColumns: TableColumnProps[] = [
   { id: '1', label: 'Name', minWidth: 300, icon: appIcons.NAME, muiIcon: true },
-  { id: '2', label: 'Type', minWidth: 300, icon: 'CUSTOM' },
+  { id: '2', label: 'Type', minWidth: 300, icon: appIcons.STREAM },
   { id: '3', label: '', align: 'right', action: true, minWidth: 50 },
   { id: '4', label: '', align: 'right', action: true, minWidth: 50 }
 ];

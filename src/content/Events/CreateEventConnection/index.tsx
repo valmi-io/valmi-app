@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import {
@@ -71,7 +71,10 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   // Initialise data
   let initialData = {
     fromId: fromId,
-    toId: toId
+    toId: toId,
+    data: {
+      dataLayout: 'segment'
+    }
   };
 
   if (isTrue(editing)) {
@@ -96,7 +99,7 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
     type: 'empty'
   });
 
-  const invisibleFields = ['fromId', 'toId', 'functions', 'batchSize'];
+  const invisibleFields = ['fromId', 'toId', 'functions', 'batchSize', 'dataLayout'];
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: invisibleFields });

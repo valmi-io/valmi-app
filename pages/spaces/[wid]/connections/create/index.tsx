@@ -45,6 +45,7 @@ import {
 } from '@utils/connection-utils';
 
 import constants from '@constants/index';
+import { FormStatus } from '@/utils/form-utils';
 
 const ConnectionFlow = () => {
   const router = useRouter();
@@ -58,6 +59,9 @@ const ConnectionFlow = () => {
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
+
+  // form state - form can be in any of the states {FormStatus}
+  const [formStatus, setformStatus] = useState<FormStatus>('empty');
 
   const [creatingConnection, setCreatingConnection] = useState<boolean>(false);
 
@@ -98,6 +102,10 @@ const ConnectionFlow = () => {
     }
   }, [router]);
 
+  const handleFormStatus = (isFetching: boolean) => {
+    setformStatus(isFetching ? 'submitting' : 'empty');
+  };
+
   const getSectionComponent = () => {
     let step_components = [
       <Connectors key={'connectors'} />,
@@ -109,8 +117,9 @@ const ConnectionFlow = () => {
         resetForm={reset}
         handleSubmit={handleSubmit}
         onSubmit={onSubmit}
+        handleFormStatus={handleFormStatus}
       />,
-      <ConnectionTest key={'connectiontest'} />
+      <ConnectionTest key={'connectiontest'} handleFormStatus={handleFormStatus} />
     ];
     if (isEditableFlow) {
       step_components = step_components.splice(1);
@@ -159,6 +168,8 @@ const ConnectionFlow = () => {
         connectionUrl = `/workspaces/${workspaceId}/credentials/update`;
       }
 
+      setformStatus('submitting');
+
       connectionNetworkHandler(connectionUrl, payload);
 
       return;
@@ -191,6 +202,8 @@ const ConnectionFlow = () => {
       const isErrorAlert = true;
       displayAlertDialog(message, isErrorAlert);
       setCreatingConnection(false);
+    } finally {
+      setformStatus('empty');
     }
   };
 
@@ -220,7 +233,7 @@ const ConnectionFlow = () => {
         variant="contained"
         type={currentStep === (isEditableFlow ? 0 : 1) ? 'submit' : 'button'}
         onClick={currentStep === (isEditableFlow ? 0 : 1) ? handleSubmit(onSubmit) : handleNext}
-        disabled={!enableNext(connection_flow)}
+        disabled={formStatus === 'submitting' || !enableNext(connection_flow)}
       >
         {currentStep === connectionSteps.length - 1 ? getConnectionButtonName(isEditableFlow) : 'Next'}
       </Button>
@@ -250,7 +263,7 @@ const ConnectionFlow = () => {
             <Button
               color="inherit"
               variant="contained"
-              disabled={!enableBack(connection_flow)}
+              disabled={formStatus === 'submitting' || !enableBack(connection_flow)}
               onClick={handleBack}
               sx={{ mr: 1 }}
             >

@@ -6,24 +6,9 @@
 
 import { createWrapper } from 'next-redux-wrapper';
 
-import {
-  configureStore,
-  ThunkAction,
-  Action,
-  AnyAction,
-  createAsyncThunk
-} from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action, AnyAction, createAsyncThunk } from '@reduxjs/toolkit';
 
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  persistReducer,
-  persistStore,
-  PURGE,
-  REGISTER,
-  REHYDRATE
-} from 'redux-persist';
+import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 
 import storage from 'redux-persist/lib/storage';
 
@@ -42,13 +27,6 @@ const reducerProxy = (state: any, action: AnyAction) => {
   }
   return rootReducer(state, action);
 };
-
-export const resetStore = createAsyncThunk(
-  'auth/logout',
-  async function (_payload, thunkAPI) {
-    thunkAPI.dispatch({ type: 'RESET_STORE' });
-  }
-);
 
 export const makeStore = () => {
   const isServer = typeof window === 'undefined';
@@ -92,11 +70,6 @@ export const makeStore = () => {
 export type AppStore = ReturnType<typeof makeStore>;
 export type AppState = ReturnType<AppStore['getState']>;
 export type AppDispatch = ReturnType<AppStore['dispatch']>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  AppState,
-  unknown,
-  Action
->;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, AppState, unknown, Action>;
 
 export const wrapper = createWrapper<AppStore>(makeStore);

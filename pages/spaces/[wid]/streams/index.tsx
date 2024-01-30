@@ -60,7 +60,6 @@ const StreamsPage: NextPageWithLayout = () => {
       pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
       query: { query: JSON.stringify(queryArgs) }
     });
-    // router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${streamId}&type=incoming.all`);
   };
 
   const PageContent = () => {

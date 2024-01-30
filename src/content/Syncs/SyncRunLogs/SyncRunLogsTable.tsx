@@ -21,12 +21,13 @@ import {
 import {
   SyncRunLogsTableProps,
   getMessageTimestamp,
+  processLogsArr,
   syncRunLogColumns
 } from '@content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 import TableHeader from '@components/Table/TableHeader';
-import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
+import { StyledChip } from '@/content/Events/LiveEvents/IncomingEventsTable';
 
 export const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {
@@ -48,11 +49,7 @@ export const LogMessage = styled(Typography)(({}) => ({
 
 const SyncRunLogsTable = ({ data, onRowClick }: SyncRunLogsTableProps) => {
   const getTimestamp = (log: any) => {
-    return log[0];
-  };
-
-  const getMessage = (log: any) => {
-    return log[1];
+    return log['timestamp'];
   };
 
   return (
@@ -68,15 +65,26 @@ const SyncRunLogsTable = ({ data, onRowClick }: SyncRunLogsTableProps) => {
             {data.ids.map((id: any) => {
               const item = data.entities[id];
 
-              return item.logs?.map((log: any, index: string) => {
+              const proccessedLogs: any[] = processLogsArr(item.logs);
+
+              return proccessedLogs.map((item, index) => {
+                const { type = '', log: { message = '' } = {} } = item?.event ?? {};
+
                 return (
-                  <CustomizedTableRow key={`log_key ${index}`} onClick={() => onRowClick({ data: log })} hover>
+                  <CustomizedTableRow key={`log_key ${index}`} onClick={() => onRowClick({ data: item })} hover>
                     <TableCell>
-                      <Typography variant="subtitle1">{getMessageTimestamp(getTimestamp(log))}</Typography>
+                      <Typography variant="subtitle1">{getMessageTimestamp(getTimestamp(item))}</Typography>
                     </TableCell>
 
                     <TableCell>
-                      <LogMessage variant="subtitle1">{getMessage(log)}</LogMessage>
+                      <StyledChip
+                        size="small"
+                        label={type}
+                        sx={{ backgroundColor: (theme) => theme.colors.secondary.main }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <LogMessage variant="subtitle1">{message}</LogMessage>
                     </TableCell>
                   </CustomizedTableRow>
                 );

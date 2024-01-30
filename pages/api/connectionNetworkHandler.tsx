@@ -12,16 +12,13 @@ import { getAccessTokenCookie, getBaseUrl } from 'pages/api/utils';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
 
-const connectionNetworkHandler = async (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => {
+const connectionNetworkHandler = async (req: NextApiRequest, res: NextApiResponse) => {
   let { connectionUrl, data } = req.body;
   let payload = data;
   // query
   connectionUrl = `${getBaseUrl()}${connectionUrl}`;
 
-  const bearerToken = getAccessTokenCookie(req) || '';
+  const bearerToken = (await getAccessTokenCookie(req)) || '';
 
   try {
     const response = await axios.post(connectionUrl, payload, {

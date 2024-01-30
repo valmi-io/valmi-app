@@ -9,16 +9,9 @@ import { useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  Hidden,
-  Typography
-} from '@mui/material';
+import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
@@ -28,6 +21,7 @@ import PopoverComponent from '@components/Popover';
 import { RootState } from '@store/reducers';
 
 import { signOutUser, stringAvatar } from '@utils/lib';
+import { AppDispatch } from '@/store/store';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -60,6 +54,8 @@ const UserBoxLabel = styled(Typography)(
 const HeaderUserbox = () => {
   const router = useRouter();
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const user = useSelector((state: RootState) => state.user.user);
 
   const ref = useRef<any>(null);
@@ -75,24 +71,18 @@ const HeaderUserbox = () => {
   };
 
   const handleSignoutClick = (): void => {
+    dispatch({ type: 'RESET_STORE' });
     signOutUser(router);
   };
 
   const userAvatar = () => {
-    return (
-      <Avatar
-        sx={{ width: 30, height: 30 }}
-        {...stringAvatar(user?.email ? user.email : 'valmi.io')}
-      />
-    );
+    return <Avatar sx={{ width: 30, height: 30 }} {...stringAvatar(user?.email ? user.email : 'valmi.io')} />;
   };
 
   const userTitle = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">
-          {user?.email ? user.email : 'valmi.io'}
-        </UserBoxLabel>
+        <UserBoxLabel variant="body2">{user?.email ? user.email : 'valmi.io'}</UserBoxLabel>
       </UserBoxText>
     );
   };
@@ -110,11 +100,7 @@ const HeaderUserbox = () => {
 
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
-          <MenuUserBox
-            sx={{ minWidth: 210 }}
-            display="flex"
-            alignItems="center"
-          >
+          <MenuUserBox sx={{ minWidth: 210 }} display="flex" alignItems="center">
             {userAvatar()}
             {userTitle()}
           </MenuUserBox>

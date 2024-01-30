@@ -34,8 +34,111 @@ import Xarrow, { Xwrapper } from 'react-xarrows';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { AppState } from '@/store/store';
 import { extStreams } from '@/constants/extDestinations';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
+import { TData } from '@/utils/typings.d';
 
 type EventConnectionType = 'STREAM' | 'DESTINATION';
+
+type ConnectionLayoutProps = {
+  type: EventConnectionType;
+  data: TData;
+  handleOnMouseEnter: any;
+  handleOnMouseLeave: any;
+  onHoverState: any;
+  handleConnectionOnClick: any;
+};
+
+type ConnectionItemProps = {
+  type: EventConnectionType;
+  item: any;
+  handleOnMouseEnter: any;
+  handleOnMouseLeave: any;
+  onHoverState: any;
+  handleConnectionOnClick: any;
+};
+
+const ConnectionLayout = ({
+  type,
+  data,
+  handleConnectionOnClick,
+  handleOnMouseEnter,
+  handleOnMouseLeave,
+  onHoverState
+}: ConnectionLayoutProps) => {
+  return (
+    <>
+      <ConnectionHeader type={type} />
+      {data.ids.map((id: string) => {
+        return (
+          <ConnectionItem
+            key={`${type.toLowerCase()}-${id}`}
+            item={data.entities[id] ?? {}}
+            handleConnectionOnClick={handleConnectionOnClick}
+            handleOnMouseEnter={handleOnMouseEnter}
+            handleOnMouseLeave={handleOnMouseLeave}
+            onHoverState={onHoverState}
+            type={type}
+          />
+        );
+      })}
+    </>
+  );
+};
+
+const ConnectionItem = ({
+  item,
+  type: connectionType,
+  handleConnectionOnClick,
+  handleOnMouseEnter,
+  handleOnMouseLeave,
+  onHoverState
+}: ConnectionItemProps) => {
+  const { id = '', name = '', destinationType = '' } = item;
+
+  const connectortype = connectionType === 'STREAM' ? extStreams.browser.type : destinationType;
+
+  return (
+    <Card
+      onMouseEnter={() => {
+        handleOnMouseEnter({ id: id });
+      }}
+      onMouseLeave={handleOnMouseLeave}
+      variant="outlined"
+      id={id}
+      sx={{
+        pl: 2,
+        borderWidth: onHoverState.id === id ? 2 : 0.5,
+        borderColor: (theme) => (onHoverState.id === id ? theme.colors.primary.main : theme.palette.divider)
+      }}
+      style={{
+        borderRadius: 5,
+        display: 'flex',
+        height: 62,
+        cursor: 'pointer',
+        alignItems: 'center'
+      }}
+      onClick={() => handleConnectionOnClick({ connectionType, id })}
+    >
+      <ImageComponent
+        title={name}
+        src={`/connectors/${connectortype.toLowerCase()}.svg`}
+        size={ImageSize.small}
+        alt={`connectionIcon`}
+        style={{ marginRight: '10px' }}
+      />
+    </Card>
+  );
+};
+
+const ConnectionHeader = ({ type }: { type: EventConnectionType }) => {
+  return (
+    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+      <CustomIcon icon={type === 'STREAM' ? appIcons.STREAM : appIcons.SRC} />
+      <Typography variant="body1">{type === 'STREAM' ? 'Streams' : 'Warehouses'}</Typography>
+    </Stack>
+  );
+};
 
 const EventsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -186,6 +289,16 @@ const EventsPage: NextPageWithLayout = () => {
     }
   };
 
+  const handleOnMouseEnter = ({ id }: { id: string }) => {
+    if (onHoverState.id !== id) {
+      setOnHoverState({ id: id });
+    }
+  };
+
+  const handleOnMouseLeave = () => {
+    setOnHoverState({ id: '' });
+  };
+
   const PageContent = () => {
     if (isDataEmpty(links)) {
       let description = '';
@@ -221,10 +334,14 @@ const EventsPage: NextPageWithLayout = () => {
       >
         <Xwrapper>
           <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
-            <Typography variant="body1">{'Streams'}</Typography>
-            {streams.ids.map((id: string) => {
-              return <ConnectionItem key={`stream-${id}`} item={streams.entities[id] ?? {}} connectionType="STREAM" />;
-            })}
+            <ConnectionLayout
+              data={streams}
+              type="STREAM"
+              handleConnectionOnClick={handleConnectionOnClick}
+              handleOnMouseEnter={handleOnMouseEnter}
+              handleOnMouseLeave={handleOnMouseLeave}
+              onHoverState={onHoverState}
+            />
           </Stack>
 
           <Stack
@@ -252,64 +369,20 @@ const EventsPage: NextPageWithLayout = () => {
           </Stack>
 
           <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
-            <Typography variant="body1">{'Destinations'}</Typography>
-            {destinations.ids.map((id: string) => {
-              return (
-                <ConnectionItem
-                  key={`destination-${id}`}
-                  item={destinations.entities[id] ?? {}}
-                  connectionType="DESTINATION"
-                />
-              );
-            })}
+            <ConnectionLayout
+              data={destinations}
+              type="DESTINATION"
+              handleConnectionOnClick={handleConnectionOnClick}
+              handleOnMouseEnter={handleOnMouseEnter}
+              handleOnMouseLeave={handleOnMouseLeave}
+              onHoverState={onHoverState}
+            />
           </Stack>
 
           {/* <Xarrow /> */}
           {linkConnections({ links, destinations, streams })}
         </Xwrapper>
       </Box>
-    );
-  };
-
-  const ConnectionItem = ({ item, connectionType }: { item: any; connectionType: EventConnectionType }) => {
-    const { id = '', name = '', destinationType = '', type = '' } = item;
-
-    const connectortype = connectionType === 'STREAM' ? extStreams.browser.type : destinationType;
-
-    return (
-      <Card
-        onMouseEnter={() => {
-          if (onHoverState.id !== id) {
-            setOnHoverState({ id: id });
-          }
-        }}
-        onMouseLeave={() => {
-          setOnHoverState({ id: '' });
-        }}
-        variant="outlined"
-        id={id}
-        sx={{
-          pl: 2,
-          borderWidth: onHoverState.id === id ? 2 : 0.5,
-          borderColor: (theme) => (onHoverState.id === id ? theme.colors.primary.main : theme.palette.divider)
-        }}
-        style={{
-          borderRadius: 5,
-          display: 'flex',
-          height: 62,
-          cursor: 'pointer',
-          alignItems: 'center'
-        }}
-        onClick={() => handleConnectionOnClick({ connectionType, id })}
-      >
-        <ImageComponent
-          title={name}
-          src={`/connectors/${connectortype.toLowerCase()}.svg`}
-          size={ImageSize.small}
-          alt={`connectionIcon`}
-          style={{ marginRight: '10px' }}
-        />
-      </Card>
     );
   };
 

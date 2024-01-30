@@ -117,8 +117,6 @@ const EventConnectionsPage: NextPageWithLayout = () => {
       pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
       query: { query: JSON.stringify(queryArgs) }
     });
-
-    // router.push(`${getBaseRoute(workspaceId)}/events/live-events?id=${id}&type=bulker_batch.all`);
   };
 
   const PageContent = () => {

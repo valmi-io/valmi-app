@@ -73,9 +73,6 @@ const FormControlComponent = ({
           onClick={onSubmitClick}
         />
       </Box>
-
-      {/* <pre>{errors.length > 0 && JSON.stringify(errors, null, 2)}</pre>
-      <pre>{status === 'error' && JSON.stringify(error, null, 2)}</pre> */}
     </FormContainer>
   );
 };

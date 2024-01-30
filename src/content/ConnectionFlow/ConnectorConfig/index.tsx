@@ -30,10 +30,11 @@ interface ConnectorConfigProps {
   resetForm: any;
   setValue: any;
   onSubmit: (formData: any) => void;
+  handleFormStatus: (isFetching: boolean) => void;
 }
 
 const ConnectorConfig = (props: ConnectorConfigProps) => {
-  const { resetForm } = props;
+  const { resetForm, handleFormStatus } = props;
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -65,12 +66,21 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
           title: connection_title
         }));
       }
+
       fetchConnectorConfig({
         type: selected_connector.type,
         workspaceId: workspaceId
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (isFetching) {
+      handleFormStatus(true);
+    } else {
+      handleFormStatus(false);
+    }
+  }, [isFetching]);
 
   useEffect(() => {
     if (data) {

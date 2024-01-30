@@ -21,6 +21,7 @@ import { SidebarContext } from '@contexts/SidebarContext';
 import Breadcrumb from '@components/Breadcrumb';
 
 import { getRouterPathname, isPublicSync } from '@utils/routes';
+import { useLoginStatus } from '@/hooks/useLoginStatus';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
@@ -46,6 +47,8 @@ function Header() {
   const url = router.pathname;
 
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
+
+  const { isLoggedIn } = useLoginStatus();
 
   return (
     <HeaderWrapper
@@ -79,14 +82,15 @@ function Header() {
               }}
             />
 
-            <Link href="/signup" passHref style={{ textDecoration: 'none' }}>
-              <Button
-                sx={{ fontWeight: 'bold', fontSize: 14 }}
-                variant="contained"
-              >
-                Sign up
-              </Button>
-            </Link>
+            {!isLoggedIn ? (
+              <Link href="/signup" passHref style={{ textDecoration: 'none' }}>
+                <Button sx={{ fontWeight: 'bold', fontSize: 14 }} variant="contained">
+                  Sign up
+                </Button>
+              </Link>
+            ) : (
+              <HeaderUserbox />
+            )}
           </Box>
         ) : (
           <HeaderUserbox />
@@ -100,11 +104,7 @@ function Header() {
         >
           <Tooltip arrow title="Toggle Menu">
             <IconButton color="primary" onClick={toggleSidebar}>
-              {!sidebarToggle ? (
-                <MenuTwoToneIcon fontSize="small" />
-              ) : (
-                <CloseTwoToneIcon fontSize="small" />
-              )}
+              {!sidebarToggle ? <MenuTwoToneIcon fontSize="small" /> : <CloseTwoToneIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
         </Box>

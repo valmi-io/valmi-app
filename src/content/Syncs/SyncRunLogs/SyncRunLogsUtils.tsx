@@ -50,6 +50,13 @@ export const syncRunLogColumns: TableColumnProps[] = [
   },
   {
     id: '2',
+    label: 'Type',
+    icon: appIcons.NAME,
+    minWidth: TABLE_COLUMN_SIZES[2],
+    muiIcon: true
+  },
+  {
+    id: '3',
     label: 'Message',
     icon: appIcons.MESSAGE,
     minWidth: TABLE_COLUMN_SIZES[4]
@@ -114,11 +121,22 @@ export const generateLogMessages = (sinces: any, logs: any) => {
  * @param logs
  * @returns logs object
  */
-export const generateLogsObject = (since: string, logs: []) => {
+export const generateLogsObject = (since: string, logs: {}) => {
   let modifiedLogsObj: any = {};
 
   modifiedLogsObj[since] = logs;
+
   return modifiedLogsObj;
+};
+
+export const processLogsArr = (logs: []) => {
+  // Transform the nested array into an array of objects
+  const result = logs.map(([timestamp, data]: [timestamp: any, data: any]) => ({
+    timestamp,
+    event: JSON.parse(data || {})
+  }));
+
+  return result;
 };
 
 /**

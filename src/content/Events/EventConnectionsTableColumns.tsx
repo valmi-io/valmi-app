@@ -16,13 +16,13 @@ export const EventConnectionsTableColumns: TableColumnProps[] = [
     id: '1',
     label: 'Stream',
     minWidth: TABLE_COLUMN_SIZES[5],
-    icon: appIcons.SRC
+    icon: appIcons.STREAM
   },
   {
     id: '2',
-    label: 'Destination',
+    label: 'Warehouse',
     minWidth: TABLE_COLUMN_SIZES[5],
-    icon: appIcons.DEST
+    icon: appIcons.SRC
   },
 
   { id: '3', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] },

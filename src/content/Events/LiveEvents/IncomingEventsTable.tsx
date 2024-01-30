@@ -70,8 +70,6 @@ const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) =>
           {/* Live events Body */}
           <TableBody>
             {data.map((item: any) => {
-              // const item = data.entities[id];
-
               const timestamp = item.date;
               const message = JSON.stringify(item);
 
@@ -86,6 +84,7 @@ const IncomingEventsTable = ({ data, onRowClick }: IIncomingEventsTableProps) =>
               const email = context?.traits?.email || httpPayload?.traits?.email;
 
               const type = httpPayload?.type;
+
               return (
                 <CustomizedTableRow onClick={() => onRowClick({ data: message })} hover key={`log_key ${item.id}`}>
                   <TableCell>

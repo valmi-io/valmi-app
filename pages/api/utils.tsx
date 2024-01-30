@@ -7,11 +7,7 @@
 import cookie from 'cookie';
 
 export const configureCredentials = (data: any) => {
-  let config = data?.config
-    ? data.config.credentials
-    : data?.connector_config
-    ? data.connector_config.credentials
-    : {};
+  let config = data?.config ? data.config.credentials : data?.connector_config ? data.connector_config.credentials : {};
 
   Object.entries(config).forEach(([key, value]) => {
     if (typeof value !== 'string') return;
@@ -30,35 +26,7 @@ export const getBaseUrl = () => {
   return process.env[`SERVER_SIDE_API_URL`];
 };
 
-export const setTokenCookie = (accessToken: string) => {
-  return fetch('/api/login', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ accessToken })
-  });
-};
-
-export const getAccessToken = () => {
-  return fetch('/api/access', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-};
-
-export const logoutUser = () => {
-  return fetch('/api/logout', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-};
-
-export const getAccessTokenCookie = (req: any) => {
+export const getAccessTokenCookie = async (req: any) => {
   const cookies = cookie.parse(req.headers?.cookie ?? '');
   const appCookie = cookies?.['AUTH'] ?? '';
   const parsedCookies = appCookie ? JSON.parse(appCookie) : {};
