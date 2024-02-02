@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, IconButton, InputLabel, Typography, styled } from '@mui/material';
+import { Box, Button, IconButton, InputLabel, Stack, Typography, styled } from '@mui/material';
 
 import {
   getOauthColorCode,
@@ -17,7 +17,7 @@ import { ErrorStatusText } from '@components/Error';
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 
 import CustomIcon from '@components/Icon/CustomIcon';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 const Item = styled(Box)(({ theme }) => ({
   ...theme.typography.body2,
@@ -41,11 +41,38 @@ const getOAuthProvider = (oAuthProvider: any) => {
 };
 
 const FormFieldAuth = (props: any) => {
-  const { label, onClick, oAuthProvider, hasOAuthAuthorized, oauth_error = '' } = props;
+  const {
+    label,
+    onClick,
+    oAuthProvider,
+    hasOAuthAuthorized,
+    oauth_error = '',
+    isConnectorConfigured,
+    handleOnConfigureButtonClick
+  } = props;
 
   return (
     <>
-      <Label>{label}</Label>
+      <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Label>{label}</Label>
+        {!isConnectorConfigured ? (
+          <Button
+            sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 14 }}
+            variant="text"
+            size="small"
+            onClick={() => handleOnConfigureButtonClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })}
+          >
+            {'Configure'}
+          </Button>
+        ) : (
+          <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
+            <Label>{'Configured'}</Label>
+            <IconButton color={hasOAuthAuthorized ? 'primary' : 'error'}>
+              <CustomIcon icon={hasOAuthAuthorized ? faCheckCircle : faCircleXmark} />
+            </IconButton>
+          </Stack>
+        )}
+      </Stack>
       <Item>
         <Box
           sx={{
@@ -57,10 +84,11 @@ const FormFieldAuth = (props: any) => {
             backgroundColor: getOauthColorCode({
               oAuth: getOAuthProvider(oAuthProvider)
             }),
+            cursor: !isConnectorConfigured ? 'not-allowed' : 'pointer',
             boxShadow: getOAuthProvider(oAuthProvider) === 'hubspot' ? '0px 0px 3px rgba(0, 0, 0, 0.4)' : 0,
             width: '100%'
           }}
-          onClick={() => onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })}
+          onClick={() => isConnectorConfigured && onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) })}
         >
           {getOAuthProvider(oAuthProvider) === 'google' ? (
             <Box
@@ -107,11 +135,6 @@ const FormFieldAuth = (props: any) => {
             })}
           </Typography>
         </Box>
-        {hasOAuthAuthorized && (
-          <IconButton color={'primary'}>
-            <CustomIcon icon={faCheckCircle} />
-          </IconButton>
-        )}
       </Item>
 
       <ErrorStatusText sx={{ ml: 1, fontSize: 14 }} variant="body1">

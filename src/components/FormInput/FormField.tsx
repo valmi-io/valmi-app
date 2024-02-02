@@ -16,12 +16,11 @@ interface FormFieldProps extends FormObject {
   hasAuthorizedOAuth?: boolean;
   oauth_error?: string;
   control: any;
+  isConnectorConfigured?: boolean;
+  handleOnConfigureButtonClick: (data: any) => void;
 }
 
 const FormField = ({
-  fileInputRef,
-  handleFileChange,
-  handleUploadButtonClick,
   label,
   name,
   description,
@@ -32,8 +31,9 @@ const FormField = ({
   type,
   fieldType,
   selectedConnector,
-  selected_file,
   onClick,
+  isConnectorConfigured,
+  handleOnConfigureButtonClick,
   hasAuthorizedOAuth,
   oauth_error,
   control
@@ -59,6 +59,8 @@ const FormField = ({
       <FormFieldAuth
         label={label}
         onClick={onClick}
+        isConnectorConfigured={isConnectorConfigured}
+        handleOnConfigureButtonClick={handleOnConfigureButtonClick}
         oAuthProvider={oAuthProvider}
         oauth_error={oauth_error}
         hasOAuthAuthorized={hasAuthorizedOAuth}
@@ -81,10 +83,7 @@ const FormField = ({
           required,
           disabled,
           getDefaultValue(field, name, selectedConnector),
-          fieldType,
-          fileInputRef,
-          handleFileChange,
-          handleUploadButtonClick
+          fieldType
         );
       }}
     />

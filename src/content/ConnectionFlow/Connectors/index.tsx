@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 
 import ConnectorLayout from '@layouts/ConnectorLayout';
 
-import ConnectorsList from '@content/ConnectionFlow/Connectors/ConnectorsList';
+import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
 
 import SkeletonLoader from '@components/SkeletonLoader';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
@@ -52,7 +52,7 @@ const Connectors = () => {
       <SkeletonLoader loading={isLoading} />
 
       {/** Display page content */}
-      {!error && !isLoading && data && <ConnectorsList data={filteredData} />}
+      {!error && !isLoading && data && <ConnectorsPageContent data={filteredData} />}
     </ConnectorLayout>
   );
 };

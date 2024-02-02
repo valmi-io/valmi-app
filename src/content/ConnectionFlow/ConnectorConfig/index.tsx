@@ -22,6 +22,7 @@ import { RootState } from '@store/reducers';
 import FormLayout from '@/layouts/FormLayout';
 import ConnectorInstructions from '@/content/ConnectionFlow/ConnectorConfig/ConnectorInstructions';
 import ConnectorFormFieldsControl from '@/content/ConnectionFlow/ConnectorConfig/ConnectorFormFieldsControl';
+import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
 
 interface ConnectorConfigProps {
   control: any;
@@ -52,7 +53,11 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
   {
     /* query for connector configuration */
   }
-  const [fetchConnectorConfig, { data, isFetching, isError, error }] = useLazyFetchConnectorSpecQuery();
+  const [fetchConnectorConfig, { data, isFetching, error }] = useLazyFetchConnectorSpecQuery();
+
+  // Getting keys for the object
+  const [fetchConnectorOAuthConfig, { data: keys, isLoading: isKeysLoading, error: keysError }] =
+    useLazyGetOAuthApiConfigQuery();
 
   useEffect(() => {
     if (selected_connector) {
@@ -71,16 +76,21 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
         type: selected_connector.type,
         workspaceId: workspaceId
       });
+
+      fetchConnectorOAuthConfig({
+        workspaceId,
+        type: selected_connector.type
+      });
     }
   }, []);
 
   useEffect(() => {
-    if (isFetching) {
+    if (isFetching || isKeysLoading) {
       handleFormStatus(true);
     } else {
       handleFormStatus(false);
     }
-  }, [isFetching]);
+  }, [isFetching, isKeysLoading]);
 
   useEffect(() => {
     if (data) {
@@ -99,24 +109,34 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
     }
   }, [data]);
 
-  return (
-    <ConnectorLayout title={`Connect to ${selected_connector ? selected_connector.display_name : 'connector'}`}>
-      {/** Display Errors */}
-      {isError && <ErrorComponent error={error} />}
+  const getDisplayComponent = () => {
+    if (error || keysError) {
+      return <ErrorComponent error={error || keysError} />;
+    }
 
-      {/** Display Trace Error */}
-      {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+    if (traceError) {
+      return <ErrorStatusText>{traceError}</ErrorStatusText>;
+    }
 
-      {/** Display Skeleton */}
-      <SkeletonLoader loading={isFetching} />
+    if (isFetching || isKeysLoading) {
+      return <SkeletonLoader loading={isFetching || isKeysLoading} />;
+    }
 
-      {/** Display Content */}
-      {!isFetching && data && (
+    if (data && keys) {
+      return (
         <FormLayout
-          formComp={<ConnectorFormFieldsControl {...props} data={data} />}
+          formComp={<ConnectorFormFieldsControl {...props} data={data} keys={keys} />}
           instructionsComp={<ConnectorInstructions data={data} selected_connector={selected_connector} />}
         />
-      )}
+      );
+    }
+
+    return null; // Default return value
+  };
+
+  return (
+    <ConnectorLayout title={`Connect to ${selected_connector ? selected_connector.display_name : 'connector'}`}>
+      {getDisplayComponent()}
     </ConnectorLayout>
   );
 };

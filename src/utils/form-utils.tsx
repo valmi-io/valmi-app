@@ -21,11 +21,8 @@ export type FormObject = {
   disabled: boolean;
   fieldType: string;
   onClick?: (data: any) => void;
-  fileInputRef?: React.Ref<HTMLInputElement>;
-  handleUploadButtonClick?: () => void;
-  handleFileChange?: (data: any) => void;
+
   selectedConnector?: string;
-  selected_file?: string;
 };
 
 export const createNewField = ({
@@ -52,20 +49,7 @@ export const createNewField = ({
   };
 };
 
-export const getInputField = (
-  field,
-  description,
-  error,
-  label,
-  enumValue,
-  required,
-  disabled,
-  value,
-  fieldType,
-  fileInputRef,
-  handleFileChange,
-  handleUploadButtonClick
-) => {
+export const getInputField = (field, description, error, label, enumValue, required, disabled, value, fieldType) => {
   switch (fieldType) {
     case 'text':
     case 'string':

@@ -150,6 +150,7 @@ export const getFormattedUTC = (date: any, offset = true) => {
 };
 
 export function flattenObjectValuesToArray<T>(obj: Record<string, T[]>): T[] {
+  if (!obj) return [];
   const result: T[] = [];
 
   Object.values(obj).forEach((value) => {
@@ -159,10 +160,10 @@ export function flattenObjectValuesToArray<T>(obj: Record<string, T[]>): T[] {
   return result;
 }
 
-export function findIntersection(arr1: any[], arr2: any[], property: string) {
-  return arr1.filter((item1) => arr2.some((item2) => item1[property] === item2));
-}
+// export function findIntersection(arr1: any[], arr2: any[], property: string) {
+//   return arr1.filter((item1) => arr2.some((item2) => item1[property] === item2));
+// }
 
-export function findUniqueElements(arr1: any[], arr2: any[], property: string) {
-  return arr1.filter((item1) => !arr2.some((item2) => item1[property] === item2));
-}
+// export function findUniqueElements(arr1: any[], arr2: any[], property: string) {
+//   return arr1.filter((item1) => !arr2.some((item2) => item1[property] === item2));
+// }

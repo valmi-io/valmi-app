@@ -647,6 +647,7 @@ export const AppFlowyTheme = createTheme({
           textTransform: 'none',
           paddingLeft: 16,
           paddingRight: 16,
+          borderRadius: 5,
           '.MuiSvgIcon-root': {
             transition: 'all .2s'
           }
@@ -656,13 +657,14 @@ export const AppFlowyTheme = createTheme({
         },
         containedSecondary: {
           backgroundColor: colors.secondary.main,
-          color: colors.alpha.white[100],
-          border: '1px solid ' + colors.alpha.black[30]
+          color: colors.alpha.white[100]
+
+          // border: '1px solid ' + colors.alpha.black[30]
         },
         containedPrimary: {
           backgroundColor: colors.primary.main,
-          color: colors.alpha.white[100],
-          borderRadius: 10
+          color: colors.alpha.white[100]
+
           // border: '1px solid ' + colors.alpha.black[30]
         },
         outlinedSecondary: {

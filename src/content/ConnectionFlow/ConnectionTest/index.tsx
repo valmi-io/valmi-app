@@ -55,6 +55,7 @@ const ConnectionTest = ({ handleFormStatus }: ConnectionTestProps) => {
       const config = {
         config: connector_config
       };
+
       const type = selected_connector ? selected_connector.type : '';
       checkConnectionConfig(`/workspaces/${workspaceId}/connectors/${type}/check`, 'POST', config);
     }

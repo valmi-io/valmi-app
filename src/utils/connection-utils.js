@@ -11,17 +11,8 @@ import { ConnectionType } from '@content/Connections/ConnectionModel';
 
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
-export const getInitialConnectionFlowState = (
-  connection_flow,
-  isInitialState
-) => {
-  const {
-    flowState: {
-      connection_type = ConnectionType.SRC,
-      steps = 0,
-      currentStep = 0
-    } = {}
-  } = connection_flow;
+export const getInitialConnectionFlowState = (connection_flow, isInitialState) => {
+  const { flowState: { connection_type = ConnectionType.SRC, steps = 0, currentStep = 0 } = {} } = connection_flow;
   const isEditableFlow = false;
   return {
     connection_type: connection_type,
@@ -31,11 +22,7 @@ export const getInitialConnectionFlowState = (
   };
 };
 
-export const initialiseConnectionFlowState = (
-  dispatch,
-  connection_flow,
-  connection_type
-) => {
+export const initialiseConnectionFlowState = (dispatch, connection_flow, connection_type) => {
   const isInitialState = true;
   dispatch(
     setConnectionFlow({
@@ -45,10 +32,7 @@ export const initialiseConnectionFlowState = (
   );
 };
 
-export const initialiseConnectorSelectionState = (
-  dispatch,
-  connection_flow
-) => {
+export const initialiseConnectorSelectionState = (dispatch, connection_flow) => {
   const { flowState: { selected_connector = null } = {} } = connection_flow;
 
   dispatch(
@@ -74,11 +58,7 @@ const createJsonObject = (required, properties_def, values) => {
     for (const field of required) {
       if (properties_def[field].type == 'object') {
         if (properties_def[field].required) {
-          obj[field] = createJsonObject(
-            properties_def[field].required,
-            properties_def[field].properties,
-            values
-          );
+          obj[field] = createJsonObject(properties_def[field].required, properties_def[field].properties, values);
         } else {
           obj[field] = values[field];
         }
@@ -99,27 +79,13 @@ export const enableBack = (connectionFlowState) => {
 };
 
 export const enableNext = (connectionFlowState) => {
-  const {
-    currentStep = 0,
-    steps = 0,
-    lastStep = false,
-    isEditableFlow = false
-  } = connectionFlowState.flowState;
+  const { currentStep = 0, steps = 0, lastStep = false, isEditableFlow = false } = connectionFlowState.flowState;
 
-  if (
-    currentStep < steps ||
-    currentStep === (isEditableFlow ? 0 : 1) ||
-    lastStep
-  )
-    return true;
+  if (currentStep < steps || currentStep === (isEditableFlow ? 0 : 1) || lastStep) return true;
   return false;
 };
 
-export const setCurrentStepInConnectionFlow = (
-  dispatch,
-  currentStep,
-  connectionFlowState
-) => {
+export const setCurrentStepInConnectionFlow = (dispatch, currentStep, connectionFlowState) => {
   dispatch(
     setConnectionFlow({
       ...connectionFlowState.flowState,
@@ -129,30 +95,12 @@ export const setCurrentStepInConnectionFlow = (
   );
 };
 
-export const setConnectorConfigInConnectionFlow = (
-  dispatch,
-  values,
-  connectionFlowState
-) => {
-  const {
-    currentStep = 0,
-    oauth_params = {},
-    connector_spec = {},
-    selected_file = {}
-  } = connectionFlowState.flowState;
-
-  let selected_file_values = {};
-
-  if (selected_file && selected_file.fileData) {
-    selected_file_values = {
-      service_account: selected_file.fileData
-    };
-  }
+export const setConnectorConfigInConnectionFlow = (dispatch, values, connectionFlowState) => {
+  const { currentStep = 0, oauth_params = {}, connector_spec = {} } = connectionFlowState.flowState;
 
   let combinedValues = {
     ...values,
-    ...getOAuthParams(oauth_params),
-    ...selected_file_values
+    ...getOAuthParams(oauth_params)
   };
 
   let config = generateConfigFromSpec(connector_spec, combinedValues);
@@ -168,12 +116,7 @@ export const setConnectorConfigInConnectionFlow = (
   );
 };
 
-export const setOAuthErrorInConnectionFlow = (
-  dispatch,
-  connectorConfig,
-  connectionTitle,
-  connectionFlowState
-) => {
+export const setOAuthErrorInConnectionFlow = (dispatch, connectorConfig, connectionTitle, connectionFlowState) => {
   const { currentStep = 0 } = connectionFlowState.flowState;
   dispatch(
     setConnectionFlow({
@@ -205,16 +148,8 @@ export const generateConnectionPayload = (connection_flow, user) => {
   return { ...(isEditableFlow && { id: connectionId }), ...payload };
 };
 
-export const generateAccountPayload = (
-  connection_flow,
-  user,
-  isEditableFlow
-) => {
-  const {
-    connector_spec = null,
-    oauth_params = {},
-    connection_data = null
-  } = connection_flow || {};
+export const generateAccountPayload = (connection_flow, user, isEditableFlow) => {
+  const { connector_spec = null, oauth_params = {}, connection_data = null } = connection_flow || {};
   let payload = {};
   const { account: { id: accountId = '' } = {} } = connection_data || {};
   // if connector requires oAuth, then payload will be created from oAuth params.

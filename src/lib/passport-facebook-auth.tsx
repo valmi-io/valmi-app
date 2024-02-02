@@ -36,10 +36,7 @@ passport.serializeUser((user, cb) => {
 });
 
 // passport.deserializeUser stores the user object in req.user
-passport.deserializeUser(function (
-  user: any,
-  cb: (arg0: null, arg1: any) => any
-) {
+passport.deserializeUser(function (user: any, cb: (arg0: null, arg1: any) => any) {
   process.nextTick(function () {
     return cb(null, user);
   });

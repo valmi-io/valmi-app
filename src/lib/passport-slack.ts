@@ -21,13 +21,9 @@ passport.use(
     {
       clientID: process.env.AUTH_SLACK_CLIENT_ID as string,
       clientSecret: process.env.AUTH_SLACK_CLIENT_SECRET as string,
+
       user_scope: ['identity.basic', 'identity.email'],
-      scope: [
-        'users.profile:read',
-        'chat:write',
-        'channels:read',
-        'channels:join'
-      ], // default,
+      scope: ['users.profile:read', 'chat:write', 'channels:read', 'channels:join'], // default,
       callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack`
     },
     async (accessToken, params, profile, cb: any) => {
@@ -52,14 +48,12 @@ passport.serializeUser((user, cb) => {
 });
 
 // passport.deserializeUser stores the user object in req.user
-passport.deserializeUser(function (
-  user: any,
-  cb: (arg0: null, arg1: any) => any
-) {
+passport.deserializeUser(function (user: any, cb: (arg0: null, arg1: any) => any) {
   process.nextTick(function () {
     return cb(null, user);
   });
 });
+// };
 
 // for broader explanation of serializeUser and deserializeUser visit https://stackoverflow.com/questions/27637609/understanding-passport-serialize-deserialize
 

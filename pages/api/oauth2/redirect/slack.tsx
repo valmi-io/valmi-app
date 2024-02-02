@@ -4,26 +4,38 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { NextApiRequest, NextApiResponse } from 'next/types';
+//@ts-nocheck
 
-import nextConnect from 'next-connect';
+import { createRouter } from 'next-connect';
+import { createStrategy } from '@/pagesapi/oauth2/login/slack';
+import passport from 'passport';
+import { oauthKeys } from '@/lib/oauth_middleware';
 
-import passport from '@lib/passport-slack';
+const router = createRouter();
 
-export default nextConnect().get(
-  passport.authenticate('slack', { session: false }),
-  (req: NextApiRequest & { user: any }, res: NextApiResponse) => {
-    const params = new URLSearchParams({
-      provider: req.user.provider ? req.user.provider : 'slack',
-      access_token: req.user['_accessToken'],
-      refresh_token: req.user._refreshToken ? req.user['_refreshToken'] : '',
-      id: req.user.profile.email,
-      unique_id: req.user.profile.email,
-      bot_user_id: req.user['_bot_user_id'],
-      email: req.user.profile.email,
-      name: req.user.profile.real_name,
-      image: req.user.profile.image_original
-    });
-    res.redirect('/auth/callback?' + params.toString());
-  }
-);
+router
+  .use(oauthKeys)
+
+  .get(async (req, res, next) => {
+    let { workspace = '', connector = '' } = req.query;
+    const query = { ...req.credentials, workspace: workspace, connector };
+    const strategy = createStrategy(query);
+
+    return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
+      const params = new URLSearchParams({
+        provider: user?.provider ?? 'slack',
+        access_token: user?.['_accessToken'] ?? '',
+        refresh_token: user?._refreshToken ?? '',
+        id: user.profile.email,
+        unique_id: user.profile.email,
+        bot_user_id: user?.['_bot_user_id'] ?? '',
+        email: user.profile.email,
+        name: user.profile.real_name,
+        image: user.profile.image_original
+      });
+
+      res.redirect('/auth/callback?' + params.toString());
+    })(req, res, next);
+  });
+
+export default router.handler();

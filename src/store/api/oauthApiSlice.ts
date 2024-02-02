@@ -20,7 +20,7 @@ export const oAuthApiSlice = apiSlice.injectEndpoints({
     }),
 
     getOAuthApiConfig: builder.query({
-      query: (workspaceId) => `/oauth/workspaces/${workspaceId}/keys`,
+      query: ({ workspaceId, type }) => `/oauth/workspaces/${workspaceId}/keys/${type}`,
       transformResponse: (responseData) => {
         return oauthApiConfigAdapter.setAll(initialOAuthKeysState, responseData);
       },
@@ -49,6 +49,14 @@ export const oAuthApiSlice = apiSlice.injectEndpoints({
         body: oauth
       }),
       invalidatesTags: ['OAuth']
+    }),
+
+    getConfiguredConnectors: builder.query({
+      query: (workspaceId) => `/connectors/${workspaceId}/configured`
+    }),
+
+    getNotConfiguredConnectors: builder.query({
+      query: (workspaceId) => `/connectors/${workspaceId}/not-configured`
     })
   }),
   //@ts-ignore
@@ -58,8 +66,11 @@ export const oAuthApiSlice = apiSlice.injectEndpoints({
 export const {
   useOAuthSchemaQuery,
   useGetOAuthApiConfigQuery,
+  useLazyGetOAuthApiConfigQuery,
   useCreateOAuthConfigMutation,
-  useEditOAuthConfigMutation
+  useEditOAuthConfigMutation,
+  useGetConfiguredConnectorsQuery,
+  useGetNotConfiguredConnectorsQuery
 } = oAuthApiSlice;
 
 /* Getting selectors from the transformed response */

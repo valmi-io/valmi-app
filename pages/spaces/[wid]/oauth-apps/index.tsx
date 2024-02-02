@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -17,16 +17,13 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import { RootState } from '@store/reducers';
 import { useFetch } from '@/hooks/useFetch';
-import { findIntersection, findUniqueElements, flattenObjectValuesToArray, getBaseRoute } from '@/utils/lib';
-import ContentLayout from '@/layouts/ContentLayout';
-import { useFetchConnectorsQuery } from '@/store/api/apiSlice';
-import { Box, Divider, Grid, Stack } from '@mui/material';
+import { flattenObjectValuesToArray, getBaseRoute } from '@/utils/lib';
+import { Box, Grid } from '@mui/material';
 import SubmitButton from '@/components/SubmitButton';
-import ConnectorLayout from '@/layouts/ConnectorLayout';
-import ConnectorCard from '@/content/ConnectionFlow/Connectors/ConnectorCard';
-import { useGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
+import { useGetConfiguredConnectorsQuery, useGetNotConfiguredConnectorsQuery } from '@/store/api/oauthApiSlice';
 import { AppDispatch, AppState } from '@/store/store';
-import { setOAuthFlowState } from '@/store/reducers/oAuthFlow';
+
+import OAuthApps from '@/content/OAuthApps';
 
 type ConnectorType = {
   display_name: string;
@@ -40,83 +37,43 @@ type ConnectorData = {
   [key: string]: ConnectorType[];
 };
 
+export type OAuthConnectorsState = {
+  type: string; // selected connector type
+  configured: boolean; // is selected connector configured
+};
+
+export type OnConnectorClickProps = {
+  item: ConnectorType;
+  configured: boolean;
+};
+
 const OAuthAppsPage: NextPageWithLayout = () => {
   const router = useRouter();
-
-  const dispatch = useDispatch<AppDispatch>();
 
   const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
-  const { data, isLoading, error, traceError } = useFetch({
-    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
-  });
-
-  // get OAuth configurations
   const {
-    data: oauthConfigData,
-    isLoading: isOAuthConfigLoading,
-    traceError: oAuthConfigTraceError,
-    error: oAuthConfigError
-  } = useFetch({ query: useGetOAuthApiConfigQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
+    data: configuredConnectors,
+    isLoading: isConfiguredConnectorsLoading,
+    traceError: configuredConnectorsTraceError,
+    error: configuredConnectorsError
+  } = useFetch({ query: useGetConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
 
-  const [state, setState] = useState<{ isLoading: boolean; traceError: any; error: any }>({
-    isLoading: false,
-    traceError: null,
-    error: null
-  });
+  const {
+    data: notConfiguredConnectors,
+    isLoading: isNotConfiguredConnectorsLoading,
+    traceError: notConfiguredConnectorsTraceError,
+    error: notConfiguredConnectorsError
+  } = useFetch({ query: useGetNotConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
 
-  const [connectorState, setConnectorState] = useState<{
-    connectors: ConnectorType[];
-    configuredConnectors: ConnectorType[];
-    type: string; // selected connector type
-    configured: boolean; // is selected connector configured
-  }>({
-    connectors: [],
-    configuredConnectors: [],
+  const [connectorState, setConnectorState] = useState<OAuthConnectorsState>({
     type: '',
     configured: false
   });
 
-  useEffect(() => {
-    setState((state) => ({
-      ...state,
-      isLoading: isOAuthConfigLoading || isLoading
-    }));
-  }, [isOAuthConfigLoading, isLoading]);
-
-  useEffect(() => {
-    if (oAuthConfigError || error) {
-      setState((state) => ({
-        ...state,
-        error: oAuthConfigError || error
-      }));
-    }
-  }, [oAuthConfigError, error]);
-
-  useEffect(() => {
-    if (oAuthConfigTraceError || traceError) {
-      setState((state) => ({
-        ...state,
-        traceError: oAuthConfigTraceError || traceError
-      }));
-    }
-  }, [oAuthConfigTraceError, traceError]);
-
-  useEffect(() => {
-    if (data && oauthConfigData) {
-      const { configuredConnectors, connectors } = getProcessedData({ connectors: data, oAuthConfig: oauthConfigData });
-
-      setConnectorState((state) => ({
-        ...state,
-        configuredConnectors: configuredConnectors,
-        connectors: connectors
-      }));
-    }
-  }, [data, oauthConfigData]);
-
-  const handleItemOnClick = ({ item, configured = false }: { item: ConnectorType; configured: boolean }) => {
+  const handleItemOnClick = ({ item, configured = false }: OnConnectorClickProps) => {
     const { type } = item;
     setConnectorState((state) => ({
       ...state,
@@ -126,63 +83,71 @@ const OAuthAppsPage: NextPageWithLayout = () => {
   };
 
   const onSubmitClick = () => {
-    const { type, configured } = connectorState;
-    dispatch(setOAuthFlowState({ editing: configured }));
-    router.push(`${getBaseRoute(workspaceId as string)}/oauth-apps/${type}`);
-  };
+    let { type = '' } = connectorState;
 
-  const PageContent = () => {
-    const { configuredConnectors = [], connectors = [], type } = connectorState;
+    const connector = type.split('_')[0] ?? '';
 
-    return (
-      <>
-        <ConnectorLayout title={'Configured'}>
-          {/** Display page content */}
+    type = type.split('_')[1];
 
-          {/** configured connectors */}
-          <Stack sx={{ display: 'flex' }} spacing={3}>
-            <Connectors
-              key={`configuredConnectors`}
-              data={configuredConnectors}
-              handleItemOnClick={(item) => handleItemOnClick({ item, configured: true })}
-              selectedType={type}
-            />
-
-            <Divider variant="fullWidth" />
-
-            {/** connectors */}
-            <Connectors
-              key={`connectors`}
-              data={connectors}
-              handleItemOnClick={(item) => handleItemOnClick({ item, configured: false })}
-              selectedType={type}
-            />
-          </Stack>
-        </ConnectorLayout>
-        <Box
-          sx={{
-            margin: (theme) => theme.spacing(2),
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'flex-end'
-          }}
-        >
-          <SubmitButton buttonText={'Next'} data={null} isFetching={false} disabled={!type} onClick={onSubmitClick} />
-        </Box>
-      </>
+    router.push(
+      `${getBaseRoute(workspaceId as string)}/oauth-apps/${type.toLowerCase()}?connector=${connector.toLowerCase()}`
     );
   };
 
+  const configured = getConnectors({ connectors: configuredConnectors });
+  const notConfigured = getConnectors({ connectors: notConfiguredConnectors });
+
   return (
-    <PageLayout pageHeadTitle="OAuth" title="Connectors" displayButton={false}>
-      <ContentLayout
-        key={`oauth-applications`}
-        error={error || oAuthConfigError}
-        PageContent={<PageContent />}
-        displayComponent={!state.error && !state.isLoading && data}
-        isLoading={state.isLoading}
-        traceError={traceError || oAuthConfigTraceError}
-      />
+    <PageLayout pageHeadTitle="OAuth" title="" displayButton={false}>
+      {configured.length > 0 && (
+        <Grid item xs={12}>
+          <OAuthApps
+            key={`configuredApps`}
+            handleItemOnClick={handleItemOnClick}
+            connectorState={connectorState}
+            state={{
+              data: configured,
+              error: configuredConnectorsError,
+              isLoading: isConfiguredConnectorsLoading,
+              title: 'Configured Apps',
+              traceError: configuredConnectorsTraceError
+            }}
+          />
+        </Grid>
+      )}
+
+      {notConfigured.length > 0 && (
+        <Grid item xs={12} sx={{ mt: 3 }}>
+          <OAuthApps
+            key={`notConfiguredApps`}
+            handleItemOnClick={handleItemOnClick}
+            connectorState={connectorState}
+            state={{
+              data: notConfigured,
+              error: notConfiguredConnectorsError,
+              isLoading: isNotConfiguredConnectorsLoading,
+              title: 'Apps that require configuration',
+              traceError: notConfiguredConnectorsTraceError
+            }}
+          />
+        </Grid>
+      )}
+      <Box
+        sx={{
+          margin: (theme) => theme.spacing(2),
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end'
+        }}
+      >
+        <SubmitButton
+          buttonText={'Next'}
+          data={null}
+          isFetching={false}
+          disabled={!connectorState.type}
+          onClick={onSubmitClick}
+        />
+      </Box>
     </PageLayout>
   );
 };
@@ -193,45 +158,8 @@ OAuthAppsPage.getLayout = function getLayout(page: ReactElement) {
 
 export default OAuthAppsPage;
 
-const Connectors = ({
-  data,
-  handleItemOnClick,
-  selectedType
-}: {
-  data: ConnectorType[];
-  handleItemOnClick: (item: ConnectorType) => void;
-  selectedType: string;
-}) => {
-  return (
-    <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-      {data.map((item: ConnectorType) => {
-        const connectorType: string = item.type.split('_').slice(1).join('_');
-
-        const selected = selectedType === item.type;
-
-        const displayName = item.display_name;
-        const src = `/connectors/${connectorType.toLowerCase()}.svg`;
-
-        return (
-          <ConnectorCard
-            key={item.type}
-            item={item}
-            handleConnectorOnClick={handleItemOnClick}
-            selected={selected}
-            src={src}
-            displayName={displayName}
-          />
-        );
-      })}
-    </Grid>
-  );
-};
-
-const getProcessedData = ({ connectors, oAuthConfig }: { connectors: ConnectorData; oAuthConfig: any }) => {
+const getConnectors = ({ connectors }: { connectors: ConnectorData }) => {
   const connectorsList: ConnectorType[] = flattenObjectValuesToArray(connectors);
 
-  return {
-    configuredConnectors: findIntersection(connectorsList, oAuthConfig.ids, 'type'),
-    connectors: findUniqueElements(connectorsList, oAuthConfig.ids, 'type')
-  };
+  return connectorsList;
 };

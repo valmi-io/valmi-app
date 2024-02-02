@@ -4,26 +4,37 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import nextConnect from 'next-connect';
+//@ts-nocheck
 
-import { NextApiRequest, NextApiResponse } from 'next/types';
+import { createRouter } from 'next-connect';
+import { createStrategy } from '@/pagesapi/oauth2/login/google';
+import passport from 'passport';
+import { oauthKeys } from '@/lib/oauth_middleware';
 
-import passport from '@lib/passport-google-auth';
+const router = createRouter();
 
-export default nextConnect().get(
-  passport.authenticate('google', { session: false }),
-  (req: NextApiRequest & { user: any }, res: NextApiResponse) => {
-    const params = new URLSearchParams({
-      provider: req.user.provider ? req.user.provider : 'google',
-      access_token: req.user['_accessToken'],
-      refresh_token: req.user._refreshToken ? req.user['_refreshToken'] : '',
-      id: req.user.id,
-      email: req.user.emails[0].value,
-      name: req.user.displayName,
-      image: req.user.photos[0].value,
-      unique_id: req.user.emails[0].value
-    });
+router
+  .use(oauthKeys)
 
-    res.redirect('/auth/callback?' + params.toString());
-  }
-);
+  .get(async (req, res, next) => {
+    let { workspace = '', connector = '' } = req.query;
+    const query = { ...req.credentials, workspace: workspace, connector };
+    const strategy = createStrategy(query);
+
+    return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
+      const params = new URLSearchParams({
+        provider: user?.provider ?? 'google',
+        access_token: user['_accessToken'],
+        refresh_token: user?._refreshToken ?? '',
+        id: user.id,
+        email: user.emails[0].value,
+        name: user.displayName,
+        image: user.photos[0].value,
+        unique_id: user.emails[0].value
+      });
+
+      res.redirect('/auth/callback?' + params.toString());
+    })(req, res, next);
+  });
+
+export default router.handler();

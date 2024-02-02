@@ -4,27 +4,38 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import nextConnect from 'next-connect';
+//@ts-nocheck
 
-import { NextApiRequest, NextApiResponse } from 'next/types';
+import { createRouter } from 'next-connect';
+import { createStrategy } from '@/pagesapi/oauth2/login/hubspot';
+import passport from 'passport';
+import { oauthKeys } from '@/lib/oauth_middleware';
 
-import passport from '@lib/passport-hubspot';
+const router = createRouter();
 
-export default nextConnect().get(
-  passport.authenticate('hubspot', { session: false }),
-  (req: NextApiRequest & { user: any }, res: NextApiResponse) => {
-    const params = new URLSearchParams({
-      provider: req.user.provider ? req.user.provider : 'hubspot',
-      access_token: req.user['_accessToken'],
-      refresh_token: req.user._refreshToken ? req.user['_refreshToken'] : '',
-      id: req.user.user_id,
-      unique_id: req.user.user,
-      hub_id: req.user['hub_id'],
-      email: req.user.user,
-      name: req.user.user.split('@')[0],
-      image: ''
-    });
+router
+  .use(oauthKeys)
 
-    res.redirect('/auth/callback?' + params.toString());
-  }
-);
+  .get(async (req, res, next) => {
+    let { workspace = '', connector = '' } = req.query;
+    const query = { ...req.credentials, workspace: workspace, connector };
+    const strategy = createStrategy(query);
+
+    return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
+      const params = new URLSearchParams({
+        provider: user?.provider ?? 'hubspot',
+        access_token: user['_accessToken'],
+        refresh_token: user?._refreshToken ?? '',
+        id: user.user_id,
+        unique_id: user.user,
+        hub_id: user['hub_id'],
+        email: user.user,
+        name: user.user.split('@')[0],
+        image: ''
+      });
+
+      res.redirect('/auth/callback?' + params.toString());
+    })(req, res, next);
+  });
+
+export default router.handler();

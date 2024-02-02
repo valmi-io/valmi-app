@@ -23,7 +23,6 @@ type ConnectionFlowState = {
     connector_config?: any;
     oauth_params?: any;
     lastStep?: boolean;
-    selected_file?: any;
     oauth_error?: string;
   };
 };

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
  * Created Date: Saturday, January 20th 2024, 4:41:18 pm

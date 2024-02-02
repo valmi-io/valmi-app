@@ -10,15 +10,7 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
-import {
-  getDestinationSelectors,
-  useCreateDestinationMutation,
-  useDeleteDestinationMutation,
-  useDestinationSchemaQuery,
-  useEditDestinationMutation
-} from '@store/api/streamApiSlice';
 import { RootState } from '@store/reducers';
-import { generateUUID, isTrue } from '@/utils/lib';
 import { useFetch } from '@/hooks/useFetch';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
@@ -30,47 +22,62 @@ import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 import FormControlComponent from '@/components/FormControlComponent';
 import {
-  getOAuthSelectors,
   useCreateOAuthConfigMutation,
   useEditOAuthConfigMutation,
+  useGetOAuthApiConfigQuery,
   useOAuthSchemaQuery
 } from '@/store/api/oauthApiSlice';
-import { materialRenderers } from '@jsonforms/material-renderers';
 import OAuthInstructions from '@/content/OAuthApps/OAuthInstructions';
+import { TData } from '@/utils/typings.d';
+import { capitalize, upperCase } from 'lodash';
 
 const CreateOAuthConfigurationLayout = () => {
   // Get type from router
   const router = useRouter();
-  const { type } = router.query;
-  if (!type) return <></>;
-  else return <CreateOAuthConfiguration type={type} />;
+  const { type, connector = '' } = router.query;
+
+  if (!type && !connector) return <></>;
+  else return <CreateOAuthConfiguration type={type} connector={connector} />;
 };
 
-const CreateOAuthConfiguration = ({ type }: any) => {
+const processData = (keys: TData) => {
+  const { ids = [], entities = {} } = keys;
+
+  if (ids.length > 0) {
+    const key = ids[0];
+
+    const { oauth_config = {} } = entities[key];
+
+    return oauth_config;
+  }
+  return {};
+};
+
+const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
+  let connectorType = connector.toUpperCase() + '_' + type.toUpperCase();
+
   const router = useRouter();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
   const { workspaceId = '' } = appState;
 
   // Getting schema for the object
-  const { data: schema, isLoading, traceError, error } = useFetch({ query: useOAuthSchemaQuery({ type }) });
+  const {
+    data: schema,
+    isLoading,
+    traceError,
+    error
+  } = useFetch({ query: useOAuthSchemaQuery({ type: connectorType }) });
 
-  // Getting from redux to decide creating/editing
-  const { editing = false } = useSelector((state: RootState) => state.oAuthFlow);
-
-  // Getting stream selectors for editing case specifically - not useful for create case
-  const { selectOAuthConfigById } = getOAuthSelectors(workspaceId as string);
-  const oAuthData = useSelector((state) => selectOAuthConfigById(state, type));
+  // Getting keys for the object
+  const {
+    data: keys,
+    isLoading: isKeysLoading,
+    traceError: isKeysTraceError,
+    error: keysError
+  } = useFetch({ query: useGetOAuthApiConfigQuery({ workspaceId, type: connectorType }) });
 
   let initialData = {};
-
-  //   if (isTrue(editing)) {
-  //     initialData = destinationData;
-  //   }
-
-  if (isTrue(editing)) {
-    initialData = oAuthData?.oauth_config ?? {};
-  }
 
   // Mutation for creating Schema object
   const [createObject, { isLoading: isCreating, isSuccess: isCreated, isError: isCreateError, error: createError }] =
@@ -79,8 +86,6 @@ const CreateOAuthConfiguration = ({ type }: any) => {
   // Mutation for editing Schema object
   const [editObject, { isLoading: isEditing, isSuccess: isEdited, isError: isEditError, error: editError }] =
     useEditOAuthConfigMutation();
-
-  const [data, setData] = useState<any>(initialData);
 
   // form state
   const [status, setStatus] = useState<FormStatus>('empty');
@@ -116,34 +121,8 @@ const CreateOAuthConfiguration = ({ type }: any) => {
     }
   }, [isCreateError, isEditError]);
 
-  const handleSubmit = () => {
-    setStatus('submitting');
-    const payload = {
-      workspaceId: workspaceId,
-      oauth: {
-        oauth_config: data,
-        type: type
-      }
-    };
-
-    if (editing) {
-      editObject(payload);
-    } else {
-      createObject(payload);
-    }
-  };
-
-  //   const handleDelete = () => {
-  //     const payload = { workspaceId: workspaceId, destinationId: destinationId };
-  //     deleteObject(payload);
-  //   };
-
   const handleNavigationOnSuccess = () => {
     router.push(`/spaces/${workspaceId}/oauth-apps`);
-  };
-
-  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
   };
 
   /**
@@ -168,7 +147,32 @@ const CreateOAuthConfiguration = ({ type }: any) => {
     });
   };
 
-  const PageContent = () => {
+  const PageContent = ({ initialData }: { initialData: any }) => {
+    const [data, setData] = useState(initialData);
+
+    const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+      setData(data);
+    };
+
+    const handleSubmit = () => {
+      setStatus('submitting');
+      const payload = {
+        workspaceId: workspaceId,
+        oauth: {
+          oauth_config: data,
+          type: connectorType
+        }
+      };
+
+      const { ids = [] } = keys ?? {};
+
+      if (ids.length > 0) {
+        editObject(payload);
+      } else {
+        createObject(payload);
+      }
+    };
+
     return (
       <ConnectorLayout title={''}>
         {/** Display Content */}
@@ -183,7 +187,6 @@ const CreateOAuthConfiguration = ({ type }: any) => {
               onSubmitClick={handleSubmit}
               isDeleting={false}
               status={status}
-              error={error}
               jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
               removeAdditionalFields={false}
             />
@@ -204,11 +207,11 @@ const CreateOAuthConfiguration = ({ type }: any) => {
       />
       <ContentLayout
         key={`createOAuthConfiguration${type}`}
-        error={error}
-        PageContent={<PageContent />}
-        displayComponent={!error && !isLoading && schema}
-        isLoading={isLoading}
-        traceError={traceError}
+        error={error || keysError}
+        PageContent={<PageContent initialData={processData(keys ?? initialData)} />}
+        displayComponent={(!error || !keysError) && (!isLoading || !isKeysLoading) && schema && keys}
+        isLoading={isLoading && isKeysLoading}
+        traceError={traceError || isKeysTraceError}
       />
     </PageLayout>
   );
