@@ -15,7 +15,7 @@ type InstructionsProps = {
 const OAuthInstructions = ({ data, type }: InstructionsProps) => {
   // TODO: documentation url changes based on schema.
 
-  const documentationUrl = `https://www.valmi.io/docs/oauth/schema/${type}`;
+  const documentationUrl = `https://www.valmi.io/docs/authentication/oauth/${type}`;
 
   const title = 'OAuth Configuration';
 

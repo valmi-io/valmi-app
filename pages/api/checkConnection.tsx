@@ -33,10 +33,11 @@ const checkConnection = async (req: NextApiRequest, res: NextApiResponse) => {
     // Handle the response data as needed
     res.status(200).json(data);
   } catch (error: any) {
+    const errorMessage = error?.response?.data ?? error.message;
     // send error to bugsnag
-    sendErrorToBugsnag(error.message);
+    sendErrorToBugsnag(errorMessage);
     // Handle any error that occurred during the request
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: errorMessage });
   }
 };
 

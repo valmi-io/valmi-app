@@ -9,6 +9,7 @@ import { memo } from 'react';
 
 const TrackInstructions = ({ data }: { data: any }) => {
   // const documentationUrl = 'https://www.valmi.io/docs/overview';
+
   const documentationUrl = 'https://www.valmi.io/docs/events/connections/default';
   const title = 'Tracks';
   const linkText = 'tracks.';

@@ -27,8 +27,8 @@ const constants = {
     SELECT_CONNECTOR_LAYOUT_TITLE: 'Select connector'
   },
   docs: {
-    syncs: 'https://valmi.io/docs/concepts/syncs',
-    tracks: 'https://valmi.io/docs/concepts/tracks'
+    syncs: 'https://www.valmi.io/docs/concepts/syncs',
+    tracks: 'https://www.valmi.io/docs/concepts/tracks'
   }
 };
 

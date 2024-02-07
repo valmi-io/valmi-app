@@ -162,6 +162,7 @@ const SyncFlow = () => {
 
   const displayInstructions = () => {
     const documentationUrl = constants.docs.syncs;
+
     const title = 'Sync Documentation';
     const linkText = 'sync';
     return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'sync'} />;

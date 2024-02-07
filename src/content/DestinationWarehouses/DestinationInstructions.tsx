@@ -14,12 +14,11 @@ type InstructionsProps = {
 };
 
 const DestinationInstructions = ({ data, type, destinationType }: InstructionsProps) => {
-  // TODO: documentation url changes based on schema.
-
+  destinationType = destinationType === 'postgres' ? 'postgresql' : destinationType;
   const documentationUrl =
     type === 'destination'
-      ? `https://www.valmi.io/docs/events/destinations/warehouses${destinationType}`
-      : 'https://www.valmi.io/docs/events/sources/streams/default';
+      ? `https://www.valmi.io/docs/events/destinations/${destinationType}`
+      : `https://www.valmi.io/docs/events/sources/shopify`;
 
   const title = type === 'destination' ? 'Destination warehouses' : 'Streams';
 
