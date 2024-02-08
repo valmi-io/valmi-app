@@ -19,14 +19,20 @@ const saveUser = (user) => {
   });
 };
 
-export const createStrategy = ({ client_id = '', client_secret = '', workspace = '', connector = '' }) => {
+export const createStrategy = ({
+  client_id = '',
+  client_secret = '',
+  workspace = '',
+  connector = '',
+  oauth_keys = 'private'
+}) => {
   const strategy = new SlackStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
       user_scope: ['identity.basic', 'identity.email'],
       scope: ['users.profile:read', 'chat:write', 'channels:read', 'channels:join'], // default,
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack?workspace=${workspace}&connector=${connector}`
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}`
     },
     async (accessToken, params, profile, cb: any) => {
       try {
@@ -47,8 +53,18 @@ export const createStrategy = ({ client_id = '', client_secret = '', workspace =
 const router = createRouter();
 
 router.use(oauthKeys).get(async (req, res, next) => {
-  let { workspace = '', connector = '' } = req.query;
-  const query = { ...req.credentials, workspace: workspace, connector };
+  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+
+  let credentials = { ...(req.credentials ?? {}) };
+
+  if (oauth_keys === 'public') {
+    credentials = {
+      client_id: process.env.AUTH_SLACK_CLIENT_ID,
+      client_secret: process.env.AUTH_SLACK_CLIENT_SECRET
+    };
+  }
+
+  const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
   const strategy = createStrategy(query);
 
   return passport.authenticate(strategy, null, {

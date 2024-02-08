@@ -17,8 +17,19 @@ router
   .use(oauthKeys)
 
   .get(async (req, res, next) => {
-    let { workspace = '', connector = '' } = req.query;
-    const query = { ...req.credentials, workspace: workspace, connector };
+    let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+
+    let credentials = { ...(req.credentials ?? {}) };
+
+    if (oauth_keys === 'public') {
+      credentials = {
+        client_id: process.env.AUTH_GOOGLE_CLIENT_ID,
+        client_secret: process.env.AUTH_GOOGLE_CLIENT_SECRET
+      };
+    }
+
+    const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+
     const strategy = createStrategy(query);
 
     return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {

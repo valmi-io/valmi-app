@@ -13,6 +13,7 @@ export type ConnectorType = {
   docker_tag: string;
   oauth?: boolean;
   type: string;
+  oauth_keys?: 'private' | 'public';
 };
 
 const ConnectorsList = ({

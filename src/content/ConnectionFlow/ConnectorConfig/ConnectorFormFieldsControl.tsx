@@ -10,6 +10,7 @@ import {
   getOauthRoute,
   hasAuthorizedOAuth
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
 import { FormContainer } from '@/layouts/FormLayout';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { RootState } from '@/store/reducers';
@@ -38,6 +39,8 @@ const ConnectorFormFieldsControl = (props: any) => {
   const fields = data ? processFields(data) : [];
 
   const handleOAuthButtonClick = async (data: any) => {
+    const { oauth_keys = 'private' } = selected_connector;
+
     const values = formValues;
     let combinedValues = { ...values, ...getOAuthParams(oauth_params) };
 
@@ -55,7 +58,7 @@ const ConnectorFormFieldsControl = (props: any) => {
       const oAuthRoute = getOauthRoute({ oAuth: data.oAuthProvider });
       if (oAuthRoute) {
         let { type = '' } = selected_connector;
-        router.push(`${oAuthRoute}?workspace=${workspaceId}&connector=${type}`);
+        router.push(`${oAuthRoute}?workspace=${workspaceId}&connector=${type}&oauth_keys=${oauth_keys}`);
       }
     }
   };
@@ -101,6 +104,7 @@ const ConnectorFormFieldsControl = (props: any) => {
               oauth_error={oauth_error}
               onClick={handleOAuthButtonClick}
               isConnectorConfigured={isConnectorConfigured({ field, keys })}
+              isConfigurationRequired={isConfigurationRequired({ connector: selected_connector })}
               handleOnConfigureButtonClick={handleOnConfigureButtonClick}
             />
           );
@@ -111,6 +115,12 @@ const ConnectorFormFieldsControl = (props: any) => {
 };
 
 export default ConnectorFormFieldsControl;
+
+const isConfigurationRequired = ({ connector }: { connector: ConnectorType }) => {
+  const { oauth_keys = 'private' } = connector;
+
+  return oauth_keys === 'private' ? true : false;
+};
 
 const isConnectorConfigured = ({ field, keys }: { field: FormObject; keys: TData }) => {
   const { ids = [] } = keys;

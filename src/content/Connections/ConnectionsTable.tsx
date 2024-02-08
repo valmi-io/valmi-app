@@ -52,7 +52,7 @@ const BoxLayout = styled(Box)(({}) => ({
   alignItems: 'center'
 }));
 
-const ConnectionsTable: FC<ConnectionsTableProps> = ({ connections, connectionType }) => {
+const ConnectionsTable = ({ connections = [], connectionType = '' }: ConnectionsTableProps) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   /** Redux store */
@@ -74,7 +74,8 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({ connections, connectionTy
         isEditableFlow: true,
         selected_connector: {
           type: connectionType + '_' + connection.type,
-          display_name: connection.display_name
+          display_name: connection.display_name,
+          oauth_keys: connection.oauth_keys
         }
       })
     );
@@ -85,7 +86,7 @@ const ConnectionsTable: FC<ConnectionsTableProps> = ({ connections, connectionTy
     const { external_id = 'account', profile = '' } = account || {};
     let imageSrc = '';
 
-    if (profile) {
+    if (profile && profile !== 'undefined') {
       imageSrc = profile;
     }
 

@@ -15,11 +15,7 @@ import { NextPageWithLayout } from '@/pages_app';
 
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import {
-  ConnectionType,
-  ConnectionsPageTitle,
-  CreateConnectionTitle
-} from '@content/Connections/ConnectionModel';
+import { ConnectionType, ConnectionsPageTitle, CreateConnectionTitle } from '@content/Connections/ConnectionModel';
 import Connections from '@content/Connections';
 
 import constants from '@constants/index';

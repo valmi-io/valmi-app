@@ -17,6 +17,7 @@ interface FormFieldProps extends FormObject {
   oauth_error?: string;
   control: any;
   isConnectorConfigured?: boolean;
+  isConfigurationRequired?: boolean;
   handleOnConfigureButtonClick: (data: any) => void;
 }
 
@@ -33,6 +34,7 @@ const FormField = ({
   selectedConnector,
   onClick,
   isConnectorConfigured,
+  isConfigurationRequired,
   handleOnConfigureButtonClick,
   hasAuthorizedOAuth,
   oauth_error,
@@ -60,6 +62,7 @@ const FormField = ({
         label={label}
         onClick={onClick}
         isConnectorConfigured={isConnectorConfigured}
+        isConfigurationRequired={isConfigurationRequired}
         handleOnConfigureButtonClick={handleOnConfigureButtonClick}
         oAuthProvider={oAuthProvider}
         oauth_error={oauth_error}

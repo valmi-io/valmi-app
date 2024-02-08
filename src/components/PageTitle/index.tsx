@@ -36,12 +36,7 @@ const PageTitle: FC<PageTitleProps> = ({
   let endIcon = null;
   let startIcon = null;
   startIcon = displayStartIcon && <AddTwoToneIcon fontSize="small" />;
-  endIcon = isFetching && (
-    <CircularProgress
-      size={16}
-      sx={{ color: (theme) => theme.colors.alpha.white[100] }}
-    />
-  );
+  endIcon = isFetching && <CircularProgress size={16} sx={{ color: (theme) => theme.colors.alpha.white[100] }} />;
 
   return (
     <Grid
@@ -60,12 +55,7 @@ const PageTitle: FC<PageTitleProps> = ({
       {displayButton && (
         <Grid item>
           {link ? (
-            <Link
-              href={linkurl}
-              target="_blank"
-              passHref
-              style={{ textDecoration: 'none' }}
-            >
+            <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
               <Button
                 sx={{
                   fontWeight: 'bold',

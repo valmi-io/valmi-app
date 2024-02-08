@@ -23,9 +23,7 @@ const OAuthRedirectPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   /** Redux store */
-  const connection_flow = useSelector(
-    (state: RootState) => state.connectionFlow
-  );
+  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
   const { flowState: {} = {} } = connection_flow;
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
@@ -109,6 +107,7 @@ const OAuthRedirectPage = () => {
 
 export const getOAuthParams = (params: any) => {
   const oAuthParams = params || {};
+
   const { provider = '' } = oAuthParams;
   switch (provider) {
     case 'facebook':

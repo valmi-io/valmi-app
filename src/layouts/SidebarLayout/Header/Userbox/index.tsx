@@ -14,7 +14,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
-import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
+
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import PopoverComponent from '@components/Popover';
 
@@ -108,7 +109,7 @@ const HeaderUserbox = () => {
           <Divider />
           <Box sx={{ m: 1 }}>
             <Button color="primary" fullWidth onClick={handleSignoutClick}>
-              <LockOpenTwoToneIcon sx={{ mr: 1 }} />
+              <LogoutIcon sx={{ mr: 1 }} />
               Sign out
             </Button>
           </Box>

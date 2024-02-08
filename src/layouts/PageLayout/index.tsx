@@ -22,14 +22,7 @@ interface PageLayoutProps {
 }
 
 const PageLayout = (props: PageLayoutProps) => {
-  const {
-    pageHeadTitle,
-    title,
-    displayButton,
-    buttonTitle,
-    handleButtonOnClick,
-    children
-  } = props;
+  const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
     <>
       <PageHead title={pageHeadTitle} />

@@ -9,7 +9,11 @@ import { getAccessTokenCookie, getBaseUrl } from '@/pagesapi/utils';
 import axios from 'axios';
 
 export const oauthKeys = async (req, res, next) => {
-  let { workspace = '', connector = '' } = req.query;
+  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+
+  if (oauth_keys === 'public') {
+    return next();
+  }
 
   let url = `${getBaseUrl()}/oauth/workspaces/${workspace}/keys/${connector}`;
 

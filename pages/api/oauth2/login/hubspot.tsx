@@ -19,13 +19,19 @@ const saveUser = (user: Profile) => {
   });
 };
 
-export const createStrategy = ({ client_id = '', client_secret = '', workspace = '', connector = '' }) => {
+export const createStrategy = ({
+  client_id = '',
+  client_secret = '',
+  workspace = '',
+  connector = '',
+  oauth_keys = 'private'
+}) => {
   const strategy = new HubspotStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
       user_scope: ['identity.basic', 'identity.email'],
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/hubspot?workspace=${workspace}&connector=${connector}`, // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/hubspot?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}`, // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
       passReqToCallback: true
     },
     async (req, _accessToken, _refreshToken, profile, cb: any) => {
@@ -46,8 +52,19 @@ export const createStrategy = ({ client_id = '', client_secret = '', workspace =
 const router = createRouter();
 
 router.use(oauthKeys).get(async (req, res, next) => {
-  let { workspace = '', connector = '' } = req.query;
-  const query = { ...req.credentials, workspace: workspace, connector };
+  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+
+  let credentials = { ...(req.credentials ?? {}) };
+
+  if (oauth_keys === 'public') {
+    credentials = {
+      client_id: process.env.AUTH_HUBSPOT_CLIENT_ID,
+      client_secret: process.env.AUTH_HUBSPOT_CLIENT_SECRET
+    };
+  }
+
+  const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+
   const strategy = createStrategy(query);
 
   return passport.authenticate(strategy, {

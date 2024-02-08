@@ -31,7 +31,9 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     initialiseConnectorSelectionState(dispatch, connection_flow);
   }, []);
 
-  const handleItemOnClick = ({ type, display_name }: ConnectorType) => {
+  const handleItemOnClick = (connector: ConnectorType) => {
+    const { type, display_name, oauth_keys = 'private' } = connector;
+
     // increase remaining steps count.
     dispatch(
       setConnectionFlow({
@@ -40,7 +42,8 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
         steps: currentStep + 1,
         selected_connector: {
           type: type,
-          display_name: display_name
+          display_name: display_name,
+          oauth_keys: oauth_keys
         }
       })
     );

@@ -77,10 +77,12 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
         workspaceId: workspaceId
       });
 
-      fetchConnectorOAuthConfig({
-        workspaceId,
-        type: selected_connector.type
-      });
+      if (selected_connector.oauth_keys === 'private') {
+        fetchConnectorOAuthConfig({
+          workspaceId,
+          type: selected_connector.type
+        });
+      }
     }
   }, []);
 
@@ -122,10 +124,12 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
       return <SkeletonLoader loading={isFetching || isKeysLoading} />;
     }
 
-    if (data && keys) {
+    const displayContent = selected_connector.oauth_keys === 'private' ? !!(data && keys) : !!data;
+
+    if (displayContent) {
       return (
         <FormLayout
-          formComp={<ConnectorFormFieldsControl {...props} data={data} keys={keys} />}
+          formComp={<ConnectorFormFieldsControl {...props} data={data} keys={keys ?? []} />}
           instructionsComp={<ConnectorInstructions data={data} selected_connector={selected_connector} />}
         />
       );

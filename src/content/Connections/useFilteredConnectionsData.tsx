@@ -16,7 +16,8 @@ const getConnectorConfig = (connector: any) => {
     display_name: connector.display_name,
     config: connector.connector_config,
     type: connector.connector_type.split('_')[1],
-    account: connector.account
+    account: connector.account,
+    oauth_keys: connector.oauth_keys
   };
   return config;
 };
