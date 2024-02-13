@@ -19,20 +19,14 @@ const saveUser = (user) => {
   });
 };
 
-export const createStrategy = ({
-  client_id = '',
-  client_secret = '',
-  workspace = '',
-  connector = '',
-  oauth_keys = 'private'
-}) => {
+export const createStrategy = ({ client_id = '', client_secret = '' }) => {
   const strategy = new SlackStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
       user_scope: ['identity.basic', 'identity.email'],
       scope: ['users.profile:read', 'chat:write', 'channels:read', 'channels:join'], // default,
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}`
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/slack`
     },
     async (accessToken, params, profile, cb: any) => {
       try {
@@ -53,7 +47,11 @@ export const createStrategy = ({
 const router = createRouter();
 
 router.use(oauthKeys).get(async (req, res, next) => {
-  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+  const { state = '' } = req.query;
+
+  let json = JSON.parse(decodeURIComponent(state));
+
+  let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
   let credentials = { ...(req.credentials ?? {}) };
 
@@ -64,13 +62,25 @@ router.use(oauthKeys).get(async (req, res, next) => {
     };
   }
 
-  const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+  const query = { ...credentials };
   const strategy = createStrategy(query);
 
-  return passport.authenticate(strategy, null, {
-    failureRedirect: '/login', // Redirect to login page on failure
-    successRedirect: '/' //
-  })(req, res, next);
+  const params = {
+    workspace: workspace,
+    connector: connector,
+    oauth_keys: oauth_keys
+  };
+
+  return passport.authenticate(
+    strategy,
+    {
+      state: encodeURIComponent(JSON.stringify(params))
+    },
+    {
+      failureRedirect: '/login', // Redirect to login page on failure
+      successRedirect: '/' //,
+    }
+  )(req, res, next);
 });
 
 export default router.handler();

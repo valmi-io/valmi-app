@@ -74,7 +74,13 @@ const FormFieldAuth = (props: any) => {
               </IconButton>
             </Stack>
           )
-        ) : null}
+        ) : (
+          <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
+            <IconButton color={hasOAuthAuthorized ? 'primary' : 'error'}>
+              <CustomIcon icon={hasOAuthAuthorized ? faCheckCircle : faCircleXmark} />
+            </IconButton>
+          </Stack>
+        )}
       </Stack>
       <Item>
         <Tooltip title={isConfigurationRequired && !isConnectorConfigured ? 'This OAuth requires configuration' : ''}>

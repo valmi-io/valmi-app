@@ -20,18 +20,13 @@ const saveUser = (user: Profile) => {
   });
 };
 
-export const createStrategy = ({
-  client_id = '',
-  client_secret = '',
-  workspace = '',
-  connector = '',
-  oauth_keys = 'private'
-}) => {
+export const createStrategy = ({ client_id = '', client_secret = '' }) => {
   const strategy = new GoogleStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/google?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
+
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/google` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
     },
     async (_accessToken, _refreshToken, profile: any, cb: any) => {
       try {
@@ -54,7 +49,11 @@ router
   .use(oauthKeys)
 
   .get(async (req, res, next) => {
-    let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+    const { state = '' } = req.query;
+
+    let json = JSON.parse(decodeURIComponent(state));
+
+    let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
     let credentials = { ...(req.credentials ?? {}) };
 
@@ -65,9 +64,15 @@ router
       };
     }
 
-    const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+    const query = { ...credentials };
 
     const strategy = createStrategy(query);
+
+    const params = {
+      workspace: workspace,
+      connector: connector,
+      oauth_keys: oauth_keys
+    };
 
     return passport.authenticate(strategy, {
       scope: [
@@ -78,7 +83,8 @@ router
       ],
       session: false,
       accessType: 'offline',
-      prompt: 'consent'
+      prompt: 'consent',
+      state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });
 

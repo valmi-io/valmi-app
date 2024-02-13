@@ -17,7 +17,15 @@ router
   .use(oauthKeys)
 
   .get(async (req, res, next) => {
-    let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+    const { state = '' } = req.query;
+
+    let json = JSON.parse(decodeURIComponent(state));
+
+    if (typeof json === 'string') {
+      json = JSON.parse(json);
+    }
+
+    let { oauth_keys = 'private' } = json;
 
     let credentials = { ...(req.credentials ?? {}) };
 
@@ -28,10 +36,11 @@ router
       };
     }
 
-    const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+    const query = { ...credentials };
+
     const strategy = createStrategy(query);
 
-    return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
+    passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
       const params = new URLSearchParams({
         provider: user?.provider ?? 'hubspot',
         access_token: user['_accessToken'],

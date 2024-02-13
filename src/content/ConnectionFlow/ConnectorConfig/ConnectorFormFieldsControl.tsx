@@ -58,7 +58,16 @@ const ConnectorFormFieldsControl = (props: any) => {
       const oAuthRoute = getOauthRoute({ oAuth: data.oAuthProvider });
       if (oAuthRoute) {
         let { type = '' } = selected_connector;
-        router.push(`${oAuthRoute}?workspace=${workspaceId}&connector=${type}&oauth_keys=${oauth_keys}`);
+
+        let obj = {
+          workspace: workspaceId,
+          connector: type,
+          oauth_keys: oauth_keys
+        };
+
+        let state = encodeURIComponent(JSON.stringify(obj));
+
+        router.push(`${oAuthRoute}?state=${state}`);
       }
     }
   };

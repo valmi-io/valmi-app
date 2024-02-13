@@ -11,20 +11,14 @@ import passport from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { oauthKeys } from '@/lib/oauth_middleware';
 
-export const createStrategy = ({
-  client_id = '',
-  client_secret = '',
-  workspace = '',
-  connector = '',
-  oauth_keys = 'private'
-}) => {
+export const createStrategy = ({ client_id = '', client_secret = '' }) => {
   const strategy = new FacebookStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
       authType: 'reauthenticate',
       profileFields: ['id', 'displayName', 'photos', 'email'],
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/facebook?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/facebook` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
     },
     async (_accessToken, _refreshToken, profile: any, cb: any) => {
       try {
@@ -46,7 +40,11 @@ router
   .use(oauthKeys)
 
   .get(async (req, res, next) => {
-    let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+    const { state = '' } = req.query;
+
+    let json = JSON.parse(decodeURIComponent(state));
+
+    let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
     let credentials = { ...(req.credentials ?? {}) };
 
@@ -57,12 +55,19 @@ router
       };
     }
 
-    const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+    const query = { ...credentials };
     const strategy = createStrategy(query);
+
+    const params = {
+      workspace: workspace,
+      connector: connector,
+      oauth_keys: oauth_keys
+    };
 
     return passport.authenticate(strategy, {
       scope: ['public_profile', 'ads_management', 'email'],
-      session: false
+      session: false,
+      state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });
 

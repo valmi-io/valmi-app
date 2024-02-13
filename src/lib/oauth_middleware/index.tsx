@@ -9,7 +9,15 @@ import { getAccessTokenCookie, getBaseUrl } from '@/pagesapi/utils';
 import axios from 'axios';
 
 export const oauthKeys = async (req, res, next) => {
-  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+  const { state = '' } = req.query;
+
+  let json = JSON.parse(decodeURIComponent(state));
+
+  if (typeof json === 'string') {
+    json = JSON.parse(json);
+  }
+
+  let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
   if (oauth_keys === 'public') {
     return next();

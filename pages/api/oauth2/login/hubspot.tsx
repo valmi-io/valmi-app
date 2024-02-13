@@ -19,19 +19,12 @@ const saveUser = (user: Profile) => {
   });
 };
 
-export const createStrategy = ({
-  client_id = '',
-  client_secret = '',
-  workspace = '',
-  connector = '',
-  oauth_keys = 'private'
-}) => {
+export const createStrategy = ({ client_id = '', client_secret = '' }) => {
   const strategy = new HubspotStrategy(
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
-      user_scope: ['identity.basic', 'identity.email'],
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/hubspot?workspace=${workspace}&connector=${connector}&oauth_keys=${oauth_keys}`, // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/hubspot`, // this is the endpoint you registered on google while creating your app. This endpoint would exist on your application for verifying the authentication
       passReqToCallback: true
     },
     async (req, _accessToken, _refreshToken, profile, cb: any) => {
@@ -52,7 +45,11 @@ export const createStrategy = ({
 const router = createRouter();
 
 router.use(oauthKeys).get(async (req, res, next) => {
-  let { workspace = '', connector = '', oauth_keys = 'private' } = req.query;
+  const { state = '' } = req.query;
+
+  let json = JSON.parse(decodeURIComponent(state));
+
+  let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
   let credentials = { ...(req.credentials ?? {}) };
 
@@ -63,9 +60,15 @@ router.use(oauthKeys).get(async (req, res, next) => {
     };
   }
 
-  const query = { ...credentials, workspace: workspace, connector: connector, oauth_keys: oauth_keys };
+  const query = { ...credentials };
 
   const strategy = createStrategy(query);
+
+  const params = {
+    workspace: workspace,
+    connector: connector,
+    oauth_keys: oauth_keys
+  };
 
   return passport.authenticate(strategy, {
     scope: [
@@ -73,7 +76,8 @@ router.use(oauthKeys).get(async (req, res, next) => {
       'crm.objects.contacts.write',
       'crm.objects.companies.read',
       'crm.objects.companies.write'
-    ]
+    ],
+    state: encodeURIComponent(JSON.stringify(params))
   })(req, res, next);
 });
 
