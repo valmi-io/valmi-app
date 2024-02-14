@@ -136,7 +136,7 @@ const ConnectionFlow = () => {
     }
 
     // check if authorized
-    if (hasAuthorizedOAuth(oauth_params)) {
+    if (hasAuthorizedOAuth(oauth_params, isEditableFlow)) {
       setConnectorConfigInConnectionFlow(dispatch, values, connection_flow);
     } else {
       // update oauth_error in connection flow state

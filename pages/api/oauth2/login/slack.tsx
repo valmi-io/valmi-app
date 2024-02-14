@@ -53,12 +53,18 @@ router.use(oauthKeys).get(async (req, res, next) => {
 
   let { workspace = '', connector = '', oauth_keys = 'private' } = json;
 
-  let credentials = { ...(req.credentials ?? {}) };
+  let credentials = {};
+  let query_response = { ...(req.credentials ?? {}) };
 
   if (oauth_keys === 'public') {
     credentials = {
       client_id: process.env.AUTH_SLACK_CLIENT_ID,
       client_secret: process.env.AUTH_SLACK_CLIENT_SECRET
+    };
+  } else {
+    credentials = {
+      client_id: query_response['AUTH_SLACK_CLIENT_ID'],
+      client_secret: query_response['AUTH_SLACK_CLIENT_SECRET']
     };
   }
 

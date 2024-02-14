@@ -90,8 +90,9 @@ export const isConnectorRequiresOAuth = (data: any) => {
   return false;
 };
 
-export const hasAuthorizedOAuth = (oAuthParams: any) => {
-  return !isObjectEmpty(oAuthParams) ? true : false;
+export const hasAuthorizedOAuth = (oAuthParams: any, isEditableFlow: boolean) => {
+  //TODO: HACK - to check if the user has already authorized based on isEditableFlow
+  return !isObjectEmpty(oAuthParams) || isEditableFlow ? true : false;
 };
 
 const getFieldType = ({ hasOAuth, enumFlag, isSecretKey, type }: any) => {

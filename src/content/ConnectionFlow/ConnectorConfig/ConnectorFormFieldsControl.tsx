@@ -31,8 +31,15 @@ const ConnectorFormFieldsControl = (props: any) => {
 
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
-  const { flowState: { selected_connector = null, oauth_params = {}, oauth_error = '', connector_spec = null } = {} } =
-    connection_flow;
+  const {
+    flowState: {
+      selected_connector = null,
+      oauth_params = {},
+      oauth_error = '',
+      connector_spec = null,
+      isEditableFlow = false
+    } = {}
+  } = connection_flow;
 
   const workspaceId = useSelector((state: RootState) => state.appFlow.appState.workspaceId);
 
@@ -109,7 +116,7 @@ const ConnectorFormFieldsControl = (props: any) => {
               {...field}
               control={control}
               selectedConnector={selected_connector?.display_name ?? ''}
-              hasAuthorizedOAuth={hasAuthorizedOAuth(oauth_params)}
+              hasAuthorizedOAuth={hasAuthorizedOAuth(oauth_params, isEditableFlow)}
               oauth_error={oauth_error}
               onClick={handleOAuthButtonClick}
               isConnectorConfigured={isConnectorConfigured({ field, keys })}

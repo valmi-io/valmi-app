@@ -67,19 +67,22 @@ const FormFieldAuth = (props: any) => {
               {'Configure'}
             </Button>
           ) : (
+            hasOAuthAuthorized && (
+              <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
+                <IconButton color={'primary'}>
+                  <CustomIcon icon={faCheckCircle} />
+                </IconButton>
+              </Stack>
+            )
+          )
+        ) : (
+          hasOAuthAuthorized && (
             <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
-              <Label>{'Configured'}</Label>
-              <IconButton color={hasOAuthAuthorized ? 'primary' : 'error'}>
-                <CustomIcon icon={hasOAuthAuthorized ? faCheckCircle : faCircleXmark} />
+              <IconButton color={'primary'}>
+                <CustomIcon icon={faCheckCircle} />
               </IconButton>
             </Stack>
           )
-        ) : (
-          <Stack sx={{ display: 'flex', flexDirection: 'row' }}>
-            <IconButton color={hasOAuthAuthorized ? 'primary' : 'error'}>
-              <CustomIcon icon={hasOAuthAuthorized ? faCheckCircle : faCircleXmark} />
-            </IconButton>
-          </Stack>
         )}
       </Stack>
       <Item>
