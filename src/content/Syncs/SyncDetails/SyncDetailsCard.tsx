@@ -95,7 +95,7 @@ const SyncDetailsCard = ({
           <Stack spacing={0.5} direction="row">
             <CustomIcon icon={appIcons.SCHEDULE} />
             <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
-              isPublicSync ? '900000' : run_interval
+              isPublicSync ?  run_interval : run_interval
             )}`}</Typography>
           </Stack>
 
