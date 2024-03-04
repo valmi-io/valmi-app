@@ -15,7 +15,7 @@ import { hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import { setConnectionFlow } from '@store/reducers/connectionFlow';
+import connectionFlow, { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 const OAuthRedirectPage = () => {
   const router = useRouter();
@@ -53,13 +53,24 @@ const OAuthRedirectPage = () => {
   }, [router]);
 
   const getFbLongLivedToken = async (url: any, method: any, data: any) => {
+    const { workspaceId = '' } = appState || {};
+
+    const { oauth_keys = 'private', type = '' } = connection_flow?.flowState?.selected_connector ?? {};
+
+    let obj = {
+      workspace: workspaceId,
+      connector: type,
+      oauth_keys: oauth_keys,
+      accessToken: data?.config?.credentials?.access_token ?? ''
+    };
+
+    let state = encodeURIComponent(JSON.stringify(obj));
+
     try {
-      const response = await axios.post('/api/getFbLongLivedToken', {
-        url,
-        method,
-        data
-      });
+      const response = await axios.get('/api/getFbLongLivedToken', { params: { state: state } });
+
       const result = response.data;
+
       if (hasErrorsInData(result)) {
         // TODO: Handle this error if needed.
         dispatch(
