@@ -13,6 +13,11 @@ type Streams = {
   browser: EventSourceType;
 };
 
+type AnalyticsDestinations = {
+  google_analytics: EventSourceType,
+  facebook_conversions: EventSourceType
+}
+
 export const extDestinations: Destinations = {
   postgres: {
     display_name: 'Postgres',
@@ -33,3 +38,16 @@ export const extStreams: Streams = {
     icon: 'browser'
   }
 };
+
+export const extAnalyticsDestinations: AnalyticsDestinations = {
+  google_analytics: {
+    display_name: 'Google Analytics 4',
+    type: 'ga4',
+    icon: 'ga4'
+  },
+  facebook_conversions : {
+    display_name: 'Facebook Conversions',
+    type: 'facebook-conversions',
+    icon: 'facebook-conversions'
+  }
+}

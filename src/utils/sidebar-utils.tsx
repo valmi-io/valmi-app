@@ -71,8 +71,8 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       id: 4,
       path: `/spaces/${workspaceId}/destination-warehouses`,
       sidebarProps: {
-        displayText: 'WAREHOUSES',
-        icon: appIcons.SRC
+        displayText: 'DESTINATIONS',
+        icon: appIcons.DEST
       },
       subRoute: true
     },

@@ -24,10 +24,11 @@ import { RootState } from '@store/reducers';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import DestinationsTable from '@/content/DestinationWarehouses/DestinationsTable';
 import { useFetch } from '@/hooks/useFetch';
-import { useGetDestinationsQuery } from '@/store/api/streamApiSlice';
+import { useGetAnalyticsDestinationsQuery, useGetDestinationsQuery } from '@/store/api/streamApiSlice';
 import { setDestinationFlowState } from '@/store/reducers/destinationFlow';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
+import AnalyticsDestinationsTable from '@/content/AnalyticsDestinations/AnalyticsDestinationsTable';
 
 const DestinationsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,6 +41,7 @@ const DestinationsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = appState;
 
   const { data, isLoading, traceError, error } = useFetch({ query: useGetDestinationsQuery(workspaceId) });
+  const { data : data1, isLoading: isLoading1, traceError : traceError1, error: error1 } = useFetch({ query: useGetAnalyticsDestinationsQuery(workspaceId) });
 
   const handleButtonOnClick = ({ edit = false, id = '', type = '', supertype = '' }) => {
     dispatch(setDestinationFlowState({ editing: edit, id: id, type: type, supertype: supertype }));
@@ -49,8 +51,16 @@ const DestinationsPage: NextPageWithLayout = () => {
       router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/create`);
     }
   };
+  const handleButtonOnClickAnalyticsDestination = ({ edit = false, id = '', type = '', supertype = '' }) => {
+    dispatch(setDestinationFlowState({ editing: edit, id: id, type: type, supertype: supertype }));
+    if (edit) {
+      router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/analytics-destinations/create/${type}`);
+    } else {
+      router.push(`${getBaseRoute(workspaceId)}/destination-warehouses/analytics-destinations/create`);
+    }
+  };
 
-  const PageContent = () => {
+  const PageContentForWarehouses = () => {
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No destination warehouses found in this workspace'} />;
     }
@@ -63,23 +73,53 @@ const DestinationsPage: NextPageWithLayout = () => {
       />
     );
   };
+  const PageContentForAnalyticsDestinations = () => {
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No analytics destinations found in this workspace'} />;
+    }
+    return (
+      <AnalyticsDestinationsTable
+        key={`analytcsdestinationstable-${workspaceId}`}
+        data={data}
+        id={id}
+        handleButtonOnClick={handleButtonOnClickAnalyticsDestination}
+      />
+    );
+  };
 
   return (
+    <>
     <PageLayout
       pageHeadTitle="Warehouses"
       title="Destination Warehouses"
       buttonTitle="Warehouse"
       handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
-    >
+      >
       <ContentLayout
         key={`destinationsWarehousesPage`}
         error={error}
-        PageContent={<PageContent />}
+        PageContent={<PageContentForWarehouses />}
         displayComponent={!error && !isLoading && data}
         isLoading={isLoading}
         traceError={traceError}
-      />
+        />
     </PageLayout>
+    <PageLayout
+      pageHeadTitle="Analytics Destinations"
+      title="Analytics Destinations"
+      buttonTitle="Analytics Destination"
+      handleButtonOnClick={() => handleButtonOnClickAnalyticsDestination({ edit: false, id: '', supertype: '', type: '' })}
+      >
+      <ContentLayout
+        key={`destinationsAnalyticsPage`}
+        error={error1}
+        PageContent={<PageContentForAnalyticsDestinations />}
+        displayComponent={!error1 && !isLoading1 && data1}
+        isLoading={isLoading1}
+        traceError={traceError1}
+        />
+    </PageLayout>
+    </>
   );
 };
 
