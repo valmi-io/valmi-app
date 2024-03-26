@@ -38,7 +38,7 @@ import CustomIcon from '@/components/Icon/CustomIcon';
 import appIcons from '@/utils/icon-utils';
 import { TData } from '@/utils/typings.d';
 
-type EventConnectionType = 'STREAM' | 'DESTINATION';
+type EventConnectionType = 'STREAM' | 'DESTINATION' | 'ANALYTICS-DESTINATION';
 
 type ConnectionLayoutProps = {
   type: EventConnectionType;
@@ -286,6 +286,8 @@ const EventsPage: NextPageWithLayout = () => {
       router.push(`${getBaseRoute(workspaceId)}/streams?id=${id}`);
     } else if (connectionType === 'DESTINATION') {
       router.push(`${getBaseRoute(workspaceId)}/destination-warehouses?id=${id}`);
+    } else if (connectionType === 'ANALYTICS-DESTINATION') {
+      router.push(`${getBaseRoute(workspaceId)}/analytics-destinations?id=${id}`);
     }
   };
 
@@ -318,6 +320,8 @@ const EventsPage: NextPageWithLayout = () => {
           router.push(`${getBaseRoute(workspaceId)}/streams`);
         } else if (connectionType === 'DESTINATION') {
           router.push(`${getBaseRoute(workspaceId)}/destination-warehouses`);
+        } else if (connectionType === 'ANALYTICS-DESTINATION') {
+          router.push(`${getBaseRoute(workspaceId)}/analytics-destinations`);
         }
       };
 

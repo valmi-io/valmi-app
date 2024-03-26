@@ -9,7 +9,7 @@ import { memo } from 'react';
 
 type InstructionsProps = {
   data: any; // schema
-  type: 'stream' | 'destination';
+  type: 'stream' | 'destination' | 'analytics-destination';
   destinationType?: string;
 };
 
@@ -20,9 +20,9 @@ const DestinationInstructions = ({ data, type, destinationType }: InstructionsPr
       ? `https://www.valmi.io/docs/events/destinations/${destinationType}`
       : `https://www.valmi.io/docs/events/sources/shopify`;
 
-  const title = type === 'destination' ? 'Destination warehouses' : 'Streams';
+  const title = type === 'destination' ? 'Destination warehouses' : type === 'analytics-destination' ?  'Analytics destinations' : 'Streams';
 
-  const linkText = type === 'destination' ? 'destination-warehouses' : 'streams.';
+  const linkText = type === 'destination' ? 'destination-warehouses' : type === 'analytics-destination' ?  'analytics-destinations' : 'streams';
 
   return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={type} />;
 };

@@ -35,7 +35,8 @@ export function DiscoverState(
   const updatedFlowStateAfterQuery = (results) => {
     const updatedFlowState = setVarsinSubStep(flowState, step, subStep, {
       more: results.catalog.more ? results.catalog.more : false,
-      type: results.catalog.type ? results.catalog.type : ''
+      type: results.catalog.type ? results.catalog.type : '',
+      allow_object_creation: results.catalog.allow_object_creation ? results.catalog.allow_object_creation : false
     });
     return updatedFlowState;
   };
@@ -89,7 +90,7 @@ export function DiscoverState(
     return result.name;
   };
 
-  const renderComponent = (resultsFilter, onSelect) => {
+  const renderComponent = (resultsFilter, onSelect, refreshData, setRefreshData) => {
     let config = {};
     if (step == 0) {
       config = sourceConfig;
@@ -98,6 +99,8 @@ export function DiscoverState(
     }
     return (
       <CatalogSelectionComponent
+        refreshData={refreshData}
+        setRefreshData={setRefreshData}
         refreshKey={refreshKey}
         query={useLazyDiscoverConnectorQuery}
         queryArgs={{

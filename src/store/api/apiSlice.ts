@@ -41,7 +41,7 @@ const staggeredBaseQueryWithBailOut = retry(
 );
 // Define our single API slice object
 export const apiSlice = createApi({
-  tagTypes: ['Stream', 'Destination', 'Link', 'Log', 'OAuth'],
+  tagTypes: ['Stream', 'Destination', 'Link', 'Log', 'OAuth', 'Analytics-Destination'],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',
@@ -199,6 +199,24 @@ export const apiSlice = createApi({
           }
         });
 
+        return result.data
+          ? { data: { resultData: result.data, queryId: queryId } }
+          : { error: { errorData: result.error, queryId: queryId } };
+      }
+    }),
+
+    createConnector: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        console.log("INSIDE CREATE API", arg)
+        const { config, workspaceId, connectorType, queryId, createdValue } = arg;
+        const payload = {...config, createdValue}
+        const result = await baseQuery({
+          url: `/workspaces/${workspaceId}/connectors/${connectorType}/create`,
+          method: 'POST',
+          body: {
+            config,
+          }
+        });
         return result.data
           ? { data: { resultData: result.data, queryId: queryId } }
           : { error: { errorData: result.error, queryId: queryId } };
@@ -398,6 +416,7 @@ export const {
   useLazyResendActivationTokenQuery,
   useLazyResetPasswordQuery,
   useLazyConfirmPasswordResetQuery,
+  useLazyCreateConnectorQuery,
   useLazyDiscoverConnectorQuery,
   useFetchCredentialsQuery,
   useLazyFetchCredentialsQuery,

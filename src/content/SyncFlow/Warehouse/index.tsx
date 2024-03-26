@@ -15,13 +15,14 @@ import { getMappingStates } from '@content/SyncFlow/Mapping/mappingManagement';
 
 import { RootState } from '@store/reducers';
 import { setFlowState } from '@store/reducers/syncFlow';
+import { useState } from 'react';
 
 const Warehouse = () => {
   const dispatch = useDispatch();
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
   const otherState = useSelector((state: RootState) => state.appFlow.appState);
-
+  const [refreshData, setRefreshData] = useState(false);
   let { steps = [], currentStep = 0 } = flowState;
 
   const moreAvailable = (flowState, lastStep) => {
@@ -143,7 +144,9 @@ const Warehouse = () => {
       <div key={'key_' + index} style={{ width: '100%' }}>
         {warehouseStep.renderComponent(
           warehouseStep.resultFilter,
-          warehouseStep.onSelect
+          warehouseStep.onSelect,
+          refreshData,
+          setRefreshData
         )}
       </div>
     );

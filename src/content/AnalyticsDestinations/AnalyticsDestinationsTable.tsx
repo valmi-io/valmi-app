@@ -44,7 +44,7 @@ const AnalyticsDestinationsTable = ({ data, handleButtonOnClick, id: queryId }: 
         <Table>
           {/* Destinations Table Columns */}
           <TableHead>
-            <TableHeader columns={AnalyticsDestinationsTableColumns} connectionType={ConnectionType.DEST} />
+            <TableHeader columns={AnalyticsDestinationsTableColumns} connectionType={ConnectionType.ANALYTICS_DESTINATION} />
           </TableHead>
           {/* Destinations Table Body */}
           <TableBody>

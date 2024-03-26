@@ -9,7 +9,8 @@ import constants from '@constants/index';
 
 export enum ConnectionType {
   SRC = 'SRC',
-  DEST = 'DEST'
+  DEST = 'DEST',
+  ANALYTICS_DESTINATION = 'ANALYTICS_DESTINATION'
 }
 
 export type ConnectorType =
@@ -19,12 +20,14 @@ export type ConnectorType =
 
 export enum ConnectionsPageTitle {
   SRC = 'Warehouses',
-  DEST = 'Destinations'
+  DEST = 'Destinations',
+  ANALYTICS_DESTINATION = 'Analytics destinations'
 }
 
 export enum CreateConnectionTitle {
   SRC = 'Warehouse',
-  DEST = 'Destination'
+  DEST = 'Destination',
+  ANALYTICS_DESTINATION = 'Analytics destination'
 }
 
 export interface ConnectionModel {

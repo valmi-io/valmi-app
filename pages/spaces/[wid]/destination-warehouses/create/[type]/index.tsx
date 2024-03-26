@@ -133,7 +133,7 @@ const CreateDestination = ({ type }: any) => {
       workspaceId: workspaceId,
       destination: data
     };
-
+    console.log("PAYLOAD", payload)
     if (editing) {
       editObject(payload);
     } else {

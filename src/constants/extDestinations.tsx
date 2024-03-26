@@ -7,16 +7,14 @@ export interface EventSourceType {
 type Destinations = {
   postgres: EventSourceType;
   snowflake: EventSourceType;
+  google_analytics: EventSourceType;
+  facebook_conversions: EventSourceType;
 };
 
 type Streams = {
   browser: EventSourceType;
 };
 
-type AnalyticsDestinations = {
-  google_analytics: EventSourceType,
-  facebook_conversions: EventSourceType
-}
 
 export const extDestinations: Destinations = {
   postgres: {
@@ -28,18 +26,7 @@ export const extDestinations: Destinations = {
     display_name: 'Snowflake',
     type: 'snowflake',
     icon: 'snowflake'
-  }
-};
-
-export const extStreams: Streams = {
-  browser: {
-    display_name: 'Browser',
-    type: 'browser',
-    icon: 'browser'
-  }
-};
-
-export const extAnalyticsDestinations: AnalyticsDestinations = {
+  },
   google_analytics: {
     display_name: 'Google Analytics 4',
     type: 'ga4',
@@ -50,4 +37,12 @@ export const extAnalyticsDestinations: AnalyticsDestinations = {
     type: 'facebook-conversions',
     icon: 'facebook-conversions'
   }
-}
+};
+
+export const extStreams: Streams = {
+  browser: {
+    display_name: 'Browser',
+    type: 'browser',
+    icon: 'browser'
+  }
+};

@@ -201,6 +201,46 @@ export const getResults = (flowState, step, subStep) => {
   return [];
 };
 
+export const ifAllowsObjectCreation = (flowState, step, subStep) => {
+  if(flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
+    return flowState.steps[step][subStep].allow_object_creation;
+}
+
+export const addNewFieldToDestinationSubStep = (flowState, step, subStep) => {
+  if(flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
+    return {...flowState.steps[step][substep], newly_created_object : ""}
+};
+
+const getType = (flowState, currentStep, subStep) => {
+  const { steps } = flowState;
+  if (subStep === 0) {
+    return null;
+  } else if (steps[step][currentStep]?.type) {
+    return steps[step][currentStep].type;
+  }
+  return null;
+};
+
+export const generateSelectedStreamsObject = (flowState, step, subStep) => {
+  const getSelectedSourceStream = (flowState, subStep) => {
+    const { steps } = flowState;
+    if (subStep === 0) {
+      return null;
+    } else if (steps[step][subStep]?.selectedSourceStream) {
+      return steps[step][subStep].selectedSourceStream;
+    }
+    return null;
+  };
+
+  const obj = {};
+  for (let j = 0; j < subStep; j++) {
+    if (getType(flowState, j)) {
+      obj[getType(flowState, j)] = getSelectedSourceStream(flowState, j);
+    }
+  }
+  return obj;
+  };
+
 export const setMyRefreshKey = (flowState, step, subStep, refreshKey) => {
   flowState.steps[step][subStep]['myRefreshKey'] = refreshKey;
   return flowState;

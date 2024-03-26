@@ -18,7 +18,8 @@ import {
   getSelectedValue,
   setMyRefreshKey,
   setResults,
-  setSelectedValue
+  setSelectedValue,
+  ifAllowsObjectCreation
 } from '@content/SyncFlow/stateManagement';
 
 import {
@@ -35,6 +36,7 @@ import { RootState } from '@store/reducers';
 import { setFlowState } from '@store/reducers/syncFlow';
 
 import { capitalizeFirstLetter } from '@utils/lib';
+import CreateFieldContainer from '@/content/SyncFlow/Warehouse/CreateFieldContainer';
 
 const CatalogSelectionComponent = (props) => {
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
@@ -50,7 +52,9 @@ const CatalogSelectionComponent = (props) => {
     displayValue,
     displayConnectorImage,
     onSelect,
-    updatedFlowStateAfterQuery
+    updatedFlowStateAfterQuery,
+    refreshData,
+    setRefreshData
   } = props;
 
   const dispatch = useDispatch();
@@ -65,7 +69,7 @@ const CatalogSelectionComponent = (props) => {
   }, [flowState.currentStep]);
 
   useEffect(() => {
-    if (getMyRefreshKey(flowState, step, subStep) !== refreshKey) {
+    if (getMyRefreshKey(flowState, step, subStep) !== refreshKey || refreshData) {
       setDisplayError(null);
       let updatedFlowState = setResults(flowState, [], step, subStep);
       updatedFlowState = setMyRefreshKey(
@@ -82,7 +86,7 @@ const CatalogSelectionComponent = (props) => {
       setQueryID(newQueryId);
       fetchQuery({ ...queryArgs, queryId: newQueryId });
     }
-  }, [refreshKey]);
+  }, [refreshKey, refreshData]);
 
   useEffect(() => {
     if (data && data.queryId === queryId) {
@@ -100,6 +104,7 @@ const CatalogSelectionComponent = (props) => {
         );
 
         dispatch(setFlowState(updatedFlowState));
+        setRefreshData(false);
       }
     }
   }, [data]);
@@ -153,6 +158,12 @@ const CatalogSelectionComponent = (props) => {
           })}
         </SelectDropdown>
       )}
+      {ifAllowsObjectCreation(flowState, step, subStep) &&
+            <CreateFieldContainer
+            refreshData={refreshData}
+            setRefreshData={setRefreshData}
+            onSelect={onSelect} getFlowState={flowState} step={step} subStep={subStep}/>
+      }
     </StackLayout>
   );
 };

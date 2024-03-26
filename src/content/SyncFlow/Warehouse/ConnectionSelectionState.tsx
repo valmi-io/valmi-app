@@ -66,6 +66,8 @@ export function ConnectionSelectionState(
 
   const renderComponent = (resultsFilter, onSelect) => (
     <CatalogSelectionComponent
+      refreshData={refreshData}
+      setRefreshData={setRefreshData}
       refreshKey={refreshKey}
       query={useLazyFetchCredentialsQuery}
       queryArgs={{ workspaceId: otherState.workspaceId }}

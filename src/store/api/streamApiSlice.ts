@@ -138,34 +138,6 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       invalidatesTags: (result, error, arg) => [{ type: 'Destination', id: arg.destinationId }]
     }),
 
-    //get analytics destinations
-    getAnalyticsDestinations: builder.query({
-      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/analytics-destinations`,
-      transformResponse: (responseData) => {
-        return analyticsDestinationsAdapter.setAll(
-          initialAnalyticsDestinationsState,
-          (responseData as { objects: any[] })?.objects ?? []
-        );
-      },
-      providesTags: (result, error, workspaceId) => {
-        const tags = result?.ids
-          ? [...result.ids.map((id: any) => ({ type: 'Destination' as const, id })), { type: 'Destination' as const }]
-          : [{ type: 'Destination' as const }];
-
-        return tags;
-      }
-    }),
-
-    // create destination
-    createAnalyticsDestination: builder.mutation({
-      query: ({ workspaceId, analyticsdestination }) => ({
-        url: `/streams/workspaces/${workspaceId}/config/analytics-destination`,
-        method: 'POST',
-        body: analyticsdestination
-      }),
-      invalidatesTags: ['Destination']
-    }),
-
 
     // get links
     getLinks: builder.query({
