@@ -8,10 +8,7 @@
 import { MappingState } from '@content/SyncFlow/Mapping/MappingState';
 import { ConnectionSelectionState } from '@content/SyncFlow/Warehouse/ConnectionSelectionState';
 import { DiscoverState } from '@content/SyncFlow/Warehouse/DiscoverState';
-import {
-  getSchedule,
-  getSyncName
-} from '@content/SyncFlow/Schedule/scheduleManagement';
+import { getSchedule, getSyncName } from '@content/SyncFlow/Schedule/scheduleManagement';
 import {
   getDestinationIdKey,
   getSelectedDestinationMode,
@@ -72,9 +69,7 @@ export const setCurrentStepInFlow = (dispatch, currentStep, flowState) => {
       stepsCopy = [...stepsCopy, [{}]];
     }
   }
-  dispatch(
-    setFlowState({ ...flowState, currentStep: currentStep, steps: stepsCopy })
-  );
+  dispatch(setFlowState({ ...flowState, currentStep: currentStep, steps: stepsCopy }));
 };
 
 export const getStepsInSyncFlow = (flowState) => {
@@ -122,8 +117,7 @@ export const isMappingStepInSyncFlow = (flowState) => {
   const hasSourceMode = getSelectedSourceMode(flowState) !== '' ? true : false;
 
   // check if destination sync mode is selected.
-  const hasDestinationMode =
-    getSelectedDestinationMode(flowState) !== '' ? true : false;
+  const hasDestinationMode = getSelectedDestinationMode(flowState) !== '' ? true : false;
 
   // check if source id key is selected.
   const hasSourceIdKey = getSourceIdKey(flowState) !== '' ? true : false;
@@ -196,19 +190,18 @@ export const setResults = (updatedFlowState, results, step, subStep) => {
 };
 
 export const getResults = (flowState, step, subStep) => {
-  if (flowState.steps[step][subStep].hasOwnProperty('results'))
-    return flowState.steps[step][subStep].results;
+  if (flowState.steps[step][subStep].hasOwnProperty('results')) return flowState.steps[step][subStep].results;
   return [];
 };
 
 export const ifAllowsObjectCreation = (flowState, step, subStep) => {
-  if(flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
+  if (flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
     return flowState.steps[step][subStep].allow_object_creation;
-}
+};
 
 export const addNewFieldToDestinationSubStep = (flowState, step, subStep) => {
-  if(flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
-    return {...flowState.steps[step][substep], newly_created_object : ""}
+  if (flowState.steps[step][subStep].hasOwnProperty('allow_object_creation'))
+    return { ...flowState.steps[step][substep], newly_created_object: '' };
 };
 
 const getType = (flowState, currentStep, subStep) => {
@@ -239,7 +232,7 @@ export const generateSelectedStreamsObject = (flowState, step, subStep) => {
     }
   }
   return obj;
-  };
+};
 
 export const setMyRefreshKey = (flowState, step, subStep, refreshKey) => {
   flowState.steps[step][subStep]['myRefreshKey'] = refreshKey;
@@ -252,12 +245,7 @@ export const getMyRefreshKey = (flowState, step, subStep) => {
   return '';
 };
 
-export const setSelectedValue = (
-  flowState,
-  step,
-  subStep,
-  selectedSourceStream
-) => {
+export const setSelectedValue = (flowState, step, subStep, selectedSourceStream) => {
   const stepsCopy = getStepsInSyncFlow(flowState);
 
   stepsCopy[step][subStep]['selectedSourceStream'] = selectedSourceStream;
@@ -265,8 +253,7 @@ export const setSelectedValue = (
 };
 
 export const getCatalogLabel = (flowState, step, subStep) => {
-  if (flowState.steps[step][subStep].hasOwnProperty('type'))
-    return flowState.steps[step][subStep]['type'];
+  if (flowState.steps[step][subStep].hasOwnProperty('type')) return flowState.steps[step][subStep]['type'];
   return '';
 };
 
@@ -276,12 +263,7 @@ export const getSelectedValue = (flowState, step, subStep) => {
   return '';
 };
 
-export const changeStepsArray = (
-  steps,
-  currentStep,
-  newSubSteps,
-  clearSubsequentSteps
-) => {
+export const changeStepsArray = (steps, currentStep, newSubSteps, clearSubsequentSteps) => {
   if (clearSubsequentSteps) {
     steps = steps.slice(0, currentStep);
   }
@@ -289,60 +271,35 @@ export const changeStepsArray = (
   return steps;
 };
 
-export const syncFlowStateMap = {
-  connectionSelectionState: (
-    refreshKey,
-    dispatch,
-    flowState,
-    otherState,
-    next,
-    step,
-    subStep
-  ) =>
-    ConnectionSelectionState(
-      refreshKey,
-      dispatch,
-      flowState,
-      otherState,
-      next,
-      step,
-      subStep
-    ),
-  discoverState: (
-    refreshKey,
-    dispatch,
-    flowState,
-    otherState,
-    next,
-    step,
-    subStep
-  ) =>
-    DiscoverState(
-      refreshKey,
-      dispatch,
-      flowState,
-      otherState,
-      next,
-      step,
-      subStep
-    ),
+export const generateCreateConfigObject = (flowState, value, appState) => {
+  const { currentStep } = flowState;
+  const { workspaceId } = appState;
+  const connectorType = flowState?.destinationCredentialId?.connector_type;
 
-  mappingState: (
-    refreshKey,
-    dispatch,
-    flowState,
-    otherState,
-    next,
-    step,
-    subStep
-  ) =>
-    MappingState(
-      refreshKey,
-      dispatch,
-      flowState,
-      otherState,
-      next,
-      step,
-      subStep
-    )
+  const obj = {
+    connectorType: connectorType,
+    workspaceId: workspaceId,
+    config: {
+      createdValue: value,
+      account: flowState?.steps[1][1]?.selectedSourceStream
+    }
+  };
+
+  if (currentStep === 0) {
+    obj['config']['credentials'] = flowState?.sourceConfig?.connector_config;
+  } else {
+    obj['config']['credentials'] = flowState?.destinationConfig?.connector_config?.credentials;
+  }
+
+  return obj;
+};
+
+export const syncFlowStateMap = {
+  connectionSelectionState: (refreshKey, dispatch, flowState, otherState, next, step, subStep) =>
+    ConnectionSelectionState(refreshKey, dispatch, flowState, otherState, next, step, subStep),
+  discoverState: (refreshKey, dispatch, flowState, otherState, next, step, subStep) =>
+    DiscoverState(refreshKey, dispatch, flowState, otherState, next, step, subStep),
+
+  mappingState: (refreshKey, dispatch, flowState, otherState, next, step, subStep) =>
+    MappingState(refreshKey, dispatch, flowState, otherState, next, step, subStep)
 };

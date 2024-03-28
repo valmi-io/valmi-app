@@ -207,9 +207,7 @@ export const apiSlice = createApi({
 
     createConnector: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
-        console.log("INSIDE CREATE API", arg)
         const { config, workspaceId, connectorType, queryId, createdValue } = arg;
-        const payload = {...config, createdValue}
         const result = await baseQuery({
           url: `/workspaces/${workspaceId}/connectors/${connectorType}/create`,
           method: 'POST',

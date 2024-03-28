@@ -4,13 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  CircularProgress,
-  IconButton,
-  InputLabel,
-  Select,
-  styled
-} from '@mui/material';
+import { Button, CircularProgress, IconButton, InputLabel, Select, Stack, styled } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ReactNode } from 'react';
 
@@ -21,12 +15,21 @@ type SelectDropdownProps = {
   isFetching?: boolean;
   value: any;
   disabled?: boolean;
+  allowCreateButton?: boolean;
+  handleCreateClick?: () => void;
   onChange: (event: any, data: any) => void;
+  isCreating?: boolean;
   children?: ReactNode;
 };
 
 const Label = styled(InputLabel)(({ theme }) => ({
   ...theme.typography.body2
+}));
+
+const CreateButton = styled(Button)(({ theme }) => ({
+  ...theme.typography.body2,
+  maxWidth: 'fit-content',
+  alignSelf: 'flex-end'
 }));
 
 const SelectDropdown = (props: SelectDropdownProps) => {
@@ -37,13 +40,23 @@ const SelectDropdown = (props: SelectDropdownProps) => {
     isFetching,
     value,
     disabled,
+    allowCreateButton,
+    handleCreateClick,
+    isCreating,
     onChange,
     children
   } = props;
 
   return (
     <>
-      {label !== '' && <Label id="label">{label}</Label>}
+      <Stack display={'flex'} flexDirection={'row'} justifyContent={'space-between'}>
+        <Stack>{label !== '' && <Label id="label">{label}</Label>}</Stack>
+        {allowCreateButton && (
+          <CreateButton variant="text" onClick={handleCreateClick}>
+            {isCreating ? 'Close' : '+ Create'}
+          </CreateButton>
+        )}
+      </Stack>
       {!hasError && (
         <Select
           disabled={disabled}
@@ -53,11 +66,7 @@ const SelectDropdown = (props: SelectDropdownProps) => {
           IconComponent={(props) => {
             return (
               <IconButton {...props} size="small">
-                {hasIconComponent && isFetching ? (
-                  <CircularProgress size={14} />
-                ) : (
-                  <ArrowDropDownIcon />
-                )}
+                {hasIconComponent && isFetching ? <CircularProgress size={14} /> : <ArrowDropDownIcon />}
               </IconButton>
             );
           }}

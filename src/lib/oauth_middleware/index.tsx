@@ -36,7 +36,7 @@ export const oauthKeys = async (req, res, next) => {
 
     req.credentials = response.data[0].oauth_config;
   } catch (error: any) {
-    // console.log('error while fetching oauth keys:-');
+
   } finally {
     await next();
   }
