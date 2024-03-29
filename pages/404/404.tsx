@@ -4,14 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  Box,
-  Card,
-  Typography,
-  Container,
-  Button,
-  styled
-} from '@mui/material';
+import { Box, Card, Typography, Container, Button, styled } from '@mui/material';
 import Head from 'next/head';
 import type { ReactElement } from 'react';
 import BaseLayout from 'src/layouts/BaseLayout';
