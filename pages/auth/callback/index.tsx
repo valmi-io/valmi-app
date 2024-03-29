@@ -15,7 +15,7 @@ import { hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import connectionFlow, { setConnectionFlow } from '@store/reducers/connectionFlow';
+import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 const OAuthRedirectPage = () => {
   const router = useRouter();
@@ -102,6 +102,7 @@ const OAuthRedirectPage = () => {
 
   const redirectToCreateConnection = ({ oAuthParams }: any) => {
     const { workspaceId = '' } = appState || {};
+
     // store oAuthparams in redux store
     dispatch(
       setConnectionFlow({
@@ -111,8 +112,17 @@ const OAuthRedirectPage = () => {
       })
     );
 
+    //TODO: remove this when the ETL UI is done.
+
+    if (oAuthParams?.provider === 'shopify') {
+      // navigate to create connection page
+      router.push(`/spaces/${workspaceId}/shopify`);
+    } else {
+      router.push(`/spaces/${workspaceId}/connections/create`);
+    }
+
     // navigate to create connection page
-    router.push(`/spaces/${workspaceId}/connections/create`);
+    // router.push(`/spaces/${workspaceId}/connections/create`);
   };
 };
 
@@ -129,6 +139,8 @@ export const getOAuthParams = (params: any) => {
       return getHubspotOAuthParams(oAuthParams);
     case 'slack':
       return getSlackOAuthParams(oAuthParams);
+    case 'shopify':
+      return getShopifyOAuthParams(oAuthParams);
     default:
       return { ...oAuthParams };
   }
@@ -164,6 +176,14 @@ const getHubspotOAuthParams = (oAuthParams: any) => {
     ...oAuthParams,
     client_id: 'AUTH_HUBSPOT_CLIENT_ID',
     client_secret: 'AUTH_HUBSPOT_CLIENT_SECRET'
+  };
+};
+
+const getShopifyOAuthParams = (oAuthParams: any) => {
+  return {
+    ...oAuthParams,
+    client_id: 'AUTH_SHOPIFY_CLIENT_ID',
+    client_secret: 'AUTH_SHOPIFY_CLIENT_SECRET'
   };
 };
 
