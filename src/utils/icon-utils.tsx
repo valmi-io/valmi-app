@@ -27,6 +27,10 @@ import {
   faWater,
   faBolt,
   faArrowLeft,
+  faBasketball,
+  faScrewdriver,
+  faCircleArrowRight,
+  faArrowsToDot,
   faWaveSquare
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
@@ -55,6 +59,9 @@ export interface IAppIcons {
   STREAM: IconDefinition;
   LIVE_EVENTS: IconDefinition;
   ARROW_LEFT: IconDefinition;
+  ETL_ICON: IconDefinition;
+  SOURCE_ICON:IconDefinition;
+  DESTINATION_ICON: IconDefinition;
   BROWSER: React.ReactElement;
   APPS: React.ReactElement;
 }
@@ -83,6 +90,9 @@ const appIcons: IAppIcons = {
   STREAM: { ...faWater },
   LIVE_EVENTS: { ...faWaveSquare },
   ARROW_LEFT: { ...faArrowLeft },
+  ETL_ICON: {...faScrewdriver},
+  SOURCE_ICON:{...faCircleArrowRight},
+  DESTINATION_ICON: {...faArrowsToDot},
   BROWSER: <LanguageIcon />,
   APPS: <AppsIcon />
 };

@@ -71,8 +71,8 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       id: 4,
       path: `/spaces/${workspaceId}/destination-warehouses`,
       sidebarProps: {
-        displayText: 'DESTINATIONS',
-        icon: appIcons.DEST
+        displayText: 'WAREHOUSES',
+        icon: appIcons.SRC
       },
       subRoute: true
     },
@@ -95,25 +95,47 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       },
       subRoute: true
     },
+
+
     {
       id: 7,
+      path: `/spaces/${workspaceId}/etl`,
+      sidebarProps: {
+        displayText: 'ETL',
+        icon: appIcons.ETL_ICON
+      },
+      subRoutes: [8, 9]
+    },
+    {
+      id : 8,
+      path: `/spaces/${workspaceId}/etl/source`,
+      sidebarProps:{
+        displayText: 'SOURCE',
+        icon: appIcons.SOURCE_ICON
+      },
+      subRoute : true
+    },
+    {
+      id: 9,
+      path: `/spaces/${workspaceId}/etl/destination`,
+      sidebarProps : {
+        displayText: 'DESTINATION',
+        icon: appIcons.DESTINATION_ICON
+      },
+      subRoute: true
+    },
+    {
+      id: 10,
       path: `/spaces/${workspaceId}/oauth-apps`,
       sidebarProps: {
         displayText: 'CONFIGURE APPS',
         icon: appIcons.APPS,
         muiIcon: true
       }
-    },
-
-    {
-      id: 8,
-      path: `/spaces/${workspaceId}/shopify`,
-      sidebarProps: {
-        displayText: 'SHOPIFY',
-        icon: appIcons.APPS,
-        muiIcon: true
-      }
     }
+    ,
+
+
   ].filter(Boolean) as TSidebarRoute[];
 
   return routes;
