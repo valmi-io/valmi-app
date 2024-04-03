@@ -70,9 +70,9 @@ const ConnectorCard = ({
           <ImageComponent src={src} alt="connector" size={ImageSize.large} style={{ marginBottom: '14px' }} />
           {displayName}
           <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'center', mt: 1 }}>
-            <Chip label={type} size="small" />
+            <Chip label={type?.toLocaleLowerCase()} size="small" />
             {mode?.map((item) => (
-              <Chip key={item} label={item} size="small" />
+              <Chip key={item} label={item?.toLocaleLowerCase()} size="small" />
             ))}
           </Stack>
         </ConnectorItem>
