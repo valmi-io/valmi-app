@@ -1,13 +1,12 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { Box, Button, CardActions, CircularProgress, Grid, Paper, Stack, useTheme } from '@mui/material';
-import { EventSourceType, extDestinations } from '@/constants/extDestinations';
-import { getBaseRoute, getCombinedConnectors } from '@/utils/lib';
-import ConnectorLayout from '@/layouts/ConnectorLayout';
+import { Paper, Stack } from '@mui/material';
+
+import { getCombinedConnectors } from '@/utils/lib';
 import { useFetchConnectorsQuery } from '@store/api/apiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import constants from '@constants/index';
@@ -15,25 +14,12 @@ import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
 
-const CreateWarehousePage = () => {
-  const theme = useTheme();
+const CatalogPage = () => {
   const router = useRouter();
 
   const { data, isLoading, error, traceError } = useFetch({
     query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
   });
-
-  const { wid } = router.query;
-
-  const [selectedType, setSelectedType] = useState<string>('');
-
-  const handleItemOnClick = ({ type }: EventSourceType) => {
-    setSelectedType(type);
-  };
-
-  const onSubmitClick = () => {
-    router.push(`${getBaseRoute(wid as string)}/destination-warehouses/create/${selectedType}`);
-  };
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -62,8 +48,8 @@ const CreateWarehousePage = () => {
   );
 };
 
-CreateWarehousePage.getLayout = function getLayout(page: ReactElement) {
+CatalogPage.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default CreateWarehousePage;
+export default CatalogPage;

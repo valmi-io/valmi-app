@@ -47,7 +47,18 @@ import {
 import constants from '@constants/index';
 import { FormStatus } from '@/utils/form-utils';
 
-const ConnectionFlow = () => {
+const CreateConnectionsPageLayout = () => {
+  // Get type from router
+  const router = useRouter();
+
+  const { query } = router.query;
+  if (!query) return <></>;
+  else return <CreateConnectionsPage query={query} />;
+};
+
+const CreateConnectionsPage = ({ query }: { query: any }) => {
+  console.log('Create ConnectionsPage ', query);
+  return null;
   const router = useRouter();
 
   const { control, handleSubmit, reset, watch, setValue } = useForm({
@@ -277,8 +288,8 @@ const ConnectionFlow = () => {
   );
 };
 
-ConnectionFlow.getLayout = function getLayout(page: ReactElement) {
+CreateConnectionsPageLayout.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default ConnectionFlow;
+export default CreateConnectionsPageLayout;
