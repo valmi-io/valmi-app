@@ -161,15 +161,12 @@ export const apiSlice = createApi({
       }
     }),
 
-    fetchConnectorSpec: builder.query({
+    fetchIntegrationSpec: builder.query({
       query: (arg) => {
         const { type, workspaceId } = arg;
         return {
           url: `/workspaces/${workspaceId}/connectors/${type}/spec`
         };
-      },
-      transformResponse: (responseData) => {
-        return connectorsAdapter.setAll(initialConnectorsState, (responseData as { links: any[] })?.links ?? []);
       }
     }),
 
@@ -414,7 +411,7 @@ export const apiSlice = createApi({
 export const {
   useLazyFetchWorkSpacesQuery,
   useLazyLoginAndFetchWorkSpacesQuery,
-  useLazyFetchConnectorSpecQuery,
+  useLazyFetchIntegrationSpecQuery,
   useFetchConnectorsQuery,
   useLazySignupUserQuery,
   useLazyActivateUserQuery,

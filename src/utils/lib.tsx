@@ -165,11 +165,3 @@ export const getCombinedConnectors = (data) => {
     return [...data.SRC, ...data.DEST];
   }
 };
-
-// export function findIntersection(arr1: any[], arr2: any[], property: string) {
-//   return arr1.filter((item1) => arr2.some((item2) => item1[property] === item2));
-// }
-
-// export function findUniqueElements(arr1: any[], arr2: any[], property: string) {
-//   return arr1.filter((item1) => !arr2.some((item2) => item1[property] === item2));
-// }

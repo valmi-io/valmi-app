@@ -17,31 +17,39 @@ import ErrorComponent, { ErrorStatusText } from '@components/Error';
 
 import { AppDispatch } from '@store/store';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
-import { useLazyFetchConnectorSpecQuery } from '@store/api/apiSlice';
+import { useLazyFetchIntegrationSpecQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import FormLayout from '@/layouts/FormLayout';
 import ConnectorInstructions from '@/content/ConnectionFlow/ConnectorConfig/ConnectorInstructions';
 import ConnectorFormFieldsControl from '@/content/ConnectionFlow/ConnectorConfig/ConnectorFormFieldsControl';
 import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
+import { JsonForms } from '@jsonforms/react';
+import FormControlComponent from '@/components/FormControlComponent';
+import { FormStatus } from '@/utils/form-utils';
+import { JsonFormsCore } from '@jsonforms/core';
+import { getCustomRenderers } from '@/utils/form-customRenderers';
+import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
-interface ConnectorConfigProps {
-  control: any;
-  handleSubmit: any;
-  formValues: any;
-  resetForm: any;
-  setValue: any;
-  onSubmit: (formData: any) => void;
-  handleFormStatus: (isFetching: boolean) => void;
-}
+// interface ConnectorConfigProps {
+//   control: any;
+//   handleSubmit: any;
+//   formValues: any;
+//   resetForm: any;
+//   setValue: any;
+//   onSubmit: (formData: any) => void;
+//   handleFormStatus: (isFetching: boolean) => void;
+// }
 
-const ConnectorConfig = (props: ConnectorConfigProps) => {
-  const { resetForm, handleFormStatus } = props;
+type Props = {
+  params: any;
+};
 
-  const dispatch = useDispatch<AppDispatch>();
+const ConnectorConfig = ({ params }: Props) => {
+  const { wid = '', type = '' } = params ?? {};
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  let initialData = {};
 
-  const { workspaceId = '' } = appState;
+  // const { resetForm, handleFormStatus } = props;
 
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
@@ -50,66 +58,96 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
 
   const [traceError, setTraceError] = useState<any>(null);
 
+  const [data, setData] = useState<any>(initialData);
+
+  // form state
+  const [status, setStatus] = useState<FormStatus>('empty');
+
+  // customJsonRenderers
+  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+
   {
     /* query for connector configuration */
   }
-  const [fetchConnectorConfig, { data, isFetching, error }] = useLazyFetchConnectorSpecQuery();
+  const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // Getting keys for the object
   const [fetchConnectorOAuthConfig, { data: keys, isLoading: isKeysLoading, error: keysError }] =
     useLazyGetOAuthApiConfigQuery();
 
   useEffect(() => {
-    if (selected_connector) {
-      // reset form if no connector_config in connection_flow
-      if (!connector_config) {
-        resetForm({});
-      } else {
-        resetForm((formValues) => ({
-          ...formValues,
-          ...connector_config,
-          title: connection_title
-        }));
-      }
-
-      fetchConnectorConfig({
-        type: selected_connector.type,
-        workspaceId: workspaceId
+    // fetch integration spec
+    console.log('type:-', type);
+    console.log('wid', wid);
+    if (type && wid) {
+      fetchIntegrationSpec({
+        type: type,
+        workspaceId: wid
       });
-
-      if (selected_connector.oauth_keys === 'private') {
-        fetchConnectorOAuthConfig({
-          workspaceId,
-          type: selected_connector.type
-        });
-      }
     }
-  }, []);
+  }, [wid, type]);
+
+  // useEffect(() => {
+  //   if (selected_connector) {
+  //     // reset form if no connector_config in connection_flow
+  //     if (!connector_config) {
+  //       resetForm({});
+  //     } else {
+  //       resetForm((formValues) => ({
+  //         ...formValues,
+  //         ...connector_config,
+  //         title: connection_title
+  //       }));
+  //     }
+
+  // fetchConnectorConfig({
+  //   type: selected_connector.type,
+  //   workspaceId: workspaceId
+  // });
+
+  //     if (selected_connector.oauth_keys === 'private') {
+  //       fetchConnectorOAuthConfig({
+  //         workspaceId,
+  //         type: selected_connector.type
+  //       });
+  //     }
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   if (isFetching || isKeysLoading) {
+  //     handleFormStatus(true);
+  //   } else {
+  //     handleFormStatus(false);
+  //   }
+  // }, [isFetching, isKeysLoading]);
 
   useEffect(() => {
-    if (isFetching || isKeysLoading) {
-      handleFormStatus(true);
-    } else {
-      handleFormStatus(false);
-    }
-  }, [isFetching, isKeysLoading]);
-
-  useEffect(() => {
-    if (data) {
-      if (hasErrorsInData(data)) {
-        const traceError = getErrorsInData(data);
+    if (spec) {
+      console.log('SPec:_', spec);
+      if (hasErrorsInData(spec)) {
+        const traceError = getErrorsInData(spec);
+        console.log('trace error: ', traceError);
         setTraceError(traceError);
-      } else {
-        // saving connector spec in store
-        dispatch(
-          setConnectionFlow({
-            ...connection_flow.flowState,
-            connector_spec: data
-          })
-        );
       }
     }
-  }, [data]);
+  }, [spec]);
+
+  const handleSubmit = () => {
+    console.log('handle Submit');
+  };
+
+  const handleDelete = () => {
+    console.log('handle delete');
+  };
+
+  const handleNavigationOnSuccess = () => {
+    router.push(`/spaces/${workspaceId}/destination-warehouses`);
+  };
+
+  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setData(data);
+  };
 
   const getDisplayComponent = () => {
     if (error || keysError) {
@@ -124,18 +162,25 @@ const ConnectorConfig = (props: ConnectorConfigProps) => {
       return <SkeletonLoader loading={isFetching || isKeysLoading} />;
     }
 
-    const displayContent = selected_connector.oauth_keys === 'private' ? !!(data && keys) : !!data;
+    if (spec) {
+      const schema = spec?.spec?.connectionSpecification ?? {};
 
-    if (displayContent) {
       return (
-        <FormLayout
-          formComp={<ConnectorFormFieldsControl {...props} data={data} keys={keys ?? []} />}
-          instructionsComp={<ConnectorInstructions data={data} selected_connector={selected_connector} />}
+        <FormControlComponent
+          key={`SourceConfig`}
+          deleteTooltip="Delete source"
+          editing={false}
+          onDelete={handleDelete}
+          onFormChange={handleFormChange}
+          onSubmitClick={handleSubmit}
+          isDeleting={false}
+          status={status}
+          error={false}
+          jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+          removeAdditionalFields={false}
         />
       );
     }
-
-    return null; // Default return value
   };
 
   return (

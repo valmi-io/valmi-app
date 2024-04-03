@@ -23,8 +23,6 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     const params = new URLSearchParams();
     params.set('type', type);
     params.set('mode', mode.length > 0 ? mode[0] : '');
-    params.set('integrationType', 'new');
-
     const pathname = `${getBaseRoute(workspaceId)}/connections/create`;
 
     router.push(pathname + '?' + params);

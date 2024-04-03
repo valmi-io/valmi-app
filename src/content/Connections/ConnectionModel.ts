@@ -13,10 +13,7 @@ export enum ConnectionType {
   ANALYTICS_DESTINATION = 'ANALYTICS_DESTINATION'
 }
 
-export type ConnectorType =
-  | 'Webhook'
-  | 'Google Sheets'
-  | 'Customer.io | Facebook Ads';
+export type ConnectorType = 'Webhook' | 'Google Sheets' | 'Customer.io | Facebook Ads';
 
 export enum ConnectionsPageTitle {
   SRC = 'Warehouses',
@@ -43,12 +40,12 @@ export interface ConnectorModel {
 
 export const ConnectionSteps: Step[] = [
   {
-    label: constants.connections.SELECT_CONNECTOR_TITLE
+    label: constants.connections.CONFIGURE_SOURCE
   },
   {
-    label: constants.connections.CONFIGURE_CONNECTOR_TITLE
+    label: constants.connections.SELECT_STREAMS
   },
   {
-    label: constants.connections.TEST_CONNECTOR_TITLE
+    label: constants.connections.CONFIGURE_CONNECTION
   }
 ];

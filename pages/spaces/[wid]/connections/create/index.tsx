@@ -47,18 +47,22 @@ import {
 import constants from '@constants/index';
 import { FormStatus } from '@/utils/form-utils';
 
+import { useSearchParams } from 'next/navigation';
+import { getSearchParams } from '@/utils/router-utils';
+import { isEmpty } from 'lodash';
+
 const CreateConnectionsPageLayout = () => {
-  // Get type from router
   const router = useRouter();
 
-  const { query } = router.query;
-  if (!query) return <></>;
-  else return <CreateConnectionsPage query={query} />;
+  const searchParams = useSearchParams();
+
+  const params = getSearchParams(searchParams);
+
+  if (isEmpty(params)) return <></>;
+  else return <CreateConnectionsPage params={params} />;
 };
 
-const CreateConnectionsPage = ({ query }: { query: any }) => {
-  console.log('Create ConnectionsPage ', query);
-  return null;
+const CreateConnectionsPage = ({ params }: { params: any }) => {
   const router = useRouter();
 
   const { control, handleSubmit, reset, watch, setValue } = useForm({
@@ -119,17 +123,7 @@ const CreateConnectionsPage = ({ query }: { query: any }) => {
 
   const getSectionComponent = () => {
     let step_components = [
-      <Connectors key={'connectors'} />,
-      <ConnectorConfig
-        key={'connectorconfig'}
-        formValues={watch()}
-        setValue={setValue}
-        control={control}
-        resetForm={reset}
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-        handleFormStatus={handleFormStatus}
-      />,
+      <ConnectorConfig key={'connectorconfig'} params={params} />,
       <ConnectionTest key={'connectiontest'} handleFormStatus={handleFormStatus} />
     ];
     if (isEditableFlow) {
