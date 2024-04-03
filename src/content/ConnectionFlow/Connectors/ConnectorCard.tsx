@@ -6,9 +6,10 @@
 
 import React from 'react';
 
-import { styled, darken } from '@mui/material';
+import { styled, darken, Chip, Stack, Box, Button } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 
 import { ConnectorModel } from '@content/Connections/ConnectionModel';
 
@@ -21,6 +22,8 @@ interface ConnectorCardProps {
   selected?: boolean;
   src: string;
   displayName: string;
+  type?: string;
+  mode?: string[];
 }
 
 export const ConnectorItem = styled(Paper)(({ theme }) => ({
@@ -41,11 +44,13 @@ const ConnectorCard = ({
   handleConnectorOnClick,
   selected = false,
   src = '',
-  displayName = ''
+  displayName = '',
+  type = 'src',
+  mode
 }: ConnectorCardProps) => {
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
-      <Paper sx={{ borderRadius: 2, mx: 10 }} variant="outlined">
+      <Paper sx={{ borderRadius: 2 }} variant="outlined">
         <ConnectorItem
           sx={{
             borderRadius: 2,
@@ -54,8 +59,22 @@ const ConnectorCard = ({
           }}
           onClick={() => handleConnectorOnClick(item)}
         >
+          <Box
+            sx={{
+              color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary),
+              alignSelf: 'flex-end'
+            }}
+          >
+            <AddCircleOutlinedIcon fill={'white'} />
+          </Box>
           <ImageComponent src={src} alt="connector" size={ImageSize.large} style={{ marginBottom: '14px' }} />
           {displayName}
+          <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'center', mt: 1 }}>
+            <Chip label={type} size="small" />
+            {mode?.map((item) => (
+              <Chip key={item} label={item} size="small" />
+            ))}
+          </Stack>
         </ConnectorItem>
       </Paper>
     </Grid>

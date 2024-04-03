@@ -14,6 +14,7 @@ export type ConnectorType = {
   oauth?: boolean;
   type: string;
   oauth_keys?: 'private' | 'public';
+  mode?: string[];
 };
 
 const ConnectorsList = ({
@@ -43,6 +44,8 @@ const ConnectorsList = ({
             selected={selected}
             src={src}
             displayName={displayName}
+            type={item.type.split('_')[0]}
+            mode={item.mode}
           />
         );
       })}

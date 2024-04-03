@@ -26,6 +26,9 @@ const constants = {
     TEST_CONNECTOR_TITLE: 'Test',
     SELECT_CONNECTOR_LAYOUT_TITLE: 'Select connector'
   },
+  catalog: {
+    CREATE_CONNECTION_TITLE: 'Integrations'
+  },
   docs: {
     syncs: 'https://www.valmi.io/docs/concepts/syncs',
     tracks: 'https://www.valmi.io/docs/concepts/tracks'

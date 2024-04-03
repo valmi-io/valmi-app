@@ -66,21 +66,21 @@ const DestinationsPage: NextPageWithLayout = () => {
 
   return (
     <>
-    <PageLayout
-      pageHeadTitle="Destinations"
-      title="Destinations"
-      buttonTitle="Destination"
-      handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
+      <PageLayout
+        pageHeadTitle="Destinations"
+        title="Destinations"
+        buttonTitle="Destination"
+        handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
       >
-      <ContentLayout
-        key={`destinationsWarehousesPage`}
-        error={error}
-        PageContent={<PageContentForWarehouses />}
-        displayComponent={!error && !isLoading && data}
-        isLoading={isLoading}
-        traceError={traceError}
+        <ContentLayout
+          key={`destinationsWarehousesPage`}
+          error={error}
+          PageContent={<PageContentForWarehouses />}
+          displayComponent={!error && !isLoading && data}
+          isLoading={isLoading}
+          traceError={traceError}
         />
-    </PageLayout>
+      </PageLayout>
     </>
   );
 };
