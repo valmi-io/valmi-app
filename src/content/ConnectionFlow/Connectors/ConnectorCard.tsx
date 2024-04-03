@@ -50,23 +50,24 @@ const ConnectorCard = ({
 }: ConnectorCardProps) => {
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
-      <Paper sx={{ borderRadius: 2 }} variant="outlined">
+      <Paper sx={{ borderRadius: 2, mx: 6, my: 2 }} variant="outlined">
         <ConnectorItem
           sx={{
             borderRadius: 2,
             backgroundColor: (theme) => (selected ? theme.colors.primary.main : darken(theme.colors.alpha.white[5], 1)),
             color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary)
           }}
-          onClick={() => handleConnectorOnClick(item)}
         >
-          <Box
+          <Button
+            type="button"
             sx={{
               color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary),
               alignSelf: 'flex-end'
             }}
+            onClick={() => handleConnectorOnClick(item)}
           >
             <AddCircleOutlinedIcon fill={'white'} />
-          </Box>
+          </Button>
           <ImageComponent src={src} alt="connector" size={ImageSize.large} style={{ marginBottom: '14px' }} />
           {displayName}
           <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'center', mt: 1 }}>

@@ -14,6 +14,7 @@ import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 import { initialiseConnectorSelectionState } from '@utils/connection-utils';
 import ConnectorsList, { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { useRouter } from 'next/router';
 
 interface ConnectorListProps {
   data: any;
@@ -21,6 +22,10 @@ interface ConnectorListProps {
 
 const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { workspaceId } = appState;
 
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
@@ -31,22 +36,8 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     initialiseConnectorSelectionState(dispatch, connection_flow);
   }, []);
 
-  const handleItemOnClick = (connector: ConnectorType) => {
-    const { type, display_name, oauth_keys = 'private' } = connector;
-
-    // increase remaining steps count.
-    dispatch(
-      setConnectionFlow({
-        ...connection_flow.flowState,
-
-        steps: currentStep + 1,
-        selected_connector: {
-          type: type,
-          display_name: display_name,
-          oauth_keys: oauth_keys
-        }
-      })
-    );
+  const handleItemOnClick = () => {
+    router.push(`/spaces/${workspaceId}/connections/create`);
   };
 
   return (

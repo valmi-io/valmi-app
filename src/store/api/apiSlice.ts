@@ -6,10 +6,14 @@
  */
 
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 import constants from '@constants/index';
 import { getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
+
+const connectorsAdapter: any = createEntityAdapter();
+const initialConnectorsState = connectorsAdapter.getInitialState();
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -163,6 +167,9 @@ export const apiSlice = createApi({
         return {
           url: `/workspaces/${workspaceId}/connectors/${type}/spec`
         };
+      },
+      transformResponse: (responseData) => {
+        return connectorsAdapter.setAll(initialConnectorsState, (responseData as { links: any[] })?.links ?? []);
       }
     }),
 
@@ -212,7 +219,7 @@ export const apiSlice = createApi({
           url: `/workspaces/${workspaceId}/connectors/${connectorType}/create`,
           method: 'POST',
           body: {
-            config,
+            config
           }
         });
         return result.data

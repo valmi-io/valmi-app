@@ -1,12 +1,12 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { Box, Grid, Paper, Stack, useTheme } from '@mui/material';
+import { Box, Button, CardActions, CircularProgress, Grid, Paper, Stack, useTheme } from '@mui/material';
 import { EventSourceType, extDestinations } from '@/constants/extDestinations';
-import { getBaseRoute } from '@/utils/lib';
+import { getBaseRoute, getCombinedConnectors } from '@/utils/lib';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 import { useFetchConnectorsQuery } from '@store/api/apiSlice';
 import { useFetch } from '@/hooks/useFetch';
@@ -35,26 +35,28 @@ const CreateWarehousePage = () => {
     router.push(`${getBaseRoute(wid as string)}/destination-warehouses/create/${selectedType}`);
   };
 
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', 'all');
+    router.push(url);
+  }, []);
+
   return (
     <PageLayout pageHeadTitle="Integrations" title={constants.catalog.CREATE_CONNECTION_TITLE} displayButton={false}>
       <Paper variant="outlined">
-        <ConnectorLayout title="Create a new connection">
-          {/** Display error */}
-          {error && <ErrorComponent error={error} />}
+        {/** Display error */}
+        {error && <ErrorComponent error={error} />}
 
-          {/* Display trace error */}
-          {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+        {/* Display trace error */}
+        {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
-          {/** Display skeleton */}
-          <SkeletonLoader loading={isLoading} />
-          {console.log('DATA :-', data)}
+        {/** Display skeleton */}
+        <SkeletonLoader loading={isLoading} />
 
-          {/** Display page content */}
-          <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            {!error && !isLoading && data && <ConnectorsPageContent data={data?.SRC} />}
-            {!error && !isLoading && data && <ConnectorsPageContent data={data?.DEST} />}
-          </Stack>
-        </ConnectorLayout>
+        {/** Display page content */}
+        <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          {!error && !isLoading && data && <ConnectorsPageContent data={data && getCombinedConnectors(data)} />}
+        </Stack>
       </Paper>
     </PageLayout>
   );
