@@ -53,11 +53,12 @@ type Props = {
 
 import { Wizard, useWizard } from 'react-use-wizard';
 import { setIds } from '@/store/reducers/connectionDataFlow';
+import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
 
 const Step2 = () => {
   return (
     <>
-      <p>Step 2</p>
+      <p>Step 2 - Display list of streams</p>
     </>
   );
 };
@@ -65,7 +66,7 @@ const Step2 = () => {
 const Step3 = () => {
   return (
     <>
-      <p>Step 3</p>
+      <ConnectionSchedule />
     </>
   );
 };
@@ -239,9 +240,8 @@ const ConnectionsUpsertPage = ({ params }: Props) => {
   };
 
   const Footer = () => {
-    const { isFirstStep, isLastStep, activeStep, handleStep, nextStep, previousStep } = useWizard();
+    const { isFirstStep, isLastStep, nextStep, previousStep } = useWizard();
 
-    console.log('active step:-', activeStep);
     if (isFirstStep) return null;
 
     return (
