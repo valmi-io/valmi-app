@@ -29,6 +29,8 @@ import { FormStatus } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
+import { useWizard } from 'react-use-wizard';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 // interface ConnectorConfigProps {
 //   control: any;
@@ -40,7 +42,7 @@ import { materialCells, materialRenderers } from '@jsonforms/material-renderers'
 //   handleFormStatus: (isFetching: boolean) => void;
 // }
 
-const spec = {
+let spec = {
   type: 'SPEC',
   spec: {
     documentationUrl: 'https://docs.airbyte.com/integrations/sources/shopify',
@@ -163,11 +165,19 @@ type Props = {
 const ConnectorConfig = ({ params }: Props) => {
   const { wid = '', type = '' } = params ?? {};
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { handleStep, activeStep, nextStep } = useWizard();
+
   let initialData = {};
 
-  // const { resetForm, handleFormStatus } = props;
-
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
+
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  if (connectionDataFlow?.entities[activeStep]?.config) {
+    initialData = connectionDataFlow?.entities[activeStep]?.config;
+  }
 
   const { flowState: { selected_connector = null, connector_config = null, connection_title = '' } = {} } =
     connection_flow;
@@ -185,23 +195,26 @@ const ConnectorConfig = ({ params }: Props) => {
   {
     /* query for connector configuration */
   }
-  // const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
+  const [fetchIntegrationSpec, { data: specData, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // Getting keys for the object
   const [fetchConnectorOAuthConfig, { data: keys, isLoading: isKeysLoading, error: keysError }] =
     useLazyGetOAuthApiConfigQuery();
 
-  // useEffect(() => {
-  //   // fetch integration spec
-  //   console.log('type:-', type);
-  //   console.log('wid', wid);
-  //   if (type && wid) {
-  //     fetchIntegrationSpec({
-  //       type: type,
-  //       workspaceId: wid
-  //     });
-  //   }
-  // }, [wid, type]);
+  useEffect(() => {
+    // fetch integration spec
+
+    if (type && wid) {
+      if (connectionDataFlow?.entities[activeStep]?.spec) {
+        spec = connectionDataFlow?.entities[activeStep]?.spec;
+      } else {
+        fetchIntegrationSpec({
+          type: type,
+          workspaceId: wid
+        });
+      }
+    }
+  }, [wid, type]);
 
   // useEffect(() => {
   //   if (selected_connector) {
@@ -238,19 +251,29 @@ const ConnectorConfig = ({ params }: Props) => {
   //   }
   // }, [isFetching, isKeysLoading]);
 
-  // useEffect(() => {
-  //   if (spec) {
-  //     console.log('SPec:_', spec);
-  //     if (hasErrorsInData(spec)) {
-  //       const traceError = getErrorsInData(spec);
-  //       console.log('trace error: ', traceError);
-  //       setTraceError(traceError);
-  //     }
-  //   }
-  // }, [spec]);
+  useEffect(() => {
+    if (specData) {
+      if (hasErrorsInData(specData)) {
+        const traceError = getErrorsInData(specData);
+        setTraceError(traceError);
+      }
+    }
+  }, [specData]);
 
   const handleSubmit = () => {
-    console.log('handle Submit');
+    const entities = connectionDataFlow?.entities ?? {};
+
+    const obj = {
+      ...entities,
+      [activeStep]: {
+        config: data,
+        spec: spec
+      }
+    };
+
+    dispatch(setEntities(obj));
+
+    nextStep();
   };
 
   const handleDelete = () => {
@@ -266,17 +289,18 @@ const ConnectorConfig = ({ params }: Props) => {
   };
 
   const getDisplayComponent = () => {
+    // handle error
     // if (error || keysError) {
     //   return <ErrorComponent error={error || keysError} />;
     // }
 
-    // if (traceError) {
-    //   return <ErrorStatusText>{traceError}</ErrorStatusText>;
-    // }
+    if (traceError) {
+      return <ErrorStatusText>{traceError}</ErrorStatusText>;
+    }
 
-    // if (isFetching || isKeysLoading) {
-    //   return <SkeletonLoader loading={isFetching || isKeysLoading} />;
-    // }
+    if (isFetching || isKeysLoading) {
+      return <SkeletonLoader loading={isFetching || isKeysLoading} />;
+    }
 
     if (spec) {
       const schema = spec?.spec?.connectionSpecification ?? {};

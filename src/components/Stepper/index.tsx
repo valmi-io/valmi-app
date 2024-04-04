@@ -10,6 +10,7 @@ import Step from '@mui/material/Step';
 import { Card } from '@mui/material';
 
 import StepperComponent from '@components/Stepper/StepperComponent';
+import { useWizard } from 'react-use-wizard';
 
 export interface Step {
   label: string;
@@ -18,17 +19,13 @@ export interface Step {
 export interface StepperProps {
   steps: Step[];
   children?: React.ReactNode;
-  activeStep: number;
 }
 
-const HorizontalLinearStepper = ({
-  steps,
-  children,
-  activeStep
-}: StepperProps) => {
+const HorizontalLinearStepper = ({ steps, children }: StepperProps) => {
+  const { activeStep: wizardActiveStep } = useWizard();
   return (
     <Card sx={{ width: '100%' }}>
-      <StepperComponent steps={steps} activeStep={activeStep} />
+      <StepperComponent steps={steps} activeStep={wizardActiveStep} />
       {children}
     </Card>
   );

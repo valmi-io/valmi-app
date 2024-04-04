@@ -14,6 +14,7 @@ import { appFlow } from '@store/reducers/appFlow';
 import { streamFlowSlice } from '@store/reducers/streamFlow';
 import { destinationFlowSlice } from '@store/reducers/destinationFlow';
 import { trackFlowSlice } from './trackFlow';
+import { connectionDataFlow } from '@/store/reducers/connectionDataFlow';
 
 const rootReducer = combineReducers({
   [appFlow.name]: appFlow.reducer,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   [connectionFlow.name]: connectionFlow.reducer,
   [syncFlow.name]: syncFlow.reducer,
   [streamFlowSlice.name]: streamFlowSlice.reducer,
+  [connectionDataFlow.name]: connectionDataFlow.reducer,
 
   [destinationFlowSlice.name]: destinationFlowSlice.reducer,
   [trackFlowSlice.name]: trackFlowSlice.reducer,

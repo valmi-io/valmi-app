@@ -42,7 +42,8 @@ export const makeStore = () => {
       whitelist: [
         'appFlow',
         'user',
-        'connectionFlow'
+        'connectionFlow',
+        'connectionDataFlow'
         // 'syncFlow'
       ], // make sure it does not clash with server keys,
 

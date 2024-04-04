@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -19,7 +19,7 @@ import axios from 'axios';
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { ConnectionSteps } from '@content/Connections/ConnectionModel';
+import { EtlConnectionSteps, RetlConnectionSteps } from '@content/Connections/ConnectionModel';
 import ConnectionTest from '@content/ConnectionFlow/ConnectionTest';
 import Connectors from '@content/ConnectionFlow/Connectors';
 import ConnectorConfig from '@content/ConnectionFlow/ConnectorConfig';
@@ -34,15 +34,6 @@ import HorizontalLinearStepper from '@components/Stepper';
 
 import { AppDispatch } from '@store/store';
 import { RootState } from '@store/reducers';
-import { setConnectionFlow } from '@store/reducers/connectionFlow';
-
-import {
-  enableBack,
-  enableNext,
-  generateConnectionPayload,
-  setConnectorConfigInConnectionFlow,
-  setCurrentStepInConnectionFlow
-} from '@utils/connection-utils';
 
 import constants from '@constants/index';
 import { FormStatus } from '@/utils/form-utils';
@@ -51,24 +42,51 @@ import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 
-const CreateConnectionsPageLayout = () => {
-  const router = useRouter();
+type Props = {
+  params: {
+    type: string;
+    wid: string;
+    mode: 'etl' | 'retl';
+    connectionId?: string;
+  };
+};
 
+import { Wizard, useWizard } from 'react-use-wizard';
+import { setIds } from '@/store/reducers/connectionDataFlow';
+
+const Step2 = () => {
+  return (
+    <>
+      <p>Step 2</p>
+    </>
+  );
+};
+
+const Step3 = () => {
+  return (
+    <>
+      <p>Step 3</p>
+    </>
+  );
+};
+
+const ConnectionsUpsertPageLayout = () => {
   const searchParams = useSearchParams();
 
   const params = getSearchParams(searchParams);
 
   if (isEmpty(params)) return <></>;
-  else return <CreateConnectionsPage params={params} />;
+  else return <ConnectionsUpsertPage params={params} />;
 };
 
-const CreateConnectionsPage = ({ params }: { params: any }) => {
-  const router = useRouter();
+const ConnectionsUpsertPage = ({ params }: Props) => {
+  console.log('params:_', params);
 
-  const { control, handleSubmit, reset, watch, setValue } = useForm({
-    defaultValues: {}
-  });
-  const [connectionSteps, setConnectionSteps] = useState(ConnectionSteps);
+  const { connectionId = '', mode = '' } = params ?? {};
+
+  const isEditableFlow = !!connectionId;
+
+  const router = useRouter();
 
   // states
   const [alertMessage, setAlertMessage] = useState<string>('');
@@ -81,107 +99,104 @@ const CreateConnectionsPage = ({ params }: { params: any }) => {
   const [creatingConnection, setCreatingConnection] = useState<boolean>(false);
 
   const dispatch = useDispatch<AppDispatch>();
-  /** Redux store */
-  const user = useSelector((state: RootState) => state.user.user);
-
-  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
-
-  const {
-    flowState: {
-      selected_connector = null,
-      connector_spec = null,
-      connection_title = '',
-      connector_config = null,
-      isEditableFlow = false,
-      oauth_params = {},
-      currentStep = 0,
-      lastStep = false
-    } = {}
-  } = connection_flow;
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '', currentRoute = '' } = appState;
 
-  useEffect(() => {
-    if (isEditableFlow) {
-      // start connection step from step-2
-      setConnectionSteps(ConnectionSteps.slice(1));
-      // set connectorConfig
-      reset((formValues) => ({
-        ...formValues,
-        ...connector_config,
-        title: connection_title,
-        connector_type: selected_connector.display_name
-      }));
+  const connectionSteps = useMemo(() => {
+    let steps: any[] = [];
+    let stepsToSlice = 0; // number of steps to skip,when connection is editable
+    const isEditableFlow = !!connectionId; // checking if connection is editable.
+
+    if (mode === 'etl') {
+      steps = [...steps, ...EtlConnectionSteps];
+      stepsToSlice = 1;
     }
-  }, [router]);
+    if (mode === 'retl') {
+      steps = [...steps, ...RetlConnectionSteps];
+      stepsToSlice = 2;
+    }
+
+    if (isEditableFlow) {
+      steps.slice(stepsToSlice);
+    }
+
+    let arr = Array.from({ length: steps.length }, (x, i) => i.toString());
+    // dispatching number of steps in redux store.
+    dispatch(setIds(arr));
+
+    return steps;
+  }, [connectionId, mode]);
 
   const handleFormStatus = (isFetching: boolean) => {
     setformStatus(isFetching ? 'submitting' : 'empty');
   };
 
-  const getSectionComponent = () => {
-    let step_components = [
-      <ConnectorConfig key={'connectorconfig'} params={params} />,
-      <ConnectionTest key={'connectiontest'} handleFormStatus={handleFormStatus} />
-    ];
-    if (isEditableFlow) {
-      step_components = step_components.splice(1);
-    }
+  // const getSectionComponent = () => {
+  //   let step_components = [
+  //     <ConnectorConfig key={'connectorconfig'} params={params} />,
+  //     <ConnectorConfig key={'connectorconfig'} params={params} />,
+  //     <ConnectionTest key={'connectiontest'} handleFormStatus={handleFormStatus} />
+  //   ];
+  //   if (isEditableFlow) {
+  //     step_components = step_components.splice(1);
+  //   }
 
-    return <React.Fragment key={step_components[currentStep].key}>{step_components[currentStep]}</React.Fragment>;
-  };
+  //   console.log('Step components:_', step_components);
 
-  const onSubmit = (values: any) => {
-    // check if this connector doesn't require oAuth
-    if (!isConnectorRequiresOAuth(connector_spec)) {
-      setConnectorConfigInConnectionFlow(dispatch, values, connection_flow);
-      return;
-    }
+  //   return <React.Fragment key={step_components[currentStep].key}>{step_components[currentStep]}</React.Fragment>;
+  // };
 
-    // check if authorized
-    if (hasAuthorizedOAuth(oauth_params, isEditableFlow)) {
-      setConnectorConfigInConnectionFlow(dispatch, values, connection_flow);
-    } else {
-      // update oauth_error in connection flow state
-      dispatch(
-        setConnectionFlow({
-          ...connection_flow.flowState,
-          oauth_error: 'This connector requires authorization'
-        })
-      );
-    }
-  };
+  // const onSubmit = (values: any) => {
+  //   // check if this connector doesn't require oAuth
+  //   if (!isConnectorRequiresOAuth(connector_spec)) {
+  //     setConnectorConfigInConnectionFlow(dispatch, values, connection_flow);
+  //     return;
+  //   }
 
-  const handleBack = () => {
-    setCurrentStepInConnectionFlow(dispatch, currentStep - 1, connection_flow);
-  };
+  //   // check if authorized
+  //   if (hasAuthorizedOAuth(oauth_params, isEditableFlow)) {
+  //     setConnectorConfigInConnectionFlow(dispatch, values, connection_flow);
+  //   } else {
+  //     // update oauth_error in connection flow state
+  //     dispatch(
+  //       setConnectionFlow({
+  //         ...connection_flow.flowState,
+  //         oauth_error: 'This connector requires authorization'
+  //       })
+  //     );
+  //   }
+  // };
 
-  const handleNext = () => {
-    // If it is the last step, create a new connection
-    if (lastStep) {
-      // Trigger api backend
-      setCreatingConnection(true);
+  // const handleBack = () => {
+  //   setCurrentStepInConnectionFlow(dispatch, currentStep - 1, connection_flow);
+  // };
 
-      // connection payload
-      const payload = generateConnectionPayload(connection_flow.flowState, user);
+  // const handleNext = () => {
+  //   // If it is the last step, create a new connection
+  //   if (lastStep) {
+  //     // Trigger api backend
+  //     setCreatingConnection(true);
 
-      let connectionUrl = `/workspaces/${workspaceId}/credentials/create`;
+  //     // connection payload
+  //     const payload = generateConnectionPayload(connection_flow.flowState, user);
 
-      if (isEditableFlow) {
-        connectionUrl = `/workspaces/${workspaceId}/credentials/update`;
-      }
+  //     let connectionUrl = `/workspaces/${workspaceId}/credentials/create`;
 
-      setformStatus('submitting');
+  //     if (isEditableFlow) {
+  //       connectionUrl = `/workspaces/${workspaceId}/credentials/update`;
+  //     }
 
-      connectionNetworkHandler(connectionUrl, payload);
+  //     setformStatus('submitting');
 
-      return;
-    }
-    // else, update current_step in connection_flow state.
-    setCurrentStepInConnectionFlow(dispatch, currentStep + 1, connection_flow);
-  };
+  //     connectionNetworkHandler(connectionUrl, payload);
+
+  //     return;
+  //   }
+  //   // else, update current_step in connection_flow state.
+  //   setCurrentStepInConnectionFlow(dispatch, currentStep + 1, connection_flow);
+  // };
 
   const connectionNetworkHandler = async (connectionUrl: string, data: any) => {
     try {
@@ -218,30 +233,31 @@ const CreateConnectionsPage = ({ params }: { params: any }) => {
     setAlertMessage(message);
   };
 
-  const getConnectionButtonName = (isEditableFlow: boolean) => {
-    if (isEditableFlow) return 'Update';
-    return 'Create';
-  };
-
   const handleClose = () => {
     setAlertMessage('');
     showAlertDialog(false);
   };
 
-  const displaySubmitButton = (isFetching: boolean) => {
-    let endIcon = null;
-    endIcon = isFetching && <CircularProgress size={16} sx={{ color: 'white' }} />;
+  const Footer = () => {
+    const { isFirstStep, isLastStep, activeStep, handleStep, nextStep, previousStep } = useWizard();
+
+    console.log('active step:-', activeStep);
+    if (isFirstStep) return null;
 
     return (
-      <Button
-        endIcon={endIcon}
-        variant="contained"
-        type={currentStep === (isEditableFlow ? 0 : 1) ? 'submit' : 'button'}
-        onClick={currentStep === (isEditableFlow ? 0 : 1) ? handleSubmit(onSubmit) : handleNext}
-        disabled={formStatus === 'submitting' || !enableNext(connection_flow)}
+      <CardActions
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}
       >
-        {currentStep === connectionSteps.length - 1 ? getConnectionButtonName(isEditableFlow) : 'Next'}
-      </Button>
+        <Button color="inherit" variant="contained" onClick={() => previousStep()} sx={{ mr: 1 }}>
+          Back
+        </Button>
+        <Button color="inherit" variant="contained" onClick={() => nextStep()} sx={{ mr: 1 }}>
+          Next
+        </Button>
+      </CardActions>
     );
   };
 
@@ -253,37 +269,23 @@ const CreateConnectionsPage = ({ params }: { params: any }) => {
     >
       <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
       {/** Stepper */}
-      <HorizontalLinearStepper activeStep={currentStep} steps={connectionSteps}>
-        {/* Component returned based on active step */}
-        <Paper variant="outlined">
-          {getSectionComponent()}
 
-          {/* Action buttons */}
-          <CardActions
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end'
-            }}
-          >
-            <Button
-              color="inherit"
-              variant="contained"
-              disabled={formStatus === 'submitting' || !enableBack(connection_flow)}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Back
-            </Button>
-            {displaySubmitButton(creatingConnection)}
-          </CardActions>
-        </Paper>
-      </HorizontalLinearStepper>
+      <Wizard
+        startIndex={0}
+        footer={<Footer />}
+        header={<HorizontalLinearStepper steps={connectionSteps} />}
+        wrapper={<Paper variant="outlined" />}
+      >
+        <ConnectorConfig key={'connectorconfig'} params={params} />
+        <Step2 />
+        <Step3 />
+      </Wizard>
     </PageLayout>
   );
 };
 
-CreateConnectionsPageLayout.getLayout = function getLayout(page: ReactElement) {
+ConnectionsUpsertPageLayout.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default CreateConnectionsPageLayout;
+export default ConnectionsUpsertPageLayout;

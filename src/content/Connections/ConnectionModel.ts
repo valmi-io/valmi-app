@@ -38,7 +38,19 @@ export interface ConnectorModel {
   display_name: string;
 }
 
-export const ConnectionSteps: Step[] = [
+export const EtlConnectionSteps: Step[] = [
+  {
+    label: constants.connections.CONFIGURE_SOURCE
+  },
+  {
+    label: constants.connections.SELECT_STREAMS
+  },
+  {
+    label: constants.connections.CONFIGURE_CONNECTION
+  }
+];
+
+export const RetlConnectionSteps: Step[] = [
   {
     label: constants.connections.CONFIGURE_SOURCE
   },
