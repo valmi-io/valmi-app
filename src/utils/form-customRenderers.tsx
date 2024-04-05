@@ -7,11 +7,18 @@
 import FormArrayControl from '@/components/FormInput/FormArrayControl';
 import FormEmptyControl from '@/components/FormInput/FormEmptyControl';
 import FormInputControl from '@/components/FormInput/FormInputControl';
+import { MaterialOneOfEnumControl } from '@/components/FormInput/FormOneOfControl';
 import FormSelectControl from '@/components/FormInput/FormSelectControl';
 import StreamKeysControl from '@/components/FormInput/StreamKeysControl';
-import { inputControlTester, customControlTester, dropdownControlTester, arrayControlTester } from '@/utils/form-utils';
+import {
+  inputControlTester,
+  customControlTester,
+  dropdownControlTester,
+  arrayControlTester,
+  oneOfControlTester
+} from '@/utils/form-utils';
 import { isArray } from '@/utils/lib';
-import { rankWith } from '@jsonforms/core';
+import { isOneOfEnumControl, rankWith } from '@jsonforms/core';
 import { materialRenderers } from '@jsonforms/material-renderers';
 
 const apiKeys = ['publicKeys', 'privateKeys'];
@@ -23,6 +30,7 @@ type CustomRenderersProps = {
 export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProps) => {
   const renderers = [
     ...materialRenderers,
+
     {
       tester: rankWith(
         4000, // Increase rank as needed
@@ -51,6 +59,13 @@ export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProp
       ),
       renderer: FormArrayControl
     }
+    // {
+    //   tester: rankWith(
+    //     5, // Increase rank as needed
+    //     oneOfControlTester
+    //   ),
+    //   renderer: MaterialOneOfEnumControl
+    // }
   ];
 
   if (isArray(invisibleFields) && invisibleFields.length > 0) {

@@ -8,3 +8,7 @@ export const getSearchParams = (params: any) => {
 
   return obj;
 };
+
+export const apiRoutes = {
+  check: `/api/checkConnection`
+};

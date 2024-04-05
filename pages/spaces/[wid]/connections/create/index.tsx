@@ -42,13 +42,15 @@ import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 
-type Props = {
-  params: {
-    type: string;
-    wid: string;
-    mode: 'etl' | 'retl';
-    connectionId?: string;
-  };
+type TConnectionUpsertParams = {
+  type: string;
+  wid: string;
+  mode: 'etl' | 'retl';
+  connectionId?: string;
+};
+
+export type TConnectionUpsertProps = {
+  params: TConnectionUpsertParams;
 };
 
 import { Wizard, useWizard } from 'react-use-wizard';
@@ -80,9 +82,7 @@ const ConnectionsUpsertPageLayout = () => {
   else return <ConnectionsUpsertPage params={params} />;
 };
 
-const ConnectionsUpsertPage = ({ params }: Props) => {
-  console.log('params:_', params);
-
+const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
   const { connectionId = '', mode = '' } = params ?? {};
 
   const isEditableFlow = !!connectionId;

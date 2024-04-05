@@ -52,7 +52,14 @@ const FormControlComponent = ({
 
   return (
     <FormContainer>
-      <JsonForms schema={schema} data={data} renderers={renderers} cells={materialCells} onChange={onFormChange} />
+      <JsonForms
+        readonly={!!(status === 'submitting')}
+        schema={schema}
+        data={data}
+        renderers={renderers}
+        cells={materialCells}
+        onChange={onFormChange}
+      />
 
       <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: editing ? 'space-between' : 'flex-end' }}>
         {editing && (

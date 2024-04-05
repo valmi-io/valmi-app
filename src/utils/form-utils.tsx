@@ -198,6 +198,18 @@ export const arrayControlTester = (uischema: any, schema: JsonSchema, context: T
   return false;
 };
 
+// jsonforms input control tester
+export const oneOfControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
+  if (uischema.type !== 'Control') return false;
+
+  const arr = uischema.scope.split('/');
+  const controlName = arr[arr.length - 1];
+
+  const hasOneOfType = !!schema?.properties?.[controlName]?.oneOf;
+
+  return hasOneOfType;
+};
+
 export const jsonFormValidator = (schema: any, data: any) => {
   const ajv = createAjv({ useDefaults: true });
   const validate = ajv.compile(schema);
