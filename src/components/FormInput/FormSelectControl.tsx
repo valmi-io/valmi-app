@@ -37,7 +37,6 @@ export const FormSelectControl = (props: ControlProps) => {
     focused,
     appliedUiSchemaOptions.showUnfocusedDescription
   );
-  const oAuthOptions = schema?.oneOf || [];
 
   const eventToValue = (ev: any) => (ev.target.value === '' ? undefined : ev.target.value);
 
@@ -68,22 +67,15 @@ export const FormSelectControl = (props: ControlProps) => {
                 shrink: true
               }}
             >
-              {schema.enum
-                ? schema.enum?.map((item: string) => {
-                    return (
-                      <MenuItem key={item} value={item}>
-                        {item}
-                      </MenuItem>
-                    );
-                  })
-                : oAuthOptions?.map((option: any, index: number) => {
-                    return (
-                      <MenuItem key={option?.title} value={index}>
-                        {option.title}
-                      </MenuItem>
-                    );
-                  })}
+              {schema.enum?.map((item: string) => {
+                return (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                );
+              })}
             </TextField>
+
             <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>

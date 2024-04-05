@@ -173,10 +173,10 @@ export const dropdownControlTester = (uischema: any, schema: JsonSchema, context
   const arr = uischema.scope.split('/');
   const controlName = arr[arr.length - 1];
 
-  const isEnumType = schema?.properties?.[controlName]?.enum;
-  const hasOneOf = schema?.properties?.[controlName]?.oneOf ? true : false;
+  const isEnumType = !!schema?.properties?.[controlName]?.enum;
+  // const hasOneOf = schema?.properties?.[controlName]?.oneOf ? true : false;
 
-  return isEnumType || hasOneOf ? true : false;
+  return isEnumType;
 };
 
 // jsonforms custom control tester
