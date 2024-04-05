@@ -66,7 +66,7 @@ const FormControlComponent = ({
           />
         )}
         <SubmitButton
-          buttonText={'Submit'}
+          buttonText={'Check'}
           data={status === 'success'}
           isFetching={status === 'submitting'}
           disabled={!valid || status === 'submitting' || isDeleting}

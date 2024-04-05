@@ -216,32 +216,32 @@ const ConnectorConfig = ({ params }: Props) => {
     }
   }, [wid, type]);
 
-  // useEffect(() => {
-  //   if (selected_connector) {
-  //     // reset form if no connector_config in connection_flow
-  //     if (!connector_config) {
-  //       resetForm({});
-  //     } else {
-  //       resetForm((formValues) => ({
-  //         ...formValues,
-  //         ...connector_config,
-  //         title: connection_title
-  //       }));
-  //     }
+  useEffect(() => {
+    if (selected_connector) {
+      // reset form if no connector_config in connection_flow
+      if (!connector_config) {
+        resetForm({});
+      } else {
+        resetForm((formValues) => ({
+          ...formValues,
+          ...connector_config,
+          title: connection_title
+        }));
+      }
 
-  // fetchConnectorConfig({
-  //   type: selected_connector.type,
-  //   workspaceId: workspaceId
-  // });
+      fetchConnectorConfig({
+        type: selected_connector.type,
+        workspaceId: workspaceId
+      });
 
-  //     if (selected_connector.oauth_keys === 'private') {
-  //       fetchConnectorOAuthConfig({
-  //         workspaceId,
-  //         type: selected_connector.type
-  //       });
-  //     }
-  //   }
-  // }, []);
+      if (selected_connector.oauth_keys === 'private') {
+        fetchConnectorOAuthConfig({
+          workspaceId,
+          type: selected_connector.type
+        });
+      }
+    }
+  }, []);
 
   // useEffect(() => {
   //   if (isFetching || isKeysLoading) {
