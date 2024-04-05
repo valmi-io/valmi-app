@@ -56,14 +56,7 @@ export type TConnectionUpsertProps = {
 import { Wizard, useWizard } from 'react-use-wizard';
 import { setIds } from '@/store/reducers/connectionDataFlow';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
-
-const Step2 = () => {
-  return (
-    <>
-      <p>Step 2 - Display list of streams</p>
-    </>
-  );
-};
+import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
 
 const Step3 = () => {
   return (
@@ -277,7 +270,7 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
         wrapper={<Paper variant="outlined" />}
       >
         <ConnectorConfig key={'connectorconfig'} params={params} />
-        <Step2 />
+        <ConnectionDiscover key={'connectionDiscover'} params={params} />
         <Step3 />
       </Wizard>
     </PageLayout>

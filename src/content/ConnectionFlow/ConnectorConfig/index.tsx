@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@layouts/ConnectorLayout';
 
 import SkeletonLoader from '@components/SkeletonLoader';
-import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 
 import { AppDispatch } from '@store/store';
@@ -30,16 +30,6 @@ import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
-
-// interface ConnectorConfigProps {
-//   control: any;
-//   handleSubmit: any;
-//   formValues: any;
-//   resetForm: any;
-//   setValue: any;
-//   onSubmit: (formData: any) => void;
-//   handleFormStatus: (isFetching: boolean) => void;
-// }
 
 type TState = {
   error: string;
@@ -77,7 +67,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   {
     /* query for connector configuration */
   }
-  let [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
+  const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // Getting keys for the object
   const [fetchConnectorOAuthConfig, { data: keys, isLoading: isKeysLoading, error: keysError }] =
