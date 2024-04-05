@@ -9,22 +9,19 @@ import constants from '@constants/index';
 
 export enum ConnectionType {
   SRC = 'SRC',
-  DEST = 'DEST',
-  ANALYTICS_DESTINATION = 'ANALYTICS_DESTINATION'
+  DEST = 'DEST'
 }
 
 export type ConnectorType = 'Webhook' | 'Google Sheets' | 'Customer.io | Facebook Ads';
 
 export enum ConnectionsPageTitle {
   SRC = 'Warehouses',
-  DEST = 'Destinations',
-  ANALYTICS_DESTINATION = 'Analytics destinations'
+  DEST = 'Destinations'
 }
 
 export enum CreateConnectionTitle {
   SRC = 'Warehouse',
-  DEST = 'Destination',
-  ANALYTICS_DESTINATION = 'Analytics destination'
+  DEST = 'Destination'
 }
 
 export interface ConnectionModel {

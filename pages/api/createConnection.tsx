@@ -20,21 +20,43 @@ const createConnection = async (req: NextApiRequest, res: NextApiResponse) => {
   // 4. if sucess: create sync object /syncs/create
   // 5. if any on the above case failed: throw error.
 
-  let { connectionUrl, data } = req.body;
-  let payload = data;
-  // query
-  connectionUrl = `${getBaseUrl()}${connectionUrl}`;
+  let { src, dest, schedule, uiState, syncData, workspaceId } = req.body;
+
+  let srcConnectionUrl = `${getBaseUrl()}/workspaces/${workspaceId}/sources/create`;
+  let destConnectionUrl = `${getBaseUrl()}/workspaces/${workspaceId}/destinations/create`;
+  let syncConnectionUrl = `${getBaseUrl()}/workspaces/${workspaceId}/syncs/create`;
 
   const bearerToken = (await getAccessTokenCookie(req)) || '';
 
   try {
-    const response = await axios.post(connectionUrl, payload, {
+    const srcResponse = await axios.post(srcConnectionUrl, src, {
       headers: {
         Authorization: `Bearer ${bearerToken}`
       }
     });
 
-    const data = response.data;
+    const { id: sourceId } = srcResponse.data;
+
+    const destResponse = await axios.post(destConnectionUrl, dest, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`
+      }
+    });
+    const { id: destinationId } = destResponse.data;
+    const syncPayload = {
+      name: syncData?.syncName,
+      source_id: sourceId,
+      destination_id: destinationId,
+      ui_state: uiState,
+      schedule
+    };
+    const syncResponse = await axios.post(syncConnectionUrl, syncPayload, {
+      headers: {
+        Authorization: `Bearer ${bearerToken}`
+      }
+    });
+
+    const data = syncResponse.data;
 
     // Handle the response data as needed
     res.status(200).json(data);
