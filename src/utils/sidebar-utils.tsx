@@ -40,7 +40,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
     {
       id: 1,
-      path: `/spaces/${workspaceId}/events/connections`,
+      path: `/spaces/${workspaceId}/connections`,
       sidebarProps: {
         displayText: 'CONNECTIONS',
         icon: appIcons.SYNC
