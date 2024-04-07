@@ -1,7 +1,7 @@
 import { checkIfPropExistsInObject } from '@/utils/lib';
 import { merge } from 'lodash';
 
-type TActionTypes = 'TOGGLE_ADD' | 'TOGGLE_SELECT_ALL' | 'CHANGE';
+type TActionTypes = 'TOGGLE_ADD' | 'TOGGLE_SELECT_ALL' | 'CHANGE' | 'SAVE';
 
 type TActionPayload = {
   type: TActionTypes;
@@ -47,7 +47,7 @@ const updateObj = (obj: any, key: string, value: string) => {
 export default function streamsReducer(state: any, action: TActionPayload) {
   switch (action.type) {
     case 'TOGGLE_ADD': {
-      let ids: number[] = state.ids;
+      let ids: string[] = state.ids;
       const entities: any = state.entities;
 
       const { id, obj } = action.payload;
@@ -58,6 +58,7 @@ export default function streamsReducer(state: any, action: TActionPayload) {
         entities[id] = generateObj(obj, 'stream');
       } else {
         ids = ids.filter((i) => i !== id);
+
         delete entities[id];
       }
 
@@ -75,13 +76,13 @@ export default function streamsReducer(state: any, action: TActionPayload) {
       const objs = action.payload.objs;
       const checked = action.payload.checked;
 
-      const ids: number[] = [];
+      const ids: string[] = [];
       const entities: any = {};
 
       if (checked) {
-        objs.forEach((obj: any, i: number) => {
-          ids.push(i);
-          entities[i] = generateObj(obj, 'stream');
+        objs.forEach((obj: any) => {
+          ids.push(obj.name);
+          entities[obj.name] = generateObj(obj, 'stream');
         });
       }
 
@@ -100,6 +101,23 @@ export default function streamsReducer(state: any, action: TActionPayload) {
           ...state.entities,
           [id]: updateObj(state.entities[id], 'sync_mode', value)
         }
+      };
+    }
+    case 'SAVE': {
+      const objs = action.payload.objs;
+
+      const ids: string[] = [];
+      const entities: any = {};
+
+      objs.forEach((obj: any, i: number) => {
+        ids.push(obj?.stream?.name ?? i);
+        entities[obj?.stream?.name ?? i] = obj;
+      });
+
+      return {
+        ...state,
+        ids: ids,
+        entities: entities
       };
     }
 

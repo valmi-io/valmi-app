@@ -61,6 +61,10 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
       if (objExistsInStore()) {
         const data = getCurrObjFromStore('discover');
 
+        const streams: any[] = getCurrObjFromStore('streams');
+
+        handleSaveObj(streams);
+
         setResults(data);
       } else {
         fetchQuery(payload);
@@ -87,7 +91,16 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     return connectionDataFlow?.entities[activeStep][key];
   };
 
-  const handleAddObj = (event: React.MouseEvent<unknown>, id: number, obj: any) => {
+  const handleSaveObj = (objs: any[]) => {
+    dispatch({
+      type: 'SAVE',
+      payload: {
+        objs: objs
+      }
+    });
+  };
+
+  const handleAddObj = (event: React.MouseEvent<unknown>, id: string, obj: any) => {
     dispatch({
       type: 'TOGGLE_ADD',
       payload: {
@@ -107,7 +120,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  const handleChangeObj = (id: number, value: string) => {
+  const handleChangeObj = (id: string, value: string) => {
     dispatch({
       type: 'CHANGE',
       payload: {
@@ -117,7 +130,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  const isSelected = (id: number) => state.ids.indexOf(id) !== -1;
+  const isSelected = (id: string) => state.ids.indexOf(id) !== -1;
 
   handleStep(() => {
     const entitiesInStore = connectionDataFlow?.entities ?? {};
@@ -186,7 +199,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
               <TableBody>
                 {rows.map((row: any, index: number) => {
-                  const isItemSelected = isSelected(index);
+                  const isItemSelected = isSelected(row.name);
 
                   const labelId = `table-checkbox-${index}`;
 
@@ -195,7 +208,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
                       <TableCellWithSwitch
                         checked={isItemSelected}
                         onClick={(event, checked) => {
-                          handleAddObj(event, index, row);
+                          handleAddObj(event, row.name, row);
                         }}
                         labelId={labelId}
                       />
@@ -204,9 +217,9 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
                         disabled={!isItemSelected}
                         data={row?.supported_sync_modes ?? []}
                         onClick={(event, key) => {
-                          handleChangeObj(index, event.target.value);
+                          handleChangeObj(row.name, event.target.value);
                         }}
-                        value={state.entities[index]?.sync_mode ?? ''}
+                        value={state.entities[row.name]?.sync_mode ?? ''}
                       />
                     </TableRow>
                   );
