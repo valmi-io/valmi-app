@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useWizard } from 'react-use-wizard';
 import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
-import ConnectorLayout from '@/layouts/ConnectorLayout';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import SkeletonLoader from '@/components/SkeletonLoader';
@@ -232,7 +231,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     }
   };
 
-  return <ConnectorLayout title={``}>{getDisplayComponent()}</ConnectorLayout>;
+  return <>{getDisplayComponent()}</>;
 };
 
 export default ConnectionDiscover;
