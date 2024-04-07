@@ -240,7 +240,7 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
       >
         <ConnectorConfig key={'connectorconfig'} params={params} />
         <ConnectionDiscover key={'connectionDiscover'} params={params} />
-        <ConnectionSchedule key={'connectionSchedule'} />
+        <ConnectionSchedule key={'connectionSchedule'} params={params} />
       </Wizard>
     </PageLayout>
   );

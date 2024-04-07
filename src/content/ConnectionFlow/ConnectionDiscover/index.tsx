@@ -206,7 +206,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
                   const labelId = `table-checkbox-${index}`;
 
                   return (
-                    <TableRow hover key={row.id} sx={{ cursor: 'pointer' }}>
+                    <TableRow hover key={row.name} sx={{ cursor: 'pointer' }}>
                       <TableCellWithSwitch
                         checked={isItemSelected}
                         onClick={(event, checked) => {

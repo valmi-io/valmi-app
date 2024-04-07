@@ -1,3 +1,5 @@
+import SubmitButton from '@/components/SubmitButton';
+import { FormStatus } from '@/utils/form-utils';
 import { Button, CardActions } from '@mui/material';
 
 export const WizardFooter = ({
@@ -5,13 +7,15 @@ export const WizardFooter = ({
   prevDisabled = false,
   nextButtonTitle = 'Next',
   onNextClick,
-  onPrevClick
+  onPrevClick,
+  status
 }: {
   disabled: boolean;
   prevDisabled?: boolean;
   nextButtonTitle: 'Create' | 'Update' | 'Next';
   onNextClick: () => void;
   onPrevClick: () => void;
+  status?: FormStatus;
 }) => {
   return (
     <CardActions
@@ -20,12 +24,26 @@ export const WizardFooter = ({
         justifyContent: 'flex-end'
       }}
     >
-      <Button disabled={prevDisabled} color="inherit" variant="contained" onClick={onPrevClick} sx={{ mr: 1 }}>
+      <SubmitButton
+        buttonText={'Back'}
+        data={false}
+        isFetching={status === 'submitting'}
+        disabled={prevDisabled}
+        onClick={onPrevClick}
+      />
+      {/* <Button disabled={prevDisabled} color="inherit" variant="contained" onClick={onPrevClick} sx={{ mr: 1 }}>
         Back
-      </Button>
-      <Button disabled={disabled} color="inherit" variant="contained" onClick={onNextClick} sx={{ mr: 1 }}>
+      </Button> */}
+      <SubmitButton
+        buttonText={nextButtonTitle}
+        data={status === 'success'}
+        isFetching={status === 'submitting'}
+        disabled={disabled}
+        onClick={onNextClick}
+      />
+      {/* <Button disabled={disabled} color="inherit" variant="contained" onClick={onNextClick} sx={{ mr: 1 }}>
         {nextButtonTitle}
-      </Button>
+      </Button> */}
     </CardActions>
   );
 };

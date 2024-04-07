@@ -277,6 +277,58 @@ export const apiSlice = createApi({
       }
     }),
 
+    createConnection: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        const { credentialPayload, connectionPayload, workspaceId } = arg;
+
+        const { src, dest, schedule, uiState, connectionName } = connectionPayload;
+
+        const credRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/credentials/create`,
+          method: 'POST',
+          body: credentialPayload
+        });
+
+        if (credRes.error) return { error: credRes.error };
+
+        const { id: credentialId, name: credentialName } = credRes.data;
+
+        let srcObj = {
+          credential_id: credentialId,
+          name: credentialName
+        };
+
+        let srcPayload = { ...src, ...srcObj };
+
+        const sourceRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/sources/create`,
+          method: 'POST',
+          body: srcPayload
+        });
+
+        if (sourceRes.error) return { error: sourceRes.error };
+
+        const { id: sourceId } = sourceRes.data;
+
+        const connPayload = {
+          name: connectionName,
+          source_id: sourceId,
+          destination_id: sourceId,
+          ui_state: uiState,
+          schedule,
+          mode: 'etl'
+        };
+
+        const createConnection = await baseQuery({
+          url: `/workspaces/${workspaceId}/syncs/create`,
+          method: 'POST',
+          body: connPayload
+        });
+
+        return createConnection.data ? { data: createConnection.data } : { error: createConnection.error };
+      }
+    }),
+
     updateSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const { src, dest, schedule, uiState, syncName, syncId = '', workspaceId } = arg;
@@ -432,5 +484,6 @@ export const {
   useGetSyncByIdQuery,
   useLazyCreateNewSyncRunQuery,
   useLazyAbortSyncRunByIdQuery,
-  useLazyGetSyncRunLogsByIdQuery
+  useLazyGetSyncRunLogsByIdQuery,
+  useLazyCreateConnectionQuery
 } = apiSlice;
