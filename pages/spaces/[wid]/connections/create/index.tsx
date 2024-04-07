@@ -224,28 +224,6 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
     showAlertDialog(false);
   };
 
-  const Footer = () => {
-    const { isFirstStep, isLastStep, nextStep, previousStep } = useWizard();
-
-    if (isFirstStep) return null;
-
-    return (
-      <CardActions
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-end'
-        }}
-      >
-        <Button color="inherit" variant="contained" onClick={() => previousStep()} sx={{ mr: 1 }}>
-          Back
-        </Button>
-        <Button color="inherit" variant="contained" onClick={() => nextStep()} sx={{ mr: 1 }}>
-          Next
-        </Button>
-      </CardActions>
-    );
-  };
-
   return (
     <PageLayout
       pageHeadTitle={constants.connections.CREATE_CONNECTION_TITLE}
@@ -257,7 +235,6 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
 
       <Wizard
         startIndex={0}
-        footer={<Footer />}
         header={<HorizontalLinearStepper steps={connectionSteps} />}
         wrapper={<Paper variant="outlined" />}
       >

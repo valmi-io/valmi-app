@@ -7,10 +7,13 @@
 import FormControlComponent from '@/components/FormControlComponent';
 import { useEffect, useState } from 'react';
 import { JsonFormsCore } from '@jsonforms/core';
-import { FormStatus } from '@/utils/form-utils';
+import { jsonFormValidator } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store/store';
+import { useSelector } from 'react-redux';
+import ConnectorLayout from '@/layouts/ConnectorLayout';
+import { useWizard } from 'react-use-wizard';
+import { WizardFooter } from '@/components/Wizard/Footer';
+import { RootState } from '@/store/reducers';
 
 const schema = {
   type: 'object',
@@ -29,48 +32,55 @@ const schema = {
 };
 
 const ConnectionSchedule = () => {
+  const { previousStep } = useWizard();
   let initialData = {};
 
-  const dispatch = useDispatch<AppDispatch>();
-
   const [data, setData] = useState<any>(initialData);
-
-  // form state
-  const [status, setStatus] = useState<FormStatus>('empty');
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
-  const handleSubmit = () => {
-    console.log('handleSubmit data', data);
-  };
-
-  const handleDelete = () => {
-    console.log('handle delete');
-  };
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
   };
 
-  useEffect(() => {
-    console.log('dispatch schedule flow:_');
-  }, []);
+  const { valid } = jsonFormValidator(schema, data);
+
+  const handleOnClick = () => {
+    // handle connection object creation from here
+
+    console.log('Connection data flow:_', connectionDataFlow);
+    const credentialObj = connectionDataFlow?.entities[0]?.config ?? {};
+    const streamsObj = connectionDataFlow?.entities[1]?.streams ?? {};
+
+    console.log('Credential obj:_', credentialObj);
+
+    console.log('Streams obj:_', streamsObj);
+  };
 
   return (
-    <FormControlComponent
-      key={`ConnectionSchedule`}
-      deleteTooltip="Delete Schedule"
-      editing={false}
-      onDelete={handleDelete}
-      onFormChange={handleFormChange}
-      onSubmitClick={handleSubmit}
-      isDeleting={false}
-      status={status}
-      error={false}
-      jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-      removeAdditionalFields={false}
-    />
+    <>
+      <ConnectorLayout title={''}>
+        <FormControlComponent
+          key={`ConnectionSchedule`}
+          editing={false}
+          onFormChange={handleFormChange}
+          error={false}
+          jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+          removeAdditionalFields={false}
+          displayActionButton={false}
+        />
+      </ConnectorLayout>
+
+      <WizardFooter
+        disabled={!valid}
+        nextButtonTitle={'Create'}
+        onNextClick={handleOnClick}
+        onPrevClick={() => previousStep()}
+      />
+    </>
   );
 };
 

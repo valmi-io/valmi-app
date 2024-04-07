@@ -17,6 +17,7 @@ import { TData } from '@/utils/typings.d';
 import streamsReducer from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
+import { WizardFooter } from '@/components/Wizard/Footer';
 
 const Columns: TableColumnProps[] = [
   { id: '1', label: '', align: 'right', action: true, minWidth: 100 },
@@ -34,7 +35,8 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
   const dispatchToStore = useDispatch<AppDispatch>();
 
-  const { activeStep, handleStep } = useWizard();
+  const { activeStep, handleStep, nextStep, previousStep } = useWizard();
+
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const prevStep = activeStep - 1;
@@ -66,6 +68,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
         setResults(data);
       } else {
+        handleSaveObj([]);
         fetchQuery(payload);
       }
     }
@@ -203,7 +206,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
                   const labelId = `table-checkbox-${index}`;
 
                   return (
-                    <TableRow hover key={row.id}>
+                    <TableRow hover key={row.id} sx={{ cursor: 'pointer' }}>
                       <TableCellWithSwitch
                         checked={isItemSelected}
                         onClick={(event, checked) => {
@@ -231,7 +234,18 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     }
   };
 
-  return <>{getDisplayComponent()}</>;
+  return (
+    <>
+      {getDisplayComponent()}
+      <WizardFooter
+        disabled={isFetching || state.ids.length < 1}
+        prevDisabled={isFetching}
+        nextButtonTitle={'Next'}
+        onNextClick={() => nextStep()}
+        onPrevClick={() => previousStep()}
+      />
+    </>
+  );
 };
 
 export default ConnectionDiscover;
