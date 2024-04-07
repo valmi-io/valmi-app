@@ -165,10 +165,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
             status: 'success'
           }));
 
-          const entities = connectionDataFlow?.entities ?? {};
-
           const obj = {
-            ...entities,
             [activeStep]: {
               config: payload,
               spec: spec

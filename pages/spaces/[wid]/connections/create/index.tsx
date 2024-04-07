@@ -58,14 +58,6 @@ import { setIds } from '@/store/reducers/connectionDataFlow';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
 import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
 
-const Step3 = () => {
-  return (
-    <>
-      <ConnectionSchedule />
-    </>
-  );
-};
-
 const ConnectionsUpsertPageLayout = () => {
   const searchParams = useSearchParams();
 
@@ -271,7 +263,7 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
       >
         <ConnectorConfig key={'connectorconfig'} params={params} />
         <ConnectionDiscover key={'connectionDiscover'} params={params} />
-        <Step3 />
+        <ConnectionSchedule key={'connectionSchedule'} />
       </Wizard>
     </PageLayout>
   );

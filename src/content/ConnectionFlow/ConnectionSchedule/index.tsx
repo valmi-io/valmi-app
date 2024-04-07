@@ -5,10 +5,12 @@
  */
 
 import FormControlComponent from '@/components/FormControlComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
 
 const schema = {
   type: 'object',
@@ -29,6 +31,8 @@ const schema = {
 const ConnectionSchedule = () => {
   let initialData = {};
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const [data, setData] = useState<any>(initialData);
 
   // form state
@@ -48,6 +52,10 @@ const ConnectionSchedule = () => {
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
   };
+
+  useEffect(() => {
+    console.log('dispatch schedule flow:_');
+  }, []);
 
   return (
     <FormControlComponent
