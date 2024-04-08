@@ -279,7 +279,7 @@ export const apiSlice = createApi({
 
     createConnection: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
-        const { credentialPayload, connectionPayload, workspaceId } = arg;
+        const { credentialPayload, connectionPayload, destCredentialPayload, workspaceId } = arg;
 
         const { src, dest, schedule, uiState, connectionName } = connectionPayload;
 
@@ -292,6 +292,31 @@ export const apiSlice = createApi({
         if (credRes.error) return { error: credRes.error };
 
         const { id: credentialId, name: credentialName } = credRes.data;
+
+        const destStorageCredRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/storage-credentials`,
+          method: 'GET'
+        });
+
+        if (destStorageCredRes.error) return { error: destStorageCredRes.error };
+
+        console.log('Dest storage credentials: ', destStorageCredRes.data);
+
+        let destCredObj = { ...destCredentialPayload, ['connector_config']: destStorageCredRes.data };
+
+        console.log('Dest cred obj:_', destCredObj);
+
+        const destCredRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/credentials/create`,
+          method: 'POST',
+          body: destCredObj
+        });
+
+        if (destCredRes.error) return { error: destCredRes.error };
+
+        console.log('dest cred res:_', destCredRes.data);
+
+        const { id: destCredentialId, name: destCredentialName } = destCredRes.data;
 
         let srcObj = {
           credential_id: credentialId,
@@ -310,10 +335,27 @@ export const apiSlice = createApi({
 
         const { id: sourceId } = sourceRes.data;
 
+        let destObj = {
+          credential_id: destCredentialId,
+          name: destCredentialName
+        };
+
+        let destPayload = { ...dest, ...destObj };
+
+        const destRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/destinations/create`,
+          method: 'POST',
+          body: destPayload
+        });
+
+        if (destRes.error) return { error: destRes.error };
+
+        const { id: destinationId } = destRes.data;
+
         const connPayload = {
           name: connectionName,
           source_id: sourceId,
-          destination_id: sourceId,
+          destination_id: destinationId,
           ui_state: uiState,
           schedule,
           mode: 'etl'

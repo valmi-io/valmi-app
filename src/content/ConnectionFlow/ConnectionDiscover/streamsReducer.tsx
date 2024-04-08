@@ -26,7 +26,7 @@ const generateObj = (obj: any, type: TIncomingObjType) => {
     destination_sync_mode: 'append'
   };
   if (hasSourceDefinedCursor(obj)) {
-    extendedObj['cursor_field'] = obj.default_cursor_field ? obj.default_cursor_field[0] : [''];
+    extendedObj['cursor_field'] = obj.default_cursor_field ? [obj.default_cursor_field[0]] : [''];
   }
 
   let newobj = {

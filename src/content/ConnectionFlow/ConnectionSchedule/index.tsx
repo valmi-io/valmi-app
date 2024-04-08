@@ -18,48 +18,15 @@ import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { useLazyCreateConnectionQuery } from '@/store/api/apiSlice';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
-
-const getRunInterval = (name: string) => {
-  const intervals = [
-    { type: 'MIN', val: 1, name: 'Every 1 minute' },
-    { type: 'MIN', val: 5, name: 'Every 5 minute' },
-    { type: 'MIN', val: 10, name: 'Every 10 minutes' },
-    { type: 'MIN', val: 15, name: 'Every 15 minutes' },
-    { type: 'MIN', val: 30, name: 'Every 30 minutes' },
-    { type: 'HOUR', val: 1, name: 'Every 1 hour' }
-  ];
-
-  //@ts-ignore
-  const { val = 0, type = '' } = intervals.find((int) => name === int.name);
-
-  const runInterval = val * (type == 'HOUR' ? 3600 : 60) * 1000; // inteval in milliseconds.
-  return runInterval;
-};
-
-const schema = {
-  type: 'object',
-  properties: {
-    name: {
-      type: 'string',
-      description: 'Name of the connection'
-    },
-    connection_interval: {
-      type: 'string',
-      enum: [
-        'Every 1 minute',
-        'Every 2 minutes',
-        'Every 5 minutes',
-        'Every 15 minutes',
-        'Every 30 minutes',
-        'Every 1 hour'
-      ],
-      description: 'Connection interval'
-    }
-  },
-  required: ['name', 'connection_interval']
-};
+import {
+  connectionScheduleSchema,
+  generateConnectionPayload,
+  generateCredentialPayload
+} from '@/utils/connectionFlowUtils';
+import { useRouter } from 'next/router';
 
 const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
+  const router = useRouter();
   const { wid = '', type = '' } = params ?? {};
   const { previousStep } = useWizard();
   let initialData = {};
@@ -90,7 +57,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
     setData(data);
   };
 
-  const { valid } = jsonFormValidator(schema, data);
+  const { valid } = jsonFormValidator(connectionScheduleSchema, data);
 
   /**
    * Responsible for opening alert dialog.
@@ -120,13 +87,16 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
     const credentialObj = connectionDataFlow?.entities[0]?.config?.config ?? {};
     const streams = connectionDataFlow?.entities[1]?.streams ?? {};
 
-    const credentialPayload = generateCredentialPayload(credentialObj);
+    const credentialPayload = generateCredentialPayload(credentialObj, type, user);
 
-    const connectionPayload = generateConnectionPayload(streams);
+    const destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
+
+    const connectionPayload = generateConnectionPayload(streams, data, wid);
 
     const payload = {
       workspaceId: wid,
       credentialPayload,
+      destCredentialPayload,
       connectionPayload
     };
 
@@ -146,6 +116,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
       } else {
         setStatus('success');
         handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
+        router.push(`/spaces/${wid}/connections`);
       }
     } catch (error) {
       const errors = getErrorsInErrorObject(error);
@@ -154,68 +125,6 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
       setStatus('error');
       handleAlertOpen({ message: message, alertType: 'error' });
     }
-  };
-
-  const generateCredentialPayload = (credentialConfig: any) => {
-    const payload = {
-      connector_type: type,
-      connector_config: credentialConfig,
-      name: type,
-      account: generateAccountPayload()
-    };
-
-    return payload;
-  };
-
-  const generateAccountPayload = () => {
-    //@ts-ignore
-    const { email = '', first_name = '' } = user || {};
-
-    const payload = {
-      name: first_name,
-      external_id: email,
-      profile: '',
-      meta_data: {}
-    };
-
-    return payload;
-  };
-
-  const generateConnectionPayload = (streams: any[]) => {
-    let connectionPayload: any = {};
-
-    const { name = '', connection_interval = '' } = data ?? {};
-    connectionPayload['src'] = generateSourcePayload(streams);
-    connectionPayload['dest'] = generateDestinationPayload(streams);
-    connectionPayload['schedule'] = { run_interval: getRunInterval(connection_interval) };
-    connectionPayload['uiState'] = {};
-    connectionPayload['connectionName'] = name;
-    connectionPayload['workspaceId'] = wid;
-
-    return connectionPayload;
-  };
-
-  const generateSourcePayload = (streams: any[]) => {
-    const sourcePayload = {
-      catalog: {
-        streams: streams
-      }
-    };
-    return sourcePayload;
-  };
-
-  const generateDestinationPayload = (streams: any[]) => {
-    return {};
-
-    const destinationPayload = {
-      catalog: {
-        streams: streams
-      },
-      credential_id: '',
-      name: ''
-    };
-
-    return destinationPayload;
   };
 
   return (
@@ -234,7 +143,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
           onFormChange={handleFormChange}
           error={false}
           status={status}
-          jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+          jsonFormsProps={{ data: data, schema: connectionScheduleSchema, renderers: customRenderers }}
           removeAdditionalFields={false}
           displayActionButton={false}
         />
