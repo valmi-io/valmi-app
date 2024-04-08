@@ -126,7 +126,6 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
 
     const payload = {
       workspaceId: wid,
-
       credentialPayload,
       connectionPayload
     };
@@ -187,7 +186,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
 
     const { name = '', connection_interval = '' } = data ?? {};
     connectionPayload['src'] = generateSourcePayload(streams);
-    connectionPayload['dest'] = generateDestinationPayload();
+    connectionPayload['dest'] = generateDestinationPayload(streams);
     connectionPayload['schedule'] = { run_interval: getRunInterval(connection_interval) };
     connectionPayload['uiState'] = {};
     connectionPayload['connectionName'] = name;
@@ -205,11 +204,12 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
     return sourcePayload;
   };
 
-  const generateDestinationPayload = () => {
+  const generateDestinationPayload = (streams: any[]) => {
     return {};
+
     const destinationPayload = {
       catalog: {
-        sinks: []
+        streams: streams
       },
       credential_id: '',
       name: ''

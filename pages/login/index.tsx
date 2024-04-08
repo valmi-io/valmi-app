@@ -92,7 +92,7 @@ const Login: NextPageWithLayout = () => {
     const workspaceID = data.organizations[0].workspaces[0].id;
     // initialise appState
     initialiseAppState(dispatch, workspaceID);
-    router.push(`/spaces/${workspaceID}/syncs`);
+    router.push(`/spaces/${workspaceID}/onboarding`);
   };
 
   const errorCb = (error: any) => {

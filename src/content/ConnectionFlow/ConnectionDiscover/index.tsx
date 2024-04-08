@@ -8,7 +8,7 @@ import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import SkeletonLoader from '@/components/SkeletonLoader';
-import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, Typography } from '@mui/material';
 import TableHeader from '@/components/Table/TableHeader';
 import { TableColumnProps } from '@/utils/table-utils';
 import appIcons from '@/utils/icon-utils';
@@ -18,11 +18,13 @@ import streamsReducer from '@/content/ConnectionFlow/ConnectionDiscover/streamsR
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { WizardFooter } from '@/components/Wizard/Footer';
+import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
 
 const Columns: TableColumnProps[] = [
   { id: '1', label: '', align: 'right', action: true, minWidth: 100 },
   { id: '2', label: 'Stream', minWidth: 300, icon: appIcons.NAME, muiIcon: true },
-  { id: '3', label: 'Sync mode', minWidth: 300, icon: appIcons.SYNC }
+  { id: '3', label: 'Sync mode', minWidth: 300, icon: appIcons.SYNC },
+  { id: '4', label: '', minWidth: 300, icon: appIcons.ETL_ICON }
 ];
 
 const initialObjs: TData = {
@@ -31,7 +33,7 @@ const initialObjs: TData = {
 };
 
 const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '', type = '' } = params ?? {};
+  const { wid = '', type = '', mode = 'etl' } = params ?? {};
 
   const dispatchToStore = useDispatch<AppDispatch>();
 
@@ -165,6 +167,14 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     dispatchToStore(setEntities(obj));
   });
 
+  const getSourceCursorField = (row: any) => {
+    return row?.source_defined_cursor && row?.default_cursor_field ? row.default_cursor_field[0] : '';
+  };
+
+  const getSourcePrimaryKey = (row: any) => {
+    return row?.source_defined_primary_key ? row?.source_defined_primary_key[0] : '';
+  };
+
   const getDisplayComponent = () => {
     if (error) {
       return <ErrorComponent error={error} />;
@@ -205,8 +215,16 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
                   const labelId = `table-checkbox-${index}`;
 
+                  let cursorField = '';
+                  let primaryKey = '';
+
+                  if (mode === 'etl') {
+                    cursorField = getSourceCursorField(row);
+                    primaryKey = getSourcePrimaryKey(row);
+                  }
+
                   return (
-                    <TableRow hover key={row.name} sx={{ cursor: 'pointer' }}>
+                    <CustomizedTableRow key={`obj_key ${index}`} hover>
                       <TableCellWithSwitch
                         checked={isItemSelected}
                         onClick={(event, checked) => {
@@ -223,7 +241,15 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
                         }}
                         value={state.entities[row.name]?.sync_mode ?? ''}
                       />
-                    </TableRow>
+                      <TableCell>
+                        <Typography variant="body2" color="text.primary" noWrap>
+                          {`cursorField - ${cursorField}`}
+                        </Typography>
+                        <Typography variant="body2" color="text.primary" noWrap>
+                          {`primaryKey - ${primaryKey}`}
+                        </Typography>
+                      </TableCell>
+                    </CustomizedTableRow>
                   );
                 })}
               </TableBody>

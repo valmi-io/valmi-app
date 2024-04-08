@@ -20,6 +20,7 @@ type SelectDropdownProps = {
   onChange: (event: any, data: any) => void;
   isCreating?: boolean;
   children?: ReactNode;
+  size?: 'medium' | 'small';
 };
 
 const Label = styled(InputLabel)(({ theme }) => ({
@@ -44,7 +45,8 @@ const SelectDropdown = (props: SelectDropdownProps) => {
     handleCreateClick,
     isCreating,
     onChange,
-    children
+    children,
+    size = 'medium'
   } = props;
 
   return (
@@ -63,6 +65,7 @@ const SelectDropdown = (props: SelectDropdownProps) => {
           labelId="label"
           id="select"
           fullWidth
+          size={size}
           IconComponent={(props) => {
             return (
               <IconButton {...props} size="small">

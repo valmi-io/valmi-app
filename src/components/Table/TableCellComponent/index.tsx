@@ -124,6 +124,7 @@ export const TableCellWithDropdown = ({
         onChange={(event, key) => {
           onClick(event, key);
         }}
+        size="small"
       >
         {isArray(data) &&
           data.map((option: any, index: string) => {
