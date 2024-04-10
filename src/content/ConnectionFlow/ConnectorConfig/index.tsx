@@ -201,6 +201,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
     if (results) {
       const schema = results?.spec?.connectionSpecification ?? {};
+      //ADD in both properties and required
 
       return (
         <>

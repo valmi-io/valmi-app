@@ -57,6 +57,7 @@ import { Wizard, useWizard } from 'react-use-wizard';
 import { setIds } from '@/store/reducers/connectionDataFlow';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
 import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
+import { OAuthContextProvider } from '@/contexts/OAuthContext';
 
 const ConnectionsUpsertPageLayout = () => {
   const searchParams = useSearchParams();
@@ -225,24 +226,26 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
   };
 
   return (
-    <PageLayout
-      pageHeadTitle={constants.connections.CREATE_CONNECTION_TITLE}
-      title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
-      displayButton={false}
-    >
-      <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
-      {/** Stepper */}
-
-      <Wizard
-        startIndex={0}
-        header={<HorizontalLinearStepper steps={connectionSteps} />}
-        wrapper={<Paper variant="outlined" />}
+    <OAuthContextProvider>
+      <PageLayout
+        pageHeadTitle={constants.connections.CREATE_CONNECTION_TITLE}
+        title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
+        displayButton={false}
       >
-        <ConnectorConfig key={'connectorconfig'} params={params} />
-        <ConnectionDiscover key={'connectionDiscover'} params={params} />
-        <ConnectionSchedule key={'connectionSchedule'} params={params} />
-      </Wizard>
-    </PageLayout>
+        <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
+        {/** Stepper */}
+
+        <Wizard
+          startIndex={0}
+          header={<HorizontalLinearStepper steps={connectionSteps} />}
+          wrapper={<Paper variant="outlined" />}
+        >
+          <ConnectorConfig key={'connectorconfig'} params={params} />
+          <ConnectionDiscover key={'connectionDiscover'} params={params} />
+          <ConnectionSchedule key={'connectionSchedule'} params={params} />
+        </Wizard>
+      </PageLayout>
+    </OAuthContextProvider>
   );
 };
 

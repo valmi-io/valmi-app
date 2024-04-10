@@ -1,25 +1,16 @@
-import React, { useCallback, useState } from 'react';
-import {
-  CombinatorRendererProps,
-  isDescriptionHidden,
-  OwnPropsOfControl,
-  createCombinatorRenderInfos
-} from '@jsonforms/core';
+import React, { useContext, useState } from 'react';
+import { CombinatorRendererProps, isDescriptionHidden, createCombinatorRenderInfos } from '@jsonforms/core';
+import { hasAuthorizedOAuth } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import { JsonFormsDispatch, withJsonFormsOneOfProps } from '@jsonforms/react';
 import { Button, Card, FormControl, FormHelperText, Hidden, Tab, Tabs, TextField } from '@mui/material';
 import { merge } from 'lodash';
 import { useFocus } from '@jsonforms/material-renderers';
+import { OAuthContext } from '@/contexts/OAuthContext';
 
-export interface OwnOneOfProps extends OwnPropsOfControl {
-  indexOfFittingSchema?: number;
-}
-
-interface CustomOneOfProps {
-  handleOAuthButtonClick: () => void;
-}
-
-const MaterialOneOfEnumControl = (props: CombinatorRendererProps & CustomOneOfProps) => {
+const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
+  const { handleOAuthButtonClick } = useContext(OAuthContext);
+
   const {
     data,
     description,
@@ -35,21 +26,18 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps & CustomOneOfPr
     rootSchema,
     uischemas,
     renderers,
-    cells,
-    indexOfFittingSchema,
-    handleOAuthButtonClick
+    cells
   } = props;
 
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
 
-  const [selectedIndex, setSelectedIndex] = useState(indexOfFittingSchema || 0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const hasOneOfArr = !!schema?.oneOf;
 
   const oAuthOptions = (hasOneOfArr && schema?.oneOf) || schema || [];
   const selectedSchema = oAuthOptions[selectedIndex]?.properties || {};
   console.log('SELECTED SCHEMA', selectedSchema);
-  console.log('DATA', data);
   const showDescription = !isDescriptionHidden(
     visible,
     description,
@@ -99,6 +87,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps & CustomOneOfPr
             </Tabs>
             {hasOneOfArr &&
               oAuthOptions[selectedIndex].title?.toLocaleLowerCase() !== 'oauth2.0' &&
+              //@ts-ignore
               oneOfRenderInfos.map(
                 (oneOfRenderInfo: any, oneOfIndex: number) =>
                   selectedIndex === oneOfIndex && (
