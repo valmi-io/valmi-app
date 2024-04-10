@@ -112,17 +112,8 @@ const OAuthRedirectPage = () => {
       })
     );
 
-    //TODO: remove this when the ETL UI is done.
-
-    if (oAuthParams?.provider === 'shopify') {
-      // navigate to create connection page
-      router.push(`/spaces/${workspaceId}/shopify`);
-    } else {
-      router.push(`/spaces/${workspaceId}/connections/create`);
-    }
-
     // navigate to create connection page
-    // router.push(`/spaces/${workspaceId}/connections/create`);
+    router.push(`/spaces/${workspaceId}/connections/create`);
   };
 };
 

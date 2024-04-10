@@ -1,34 +1,165 @@
-import React from 'react';
-import { ControlProps, isOneOfEnumControl, OwnPropsOfEnum, RankedTester, rankWith } from '@jsonforms/core';
-import { TranslateProps, withJsonFormsOneOfEnumProps, withTranslateProps } from '@jsonforms/react';
-// import { MuiAutocomplete, WithOptionLabel } from '/mui-controls/MuiAutocomplete';
-// import { MuiSelect } from '../mui-controls/MuiSelect';
-// import { MaterialInputControl } from '../controls/MaterialInputControl';
-import merge from 'lodash/merge';
-import { MuiAutocomplete, WithOptionLabel } from '@/components/mui-controls/MuiAutoComplete';
-import FormInputControl from '@/components/FormInput/FormInputControl';
+import React, { useCallback, useState } from 'react';
+import {
+  CombinatorRendererProps,
+  isDescriptionHidden,
+  OwnPropsOfControl,
+  createCombinatorRenderInfos
+} from '@jsonforms/core';
+import { JsonFormsDispatch, withJsonFormsOneOfProps } from '@jsonforms/react';
+import { Button, Card, FormControl, FormHelperText, Hidden, Tab, Tabs, TextField } from '@mui/material';
+import { merge } from 'lodash';
+import { useFocus } from '@jsonforms/material-renderers';
 
-export const MaterialOneOfEnumControl = (props: ControlProps & OwnPropsOfEnum & WithOptionLabel & TranslateProps) => {
-  console.log('Material one of enum control: ', props);
-  const { config, uischema, errors, data } = props;
+export interface OwnOneOfProps extends OwnPropsOfControl {
+  indexOfFittingSchema?: number;
+}
 
-  console.log('Data:_', data);
+interface CustomOneOfProps {
+  handleOAuthButtonClick: () => void;
+}
+
+const MaterialOneOfEnumControl = (props: CombinatorRendererProps & CustomOneOfProps) => {
+  const [focused, onFocus, onBlur] = useFocus();
+  const {
+    data,
+    description,
+    schema,
+    uischema,
+    path,
+    errors,
+    enabled,
+    visible,
+    id,
+    handleChange,
+    config,
+    rootSchema,
+    uischemas,
+    renderers,
+    cells,
+    indexOfFittingSchema,
+    handleOAuthButtonClick
+  } = props;
+
+  const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
 
-  console.log('applied ui options:_', appliedUiSchemaOptions);
+  const [selectedIndex, setSelectedIndex] = useState(indexOfFittingSchema || 0);
+  const hasOneOfArr = !!schema?.oneOf;
 
-  const isValid = errors?.length === 0;
+  const oAuthOptions = (hasOneOfArr && schema?.oneOf) || schema || [];
+  const selectedSchema = oAuthOptions[selectedIndex]?.properties || {};
+  console.log('SELECTED SCHEMA', selectedSchema);
+  console.log('DATA', data);
+  const showDescription = !isDescriptionHidden(
+    visible,
+    description,
+    focused,
+    appliedUiSchemaOptions.showUnfocusedDescription
+  );
 
-  return <></>;
+  const isOAuthSelected = (option: number) => {
+    return !!(oAuthOptions[option].title?.toLowerCase() === 'oauth2.0');
+  };
 
-  //   return appliedUiSchemaOptions.autocomplete === false ? (
-  //     <MaterialInputControl {...props} input={MuiSelect} />
-  //   ) : (
-  //     <MuiAutocomplete {...props} isValid={isValid} />
-  //   );
+  const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
+  const secondFormHelperText = showDescription && !isValid ? errors : null;
+
+  const handleTabChange = (_event: any, newOneOfIndex: number) => {
+    setSelectedIndex(newOneOfIndex);
+  };
+
+  // Add this function to check if form fields are filled
+  const areFieldsFilled = () => {
+    // Check if any field is filled
+    for (const key in selectedSchema) {
+      if (selectedSchema[key]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const oneOfRenderInfos =
+    hasOneOfArr && createCombinatorRenderInfos(oAuthOptions, rootSchema, 'oneOf', uischema, path, uischemas);
+
+  return (
+    <Hidden xsUp={!visible}>
+      <Card sx={{ py: 2 }}>
+        {visible && (
+          <FormControl
+            fullWidth={!appliedUiSchemaOptions.trim}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            id={id}
+            variant={'standard'}
+          >
+            <Tabs value={selectedIndex} onChange={handleTabChange}>
+              {hasOneOfArr &&
+                oAuthOptions.map((option: any, index: number) => <Tab key={option?.title} label={option?.title} />)}
+            </Tabs>
+            {hasOneOfArr &&
+              oAuthOptions[selectedIndex].title?.toLocaleLowerCase() !== 'oauth2.0' &&
+              oneOfRenderInfos.map(
+                (oneOfRenderInfo: any, oneOfIndex: number) =>
+                  selectedIndex === oneOfIndex && (
+                    <JsonFormsDispatch
+                      key={oneOfIndex}
+                      schema={oneOfRenderInfo.schema}
+                      uischema={oneOfRenderInfo.uischema}
+                      path={path}
+                      renderers={renderers}
+                      cells={cells}
+                    />
+                  )
+              )}
+
+            {hasOneOfArr ? (
+              isOAuthSelected(selectedIndex) && (
+                <Button
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    m: 2
+                  }}
+                  variant="contained"
+                  onClick={handleOAuthButtonClick}
+                  disabled={!areFieldsFilled()}
+                >
+                  {schema?.title}
+                </Button>
+              )
+            ) : (
+              <Button
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mt: 2
+                }}
+                variant="contained"
+                onClick={handleOAuthButtonClick}
+                disabled={!enabled}
+              >
+                {schema?.title}
+              </Button>
+
+              // <FormFieldAuth
+              //   label={{schema?.title}}
+              //   onClick={handleOAuthButtonClick}
+              //   isConnectorConfigured={isConnectorConfigured}
+              //   isConfigurationRequired={isConfigurationRequired}
+              //   handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+              //   oAuthProvider={oAuthProvider}
+              //   oauth_error={oauth_error}
+              //   hasOAuthAuthorized={hasAuthorizedOAuth}
+              // />
+            )}
+            <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
+            <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
+          </FormControl>
+        )}
+      </Card>
+    </Hidden>
+  );
 };
 
-export const materialOneOfEnumControlTester: RankedTester = rankWith(5, isOneOfEnumControl);
-
-// HOC order can be reversed with https://github.com/eclipsesource/jsonforms/issues/1987
-export default withJsonFormsOneOfEnumProps(withTranslateProps(React.memo(MaterialOneOfEnumControl)), false);
+export default withJsonFormsOneOfProps(MaterialOneOfEnumControl);

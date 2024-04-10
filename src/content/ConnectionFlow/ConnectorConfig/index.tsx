@@ -80,8 +80,10 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   const [results, setResults] = useState(null);
 
+  const handleOAuthButtonClick = () => alert('HELLOO');
+
   // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'], handleOAuthButtonClick });
 
   useEffect(() => {
     // fetch integration spec

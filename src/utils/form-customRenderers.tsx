@@ -7,7 +7,7 @@
 import FormArrayControl from '@/components/FormInput/FormArrayControl';
 import FormEmptyControl from '@/components/FormInput/FormEmptyControl';
 import FormInputControl from '@/components/FormInput/FormInputControl';
-import { MaterialOneOfEnumControl } from '@/components/FormInput/FormOneOfControl';
+import MaterialOneOfEnumControl from '@/components/FormInput/FormOneOfControl';
 import FormSelectControl from '@/components/FormInput/FormSelectControl';
 import StreamKeysControl from '@/components/FormInput/StreamKeysControl';
 import {
@@ -25,9 +25,10 @@ const apiKeys = ['publicKeys', 'privateKeys'];
 
 type CustomRenderersProps = {
   invisibleFields?: string[];
+  handleOAuthButtonClick?: () => void;
 };
 
-export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProps) => {
+export const getCustomRenderers = ({ invisibleFields = [], handleOAuthButtonClick }: CustomRenderersProps) => {
   const renderers = [
     ...materialRenderers,
 
@@ -58,14 +59,14 @@ export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProp
         arrayControlTester
       ),
       renderer: FormArrayControl
+    },
+    {
+      tester: rankWith(
+        3000, // Increase rank as needed
+        oneOfControlTester
+      ),
+      renderer: MaterialOneOfEnumControl
     }
-    // {
-    //   tester: rankWith(
-    //     5, // Increase rank as needed
-    //     oneOfControlTester
-    //   ),
-    //   renderer: MaterialOneOfEnumControl
-    // }
   ];
 
   if (isArray(invisibleFields) && invisibleFields.length > 0) {

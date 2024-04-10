@@ -201,13 +201,14 @@ export const arrayControlTester = (uischema: any, schema: JsonSchema, context: T
 // jsonforms input control tester
 export const oneOfControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
   if (uischema.type !== 'Control') return false;
-
   const arr = uischema.scope.split('/');
   const controlName = arr[arr.length - 1];
 
   const hasOneOfType = !!schema?.properties?.[controlName]?.oneOf;
+  const hasOauthInCredentials =
+    schema?.properties?.credentials && schema?.properties?.credentials?.title?.toLowerCase().includes('oauth');
 
-  return hasOneOfType;
+  return !!(hasOneOfType || hasOauthInCredentials);
 };
 
 export const jsonFormValidator = (schema: any, data: any) => {
