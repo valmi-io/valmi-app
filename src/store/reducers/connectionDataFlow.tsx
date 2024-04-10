@@ -10,10 +10,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { TData } from '@/utils/typings.d';
 
-// export const connectionDataFlowKeys = ["config","spec"]
-
 const initialState: TData = {
-  ids: [], // list of steps
+  ids: [], // list of steps ['selected_connector','source_credential','source_catalog','schedule']
   entities: {} // step data (object)
 };
 
@@ -30,6 +28,10 @@ export const connectionDataFlow = createSlice({
     clearConnectionFlowState(state) {
       state.ids = [];
       state.entities = {};
+    },
+    setConnectionFlowState(state, action: PayloadAction<any>) {
+      state.ids = action.payload.ids;
+      state.entities = action.payload.entities;
     }
   },
   extraReducers: (builder) => {
@@ -43,6 +45,6 @@ export const connectionDataFlow = createSlice({
   }
 });
 
-export const { setIds, setEntities, clearConnectionFlowState } = connectionDataFlow.actions;
+export const { setIds, setEntities, clearConnectionFlowState, setConnectionFlowState } = connectionDataFlow.actions;
 
 export default connectionDataFlow.reducer;

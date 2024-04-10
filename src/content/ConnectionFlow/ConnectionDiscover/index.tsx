@@ -19,9 +19,10 @@ import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { WizardFooter } from '@/components/Wizard/Footer';
 import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
+import { getCatalogObjKey, getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 
 const Columns: TableColumnProps[] = [
-  { id: '1', label: '', align: 'right', action: true, minWidth: 100 },
+  { id: '1', label: '', align: 'right', action: true, checkBox: true, minWidth: 100 },
   { id: '2', label: 'Stream', minWidth: 300, icon: appIcons.NAME, muiIcon: true },
   { id: '3', label: 'Sync mode', minWidth: 300, icon: appIcons.SYNC },
   { id: '4', label: '', minWidth: 300, icon: appIcons.ETL_ICON }
@@ -33,17 +34,19 @@ const initialObjs: TData = {
 };
 
 const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '', type = '', mode = 'etl' } = params ?? {};
+  const { wid = '', mode = 'etl' } = params ?? {};
 
   const dispatchToStore = useDispatch<AppDispatch>();
 
-  const { activeStep, handleStep, nextStep, previousStep } = useWizard();
+  const { handleStep, nextStep, previousStep } = useWizard();
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
-  const prevStep = activeStep - 1;
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const config = connectionDataFlow?.entities[prevStep]?.config?.config ?? {};
+  const { type = '' } = selectedConnector;
+
+  const config = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
 
   const [fetchQuery, { data, isFetching, error }] = useLazyDiscoverConnectorQuery();
 
@@ -62,7 +65,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
       };
 
       if (objExistsInStore()) {
-        const data = getCurrObjFromStore('discover');
+        const data = getCurrObjFromStore('catalog');
 
         const streams: any[] = getCurrObjFromStore('streams');
 
@@ -88,11 +91,11 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
   }, [data]);
 
   const objExistsInStore = () => {
-    return !!connectionDataFlow?.entities[activeStep];
+    return !!connectionDataFlow?.entities[getCatalogObjKey(type)];
   };
 
   const getCurrObjFromStore = (key: string) => {
-    return connectionDataFlow?.entities[activeStep][key];
+    return connectionDataFlow?.entities[getCatalogObjKey(type)][key];
   };
 
   const handleSaveObj = (objs: any[]) => {
@@ -151,16 +154,16 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
     let results = null;
     if (objExistsInStore()) {
-      results = getCurrObjFromStore('discover');
+      results = getCurrObjFromStore('catalog');
     } else {
       results = data?.resultData;
     }
 
     const obj = {
       ...entitiesInStore,
-      [activeStep]: {
+      [getCatalogObjKey(type)]: {
         streams: streamsArr,
-        discover: results
+        catalog: results
       }
     };
 

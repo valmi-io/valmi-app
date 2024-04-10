@@ -300,11 +300,7 @@ export const apiSlice = createApi({
 
         if (destStorageCredRes.error) return { error: destStorageCredRes.error };
 
-        console.log('Dest storage credentials: ', destStorageCredRes.data);
-
         let destCredObj = { ...destCredentialPayload, ['connector_config']: destStorageCredRes.data };
-
-        console.log('Dest cred obj:_', destCredObj);
 
         const destCredRes = await baseQuery({
           url: `/workspaces/${workspaceId}/credentials/create`,
@@ -313,8 +309,6 @@ export const apiSlice = createApi({
         });
 
         if (destCredRes.error) return { error: destCredRes.error };
-
-        console.log('dest cred res:_', destCredRes.data);
 
         const { id: destCredentialId, name: destCredentialName } = destCredRes.data;
 

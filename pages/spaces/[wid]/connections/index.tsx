@@ -1,12 +1,6 @@
 /*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Monday, June 12th 2023, 5:28:44 pm
- * Author: Nagendra S @ valmi.io
- */
-
-/*
- * SyncsPage Component
- * This component represents a page for displaying syncs and creating new syncs.
+ * Connections page
+ * This component represents a page for displaying connections and creating / editing connection.
  */
 
 import { ReactElement, useEffect } from 'react';
@@ -29,17 +23,6 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
-
-/**
- * Responsible for rendering the connections page and its components.
- *
- * - Responsible for passing `workspaceId` to `useSyncs` hook.
- * - Passes `syncs` prop to the `SyncsTable` component.
- * - Passes `error` prop to the  `ErrorContainer` component.
- * - Passes `traceError` prop to the `ErrorStatusText` component
- * - Responsible for the container card styles.
- * - Responsible for rendering `ListEmptyComponent` when `syncs` are empty.
- */
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();

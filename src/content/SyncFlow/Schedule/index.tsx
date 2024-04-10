@@ -65,12 +65,7 @@ const Schedule = () => {
           label={'Schedule'}
           value={displaySchedule(getSchedule(flowState))}
           onChange={(event, key) => {
-            saveToStore(
-              saveSchedule(
-                flowState,
-                getScheduleOptions()[parseInt(key.key.split('_valkey')[1])]
-              )
-            );
+            saveToStore(saveSchedule(flowState, getScheduleOptions()[parseInt(key.key.split('_valkey')[1])]));
           }}
         >
           {getScheduleOptions().map((option, index) => {

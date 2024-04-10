@@ -30,6 +30,7 @@ import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
+import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 
 type TState = {
   error: string;
@@ -42,11 +43,11 @@ const Item = styled(Box)(({}) => ({
 }));
 
 const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '', type = '' } = params ?? {};
+  const { wid = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { activeStep, nextStep } = useWizard();
+  const { nextStep } = useWizard();
 
   let initialData = {};
 
@@ -54,8 +55,12 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
-  if (connectionDataFlow?.entities[activeStep]?.config) {
-    initialData = connectionDataFlow?.entities[activeStep]?.config?.config;
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
+
+  if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
+    initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
 
   const { flowState: {} = {} } = connection_flow;
@@ -70,7 +75,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // Getting keys for the object
-  const [fetchConnectorOAuthConfig, { data: keys, isLoading: isKeysLoading, error: keysError }] =
+  const [fetchIntegrationOauthCredentials, { data: keys, isLoading: isKeysLoading, error: keysError }] =
     useLazyGetOAuthApiConfigQuery();
 
   const [state, setState] = useState<TState>({
@@ -89,8 +94,8 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     // fetch integration spec
 
     if (type && wid) {
-      if (connectionDataFlow?.entities[activeStep]?.spec) {
-        setResults(connectionDataFlow?.entities[activeStep]?.spec);
+      if (connectionDataFlow?.entities[getCredentialObjKey[type]]?.spec) {
+        setResults(connectionDataFlow?.entities[getCredentialObjKey[type]]?.spec);
       } else {
         fetchIntegrationSpec({
           type: type,
@@ -98,24 +103,17 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
         });
       }
     }
-  }, [wid, type]);
+  }, [type, wid]);
 
-  // useEffect(() => {
-  //   if (selected_connector.oauth_keys === 'private') {
-  //     fetchConnectorOAuthConfig({
-  //       workspaceId,
-  //       type: selected_connector.type
-  //     });
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (isFetching || isKeysLoading) {
-  //     handleFormStatus(true);
-  //   } else {
-  //     handleFormStatus(false);
-  //   }
-  // }, [isFetching, isKeysLoading]);
+  useEffect(() => {
+    // fetch connector oauth credentials
+    if (oauthKeys === 'private') {
+      fetchIntegrationOauthCredentials({
+        workspaceId: wid,
+        type: type
+      });
+    }
+  }, [oauthKeys]);
 
   useEffect(() => {
     if (spec) {
@@ -167,14 +165,16 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
             status: 'success'
           }));
 
-          const obj = {
-            [activeStep]: {
-              config: payload,
+          const entities = {
+            ...connectionDataFlow.entities,
+            [getCredentialObjKey(type)]: {
+              ...connectionDataFlow.entities[getCredentialObjKey(type)],
+              config: payload.config,
               spec: spec
             }
           };
 
-          dispatch(setEntities(obj));
+          dispatch(setEntities(entities));
 
           nextStep();
         }
@@ -224,7 +224,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     }
   };
 
-  return <ConnectorLayout title={`Connect to ${type}`}>{getDisplayComponent()}</ConnectorLayout>;
+  return <ConnectorLayout title={`Connect to ${displayName}`}>{getDisplayComponent()}</ConnectorLayout>;
 };
 
 export default ConnectorConfig;

@@ -14,7 +14,6 @@ type TTableHeaderProps = {
   columns: TableColumnProps[];
   connectionType?: string;
   onSelectAllClick?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  actionType?: 'SELECT_ALL';
   numSelected?: number;
   rowCount?: number;
 };
@@ -27,7 +26,6 @@ const TableHeader = ({
   columns,
   connectionType = '',
   onSelectAllClick,
-  actionType = 'SELECT_ALL',
   numSelected,
   rowCount = 0
 }: TTableHeaderProps) => {
@@ -37,7 +35,7 @@ const TableHeader = ({
       {columns.map((column: any, index) => {
         return (
           <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
-            {column?.action ? (
+            {column?.checkBox ? (
               <Stack direction="row" alignItems="center">
                 <Checkbox
                   color="primary"

@@ -14,6 +14,7 @@ import { useWizard } from 'react-use-wizard';
 
 export interface Step {
   label: string;
+  type?: string;
 }
 
 export interface StepperProps {

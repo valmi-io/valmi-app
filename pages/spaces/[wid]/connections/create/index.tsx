@@ -4,39 +4,23 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
-
-import { useRouter } from 'next/router';
+import React, { ReactElement, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Paper, CardActions, Button, CircularProgress } from '@mui/material';
-
-import { useForm } from 'react-hook-form';
-
-import axios from 'axios';
+import { Paper } from '@mui/material';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { EtlConnectionSteps, RetlConnectionSteps } from '@content/Connections/ConnectionModel';
-import ConnectionTest from '@content/ConnectionFlow/ConnectionTest';
-import Connectors from '@content/ConnectionFlow/Connectors';
 import ConnectorConfig from '@content/ConnectionFlow/ConnectorConfig';
-import {
-  hasAuthorizedOAuth,
-  isConnectorRequiresOAuth
-} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-
-import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 import AlertComponent from '@components/Alert';
-import HorizontalLinearStepper from '@components/Stepper';
+import HorizontalLinearStepper, { Step } from '@components/Stepper';
 
 import { AppDispatch } from '@store/store';
 import { RootState } from '@store/reducers';
 
 import constants from '@constants/index';
-import { FormStatus } from '@/utils/form-utils';
 
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
@@ -58,6 +42,7 @@ import { setIds } from '@/store/reducers/connectionDataFlow';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
 import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
 import { OAuthContextProvider } from '@/contexts/OAuthContext';
+import { getConnectionFlowSteps } from '@/utils/connectionFlowUtils';
 
 const ConnectionsUpsertPageLayout = () => {
   const searchParams = useSearchParams();
@@ -71,69 +56,37 @@ const ConnectionsUpsertPageLayout = () => {
 const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
   const { connectionId = '', mode = '' } = params ?? {};
 
-  const isEditableFlow = !!connectionId;
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
-  const router = useRouter();
+  const isEditableFlow = !!connectionId;
 
   // states
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
 
-  // form state - form can be in any of the states {FormStatus}
-  const [formStatus, setformStatus] = useState<FormStatus>('empty');
-
-  const [creatingConnection, setCreatingConnection] = useState<boolean>(false);
-
   const dispatch = useDispatch<AppDispatch>();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '', currentRoute = '' } = appState;
-
   const connectionSteps = useMemo(() => {
-    let steps: any[] = [];
-    let stepsToSlice = 0; // number of steps to skip,when connection is editable
-    const isEditableFlow = !!connectionId; // checking if connection is editable.
+    let isEditableFlow = false;
+    const steps: Step[] = getConnectionFlowSteps(mode, isEditableFlow);
 
-    if (mode === 'etl') {
-      steps = [...steps, ...EtlConnectionSteps];
-      stepsToSlice = 1;
-    }
-    if (mode === 'retl') {
-      steps = [...steps, ...RetlConnectionSteps];
-      stepsToSlice = 2;
-    }
+    let newIds = steps
+      .filter((step) => {
+        const idExists = connectionDataFlow.ids.includes(step.type ?? '');
 
-    if (isEditableFlow) {
-      steps.slice(stepsToSlice);
-    }
+        if (!idExists) {
+          return step.type;
+        }
+      })
+      .map((step) => step.type);
 
-    let arr = Array.from({ length: steps.length }, (x, i) => i.toString());
-    // dispatching number of steps in redux store.
-    dispatch(setIds(arr));
+    let idsToStore = [...connectionDataFlow.ids, ...newIds];
+
+    dispatch(setIds(idsToStore));
 
     return steps;
   }, [connectionId, mode]);
-
-  const handleFormStatus = (isFetching: boolean) => {
-    setformStatus(isFetching ? 'submitting' : 'empty');
-  };
-
-  // const getSectionComponent = () => {
-  //   let step_components = [
-  //     <ConnectorConfig key={'connectorconfig'} params={params} />,
-  //     <ConnectorConfig key={'connectorconfig'} params={params} />,
-  //     <ConnectionTest key={'connectiontest'} handleFormStatus={handleFormStatus} />
-  //   ];
-  //   if (isEditableFlow) {
-  //     step_components = step_components.splice(1);
-  //   }
-
-  //   console.log('Step components:_', step_components);
-
-  //   return <React.Fragment key={step_components[currentStep].key}>{step_components[currentStep]}</React.Fragment>;
-  // };
 
   // const onSubmit = (values: any) => {
   //   // check if this connector doesn't require oAuth
@@ -184,35 +137,6 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
   //   // else, update current_step in connection_flow state.
   //   setCurrentStepInConnectionFlow(dispatch, currentStep + 1, connection_flow);
   // };
-
-  const connectionNetworkHandler = async (connectionUrl: string, data: any) => {
-    try {
-      const response = await axios.post('/api/connectionNetworkHandler', {
-        connectionUrl,
-        data
-      });
-      const result = response.data;
-      let isErrorAlert = false;
-      if (hasErrorsInData(result)) {
-        const traceError = getErrorsInData(data);
-        isErrorAlert = true;
-        displayAlertDialog(traceError, isErrorAlert);
-      } else {
-        displayAlertDialog(`Connection ${isEditableFlow ? 'updated' : 'created'} successfully`, isErrorAlert);
-        router.push(`/spaces/${workspaceId}/connections/${currentRoute}`);
-      }
-      setCreatingConnection(false);
-    } catch (error: any) {
-      // Handle any errors that occur during the API request
-      const errors = getErrorsInErrorObject(error.response);
-      const { message = 'unknown' } = errors || {};
-      const isErrorAlert = true;
-      displayAlertDialog(message, isErrorAlert);
-      setCreatingConnection(false);
-    } finally {
-      setformStatus('empty');
-    }
-  };
 
   const displayAlertDialog = (message: any, isError: boolean) => {
     showAlertDialog(true);

@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus, jsonFormValidator } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 import { useWizard } from 'react-use-wizard';
 import { WizardFooter } from '@/components/Wizard/Footer';
@@ -21,14 +21,21 @@ import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import {
   connectionScheduleSchema,
   generateConnectionPayload,
-  generateCredentialPayload
+  generateCredentialPayload,
+  getCatalogObjKey,
+  getCredentialObjKey,
+  getSelectedConnectorKey
 } from '@/utils/connectionFlowUtils';
 import { useRouter } from 'next/router';
+import { AppDispatch } from '@/store/store';
+import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 
 const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
   const router = useRouter();
-  const { wid = '', type = '' } = params ?? {};
+  const { wid = '' } = params ?? {};
   const { previousStep } = useWizard();
+
+  const dispatch = useDispatch<AppDispatch>();
   let initialData = {};
 
   const [data, setData] = useState<any>(initialData);
@@ -47,6 +54,10 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const { type = '' } = selectedConnector;
 
   const user = useSelector((state: RootState) => state.user.user);
 
@@ -84,8 +95,8 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
   const handleOnClick = () => {
     setStatus('submitting');
 
-    const credentialObj = connectionDataFlow?.entities[0]?.config?.config ?? {};
-    const streams = connectionDataFlow?.entities[1]?.streams ?? {};
+    const credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
+    const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
 
     const credentialPayload = generateCredentialPayload(credentialObj, type, user);
 
@@ -116,6 +127,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
       } else {
         setStatus('success');
         handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
+        dispatch(clearConnectionFlowState());
         router.push(`/spaces/${wid}/connections`);
       }
     } catch (error) {
@@ -142,7 +154,6 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
           editing={false}
           onFormChange={handleFormChange}
           error={false}
-          status={status}
           jsonFormsProps={{ data: data, schema: connectionScheduleSchema, renderers: customRenderers }}
           removeAdditionalFields={false}
           displayActionButton={false}
@@ -150,6 +161,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
       </ConnectorLayout>
 
       <WizardFooter
+        status={status}
         disabled={!valid || isFetching}
         prevDisabled={isFetching}
         nextButtonTitle={'Create'}

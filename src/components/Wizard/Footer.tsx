@@ -24,13 +24,7 @@ export const WizardFooter = ({
         justifyContent: 'flex-end'
       }}
     >
-      <SubmitButton
-        buttonText={'Back'}
-        data={false}
-        isFetching={status === 'submitting'}
-        disabled={prevDisabled}
-        onClick={onPrevClick}
-      />
+      <SubmitButton buttonText={'Back'} data={false} isFetching={false} disabled={prevDisabled} onClick={onPrevClick} />
       {/* <Button disabled={prevDisabled} color="inherit" variant="contained" onClick={onPrevClick} sx={{ mr: 1 }}>
         Back
       </Button> */}

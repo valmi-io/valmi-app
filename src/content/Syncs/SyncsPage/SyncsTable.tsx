@@ -39,7 +39,7 @@ const SyncsTable = ({ syncs }) => {
 
   const handleOnClick = ({ syncId }: SyncOnClickProps) => {
     // navigate to sync runs
-    router.push(`/spaces/${workspaceId}/syncs/${syncId}/runs`);
+    router.push(`/spaces/${workspaceId}/connections/${syncId}/runs`);
   };
 
   return (
@@ -54,13 +54,7 @@ const SyncsTable = ({ syncs }) => {
           {/* Syncs Table Body */}
           <TableBody>
             {syncs.map((sync) => {
-              return (
-                <SyncTableRow
-                  key={sync.id}
-                  sync={sync}
-                  onClick={handleOnClick}
-                />
-              );
+              return <SyncTableRow key={sync.id} sync={sync} onClick={handleOnClick} />;
             })}
           </TableBody>
         </Table>

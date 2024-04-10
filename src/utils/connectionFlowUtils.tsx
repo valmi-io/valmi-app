@@ -1,3 +1,7 @@
+import { Step } from '@/components/Stepper';
+import constants from '@/constants';
+import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+
 export type TStream = {
   name: string;
   json_schema: any;
@@ -43,6 +47,17 @@ export const connectionScheduleSchema = {
     }
   },
   required: ['name', 'connection_interval']
+};
+
+export const getSelectedConnectorObj = (item: ConnectorType, key: string) => {
+  const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string } = {
+    type: item.type,
+    display_name: item.display_name,
+    oauth: !!item.oauth,
+    oauth_keys: item.oauth_keys ?? ''
+  };
+
+  return obj;
 };
 
 export const generateCredentialPayload = (credentialConfig: any, type: string, user: any) => {
@@ -125,4 +140,93 @@ const getRunInterval = (name: string) => {
 
   const runInterval = val * (type === 'HOUR' ? 3600 : 60) * 1000; // inteval in milliseconds.
   return runInterval;
+};
+
+const etlConnectionSteps: Step[] = [
+  {
+    label: constants.connections.CONFIGURE_SOURCE,
+    type: 'source_credential'
+  },
+  {
+    label: constants.connections.SELECT_STREAMS,
+    type: 'source_catalog'
+  },
+  {
+    label: constants.connections.CONFIGURE_CONNECTION,
+    type: 'schedule'
+  }
+];
+
+const etlConnectionEditFlowSteps: Step[] = [
+  {
+    label: constants.connections.SELECT_STREAMS,
+    type: 'source_catalog'
+  },
+  {
+    label: constants.connections.CONFIGURE_CONNECTION,
+    type: 'schedule'
+  }
+];
+
+const rEtlConnectionSteps: Step[] = [
+  {
+    label: constants.connections.CONFIGURE_SOURCE,
+    type: 'source_credential'
+  },
+  {
+    label: constants.connections.SELECT_STREAMS,
+    type: 'source_catalog'
+  },
+  {
+    label: 'Configure destination',
+    type: 'destination_credential'
+  },
+  {
+    label: 'Select sinks',
+    type: 'destination_catalog'
+  },
+  {
+    label: constants.connections.CONFIGURE_CONNECTION,
+    type: 'schedule'
+  }
+];
+
+export type TConnectionFlowStep = {
+  type: 'etl' | 'retl' | 'events';
+  create: Step[];
+  edit: Step[];
+};
+
+export const getConnectionFlowSteps = (mode: string, isEditableFlow: boolean) => {
+  const steps: TConnectionFlowStep[] = [
+    { type: 'etl', create: etlConnectionSteps, edit: etlConnectionEditFlowSteps },
+    { type: 'retl', create: rEtlConnectionSteps, edit: rEtlConnectionSteps },
+    { type: 'events', create: [], edit: [] }
+  ];
+
+  //@ts-ignore
+  const { create = [], edit = [] } = steps.find((step) => mode === step.type);
+
+  return isEditableFlow ? edit : create;
+};
+
+export const getSelectedConnectorKey = () => {
+  return 'selected_connector';
+};
+
+const INTEGRATION_TYPES: any = {
+  SRC: 'source',
+  DEST: 'destination'
+};
+
+export const getCredentialObjKey = (integrationType: string) => {
+  const key = INTEGRATION_TYPES[integrationType.split('_')[0]];
+
+  return `${key}_credential`;
+};
+
+export const getCatalogObjKey = (integrationType: string) => {
+  const key = INTEGRATION_TYPES[integrationType.split('_')[0]];
+
+  return `${key}_catalog`;
 };
