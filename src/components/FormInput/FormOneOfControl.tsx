@@ -6,10 +6,17 @@ import { Button, Card, FormControl, FormHelperText, Hidden, Tab, Tabs, TextField
 import { merge } from 'lodash';
 import { useFocus } from '@jsonforms/material-renderers';
 import { OAuthContext } from '@/contexts/OAuthContext';
+import FormFieldAuth from '@/components/FormInput/FormFieldAuth';
 
 const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
-  const { handleOAuthButtonClick } = useContext(OAuthContext);
+  const {
+    handleOAuthButtonClick,
+    isConnectorConfigured,
+    handleOnConfigureButtonClick,
+    isConfigurationRequired,
+    oAuthProvider
+  } = useContext(OAuthContext);
 
   const {
     data,
@@ -37,7 +44,10 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const oAuthOptions = (hasOneOfArr && schema?.oneOf) || schema || [];
   const selectedSchema = oAuthOptions[selectedIndex]?.properties || {};
-  console.log('SELECTED SCHEMA', selectedSchema);
+
+  console.log('OAUTH OPTILNS :', oAuthOptions);
+  console.log('selected schema :', selectedSchema);
+
   const showDescription = !isDescriptionHidden(
     visible,
     description,
@@ -102,46 +112,31 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                   )
               )}
 
-            {hasOneOfArr ? (
-              isOAuthSelected(selectedIndex) && (
-                <Button
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    m: 2
-                  }}
-                  variant="contained"
-                  onClick={handleOAuthButtonClick}
-                  disabled={!areFieldsFilled()}
-                >
-                  {schema?.title}
-                </Button>
-              )
-            ) : (
-              <Button
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  mt: 2
-                }}
-                variant="contained"
-                onClick={handleOAuthButtonClick}
-                disabled={!enabled}
-              >
-                {schema?.title}
-              </Button>
-
-              // <FormFieldAuth
-              //   label={{schema?.title}}
-              //   onClick={handleOAuthButtonClick}
-              //   isConnectorConfigured={isConnectorConfigured}
-              //   isConfigurationRequired={isConfigurationRequired}
-              //   handleOnConfigureButtonClick={handleOnConfigureButtonClick}
-              //   oAuthProvider={oAuthProvider}
-              //   oauth_error={oauth_error}
-              //   hasOAuthAuthorized={hasAuthorizedOAuth}
-              // />
-            )}
+            {hasOneOfArr
+              ? isOAuthSelected(selectedIndex) && (
+                  <FormFieldAuth
+                    label={schema?.title}
+                    onClick={handleOAuthButtonClick}
+                    isConnectorConfigured={isConnectorConfigured}
+                    isConfigurationRequired={isConfigurationRequired}
+                    handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+                    oAuthProvider={'facebook'}
+                    // oauth_error={oauth_error}
+                    hasOAuthAuthorized={hasAuthorizedOAuth}
+                  />
+                )
+              : isOAuthSelected(selectedIndex) && (
+                  <FormFieldAuth
+                    label={schema?.title}
+                    onClick={handleOAuthButtonClick}
+                    isConnectorConfigured={isConnectorConfigured}
+                    isConfigurationRequired={isConfigurationRequired}
+                    handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+                    oAuthProvider={'facebook'}
+                    // oauth_error={oauth_error}
+                    hasOAuthAuthorized={hasAuthorizedOAuth}
+                  />
+                )}
             <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>

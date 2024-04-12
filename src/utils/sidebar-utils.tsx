@@ -32,14 +32,22 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
   const routes: TSidebarRoute[] = [
     jitsuEnabled && {
       id: 0,
-      path: `/spaces/${workspaceId}/onboarding`,
+      path: `/spaces/${workspaceId}/insights`,
       sidebarProps: {
-        displayText: 'ONBOARDING',
+        displayText: 'INSIGHTS',
         icon: appIcons.TRACK
       }
     },
-    {
+    jitsuEnabled && {
       id: 1,
+      path: `/spaces/${workspaceId}/explore`,
+      sidebarProps: {
+        displayText: 'EXPLORE',
+        icon: appIcons.STREAM
+      }
+    },
+    {
+      id: 2,
       path: `/spaces/${workspaceId}/connections`,
       sidebarProps: {
         displayText: 'CONNECTIONS',
@@ -48,43 +56,16 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
 
     {
-      id: 2,
+      id: 3,
       path: `/spaces/${workspaceId}/catalog`,
       sidebarProps: {
         displayText: 'CATALOG',
         icon: appIcons.CONNECTION
       }
     },
-    jitsuEnabled && {
-      id: 3,
-      path: `/spaces/${workspaceId}/exploration`,
-      sidebarProps: {
-        displayText: 'EXPLORATION',
-        icon: appIcons.STREAM
-      },
-      subRoutes: [4, 5]
-    },
-    {
-      id: 4,
-      path: `/spaces/${workspaceId}/exploration/query-editor`,
-      sidebarProps: {
-        displayText: 'QUERY EDITOR',
-        icon: appIcons.SRC
-      },
-      subRoute: true
-    },
-    {
-      id: 5,
-      path: `/spaces/${workspaceId}/exploration/models`,
-      sidebarProps: {
-        displayText: 'MODELS',
-        icon: appIcons.DEST
-      },
-      subRoute: true
-    },
 
     {
-      id: 6,
+      id: 4,
       path: `/spaces/${workspaceId}/oauth-apps`,
       sidebarProps: {
         displayText: 'CONFIGURE APPS',
@@ -93,7 +74,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       }
     },
     {
-      id: 7,
+      id: 5,
       path: `/spaces/${workspaceId}/shopify`,
       sidebarProps: {
         displayText: 'SHOPIFY',

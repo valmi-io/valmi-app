@@ -95,7 +95,7 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
   const handleOnClick = () => {
     setStatus('submitting');
 
-    const credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
+    let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
     const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
 
     const credentialPayload = generateCredentialPayload(credentialObj, type, user);

@@ -88,7 +88,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const handleOAuthButtonClick = () => alert('HELLOO');
 
   // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'], handleOAuthButtonClick });
+  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
   useEffect(() => {
     // fetch integration spec
@@ -169,7 +169,11 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
             ...connectionDataFlow.entities,
             [getCredentialObjKey(type)]: {
               ...connectionDataFlow.entities[getCredentialObjKey(type)],
-              config: payload.config,
+              //TODO : after check, get the name from the response and send it here instead displayName
+              config: {
+                ...payload.config,
+                name: displayName
+              },
               spec: spec
             }
           };
@@ -201,7 +205,6 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
     if (results) {
       const schema = results?.spec?.connectionSpecification ?? {};
-      //ADD in both properties and required
 
       return (
         <>

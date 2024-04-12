@@ -61,10 +61,11 @@ export const getSelectedConnectorObj = (item: ConnectorType, key: string) => {
 };
 
 export const generateCredentialPayload = (credentialConfig: any, type: string, user: any) => {
+  const { name, ...config } = credentialConfig;
   const payload = {
     connector_type: type,
-    connector_config: credentialConfig,
-    name: type,
+    connector_config: config,
+    name: name,
     account: generateAccountPayload(user)
   };
 
