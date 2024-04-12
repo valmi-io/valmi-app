@@ -33,7 +33,7 @@ const initialObjs: TData = {
   entities: {}
 };
 
-const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
+const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpsertProps) => {
   const { wid = '', mode = 'etl' } = params ?? {};
 
   const dispatchToStore = useDispatch<AppDispatch>();
@@ -64,7 +64,7 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
         queryId: 1
       };
 
-      if (objExistsInStore()) {
+      if (objExistsInStore() && hasCatalogObj()) {
         const data = getCurrObjFromStore('catalog');
 
         const streams: any[] = getCurrObjFromStore('streams');
@@ -73,7 +73,13 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
         setResults(data);
       } else {
-        handleSaveObj([]);
+        if (!isEditableFlow) {
+          handleSaveObj([]);
+        } else {
+          const streams: any[] = getCurrObjFromStore('streams');
+          handleSaveObj(streams);
+        }
+
         fetchQuery(payload);
       }
     }
@@ -96,6 +102,11 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
 
   const getCurrObjFromStore = (key: string) => {
     return connectionDataFlow?.entities[getCatalogObjKey(type)][key];
+  };
+
+  const hasCatalogObj = () => {
+    const key = 'catalog';
+    return !!connectionDataFlow?.entities[getCatalogObjKey(type)].hasOwnProperty(key);
   };
 
   const handleSaveObj = (objs: any[]) => {
@@ -153,7 +164,8 @@ const ConnectionDiscover = ({ params }: TConnectionUpsertProps) => {
     }
 
     let results = null;
-    if (objExistsInStore()) {
+
+    if (objExistsInStore() && hasCatalogObj()) {
       results = getCurrObjFromStore('catalog');
     } else {
       results = data?.resultData;

@@ -25,9 +25,7 @@ export const WizardFooter = ({
       }}
     >
       <SubmitButton buttonText={'Back'} data={false} isFetching={false} disabled={prevDisabled} onClick={onPrevClick} />
-      {/* <Button disabled={prevDisabled} color="inherit" variant="contained" onClick={onPrevClick} sx={{ mr: 1 }}>
-        Back
-      </Button> */}
+
       <SubmitButton
         buttonText={nextButtonTitle}
         data={status === 'success'}
@@ -35,9 +33,6 @@ export const WizardFooter = ({
         disabled={disabled}
         onClick={onNextClick}
       />
-      {/* <Button disabled={disabled} color="inherit" variant="contained" onClick={onNextClick} sx={{ mr: 1 }}>
-        {nextButtonTitle}
-      </Button> */}
     </CardActions>
   );
 };

@@ -18,14 +18,22 @@ import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
 
-import {
-  useLazyGetSyncByIdQuery,
-  useLazyToggleSyncQuery
-} from '@store/api/apiSlice';
+import { useLazyGetSyncByIdQuery, useLazyToggleSyncQuery } from '@store/api/apiSlice';
 import { setFlowState } from '@store/reducers/syncFlow';
 import { RootState } from '@store/reducers';
 
 import { getRouterPathname, isPublicSync } from '@utils/routes';
+import { convertDurationToMinutesOrHours, getBaseRoute } from '@/utils/lib';
+import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import {
+  getCatalogObjKey,
+  getCredentialObjKey,
+  getExtrasObjKey,
+  getRunIntervalName,
+  getScheduleObjKey,
+  getSelectedConnectorKey,
+  getSelectedConnectorObj
+} from '@/utils/connectionFlowUtils';
 
 const SyncDetails = ({ syncId, workspaceId }: any) => {
   const router = useRouter();
@@ -40,15 +48,11 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  const [getSyncDetails, { data, isFetching, isError, error }] =
-    useLazyGetSyncByIdQuery();
+  const [getSyncDetails, { data, isFetching, isError, error }] = useLazyGetSyncByIdQuery();
 
   const [toggleSync, { data: updateSyncData }] = useLazyToggleSyncQuery();
 
-  let publicSync = useMemo(
-    () => isPublicSync(getRouterPathname(query, url)),
-    [query, url]
-  );
+  let publicSync = useMemo(() => isPublicSync(getRouterPathname(query, url)), [query, url]);
 
   useEffect(() => {
     if (updateSyncData) {
@@ -85,11 +89,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
     }
   }, [data]);
 
-  const handleSyncSwitch = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    val: any,
-    syncData: any
-  ) => {
+  const handleSyncSwitch = (event: React.ChangeEvent<HTMLInputElement>, val: any, syncData: any) => {
     event.stopPropagation();
 
     const payload = {
@@ -103,26 +103,53 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
   };
 
   const handleEditSync = (data: any) => {
-    const { id: syncId = '', source = {}, destination = {} } = data || {};
+    const { id: connId = '', source = {}, destination = {}, schedule = {}, name: connName = '' } = data || {};
 
-    if (data?.ui_state?.steps) {
-      dispatch(
-        setFlowState({
-          ...flowState,
-          steps: data.ui_state.steps,
-          destinationCatalog: data.ui_state.destinationCatalog,
-          sourceCatalog: data.ui_state.sourceCatalog,
-          isEditableFlow: true,
-          extra: {
-            syncId: syncId,
-            source: source,
-            destination: destination
+    const key = getSelectedConnectorKey();
+
+    const { account = {}, connector_config = {}, name: sourceCredentialName = '', ...item } = source?.credential ?? {};
+
+    const obj = getSelectedConnectorObj(item, key);
+
+    const run_interval = getRunIntervalName(parseInt(schedule?.run_interval ?? 0));
+
+    const objToDispatch = {
+      ids: [key, getCredentialObjKey(obj.type), getCatalogObjKey(obj.type), getScheduleObjKey(), getExtrasObjKey()],
+      entities: {
+        [key]: getSelectedConnectorObj(item, key),
+        [getCredentialObjKey(obj.type)]: {
+          config: {
+            ...connector_config,
+            name: sourceCredentialName
           }
-        })
-      );
+        },
+        [getCatalogObjKey(obj.type)]: {
+          streams: source?.catalog?.streams ?? []
+        },
+        [getScheduleObjKey()]: {
+          run_interval: run_interval,
+          name: connName
+        },
+        [getExtrasObjKey()]: {
+          connId: connId,
+          sourceId: source?.id ?? '',
+          sourceName: source?.name ?? '',
+          destinationId: destination?.id ?? '',
+          destinationName: destination?.name ?? ''
+        }
+      }
+    };
 
-      router.push(`/spaces/${workspaceId}/syncs/create`);
-    }
+    const mode = item?.mode ?? [];
+
+    dispatch(setConnectionFlowState(objToDispatch));
+
+    const params = new URLSearchParams();
+
+    params.set('mode', mode.length > 0 ? mode[0] : '');
+    const pathname = `${getBaseRoute(workspaceId)}/connections/${connId}`;
+
+    router.push(pathname + '?' + params);
   };
 
   const displayPageContent = (isPublicSync: boolean) => {
@@ -148,10 +175,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
       {publicSync
         ? displayPageContent(publicSync)
-        : !isError &&
-          !isFetching &&
-          syncDetails &&
-          displayPageContent(publicSync)}
+        : !isError && !isFetching && syncDetails && displayPageContent(publicSync)}
     </Card>
   );
 };

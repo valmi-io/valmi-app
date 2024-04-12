@@ -365,6 +365,51 @@ export const apiSlice = createApi({
       }
     }),
 
+    updateConnection: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        const { connectionPayload, workspaceId } = arg;
+
+        const { src, dest, schedule, uiState, connectionName, connId = '' } = connectionPayload;
+
+        const sourceRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/sources/create`,
+          method: 'POST',
+          body: src
+        });
+
+        if (sourceRes.error) return { error: sourceRes.error };
+
+        const { id: sourceId } = sourceRes.data;
+
+        const destRes = await baseQuery({
+          url: `/workspaces/${workspaceId}/destinations/create`,
+          method: 'POST',
+          body: dest
+        });
+
+        if (destRes.error) return { error: destRes.error };
+
+        const { id: destinationId } = destRes.data;
+
+        const connPayload = {
+          id: connId,
+          name: connectionName,
+          source_id: sourceId,
+          destination_id: destinationId,
+          ui_state: uiState,
+          schedule,
+          mode: 'etl'
+        };
+
+        const result = await baseQuery({
+          url: `/workspaces/${workspaceId}/syncs/update`,
+          method: 'POST',
+          body: connPayload
+        });
+        return result.data ? { data: result.data } : { error: result.error };
+      }
+    }),
+
     updateSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const { src, dest, schedule, uiState, syncName, syncId = '', workspaceId } = arg;
@@ -521,5 +566,6 @@ export const {
   useLazyCreateNewSyncRunQuery,
   useLazyAbortSyncRunByIdQuery,
   useLazyGetSyncRunLogsByIdQuery,
-  useLazyCreateConnectionQuery
+  useLazyCreateConnectionQuery,
+  useLazyUpdateConnectionQuery
 } = apiSlice;

@@ -28,14 +28,11 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     const { type = '', mode = [] } = item ?? {};
 
     const params = new URLSearchParams();
-    // params.set('connectionId', '123456789'); // set this param to enable connection edit flow
-    // params.set('type', type);
+
     params.set('mode', mode.length > 0 ? mode[0] : '');
     const pathname = `${getBaseRoute(workspaceId)}/connections/create`;
 
     const key = getSelectedConnectorKey();
-
-    console.log('Connection data flow:_', connectionDataFlow);
 
     const objToDispatch = {
       ids: [key],
@@ -45,8 +42,6 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     };
 
     dispatch(setConnectionFlowState(objToDispatch));
-
-    // dispatch(clearConnectionFlowState());
 
     router.push(pathname + '?' + params);
   };

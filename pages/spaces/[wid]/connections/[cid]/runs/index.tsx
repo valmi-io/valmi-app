@@ -25,29 +25,19 @@ import { RootState } from '@store/reducers';
 const SyncRunsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const { sid = '1' } = router.query;
+  const { cid = '1' } = router.query;
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
   return (
-    <PageLayout
-      pageHeadTitle="Sync Runs"
-      title={'Sync Details'}
-      displayButton={false}
-    >
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="stretch"
-        spacing={3}
-      >
+    <PageLayout pageHeadTitle="Sync Runs" title={'Sync Details'} displayButton={false}>
+      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          <SyncDetails syncId={sid} workspaceId={workspaceId} />
+          <SyncDetails syncId={cid} workspaceId={workspaceId} />
         </Grid>
         <Grid item xs={12}>
-          <SyncRuns syncId={sid} workspaceId={workspaceId} />
+          <SyncRuns syncId={cid} workspaceId={workspaceId} />
         </Grid>
       </Grid>
     </PageLayout>

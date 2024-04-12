@@ -15,7 +15,7 @@ import { useWizard } from 'react-use-wizard';
 import { WizardFooter } from '@/components/Wizard/Footer';
 import { RootState } from '@/store/reducers';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
-import { useLazyCreateConnectionQuery } from '@/store/api/apiSlice';
+import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/apiSlice';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import {
@@ -24,19 +24,39 @@ import {
   generateCredentialPayload,
   getCatalogObjKey,
   getCredentialObjKey,
+  getExtrasObjKey,
+  getScheduleObjKey,
   getSelectedConnectorKey
 } from '@/utils/connectionFlowUtils';
 import { useRouter } from 'next/router';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 
-const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
+const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) => {
   const router = useRouter();
   const { wid = '' } = params ?? {};
   const { previousStep } = useWizard();
 
   const dispatch = useDispatch<AppDispatch>();
   let initialData = {};
+
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  if (connectionDataFlow.entities[getScheduleObjKey()]) {
+    initialData = connectionDataFlow?.entities[getScheduleObjKey()] ?? {};
+  }
+
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const { type = '' } = selectedConnector;
+
+  const user = useSelector((state: RootState) => state.user.user);
+
+  // create connection query
+  const [createConnection, { isFetching: isCreating }] = useLazyCreateConnectionQuery();
+
+  // update connection query
+  const [updateConnection, { isFetching: isUpdating }] = useLazyUpdateConnectionQuery();
 
   const [data, setData] = useState<any>(initialData);
 
@@ -52,17 +72,6 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
-
-  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
-
-  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
-
-  const { type = '' } = selectedConnector;
-
-  const user = useSelector((state: RootState) => state.user.user);
-
-  // reset password query
-  const [createConnection, { isFetching }] = useLazyCreateConnectionQuery();
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
@@ -98,25 +107,35 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
     let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
     const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
 
-    const credentialPayload = generateCredentialPayload(credentialObj, type, user);
+    const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
 
-    const destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
+    let credentialPayload = null;
+    let destCredentialPayload = null;
 
-    const connectionPayload = generateConnectionPayload(streams, data, wid);
+    const connectionPayload = generateConnectionPayload(streams, data, wid, isEditableFlow, extras);
 
-    const payload = {
+    const payload: any = {
       workspaceId: wid,
-      credentialPayload,
-      destCredentialPayload,
+
       connectionPayload
     };
 
-    handleCreateConnection(payload);
+    if (!isEditableFlow) {
+      credentialPayload = generateCredentialPayload(credentialObj, type, user);
+      destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
+      payload['credentialPayload'] = credentialPayload;
+      payload['destCredentialPayload'] = destCredentialPayload;
+    }
+
+    console.log('Payload:_', payload);
+
+    const query = isEditableFlow ? updateConnection : createConnection;
+    createOrUpdateConnection(payload, query);
   };
 
-  const handleCreateConnection = async (payload: any) => {
+  const createOrUpdateConnection = async (payload: any, query: any) => {
     try {
-      const data: any = await createConnection(payload).unwrap();
+      const data: any = await query(payload).unwrap();
 
       if (hasErrorsInData(data)) {
         setStatus('error');
@@ -162,9 +181,9 @@ const ConnectionSchedule = ({ params }: TConnectionUpsertProps) => {
 
       <WizardFooter
         status={status}
-        disabled={!valid || isFetching}
-        prevDisabled={isFetching}
-        nextButtonTitle={'Create'}
+        disabled={!valid || isCreating || isUpdating}
+        prevDisabled={isCreating || isUpdating}
+        nextButtonTitle={isEditableFlow ? 'Update' : 'Create'}
         onNextClick={handleOnClick}
         onPrevClick={() => previousStep()}
       />

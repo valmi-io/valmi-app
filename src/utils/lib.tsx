@@ -29,7 +29,7 @@ export const convertDurationToMinutesOrHours = (milliseconds) => {
   const hours = Math.floor(minutes / 60);
 
   if (hours >= 1) {
-    return hours + ' ' + capitalizeFirstLetter(HOUR) + 's';
+    return hours + ' ' + capitalizeFirstLetter(HOUR) + (hours > 1 ? 's' : '');
   }
   return minutes + ' ' + capitalizeFirstLetter(MIN) + (minutes > 1 ? 's' : '');
 };

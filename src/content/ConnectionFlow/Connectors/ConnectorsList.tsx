@@ -13,6 +13,7 @@ export type ConnectorType = {
   docker_tag: string;
   oauth?: boolean;
   type: string;
+  connector_type?: string; // returned from backend
   oauth_keys?: 'private' | 'public';
   mode?: string[];
 };

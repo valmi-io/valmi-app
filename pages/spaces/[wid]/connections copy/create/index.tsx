@@ -20,7 +20,6 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { EtlConnectionSteps, RetlConnectionSteps } from '@content/Connections/ConnectionModel';
-import ConnectionTest from '@content/ConnectionFlow/ConnectionTest';
 import Connectors from '@content/ConnectionFlow/Connectors';
 import ConnectorConfig from '@content/ConnectionFlow/ConnectorConfig';
 import {
