@@ -36,8 +36,8 @@ function OAuthContextProvider({ children }: Props) {
 
   const { wid = '', mode = 'etl' } = params ?? {};
 
-  console.log('selectedConnector:', selectedConnector);
-  console.log('wid:', wid);
+  // console.log('selectedConnector:', selectedConnector);
+  // console.log('wid:', wid);
 
   const isConfigurationRequired = ({ connector }: { connector: ConnectorType }) => {
     const { oauth_keys = 'private' } = connector;

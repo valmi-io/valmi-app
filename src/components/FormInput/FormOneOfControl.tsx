@@ -45,8 +45,8 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const oAuthOptions = (hasOneOfArr && schema?.oneOf) || schema || [];
   const selectedSchema = oAuthOptions[selectedIndex]?.properties || {};
 
-  console.log('OAUTH OPTILNS :', oAuthOptions);
-  console.log('selected schema :', selectedSchema);
+  // console.log('OAUTH OPTILNS :', oAuthOptions);
+  // console.log('selected schema :', selectedSchema);
 
   const showDescription = !isDescriptionHidden(
     visible,

@@ -132,9 +132,9 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
         },
         [getExtrasObjKey()]: {
           connId: connId,
-          sourceId: source?.id ?? '',
+          sourceId: source?.credential?.id ?? '',
           sourceName: source?.name ?? '',
-          destinationId: destination?.id ?? '',
+          destinationId: destination?.credential?.id ?? '',
           destinationName: destination?.name ?? ''
         }
       }

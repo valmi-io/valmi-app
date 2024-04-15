@@ -116,7 +116,6 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
 
     const payload: any = {
       workspaceId: wid,
-
       connectionPayload
     };
 
@@ -127,9 +126,8 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
       payload['destCredentialPayload'] = destCredentialPayload;
     }
 
-    console.log('Payload:_', payload);
-
     const query = isEditableFlow ? updateConnection : createConnection;
+
     createOrUpdateConnection(payload, query);
   };
 

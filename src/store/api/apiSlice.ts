@@ -300,7 +300,11 @@ export const apiSlice = createApi({
 
         if (destStorageCredRes.error) return { error: destStorageCredRes.error };
 
-        let destCredObj = { ...destCredentialPayload, ['connector_config']: destStorageCredRes.data };
+        let destCredObj = {
+          ...destCredentialPayload,
+          ['connector_config']: destStorageCredRes.data,
+          ['name']: 'Postgres'
+        };
 
         const destCredRes = await baseQuery({
           url: `/workspaces/${workspaceId}/credentials/create`,

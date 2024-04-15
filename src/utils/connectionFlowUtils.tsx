@@ -180,7 +180,6 @@ export const getRunIntervalName = (run_interval: number) => {
     type = 'MIN';
   }
 
-  console.log('get run interval name', val, type);
   //@ts-ignore
   const { name = '' } = intervals.find((int) => val === int.val && type === int.type);
 
