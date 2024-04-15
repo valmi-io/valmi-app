@@ -40,9 +40,9 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
     jitsuEnabled && {
       id: 1,
-      path: `/spaces/${workspaceId}/explore`,
+      path: `/spaces/${workspaceId}/explores`,
       sidebarProps: {
-        displayText: 'EXPLORE',
+        displayText: 'EXPLORES',
         icon: appIcons.STREAM
       }
     },
