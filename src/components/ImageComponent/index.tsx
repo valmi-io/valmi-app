@@ -19,7 +19,7 @@ export interface ImageComponentProps {
   size: ImageSize;
   alt?: string;
   title?: string;
-  style?: object;
+  style?: React.CSSProperties;
 }
 
 const BoxLayout = styled(Box)(({}) => ({
@@ -47,11 +47,7 @@ const ImageComponent = (props: ImageComponentProps) => {
         style={style}
       />
       {title && (
-        <Typography
-          variant={getTypographyVariant(size)}
-          color="text.primary"
-          noWrap
-        >
+        <Typography variant={getTypographyVariant(size)} color="text.primary" noWrap>
           {title}
         </Typography>
       )}
