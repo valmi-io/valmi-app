@@ -25,7 +25,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (workspaceId !== '') {
-      router.push(`/spaces/${workspaceId}/onboarding`);
+      router.push(`/spaces/${workspaceId}/connections`);
     }
   }, []);
 
