@@ -18,6 +18,15 @@ export type ConnectorType = {
   mode?: string[];
 };
 
+export type NewConnectorType = {
+  display_name: string;
+  oauth?: boolean;
+  type: string;
+  oauth_keys?: 'private' | 'public';
+  oauth_params?: object; // added in ConnectorsPageContent
+  oauth_error?: string;
+};
+
 const ConnectorsList = ({
   data,
   handleItemOnClick,

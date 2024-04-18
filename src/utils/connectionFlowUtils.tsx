@@ -1,6 +1,6 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
-import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
 
 export type TStream = {
   name: string;
@@ -180,6 +180,7 @@ export const getRunIntervalName = (run_interval: number) => {
     type = 'MIN';
   }
 
+  console.log('get run interval name', val, type);
   //@ts-ignore
   const { name = '' } = intervals.find((int) => val === int.val && type === int.type);
 
@@ -273,6 +274,15 @@ export const getCatalogObjKey = (integrationType: string) => {
   const key = INTEGRATION_TYPES[integrationType.split('_')[0]];
 
   return `${key}_catalog`;
+};
+
+export const getOAuthObjInStore = (item: NewConnectorType) => {
+  const obj: { oauth_params: object; oauth_error: string } = {
+    oauth_params: item?.oauth_params ?? {},
+    oauth_error: item?.oauth_error ?? ''
+  };
+
+  return obj;
 };
 
 export const getScheduleObjKey = () => {

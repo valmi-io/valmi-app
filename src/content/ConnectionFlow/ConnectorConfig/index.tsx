@@ -1,3 +1,5 @@
+//SRC/CONTENT/CONNECTIONFLOW/CONNECTORCONFIG/INDEX.TSX
+
 // @ts-nocheck
 /*
  * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
@@ -5,7 +7,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -30,7 +32,10 @@ import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
+import { OAuthContext } from '@/contexts/OAuthContext';
 import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { isObjectEmpty } from '@/utils/lib';
+import { getOAuthParams } from '@/pagesauth/callback';
 
 type TState = {
   error: string;
@@ -43,27 +48,28 @@ const Item = styled(Box)(({}) => ({
 }));
 
 const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '' } = params ?? {};
+  const { wid = '', connectionId = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
 
   const { nextStep } = useWizard();
 
-  let initialData = {};
+  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
 
-  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
+  let initialData = {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const isEditableFlow = !!connectionId;
+  const entitiesInStore = connectionDataFlow?.entities ?? {};
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
 
   if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
     initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
-
-  const { flowState: {} = {} } = connection_flow;
 
   const [traceError, setTraceError] = useState<any>(null);
 
@@ -84,8 +90,6 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   });
 
   const [results, setResults] = useState(null);
-
-  const handleOAuthButtonClick = () => alert('HELLOO');
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
@@ -122,6 +126,66 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
         setTraceError(traceError);
       } else {
         setResults(spec);
+      }
+    }
+  }, [spec]);
+
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      let { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+      let { isconfigured, isAuthorized } = oAuthConfigData;
+      const obj = {
+        ...entitiesInStore,
+        [getCredentialObjKey(type)]: {
+          ...connectionDataFlow.entities[getCredentialObjKey(type)],
+          spec: spec,
+          config: {
+            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              ...getOAuthParams(oauth_params),
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            },
+            name: displayName
+          }
+        }
+      };
+      dispatch(setEntities(obj));
+      isconfigured && isAuthorized && setIsOAuthStepDone(true);
+    }
+  }, [spec]);
+
+  useEffect(() => {
+    if (keys) {
+      if (hasErrorsInData(keys)) {
+        const traceError = getErrorsInData(spec);
+        setTraceError(traceError);
+      } else {
+        const setOAuthData = () => {
+          //checking if connector configured for oAuth
+          const { entities = {} } = keys;
+          const { type = '', oauth_keys = 'private' } = selectedConnector;
+          if (entities[`${type}`]) {
+            oAuthConfigData = { ...oAuthConfigData, isconfigured: true };
+            setOAuthConfigData(oAuthConfigData);
+          }
+
+          //check if configuration required
+          if (oauth_keys === 'private') {
+            oAuthConfigData = { ...oAuthConfigData, requireConfiguration: true };
+            setOAuthConfigData(oAuthConfigData);
+          }
+
+          //check if hasAuthorizedOAuth
+          const hasAuthorizedOAuth = (oAuthParams: any, isEditableFlow: boolean) => {
+            let authorizedStatus = !isObjectEmpty(oAuthParams) || isEditableFlow ? true : false;
+            let authData = { ...oAuthConfigData, isAuthorized: authorizedStatus };
+            setOAuthConfigData(authData);
+          };
+          hasAuthorizedOAuth(selectedConnector?.oauth_params, isEditableFlow);
+        };
+        setOAuthData();
       }
     }
   }, [spec]);
@@ -188,6 +252,9 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
+
+    let formData = { ...oAuthConfigData, formValues: data };
+    setOAuthConfigData(formData);
   };
 
   const getDisplayComponent = () => {

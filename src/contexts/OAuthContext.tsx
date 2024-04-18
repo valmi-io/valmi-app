@@ -1,21 +1,27 @@
 import { useRouter } from 'next/router';
-import { ReactNode, createContext } from 'react';
+import { ReactNode, createContext, useState } from 'react';
 import { FormObject } from '@/utils/form-utils';
 import { TData } from '@/utils/typings.d';
-import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
-import { getBaseRoute } from '@/utils/lib';
+import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
+import { getOauthRoute } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 type OAuthContextType = {
   handleOAuthButtonClick: () => void;
   handleOnConfigureButtonClick: () => void;
-  isConnectorConfigured: boolean;
-  isConfigurationRequired: boolean;
+  isConnectorConfigured: any;
+  isConfigurationRequired: any;
   oAuthProvider: string;
+  selectedConnector: object;
+  oAuthConfigData: any;
+  setOAuthConfigData: any;
+  isoAuthStepDone: boolean;
+  setIsOAuthStepDone: any;
 };
 
 const OAuthContext = createContext<OAuthContextType>({} as OAuthContextType);
@@ -27,29 +33,28 @@ type Props = {
 function OAuthContextProvider({ children }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useDispatch();
 
   const params = getSearchParams(searchParams);
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
+  const entitiesInStore = connectionDataFlow?.entities ?? {};
+
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  let { oauth_keys = 'private', type = '', oauth_params = {} } = selectedConnector;
 
   const { wid = '', mode = 'etl' } = params ?? {};
 
-  // console.log('selectedConnector:', selectedConnector);
-  // console.log('wid:', wid);
+  const [oAuthConfigData, setOAuthConfigData] = useState({
+    isconfigured: false,
+    requireConfiguration: true,
+    isAuthorized: false,
+    formValues: {}
+  });
 
-  const isConfigurationRequired = ({ connector }: { connector: ConnectorType }) => {
-    const { oauth_keys = 'private' } = connector;
-
-    return oauth_keys === 'private' ? true : false;
-  };
-
-  const isConnectorConfigured = ({ field, keys }: { field: FormObject; keys: TData }) => {
-    const { ids = [] } = keys;
-    if (field.fieldType !== 'auth') return false;
-    return !!ids.length;
-  };
+  const [isoAuthStepDone, setIsOAuthStepDone] = useState(false);
 
   const handleOnConfigureButtonClick = () => {
     let { type = '' } = selectedConnector;
@@ -61,16 +66,39 @@ function OAuthContextProvider({ children }: Props) {
     router.push(`${getBaseRoute(wid as string)}/oauth-apps/${type.toLowerCase()}?connector=${connector.toLowerCase()}`);
   };
 
-  const getOAuthProvider = (oAuthProvider: any) => {
-    return oAuthProvider.split('$$')[0];
-  };
-
-  const oAuthProvider = (selectedConnector: string) => {
-    return getOAuthProvider(selectedConnector);
-  };
-
   const handleOAuthButtonClick = () => {
-    alert('Hello');
+    type = type.split('_')[1].toLowerCase(); // shopify | facebook
+
+    const oAuthRoute = getOauthRoute({ oAuth: type });
+    if (oAuthRoute) {
+      let { type = '' } = selectedConnector;
+
+      let meta = {
+        shop: oAuthConfigData?.formValues?.shop
+      };
+
+      let obj = {
+        workspace: wid,
+        connector: type,
+        oauth_keys: oauth_keys,
+        ...meta
+      };
+
+      let state = encodeURIComponent(JSON.stringify(obj));
+
+      const entities = {
+        ...entitiesInStore,
+        [getSelectedConnectorKey()]: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          formValues: {
+            ...oAuthConfigData?.formValues
+          }
+        }
+      };
+      dispatch(setEntities(entities));
+
+      router.push(`${oAuthRoute}?state=${state}`);
+    }
   };
 
   return (
@@ -78,10 +106,11 @@ function OAuthContextProvider({ children }: Props) {
       value={{
         handleOAuthButtonClick,
         handleOnConfigureButtonClick,
-        isConnectorConfigured,
-        isConfigurationRequired,
         selectedConnector,
-        oAuthProvider
+        oAuthConfigData,
+        setOAuthConfigData,
+        isoAuthStepDone,
+        setIsOAuthStepDone
       }}
     >
       {children}

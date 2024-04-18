@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Wizard } from 'react-use-wizard';
 
 const ConnectionFormComponent = ({ params }: { params: any }) => {
-  const { cid = '', mode = '' } = params ?? {};
+  const { cid = '', mode = 'etl' } = params ?? {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 

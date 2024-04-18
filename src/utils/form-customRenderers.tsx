@@ -25,10 +25,9 @@ const apiKeys = ['publicKeys', 'privateKeys'];
 
 type CustomRenderersProps = {
   invisibleFields?: string[];
-  handleOAuthButtonClick?: () => void;
 };
 
-export const getCustomRenderers = ({ invisibleFields = [], handleOAuthButtonClick }: CustomRenderersProps) => {
+export const getCustomRenderers = ({ invisibleFields = [] }: CustomRenderersProps) => {
   const renderers = [
     ...materialRenderers,
 

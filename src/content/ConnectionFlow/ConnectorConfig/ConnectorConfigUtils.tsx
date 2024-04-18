@@ -124,6 +124,8 @@ export const getOauthImage = ({ oAuth }: any) => {
       return getConnectorImage('slack');
     case 'hubspot':
       return getConnectorImage('hubspot');
+    case 'shopify':
+      return getConnectorImage('shopify');
     default:
       return '';
   }
@@ -139,6 +141,8 @@ export const getOauthColorCode = ({ oAuth }: any) => {
       return '#4A154B';
     case 'hubspot':
       return '#fff';
+    case 'shopify':
+      return '#9bce39';
     default:
       return '';
   }
@@ -154,6 +158,8 @@ export const getOauthLoginText = ({ oAuth }: any) => {
       return 'Sign in with Slack';
     case 'hubspot':
       return 'Sign in with Hubspot';
+    case 'shopify':
+      return 'Sign in with Shopify';
     default:
       return '';
   }
