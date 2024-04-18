@@ -45,7 +45,7 @@ const staggeredBaseQueryWithBailOut = retry(
 );
 // Define our single API slice object
 export const apiSlice = createApi({
-  tagTypes: ['Stream', 'Destination', 'Link', 'Log', 'OAuth', 'Analytics-Destination', 'Prompt'],
+  tagTypes: ['Stream', 'Destination', 'Link', 'Log', 'OAuth', 'Analytics-Destination', 'Prompt', 'Preview'],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',

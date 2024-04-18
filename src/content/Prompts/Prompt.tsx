@@ -29,7 +29,7 @@ const Filter = styled(Chip)(({ theme }) => ({
   backgroundColor: '#B497FF'
 }));
 
-const Prompt = ({ item }: { item: TPrompt }) => {
+const Prompt = ({ item, handleOnClick }: { item: TPrompt; handleOnClick: (promptId: string) => void }) => {
   const src = `/connectors/shopify.svg`;
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
@@ -50,7 +50,7 @@ const Prompt = ({ item }: { item: TPrompt }) => {
           <ImageComponent src={src} alt="connector" size={ImageSize.medium} />
 
           <Tooltip title="">
-            <IconButton sx={{ ml: 2 }} color="primary" onClick={() => {}}>
+            <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handleOnClick(item.id)}>
               <CustomIcon style={{ fontSize: ImageSize.medium }} icon={appIcons.CIRCLE_PLUS_OUTLINED} />
             </IconButton>
           </Tooltip>
@@ -77,9 +77,7 @@ const Prompt = ({ item }: { item: TPrompt }) => {
           gap={1}
         >
           {Object.keys(item.parameters).map((val, i) => (
-            <>
-              <Filter key={`${i.toString()}`} label={'LAST 7 DAYS'} size="medium" />
-            </>
+            <Filter key={`${i.toString()}`} label={'LAST 7 DAYS'} size="medium" />
           ))}
         </Stack>
       </Card>
