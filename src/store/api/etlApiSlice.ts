@@ -61,9 +61,10 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getExplores: builder.query({
-      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/stream`,
+      query: ({ workspaceId }) => `/explores/workspaces/${workspaceId}`,
+
       transformResponse: (responseData) => {
-        return exploresAdapter.setAll(initialExploresState, (responseData as { objects: any[] })?.objects ?? []);
+        return exploresAdapter.setAll(initialExploresState, responseData);
       },
       providesTags: (result, error, workspaceId) => {
         const tags = result?.ids

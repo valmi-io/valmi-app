@@ -216,6 +216,7 @@ const Filters = ({
         disabled={isDataFetching || status === 'submitting'}
         onClick={handleSaveAsExplore}
         styles={{ margin: 0 }}
+        size="medium"
       />
       <Box sx={{ width: 300 }}>
         <FormControlComponent

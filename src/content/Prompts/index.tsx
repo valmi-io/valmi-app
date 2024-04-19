@@ -13,6 +13,8 @@ const Prompts = ({ data }: { data: TData }) => {
 
   const { workspaceId = '' } = appState;
 
+  const src = `/connectors/shopify.svg`;
+
   const handleOnClick = (prompt: TPrompt) => {
     // redirect to preview page
 
@@ -22,7 +24,7 @@ const Prompts = ({ data }: { data: TData }) => {
   return (
     <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} sx={{ padding: 2 }}>
       {data.ids.map((id: string) => (
-        <Prompt key={id} item={data.entities[id]} handleOnClick={handleOnClick} />
+        <Prompt key={id} item={data.entities[id]} handleOnClick={handleOnClick} src={src} />
       ))}
     </Grid>
   );

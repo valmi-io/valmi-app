@@ -1,27 +1,19 @@
 import { ReactElement } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { RootState } from '@store/reducers';
 import { useFetch } from '@/hooks/useFetch';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
-import { AppState } from '@/store/store';
 import { useGetPromptsQuery } from '@/store/api/etlApiSlice';
 import Prompts from '@/content/Prompts';
 
 const PromptsPage: NextPageWithLayout = () => {
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
-
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useGetPromptsQuery({}, { refetchOnMountOrArgChange: true })
   });
 
   const PageContent = () => {
