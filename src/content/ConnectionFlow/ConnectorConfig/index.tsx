@@ -1,5 +1,3 @@
-//SRC/CONTENT/CONNECTIONFLOW/CONNECTORCONFIG/INDEX.TSX
-
 // @ts-nocheck
 /*
  * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
@@ -131,32 +129,6 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   }, [spec]);
 
   useEffect(() => {
-    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-      let { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
-      let { isconfigured, isAuthorized } = oAuthConfigData;
-      const obj = {
-        ...entitiesInStore,
-        [getCredentialObjKey(type)]: {
-          ...connectionDataFlow.entities[getCredentialObjKey(type)],
-          spec: spec,
-          config: {
-            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-            credentials: {
-              ...getOAuthParams(oauth_params),
-              auth_method: 'oauth2.0',
-              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-            },
-            name: displayName
-          }
-        }
-      };
-      dispatch(setEntities(obj));
-      isconfigured && isAuthorized && setIsOAuthStepDone(true);
-    }
-  }, [spec]);
-
-  useEffect(() => {
     if (keys) {
       if (hasErrorsInData(keys)) {
         const traceError = getErrorsInData(spec);
@@ -189,6 +161,53 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       }
     }
   }, [spec]);
+
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+      const { isconfigured, isAuthorized } = oAuthConfigData;
+      const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
+      const obj = {
+        ...entitiesInStore,
+        [getSelectedConnectorKey()]: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          formValues: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              client_id,
+              client_secret,
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            }
+          }
+        },
+        [getCredentialObjKey(type)]: {
+          ...connectionDataFlow.entities[getCredentialObjKey(type)],
+          spec: spec,
+          config: {
+            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              ...getOAuthParams(oauth_params),
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            },
+            name: displayName
+          }
+        }
+      };
+      dispatch(setEntities(obj));
+      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
+    }
+  }, [spec]);
+
+  // run this effect twice as initially the credentials will be empty, upon redirecting after oAuth, they are filled and will be available in formValues
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+      setData(formDataFromStore);
+    }
+  });
 
   const handleSubmit = () => {
     setState((state) => ({

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useRouter } from 'next/router';
 import { ReactNode, createContext, useState } from 'react';
 import { FormObject } from '@/utils/form-utils';

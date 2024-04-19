@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import {
   CombinatorRendererProps,
@@ -13,9 +14,11 @@ import { OAuthContext } from '@/contexts/OAuthContext';
 import FormFieldAuth from '@/components/FormInput/FormFieldAuth';
 import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmDialog';
 import { isObjectEmpty } from '@/utils/lib';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { AppDispatch } from '@/store/store';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
@@ -48,6 +51,8 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
@@ -99,6 +104,24 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const confirm = useCallback(() => {
     openNewTab(newSelectedIndex);
+    const authMethodValue = !!(oAuthOptions[newSelectedIndex].title?.toLowerCase() === 'oauth2.0')
+      ? 'oauth2.0'
+      : oAuthOptions[newSelectedIndex]?.properties?.auth_method?.const;
+    const obj = {
+      ...entitiesInStore,
+      [getSelectedConnectorKey()]: {
+        ...connectionDataFlow.entities[getSelectedConnectorKey()],
+        formValues: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+          credentials: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues?.credentials,
+            auth_method: authMethodValue
+          }
+        }
+      }
+    };
+    dispatch(setEntities(obj));
+
     setConfirmDialogOpen(false);
   }, [handleChange, createDefaultValue, newSelectedIndex]);
 
@@ -120,8 +143,6 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
   const secondFormHelperText = showDescription && !isValid ? errors : null;
-
-  console.log('FORMONEOF:', oAuthOptions);
 
   return (
     <Hidden xsUp={!visible}>
