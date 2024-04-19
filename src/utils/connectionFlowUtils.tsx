@@ -1,6 +1,7 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
 import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { generateAccountPayload } from '@/utils/account-utils';
 
 export type TStream = {
   name: string;
@@ -67,20 +68,6 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
     connector_config: config,
     name: name,
     account: generateAccountPayload(user)
-  };
-
-  return payload;
-};
-
-const generateAccountPayload = (user: any) => {
-  //@ts-ignore
-  const { email = '', first_name = '' } = user || {};
-
-  const payload = {
-    name: first_name,
-    external_id: email,
-    profile: '',
-    meta_data: {}
   };
 
   return payload;
@@ -180,7 +167,6 @@ export const getRunIntervalName = (run_interval: number) => {
     type = 'MIN';
   }
 
-  console.log('get run interval name', val, type);
   //@ts-ignore
   const { name = '' } = intervals.find((int) => val === int.val && type === int.type);
 

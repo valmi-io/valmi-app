@@ -10,10 +10,27 @@ const previewAdapter: any = createEntityAdapter({
 
 const initialPreviewState = previewAdapter.getInitialState();
 
+const exploresAdapter: any = createEntityAdapter();
+const initialExploresState = exploresAdapter.getInitialState();
+
 export const etlApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPrompts: builder.query({
       query: (arg) => `/prompts/`,
+      transformResponse: (responseData) => {
+        return promptsAdapter.setAll(initialPromptsState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Prompt' as const, id })), { type: 'Prompt' as const }]
+          : [{ type: 'Prompt' as const }];
+
+        return tags;
+      }
+    }),
+
+    getPromptById: builder.query({
+      query: ({ promptId }) => `/prompts/${promptId}`,
       transformResponse: (responseData) => {
         return promptsAdapter.setAll(initialPromptsState, responseData);
       },
@@ -41,10 +58,40 @@ export const etlApiSlice = apiSlice.injectEndpoints({
 
         return tags;
       }
+    }),
+
+    getExplores: builder.query({
+      query: (workspaceId) => `/streams/workspaces/${workspaceId}/config/stream`,
+      transformResponse: (responseData) => {
+        return exploresAdapter.setAll(initialExploresState, (responseData as { objects: any[] })?.objects ?? []);
+      },
+      providesTags: (result, error, workspaceId) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Explore' as const, id })), { type: 'Explore' as const }]
+          : [{ type: 'Explore' as const }];
+
+        return tags;
+      }
+    }),
+
+    createExplore: builder.mutation({
+      query: ({ workspaceId, explore }) => ({
+        url: `/explores/workspaces/${workspaceId}/create`,
+        method: 'POST',
+        body: explore
+      }),
+      invalidatesTags: ['Explore']
     })
   }),
   //@ts-ignore
   overrideExisting: module.hot?.status() === 'apply'
 });
 
-export const { useGetPromptsQuery, useGetPreviewDataQuery, useLazyGetPreviewDataQuery } = etlApiSlice;
+export const {
+  useGetPromptsQuery,
+  useGetPreviewDataQuery,
+  useLazyGetPreviewDataQuery,
+  useGetPromptByIdQuery,
+  useGetExploresQuery,
+  useCreateExploreMutation
+} = etlApiSlice;

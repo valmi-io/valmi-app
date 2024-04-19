@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 
 import SidebarLayout from '@layouts/SidebarLayout';
 import DataTable from '@/components/DataTable';
-import { useLazyGetPreviewDataQuery } from '@/store/api/etlApiSlice';
+import { useCreateExploreMutation, useLazyGetPreviewDataQuery } from '@/store/api/etlApiSlice';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 import { IParams, TData } from '@/utils/typings.d';
@@ -21,6 +21,12 @@ import FormControlComponent from '@/components/FormControlComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { JsonFormsCore } from '@jsonforms/core';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/reducers';
+import { generateExplorePayload } from '@/utils/explore-utils';
+import { FormStatus } from '@/utils/form-utils';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { queryHandler } from '@/services';
 
 interface IPreviewPage extends IParams {
   pid: string;
@@ -39,7 +45,23 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
   const { pid = '', wid = '', filter = '' } = params;
 
+  const router = useRouter();
+
   const [preview, { data, isFetching, error }] = useLazyGetPreviewDataQuery();
+
+  const [createObject] = useCreateExploreMutation();
+
+  const user = useSelector((state: RootState) => state.user.user);
+
+  // form state - form can be in any of the states {FormStatus}
+  const [status, setStatus] = useState<FormStatus>('empty');
+
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
 
   useEffect(() => {
     if (filter) {
@@ -54,9 +76,68 @@ const PreviewPage = ({ params }: { params: IPreviewPage }) => {
     });
   };
 
+  const handleSaveAsExplore = () => {
+    setStatus('submitting');
+    const payload = generateExplorePayload(wid, pid, user);
+
+    createExploreHandler({ query: createObject, payload: payload });
+  };
+
+  const successCb = (data: any) => {
+    setStatus('success');
+    handleNavigationOnSuccess();
+  };
+
+  const errorCb = (error: any) => {
+    setStatus('error');
+    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
+  };
+
+  const createExploreHandler = async ({ query, payload }: { query: any; payload: any }) => {
+    await queryHandler({ query, payload, successCb, errorCb });
+  };
+
+  const handleNavigationOnSuccess = () => {
+    router.push(`${getBaseRoute(wid)}/explores`);
+  };
+
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
+  };
+
   return (
     <PageLayout pageHeadTitle="Preview" title="Preview" displayButton={false}>
-      <Filters val={filter} params={params} isDataFetching={isFetching} />
+      <AlertComponent
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        isError={alertState.type === 'error'}
+      />
+      <Filters
+        val={filter}
+        params={params}
+        isDataFetching={isFetching}
+        handleSaveAsExplore={handleSaveAsExplore}
+        status={status}
+      />
       <PageTitle title={'Data table'} displayButton={false} />
 
       <ContentLayout
@@ -95,7 +176,19 @@ const promptFilterSchema = {
   }
 };
 
-const Filters = ({ val, params, isDataFetching }: { val: string; params: IPreviewPage; isDataFetching: boolean }) => {
+const Filters = ({
+  val,
+  params,
+  isDataFetching,
+  handleSaveAsExplore,
+  status
+}: {
+  val: string;
+  params: IPreviewPage;
+  isDataFetching: boolean;
+  handleSaveAsExplore: () => void;
+  status: string;
+}) => {
   const router = useRouter();
 
   const { pid = '', wid = '' } = params;
@@ -131,10 +224,10 @@ const Filters = ({ val, params, isDataFetching }: { val: string; params: IPrevie
     >
       <SubmitButton
         buttonText={'Save as explore'}
-        data={null}
-        isFetching={false}
-        disabled={isDataFetching}
-        onClick={() => {}}
+        data={status === 'success'}
+        isFetching={status === 'submitting'}
+        disabled={isDataFetching || status === 'submitting'}
+        onClick={handleSaveAsExplore}
         styles={{ margin: 0 }}
       />
       <Box sx={{ width: 300 }}>
