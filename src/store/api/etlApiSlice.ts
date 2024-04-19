@@ -32,7 +32,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     getPromptById: builder.query({
       query: ({ promptId }) => `/prompts/${promptId}`,
       transformResponse: (responseData) => {
-        return promptsAdapter.setAll(initialPromptsState, responseData);
+        return promptsAdapter.setOne(initialPromptsState, responseData);
       },
       providesTags: (result, error) => {
         const tags = result?.ids

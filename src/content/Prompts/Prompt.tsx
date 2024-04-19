@@ -23,7 +23,7 @@ const Card = styled(Paper)(({ theme }) => ({
   minHeight: 300
 }));
 
-const Filter = styled(Chip)(({ theme }) => ({
+export const PromptFilterChip = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100],
   borderRadius: 4,
   backgroundColor: '#B497FF'
@@ -77,7 +77,7 @@ const Prompt = ({ item, handleOnClick }: { item: TPrompt; handleOnClick: (item: 
           gap={1}
         >
           {Object.keys(item.parameters).map((val, i) => (
-            <Filter key={`${i.toString()}`} label={'LAST 7 DAYS'} size="medium" />
+            <PromptFilterChip key={`${i.toString()}`} label={'LAST 7 DAYS'} size="medium" />
           ))}
         </Stack>
       </Card>
