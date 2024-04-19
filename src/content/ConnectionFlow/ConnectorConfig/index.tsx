@@ -201,13 +201,13 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     }
   }, [spec]);
 
-  // run this effect twice as initially the credentials will be empty, upon redirecting after oAuth, they are filled and will be available in formValues
+  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
   useEffect(() => {
     if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
       const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
       setData(formDataFromStore);
     }
-  });
+  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
 
   const handleSubmit = () => {
     setState((state) => ({
