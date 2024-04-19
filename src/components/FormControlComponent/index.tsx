@@ -32,6 +32,7 @@ type FormControlComponentProps = {
   removeAdditionalFields?: boolean;
   containerStyles?: React.CSSProperties;
   displayActionButton?: boolean;
+  disabled?: boolean;
 };
 
 const FormControlComponent = ({
@@ -46,7 +47,8 @@ const FormControlComponent = ({
   removeAdditionalFields = false,
   containerStyles,
   onSubmitClick,
-  displayActionButton = true
+  displayActionButton = true,
+  disabled
 }: FormControlComponentProps) => {
   const { data, schema, renderers } = jsonFormsProps;
 
@@ -59,7 +61,7 @@ const FormControlComponent = ({
   return (
     <FormContainer>
       <JsonForms
-        readonly={!!(status === 'submitting')}
+        readonly={!!(status === 'submitting' || disabled)}
         schema={schema}
         data={data}
         renderers={renderers}

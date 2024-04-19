@@ -1,7 +1,7 @@
 import { TData } from '@/utils/typings.d';
 import { Grid } from '@mui/material';
 
-import Prompt from '@/content/Prompts/Prompt';
+import Prompt, { TPrompt } from '@/content/Prompts/Prompt';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
 import { useSelector } from 'react-redux';
@@ -13,9 +13,10 @@ const Prompts = ({ data }: { data: TData }) => {
 
   const { workspaceId = '' } = appState;
 
-  const handleOnClick = (promptId: string) => {
+  const handleOnClick = (prompt: TPrompt) => {
     // redirect to preview page
-    router.push(`${getBaseRoute(workspaceId)}/prompts/${promptId}`);
+
+    router.push(`${getBaseRoute(workspaceId)}/prompts/${prompt.id}?filter=Last 7 days`);
   };
 
   return (

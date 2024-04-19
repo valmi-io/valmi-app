@@ -47,4 +47,4 @@ export const etlApiSlice = apiSlice.injectEndpoints({
   overrideExisting: module.hot?.status() === 'apply'
 });
 
-export const { useGetPromptsQuery, useGetPreviewDataQuery } = etlApiSlice;
+export const { useGetPromptsQuery, useGetPreviewDataQuery, useLazyGetPreviewDataQuery } = etlApiSlice;
