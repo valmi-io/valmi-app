@@ -39,11 +39,14 @@ import { signinValidationSchema } from '@utils/validation-schema';
 import { useLoginStatus } from '@hooks/useLoginStatus';
 import { signOutUser } from '@utils/lib';
 import { queryHandler } from '@/services';
+import { GoogleSignInButton } from '@/components/AuthButtons';
+import { useSession } from 'next-auth/react';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
+  const { data: session } = useSession();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -174,6 +177,9 @@ const Login: NextPageWithLayout = () => {
               footerText={"Don't have an account? Sign up"}
             />
           </Stack>
+        </Stack>
+        <Stack sx={{ marginTop: 2 }}>
+          <GoogleSignInButton />
         </Stack>
       </AuthenticationLayout>
     </>

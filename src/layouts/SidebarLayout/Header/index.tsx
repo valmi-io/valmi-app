@@ -49,6 +49,7 @@ function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
   const { isLoggedIn } = useLoginStatus();
+  const { data: session, status } = useSession();
 
   return (
     <HeaderWrapper
@@ -82,7 +83,7 @@ function Header() {
               }}
             />
 
-            {!isLoggedIn ? (
+            {!session ? (
               <Link href="/signup" passHref style={{ textDecoration: 'none' }}>
                 <Button sx={{ fontWeight: 'bold', fontSize: 14 }} variant="contained">
                   Sign up
