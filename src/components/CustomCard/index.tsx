@@ -36,7 +36,16 @@ const CustomCard = ({ startIcon, endIcon, title, desc, footer }: TCustomCardProp
         }}
       >
         {startIcon && startIcon}
-        {endIcon && endIcon}
+        <Stack
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          {endIcon && endIcon}
+        </Stack>
       </Stack>
 
       <Stack spacing={1}>

@@ -3,15 +3,18 @@ import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { Grid, IconButton, Tooltip } from '@mui/material';
 
 import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 import { PromptFilterChip } from '@/content/Prompts/Prompt';
 
 type TExploreProps = {
   item: any;
   handleOnClick: (item: any) => void;
+  handlePreviewOnClick: (item: any) => void;
   src: string;
 };
 
-const Explore = ({ item, handleOnClick, src }: TExploreProps) => {
+const Explore = ({ item, handleOnClick, handlePreviewOnClick, src }: TExploreProps) => {
   const {
     account: { external_id = '' },
     prompt: { name = '', description = '', parameters = {} } = ({} = {})
@@ -24,11 +27,18 @@ const Explore = ({ item, handleOnClick, src }: TExploreProps) => {
       <CustomCard
         startIcon={<ImageComponent src={src} alt="connector" size={ImageSize.medium} />}
         endIcon={
-          <Tooltip title="download">
-            <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handleOnClick(item)}>
-              <DownloadIcon />
-            </IconButton>
-          </Tooltip>
+          <>
+            <Tooltip title="download">
+              <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handleOnClick(item)}>
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="preview sheet">
+              <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handlePreviewOnClick(item)}>
+                <VisibilityIcon />
+              </IconButton>
+            </Tooltip>
+          </>
         }
         title={title}
         desc={description}
