@@ -6,7 +6,7 @@
 
 import { memo } from 'react';
 
-import { Icon, ListItemButton, Typography, styled, useTheme } from '@mui/material';
+import { Icon, ListItemButton, Stack, Typography, styled } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
@@ -21,19 +21,18 @@ export type TSidebarItemProps = {
 };
 
 const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
-  const theme = useTheme();
-
   const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <ListItemButton onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
-      {icon &&
-        (muiIcon ? (
-          <Icon style={{ marginRight: theme.spacing(3) }}>{icon}</Icon>
-        ) : (
-          <CustomIcon icon={icon} style={{ marginRight: theme.spacing(3) }} />
-        ))}
-      <Label variant="h5">{displayText}</Label>
+    <ListItemButton
+      sx={{ my: 1, height: 50 }}
+      onClick={() => onClick(path)}
+      className={currentRoute === id ? 'active' : ''}
+    >
+      <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} gap={2}>
+        {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
+        <Label variant="h5">{displayText}</Label>
+      </Stack>
     </ListItemButton>
   );
 };

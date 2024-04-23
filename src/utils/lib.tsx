@@ -118,6 +118,7 @@ export const getBrowserRoute = (path: string) => {
   if (widIndex !== -1) {
     return { route: route[widIndex + 1], subRoute: route[widIndex + 2] };
   }
+
   return { route: '', subRoute: '' };
 };
 
