@@ -1,16 +1,14 @@
 //@S-Nagendra
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import { useSearchParams } from 'next/navigation';
 
-import SidebarLayout from '@layouts/SidebarLayout';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 import { IParams, TData } from '@/utils/typings.d';
-import PageLayout from '@/layouts/PageLayout';
-import { Box, Card, Grid, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetExploreByIdQuery } from '@/store/api/etlApiSlice';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
@@ -18,7 +16,6 @@ import SkeletonLoader from '@/components/SkeletonLoader';
 import { isDataEmpty } from '@/utils/lib';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import BaseLayout from '@/layouts/BaseLayout';
-import PageTitle from '@/components/PageTitle';
 
 import Breadcrumb from '@components/Breadcrumb';
 
@@ -67,11 +64,26 @@ export default PreviewPageLayout;
 
 const PageContent = ({ data }: { data: TData }) => {
   const { ids, entities } = data;
+  const [isLoading, setIsLoading] = useState(true);
   if (isDataEmpty(data)) {
-    return <ListEmptyComponent description={'No data found for this prompt'} />;
+    return <ListEmptyComponent description={'No data found for this explore'} />;
   }
 
-  const spreadsheet = entities[ids[0]].spreadsheet_url;
+  const spreadsheet = entities[ids[0]]?.spreadsheet_url ?? '';
 
-  return <iframe src={spreadsheet ?? ''} width="100%" height="100%" style={{ border: 0 }} loading="lazy"></iframe>;
+  return (
+    <>
+      {isLoading && <SkeletonLoader loading={isLoading} />}
+      <iframe
+        src={spreadsheet}
+        width="100%"
+        height="100%"
+        style={{ border: 0, opacity: isLoading ? 0 : 1 }}
+        onLoad={() => {
+          setIsLoading(false);
+        }}
+        loading="lazy"
+      ></iframe>
+    </>
+  );
 };
