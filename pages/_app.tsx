@@ -39,6 +39,7 @@ import { wrapper } from '@store/store';
 
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
+import { SessionProvider } from 'next-auth/react';
 
 import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
 
@@ -115,9 +116,11 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <CssBaseline />
-              {/* <PostHogProvider client={posthog}> */}
-              {getLayout(<Component {...pageProps} />)}
-              {/* </PostHogProvider> */}
+              <SessionProvider session={pageProps.session}>
+                {/* <PostHogProvider client={posthog}> */}
+                {getLayout(<Component {...pageProps} />)}
+                {/* </PostHogProvider> */}
+              </SessionProvider>
             </LocalizationProvider>
           </ThemeProviderWrapper>
         </SidebarProvider>

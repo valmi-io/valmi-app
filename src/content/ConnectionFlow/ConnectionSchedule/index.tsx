@@ -5,7 +5,7 @@
  */
 
 import FormControlComponent from '@/components/FormControlComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { JsonFormsCore } from '@jsonforms/core';
 import { FormStatus, jsonFormValidator } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
@@ -31,6 +31,7 @@ import {
 import { useRouter } from 'next/router';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { isObjectEmpty } from '@/utils/lib';
 
 const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) => {
   const router = useRouter();
@@ -74,8 +75,19 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
+    // setData(data);
   };
+
+  useEffect(() => {
+    if (connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams) {
+      let scheduleFormValues = {
+        name: type?.toLocaleLowerCase(),
+        run_interval: 'Every 1 hour'
+      };
+      setData(scheduleFormValues);
+      handleOnClick();
+    }
+  }, []);
 
   const { valid } = jsonFormValidator(connectionScheduleSchema, data);
 
@@ -167,6 +179,7 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
       />
       <ConnectorLayout title={''}>
         <FormControlComponent
+          disabled={true}
           key={`ConnectionSchedule`}
           editing={false}
           onFormChange={handleFormChange}
@@ -177,14 +190,14 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
         />
       </ConnectorLayout>
 
-      <WizardFooter
+      {/* <WizardFooter
         status={status}
         disabled={!valid || isCreating || isUpdating}
         prevDisabled={isCreating || isUpdating}
         nextButtonTitle={isEditableFlow ? 'Update' : 'Create'}
         onNextClick={handleOnClick}
         onPrevClick={() => previousStep()}
-      />
+      /> */}
     </>
   );
 };

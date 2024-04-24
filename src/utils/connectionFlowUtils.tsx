@@ -278,3 +278,11 @@ export const getScheduleObjKey = () => {
 export const getExtrasObjKey = () => {
   return 'extras';
 };
+
+export const getFreePackageId = () => {
+  return 'p0';
+};
+
+export const getPremiuimPackageIds = () => {
+  return ['p0', 'p1'];
+};

@@ -43,7 +43,7 @@ router
 
     let json = JSON.parse(decodeURIComponent(state));
 
-    let { workspace = '', connector = '', oauth_keys = 'private', shop = '' } = json;
+    let { workspace = '', connector = '', oauth_keys = 'private', meta: { shop = '', scope = [] } = {} } = json;
 
     let credentials = {};
     let query_response = { ...(req.credentials ?? {}) };
@@ -74,7 +74,7 @@ router
     };
 
     return passport.authenticate(strategy, {
-      scope: ['read_orders', 'read_products', 'write_products'],
+      scope: scope,
       state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });

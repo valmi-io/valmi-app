@@ -11,6 +11,11 @@ const initialPreviewState = previewAdapter.getInitialState();
 const exploresAdapter: any = createEntityAdapter();
 const initialExploresState = exploresAdapter.getInitialState();
 
+const packageAdapter: any = createEntityAdapter({
+  selectId: (e: any) => e.name
+});
+const initialpackageState = packageAdapter.getInitialState();
+
 export const etlApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPrompts: builder.query({
@@ -94,6 +99,21 @@ export const etlApiSlice = apiSlice.injectEndpoints({
 
         return tags;
       }
+    }),
+
+    getPackageById: builder.query({
+      query: ({ packageId }) => `/packages/${packageId}`,
+
+      transformResponse: (responseData) => {
+        return packageAdapter.setOne(initialpackageState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Package' as const, id })), { type: 'Package' as const }]
+          : [{ type: 'Package' as const }];
+
+        return tags;
+      }
     })
   }),
   //@ts-ignore
@@ -107,5 +127,6 @@ export const {
   useGetPromptByIdQuery,
   useGetExploresQuery,
   useCreateExploreMutation,
-  useGetExploreByIdQuery
+  useGetExploreByIdQuery,
+  useGetPackageByIdQuery
 } = etlApiSlice;

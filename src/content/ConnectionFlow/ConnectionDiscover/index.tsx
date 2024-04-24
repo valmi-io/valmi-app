@@ -8,7 +8,7 @@ import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import SkeletonLoader from '@/components/SkeletonLoader';
-import { Table, TableBody, TableCell, TableContainer, TableHead, Typography } from '@mui/material';
+import { Box, Modal, Table, TableBody, TableCell, TableContainer, TableHead, Typography } from '@mui/material';
 import TableHeader from '@/components/Table/TableHeader';
 import { TableColumnProps } from '@/utils/table-utils';
 import appIcons from '@/utils/icon-utils';
@@ -20,6 +20,7 @@ import { AppDispatch } from '@/store/store';
 import { WizardFooter } from '@/components/Wizard/Footer';
 import { CustomizedTableRow } from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
 import { getCatalogObjKey, getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import Spinner from '@/components/Spinner';
 
 const Columns: TableColumnProps[] = [
   { id: '1', label: '', align: 'right', action: true, checkBox: true, minWidth: 100 },
@@ -50,10 +51,20 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   const [fetchQuery, { data, isFetching, error }] = useLazyDiscoverConnectorQuery();
 
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+
   const [traceError, setTraceError] = useState<any>(null);
   const [results, setResults] = useState(null);
 
   const [state, dispatch] = useReducer(streamsReducer, initialObjs);
+
+  useEffect(() => {
+    if (isFetching) {
+      setShowLoadingModal(true);
+    } else {
+      setShowLoadingModal(false);
+    }
+  }, [isFetching]);
 
   useEffect(() => {
     if (!isObjectEmpty(config)) {
@@ -64,24 +75,33 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
         queryId: 1
       };
 
-      if (objExistsInStore() && hasCatalogObj()) {
-        const data = getCurrObjFromStore('catalog');
-
-        const streams: any[] = getCurrObjFromStore('streams');
-
-        handleSaveObj(streams);
-
-        setResults(data);
+      if (!isEditableFlow) {
+        handleSaveObj([]);
       } else {
-        if (!isEditableFlow) {
-          handleSaveObj([]);
-        } else {
-          const streams: any[] = getCurrObjFromStore('streams');
-          handleSaveObj(streams);
-        }
-
-        fetchQuery(payload);
+        const streams: any[] = getCurrObjFromStore('streams');
+        handleSaveObj(streams);
       }
+
+      fetchQuery(payload);
+
+      // if (objExistsInStore() && hasCatalogObj()) {
+      //   const data = getCurrObjFromStore('catalog');
+
+      //   const streams: any[] = getCurrObjFromStore('streams');
+
+      //   handleSaveObj(streams);
+
+      //   setResults(data);
+      // } else {
+      //   if (!isEditableFlow) {
+      //     handleSaveObj([]);
+      //   } else {
+      //     const streams: any[] = getCurrObjFromStore('streams');
+      //     handleSaveObj(streams);
+      //   }
+
+      //   fetchQuery(payload);
+      // }
     }
   }, [config]);
 
@@ -92,9 +112,70 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
         setTraceError(traceError);
       } else {
         setResults(data?.resultData);
+        if (!isEditableFlow) {
+          getSelectedStreams(data?.resultData);
+        }
       }
     }
   }, [data]);
+
+  useEffect(() => {
+    if (results && !isObjectEmpty(state)) {
+      setObjectsInStore(state, results);
+    }
+  }, [state]);
+
+  const getSelectedStreams = (results: any) => {
+    const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+
+    const rows = results?.catalog?.streams ?? [];
+
+    const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
+
+    const authorizedScopesRows = rows.filter(({ name }: { name: string }) => {
+      if (namesInScopes.includes(name)) return true;
+    });
+
+    dispatch({
+      type: 'TOGGLE_SELECT_ALL',
+      payload: {
+        checked: true,
+        objs: authorizedScopesRows
+      }
+    });
+  };
+
+  const setObjectsInStore = (state: any, results: any) => {
+    const entitiesInStore = connectionDataFlow?.entities ?? {};
+
+    let resultsFromStore = null;
+    const { ids = [], entities = {} } = state;
+
+    const streamsArr: any[] = [];
+
+    if (ids.length > 0) {
+      ids.forEach((id: any) => {
+        streamsArr.push(entities[id]);
+      });
+    }
+
+    if (objExistsInStore() && hasCatalogObj()) {
+      resultsFromStore = getCurrObjFromStore('catalog');
+    } else {
+      resultsFromStore = results;
+    }
+
+    const obj = {
+      ...entitiesInStore,
+      [getCatalogObjKey(type)]: {
+        streams: streamsArr,
+        catalog: resultsFromStore
+      }
+    };
+
+    dispatchToStore(setEntities(obj));
+    nextStep();
+  };
 
   const objExistsInStore = () => {
     return !!connectionDataFlow?.entities[getCatalogObjKey(type)];
@@ -150,37 +231,37 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   const isSelected = (id: string) => state.ids.indexOf(id) !== -1;
 
-  handleStep(() => {
-    const entitiesInStore = connectionDataFlow?.entities ?? {};
+  // handleStep(() => {
+  //   const entitiesInStore = connectionDataFlow?.entities ?? {};
 
-    const { ids = [], entities = {} } = state;
+  // const { ids = [], entities = {} } = state;
 
-    const streamsArr: any[] = [];
+  // const streamsArr: any[] = [];
 
-    if (ids.length > 0) {
-      ids.forEach((id: any) => {
-        streamsArr.push(entities[id]);
-      });
-    }
+  // if (ids.length > 0) {
+  //   ids.forEach((id: any) => {
+  //     streamsArr.push(entities[id]);
+  //   });
+  // }
 
-    let results = null;
+  //   let results = null;
 
-    if (objExistsInStore() && hasCatalogObj()) {
-      results = getCurrObjFromStore('catalog');
-    } else {
-      results = data?.resultData;
-    }
+  //   if (objExistsInStore() && hasCatalogObj()) {
+  //     results = getCurrObjFromStore('catalog');
+  //   } else {
+  //     results = data?.resultData;
+  //   }
 
-    const obj = {
-      ...entitiesInStore,
-      [getCatalogObjKey(type)]: {
-        streams: streamsArr,
-        catalog: results
-      }
-    };
+  //   const obj = {
+  //     ...entitiesInStore,
+  //     [getCatalogObjKey(type)]: {
+  //       streams: streamsArr,
+  //       catalog: results
+  //     }
+  //   };
 
-    dispatchToStore(setEntities(obj));
-  });
+  //   dispatchToStore(setEntities(obj));
+  // });
 
   const getSourceCursorField = (row: any) => {
     return row?.source_defined_cursor && row?.default_cursor_field ? row.default_cursor_field[0] : '';
@@ -249,12 +330,12 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
                       />
                       <TableCellComponent text={row.name} />
                       <TableCellWithDropdown
-                        disabled={!isItemSelected}
+                        disabled={isItemSelected}
                         data={row?.supported_sync_modes ?? []}
                         onClick={(event, key) => {
                           handleChangeObj(row.name, event.target.value);
                         }}
-                        value={state.entities[row.name]?.sync_mode ?? ''}
+                        value={isItemSelected ? 'incremental' : ''}
                       />
                       <TableCell>
                         <Typography variant="body2" color="text.primary" noWrap>
@@ -277,14 +358,15 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   return (
     <>
+      {showLoadingModal && <Spinner />}
       {getDisplayComponent()}
-      <WizardFooter
+      {/* <WizardFooter
         disabled={isFetching || state.ids.length < 1}
         prevDisabled={isFetching}
         nextButtonTitle={'Next'}
         onNextClick={() => nextStep()}
         onPrevClick={() => previousStep()}
-      />
+      /> */}
     </>
   );
 };

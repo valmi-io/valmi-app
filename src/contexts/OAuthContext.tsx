@@ -74,15 +74,21 @@ function OAuthContextProvider({ children }: Props) {
     if (oAuthRoute) {
       let { type = '' } = selectedConnector;
 
-      let meta = {
-        shop: oAuthConfigData?.formValues?.shop
-      };
+      let meta = {}; // pass any additional data required for oAuth step and access at server side
+
+      if (type === 'SRC_SHOPIFY') {
+        meta = {
+          ...meta,
+          shop: oAuthConfigData?.formValues?.shop || '',
+          scope: ['read_orders', 'read_products', 'write_products']
+        };
+      }
 
       let obj = {
         workspace: wid,
         connector: type,
         oauth_keys: oauth_keys,
-        ...meta
+        meta: meta
       };
 
       let state = encodeURIComponent(JSON.stringify(obj));

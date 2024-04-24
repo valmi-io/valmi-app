@@ -31,9 +31,11 @@ import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';
-import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { getCredentialObjKey, getSelectedConnectorKey, getFreePackageId } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { getOAuthParams } from '@/pagesauth/callback';
+import { useGetPackageByIdQuery } from '@/store/api/etlApiSlice';
+import { useFetch } from '@/hooks/useFetch';
 
 type TState = {
   error: string;
@@ -77,6 +79,14 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     /* query for connector configuration */
   }
   const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
+
+  const {
+    data: packageData,
+    error: packageError,
+    isLoading: isPackageLoading
+  } = useFetch({
+    query: useGetPackageByIdQuery({ packageId: getFreePackageId() })
+  });
 
   // Getting keys for the object
   const [fetchIntegrationOauthCredentials, { data: keys, isLoading: isKeysLoading, error: keysError }] =
@@ -257,7 +267,9 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
                 ...payload.config,
                 name: displayName
               },
-              spec: spec
+              spec: spec,
+              // set the package data in store
+              package: packageData?.entities[getFreePackageId().toLocaleUpperCase()]
             }
           };
 
@@ -269,11 +281,11 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+  const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
 
     let formData = { ...oAuthConfigData, formValues: data };
-    setOAuthConfigData(formData);
+    await setOAuthConfigData(formData);
   };
 
   const getDisplayComponent = () => {

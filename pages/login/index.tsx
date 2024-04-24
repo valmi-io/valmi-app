@@ -39,6 +39,7 @@ import { signinValidationSchema } from '@utils/validation-schema';
 import { useLoginStatus } from '@hooks/useLoginStatus';
 import { signOutUser } from '@utils/lib';
 import { queryHandler } from '@/services';
+import { GoogleSignInButton } from '@/components/AuthButtons';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
@@ -174,6 +175,9 @@ const Login: NextPageWithLayout = () => {
               footerText={"Don't have an account? Sign up"}
             />
           </Stack>
+        </Stack>
+        <Stack sx={{ marginTop: 2 }}>
+          <GoogleSignInButton />
         </Stack>
       </AuthenticationLayout>
     </>
