@@ -16,11 +16,10 @@ type TExploreProps = {
 
 const Explore = ({ item, handleOnClick, handlePreviewOnClick, src }: TExploreProps) => {
   const {
+    name = '',
     account: { external_id = '' },
-    prompt: { name = '', description = '', parameters = {} } = ({} = {})
+    prompt: { description = '', parameters = {} } = ({} = {})
   } = item ?? {};
-
-  const title = `valmi.io - ${name}`;
 
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
@@ -40,7 +39,7 @@ const Explore = ({ item, handleOnClick, handlePreviewOnClick, src }: TExplorePro
             </Tooltip>
           </>
         }
-        title={title}
+        title={name}
         desc={description}
         footer={
           <>
