@@ -8,9 +8,19 @@ import { useSearchParams } from 'next/navigation';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
-import { IParams } from '@/utils/typings.d';
+import { IParams, TData } from '@/utils/typings.d';
 import PageLayout from '@/layouts/PageLayout';
-import { Card, Grid } from '@mui/material';
+import { Box, Card, Grid, Stack } from '@mui/material';
+import { useFetch } from '@/hooks/useFetch';
+import { useGetExploreByIdQuery } from '@/store/api/etlApiSlice';
+import ErrorComponent, { ErrorStatusText } from '@/components/Error';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import { isDataEmpty } from '@/utils/lib';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import BaseLayout from '@/layouts/BaseLayout';
+import PageTitle from '@/components/PageTitle';
+
+import Breadcrumb from '@components/Breadcrumb';
 
 const PreviewPageLayout: NextPageWithLayout = () => {
   const searchParams = useSearchParams();
@@ -22,59 +32,46 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 };
 
 const PreviewPage = ({ params }: { params: IParams }) => {
+  const { wid = '', eid = '' } = params;
+
+  const { data, error, isLoading, traceError } = useFetch({
+    query: useGetExploreByIdQuery({ workspaceId: wid, exploreId: eid })
+  });
+
   return (
-    <PageLayout pageHeadTitle="Preview" title="Preview" displayButton={false}>
-      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
-          <Card variant="outlined" sx={{ display: 'flex', height: 800 }}>
-            <iframe
-              src={
-                'https://docs.google.com/spreadsheets/d/1Snsa-GXmxDtzV5D4Jd8OhXG5TxXigFeOJD2Q4XLiMOI/edit#gid=1115838130'
-              }
-              width="100%"
-              height="100%"
-              loading="lazy"
-            ></iframe>
-            {/* <GoogleDocumentViewer /> */}
-          </Card>
-        </Grid>
-      </Grid>
-    </PageLayout>
+    <Stack sx={{ flexGrow: 1 }}>
+      <Box sx={{ display: 'flex', p: 2 }}>
+        <Breadcrumb />
+      </Box>
+
+      <Box sx={{ display: 'flex', flexGrow: 1 }}>
+        {/** Display Errors */}
+        {error && <ErrorComponent error={error} />}
+
+        {/** Display Trace Error */}
+        {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+
+        <SkeletonLoader loading={isLoading} />
+
+        {!error && !isLoading && data && <PageContent data={data} />}
+      </Box>
+    </Stack>
   );
 };
 
 PreviewPageLayout.getLayout = function getLayout(page: ReactElement) {
-  return <SidebarLayout>{page}</SidebarLayout>;
+  return <BaseLayout>{page}</BaseLayout>;
 };
 
 export default PreviewPageLayout;
 
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// const GoogleDocumentViewer = () => {
-//   const [documentContent, setDocumentContent] = useState('');
-//   useEffect(() => {
-//     const fetchDocument = async () => {
-//       try {
-//         const response = await axios.get(
-//           'https://docs.google.com/spreadsheets/d/13MHItdsg2cDElpZzZclNZKKFVuEpklDTkyRyt4unn4E/edit#gid=0',
-//           {
-//             headers: {
-//               Authorization: `Bearer ya29.a0Ad52N390yh37zxNZayJSBzG-WryQGPZxXJdCs0RurDUf9HHhZzdzThE4N6UqiLoha9CY-TsCLmTAlHPoouYwZ8FW8fQ9Xn2zkr3vHdh4fwfCDk5Xd6HL5RnuvJ8vsGNCnaZ4Y-RuHtbcn-Mj2ene-LutH9R1yraAl_VFaCgYKAQoSARASFQHGX2Mi-VkhKIc-refTLYPP4DztHg0171`
-//             }
-//           }
-//         );
-//         console.log('response.data', response.data);
-//         setDocumentContent(response.data);
-//       } catch (error) {
-//         console.error('Error fetching Google Document:', error);
-//       }
-//     };
-//     fetchDocument();
-//   }, []);
-//   return (
-//     <div>
-//       <div dangerouslySetInnerHTML={{ __html: documentContent }} />
-//     </div>
-//   );
-// };
+const PageContent = ({ data }: { data: TData }) => {
+  const { ids, entities } = data;
+  if (isDataEmpty(data)) {
+    return <ListEmptyComponent description={'No data found for this prompt'} />;
+  }
+
+  const spreadsheet = entities[ids[0]].spreadsheet_url;
+
+  return <iframe src={spreadsheet ?? ''} width="100%" height="100%" style={{ border: 0 }} loading="lazy"></iframe>;
+};

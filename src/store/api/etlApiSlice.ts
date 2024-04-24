@@ -4,9 +4,7 @@ import { createEntityAdapter } from '@reduxjs/toolkit';
 const promptsAdapter: any = createEntityAdapter();
 const initialPromptsState = promptsAdapter.getInitialState();
 
-const previewAdapter: any = createEntityAdapter({
-  selectId: (e: any) => e._airbyte_ab_id
-});
+const previewAdapter: any = createEntityAdapter();
 
 const initialPreviewState = previewAdapter.getInitialState();
 
@@ -82,6 +80,20 @@ export const etlApiSlice = apiSlice.injectEndpoints({
         body: explore
       }),
       invalidatesTags: ['Explore']
+    }),
+
+    getExploreById: builder.query({
+      query: ({ workspaceId, exploreId }) => `/explores/workspaces/${workspaceId}/${exploreId}`,
+      transformResponse: (responseData) => {
+        return exploresAdapter.setOne(initialExploresState, responseData);
+      },
+      providesTags: (result, error, exploreId) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Explore' as const, id })), { type: 'Explore' as const }]
+          : [{ type: 'Explore' as const }];
+
+        return tags;
+      }
     })
   }),
   //@ts-ignore
@@ -94,5 +106,6 @@ export const {
   useLazyGetPreviewDataQuery,
   useGetPromptByIdQuery,
   useGetExploresQuery,
-  useCreateExploreMutation
+  useCreateExploreMutation,
+  useGetExploreByIdQuery
 } = etlApiSlice;
