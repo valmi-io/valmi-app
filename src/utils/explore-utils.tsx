@@ -6,9 +6,10 @@ export const generateExplorePayload = (wid: string, pid: string, user: any) => {
     explore: {
       name: '',
       prompt_id: pid,
-      spreadsheet_url: 'https://www.abcd.com',
       ready: false,
-      account: generateAccountPayload(user)
+      account: generateAccountPayload(user),
+      refresh_token:
+        '1//04-3EPBsjabP3CgYIARAAGAQSNwF-L9IrD2d-9DGpUop1OA6QmCQ73eMBUQUpssfUfc3OfL3BtWxRaqAgs-nbIhJMFiFjH8gCK9k'
     }
   };
 };
