@@ -9,20 +9,26 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 
 type AppState = {
-  currentRoute?: string;
   workspaceId: string;
-  loginFlowState: any | object;
+  loginFlowState?: any;
+  user?: {
+    email: string;
+    username: string;
+  };
 };
 
-type AppFlowState = {
+export type AppFlowState = {
   appState: AppState;
 };
 
 const initialState: AppFlowState = {
   appState: {
-    currentRoute: '',
     workspaceId: '',
-    loginFlowState: {}
+    loginFlowState: {},
+    user: {
+      username: '',
+      email: ''
+    }
   }
 };
 

@@ -30,7 +30,6 @@ import AlertComponent, { AlertStatus, AlertType } from '@components/Alert';
 
 import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
-import { setUserData } from '@store/reducers/user';
 import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
@@ -90,12 +89,18 @@ const Login: NextPageWithLayout = () => {
   const successCb = (data: any) => {
     handleAlertOpen({ message: 'Signed in successfully', alertType: 'success' as AlertStatus });
     setLoginData(data);
-    // store user data in redux.
-    dispatch(setUserData(data));
 
+    const { username = '', email = '' } = data ?? {};
     const workspaceID = data.organizations[0].workspaces[0].id;
+
+    let obj = {
+      workspaceId: workspaceID,
+      username: username,
+      email: email
+    };
+    initialiseAppState(dispatch, appState, obj);
+
     // initialise appState
-    initialiseAppState(dispatch, workspaceID);
     router.push(`/spaces/${workspaceID}/connections`);
   };
 

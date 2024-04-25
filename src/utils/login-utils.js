@@ -6,11 +6,16 @@
 
 import { setAppState } from '@store/reducers/appFlow';
 
-export const initialiseAppState = (dispatch, workspaceId) => {
+export const initialiseAppState = (dispatch, appState, data) => {
+  const { workspaceId = '', username = '', email = '' } = data ?? {};
   dispatch(
     setAppState({
+      ...appState,
       workspaceId: workspaceId,
-      currentRoute: 'syncs'
+      user: {
+        email: email,
+        username: username
+      }
     })
   );
 };

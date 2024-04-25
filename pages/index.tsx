@@ -32,7 +32,7 @@ const HomePage = ({ params }: { params: any }) => {
 
   const dispatch = useDispatch();
 
-  const { wid = '' } = params ?? {};
+  const { wid = '', username = '', email = '' } = params ?? {};
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -42,7 +42,13 @@ const HomePage = ({ params }: { params: any }) => {
     if (workspaceId) {
       router.push(`/spaces/${workspaceId}/connections`);
     } else if (wid) {
-      initialiseAppState(dispatch, wid);
+      let obj = {
+        workspaceId: wid,
+        username: username,
+        email: email
+      };
+      initialiseAppState(dispatch, appState, obj);
+
       router.push(`/spaces/${wid}/connections`);
     }
   }, [wid, workspaceId]);

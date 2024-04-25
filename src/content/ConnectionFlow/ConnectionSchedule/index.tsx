@@ -59,7 +59,9 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
     };
   }
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { user } = appState ?? {};
 
   // create connection query
   const [createConnection] = useLazyCreateConnectionQuery();

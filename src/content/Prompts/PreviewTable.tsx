@@ -30,7 +30,9 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 
   const [createObject] = useCreateExploreMutation();
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { user } = appState ?? {};
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
