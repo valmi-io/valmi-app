@@ -82,7 +82,6 @@ export const signOutUser = async (router) => {
   try {
     setCookie('AUTH', '', {
       expires: new Date(0),
-      sameSite: 'strict',
       path: '/'
     });
   } catch (err) {

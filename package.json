@@ -82,6 +82,7 @@
   },
   "devDependencies": {
     "@types/cookie": "^0.5.1",
+    "@types/cookies": "^0.9.0",
     "@types/passport": "^1.0.12",
     "@types/passport-facebook": "^2.1.11",
     "@types/passport-google-oauth20": "^2.0.11",
