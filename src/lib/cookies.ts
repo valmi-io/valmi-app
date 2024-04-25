@@ -5,7 +5,6 @@
  */
 
 import Cookies from 'react-cookies';
-import { setCookie as setNextCookie, getCookie as getNextCookie, deleteCookie } from 'cookies-next';
 
 // Type for the options object used in cookie operations
 type CookieOptions = {
@@ -21,9 +20,7 @@ type CookieOptions = {
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
   try {
-    // Cookies.save(name, value, options);
-
-    setNextCookie(name, value, options);
+    Cookies.save(name, value, options);
     return {
       success: true
     };
@@ -36,10 +33,10 @@ export async function setCookie(name: string, value: string, options: CookieOpti
 
 // Function to get a cookie
 export function getCookie(name: string) {
-  return getNextCookie(name);
+  return Cookies.load(name);
 }
 
 // Function to clear a cookie
 export function clearCookie(name: string, options: CookieOptions = {}): void {
-  deleteCookie(name, options);
+  Cookies.remove(name, options);
 }
