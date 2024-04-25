@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
- * Created Date: Tuesday, January 30th 2024, 12:02:48 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import Cookies from 'react-cookies';
 
 // Type for the options object used in cookie operations

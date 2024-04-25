@@ -7,27 +7,45 @@
 import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Head from '@components/PageHead';
 import { RootState } from '@store/reducers';
+import { useSearchParams } from 'next/navigation';
+import { getSearchParams } from '@/utils/router-utils';
+import { initialiseAppState } from '@/utils/login-utils';
 
 const propTypes = {};
 
 const defaultProps = {};
 
-const HomePage = () => {
+const HomePageLayout = () => {
+  const searchParams = useSearchParams();
+
+  const params = getSearchParams(searchParams);
+
+  return <HomePage params={params} />;
+};
+
+const HomePage = ({ params }: { params: any }) => {
   const router = useRouter();
+
+  const dispatch = useDispatch();
+
+  const { wid = '' } = params ?? {};
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
   useEffect(() => {
-    if (workspaceId !== '') {
+    if (workspaceId) {
       router.push(`/spaces/${workspaceId}/connections`);
+    } else if (wid) {
+      initialiseAppState(dispatch, wid);
+      router.push(`/spaces/${wid}/connections`);
     }
-  }, []);
+  }, [wid, workspaceId]);
 
   return (
     <>
@@ -36,8 +54,8 @@ const HomePage = () => {
   );
 };
 
-HomePage.propTypes = propTypes;
+HomePageLayout.propTypes = propTypes;
 
-HomePage.defaultProps = defaultProps;
+HomePageLayout.defaultProps = defaultProps;
 
-export default HomePage;
+export default HomePageLayout;

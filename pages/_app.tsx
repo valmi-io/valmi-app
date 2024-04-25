@@ -115,7 +115,7 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
         <SidebarProvider>
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <CssBaseline />
+              <CssBaseline /> 
               <SessionProvider session={pageProps.session}>
                 {/* <PostHogProvider client={posthog}> */}
                 {getLayout(<Component {...pageProps} />)}
