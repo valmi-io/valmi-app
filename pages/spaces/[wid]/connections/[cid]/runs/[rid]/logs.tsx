@@ -42,13 +42,13 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const theme = useTheme();
 
-  const { rid = '1', sid = '1', connection_type = '' } = router.query as any;
+  const { rid = '1', cid = '1', connection_type = '' } = router.query as any;
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const { workspaceId = '' } = appState;
 
   const logProps = {
-    syncId: sid,
+    syncId: cid,
     runId: rid,
     connectionType: connection_type,
     workspaceId: workspaceId

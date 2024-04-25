@@ -16,8 +16,9 @@ export function GoogleSignInButton() {
       sx={{
         display: 'flex',
         alignSelf: 'center',
-        alignItems: 'center',
-        width: '90%',
+        alignItems: 'center', 
+        justifyContent: 'center',
+        width: '100%',
         height: 60,
         padding: 1,
         backgroundColor: '#fff',
@@ -48,8 +49,8 @@ export function GoogleSignInButton() {
       <Box
         sx={{
           display: 'flex',
-          width: '100%',
-          height: '100%',
+           width: '100%',
+           height: '100%',
           alignItems: 'center',
           justifyContent: 'center'
         }}

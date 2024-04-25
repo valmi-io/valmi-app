@@ -30,7 +30,7 @@ const PageLayout = (props: PageLayoutProps) => {
         <PageTitle
           title={title}
           displayButton={displayButton}
-          buttonTitle={buttonTitle}
+          buttonTitle={buttonTitle?.toUpperCase()}
           onClick={handleButtonOnClick}
         />
       </PageTitleWrapper>

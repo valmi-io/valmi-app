@@ -34,10 +34,10 @@ const ContentLayout = ({
       <Grid item xs={12}>
         <Card variant={cardVariant ? 'outlined' : undefined} style={cardStyles}>
           {/** Display error */}
-          {error && <ErrorContainer error={error} />}
+          {!isLoading && error && <ErrorContainer error={error} />}
 
           {/** Display trace error*/}
-          {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
+          {!isLoading && traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
           {/** Display skeleton */}
           <SkeletonLoader loading={isLoading} />

@@ -19,6 +19,7 @@ interface PageTitleProps {
   isFetching?: boolean;
   displayStartIcon?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  customContent?: JSX.Element;
 }
 
 const PageTitle: FC<PageTitleProps> = ({
@@ -31,6 +32,7 @@ const PageTitle: FC<PageTitleProps> = ({
   isFetching = false,
   displayStartIcon = true,
   disabled = false,
+  customContent,
   ...rest
 }) => {
   let endIcon = null;
@@ -52,36 +54,38 @@ const PageTitle: FC<PageTitleProps> = ({
           {title}
         </Typography>
       </Grid>
-      {displayButton && (
-        <Grid item>
-          {link ? (
-            <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
-              <Button
-                sx={{
-                  fontWeight: 'bold',
-                  fontSize: 14,
-                  color: 'black'
-                }}
-                variant="contained"
-                color="warning"
-              >
-                {buttonTitle.toUpperCase()}
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              endIcon={endIcon}
-              startIcon={startIcon}
-              disabled={disabled}
-              sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
-              variant="contained"
-              onClick={onClick}
-            >
-              {buttonTitle.toUpperCase()}
-            </Button>
+      {customContent
+        ? customContent
+        : displayButton && (
+            <Grid item>
+              {link ? (
+                <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
+                  <Button
+                    sx={{
+                      fontWeight: 'bold',
+                      fontSize: 14,
+                      color: 'black'
+                    }}
+                    variant="contained"
+                    color="warning"
+                  >
+                    {buttonTitle}
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  endIcon={endIcon}
+                  startIcon={startIcon}
+                  disabled={disabled}
+                  sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+                  variant="contained"
+                  onClick={onClick}
+                >
+                  {buttonTitle}
+                </Button>
+              )}
+            </Grid>
           )}
-        </Grid>
-      )}
     </Grid>
   );
 };

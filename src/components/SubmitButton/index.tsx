@@ -20,6 +20,7 @@ interface SubmitButtonProps {
   fullWidth?: boolean;
   color?: 'primary' | 'secondary' | 'error' | 'success';
   styles?: React.CSSProperties;
+  size?: 'small' | 'medium' | 'large';
 }
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({
@@ -32,7 +33,8 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
   buttonType = 'button',
   fullWidth = false,
   color = 'primary',
-  styles
+  styles,
+  size = 'large'
 }) => {
   let endIcon = null;
   endIcon = isFetching && <CircularProgress size={16} sx={{ color: 'white' }} />;
@@ -48,7 +50,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       fullWidth={fullWidth}
       variant="contained"
       color={color}
-      size="large"
+      size={size}
       endIcon={endIcon}
       sx={{ mt: 2 }}
       onClick={onClick && onClick}

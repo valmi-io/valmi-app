@@ -72,15 +72,6 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
         icon: appIcons.APPS,
         muiIcon: true
       }
-    },
-    {
-      id: 5,
-      path: `/spaces/${workspaceId}/shopify`,
-      sidebarProps: {
-        displayText: 'SHOPIFY',
-        icon: appIcons.APPS,
-        muiIcon: true
-      }
     }
   ].filter(Boolean) as TSidebarRoute[];
 
