@@ -16,11 +16,16 @@ export default NextAuth({
         params: {
           prompt: 'consent',
           access_type: 'offline',
-          response_type: 'code'
+          response_type: 'code',
+          scope: 'openid email profile https://www.googleapis.com/auth/drive'
         }
       }
     })
   ],
+  scope:
+    'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/spreadsheets.readonly',
+  authorizationUrl:
+    'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code',
   session: { strategy: 'jwt', maxAge: 7 * 24 * 60 * 60 }, // this session lasts 7 days
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
