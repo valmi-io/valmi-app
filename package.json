@@ -40,6 +40,7 @@
     "context-api": "0.0.2",
     "cookie": "^0.5.0",
     "cookies": "^0.8.0",
+    "cookies-next": "^4.1.1",
     "crypto-js": "^4.1.1",
     "date-fns": "2.28.0",
     "lodash": "^4.17.21",
