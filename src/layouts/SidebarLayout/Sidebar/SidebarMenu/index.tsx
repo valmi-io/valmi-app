@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
+import React, { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -73,6 +73,13 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
   const [selectedRoute, setSelectedRoute] = useState('');
 
+  useEffect(() => {
+    if (router.pathname) {
+      const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
+      setSelectedRoute(browserRoute);
+    }
+  }, [router.pathname]);
+
   const sidebarRoutes = useMemo(() => {
     return getSidebarRoutes({ workspaceId, jitsuEnabled: isJitsuEnabled() });
   }, [workspaceId, isJitsuEnabled()]);
@@ -103,16 +110,12 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   };
 
   const activeIndex = useMemo(() => {
-    const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
-
-    // const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(selectedRoute as string);
-
-    const route = selectedRoute ?? browserRoute;
+    const route = selectedRoute;
 
     const { id = 0 } = findPathInRoutes(sidebarRoutes, route);
 
     return id;
-  }, [selectedRoute, router.pathname, sidebarRoutes]);
+  }, [selectedRoute, sidebarRoutes]);
 
   const handleItemOnClick = useCallback(
     (path: string) => {
