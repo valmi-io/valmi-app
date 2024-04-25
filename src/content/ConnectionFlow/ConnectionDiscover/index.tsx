@@ -8,7 +8,7 @@ import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import SkeletonLoader from '@/components/SkeletonLoader';
-import { Box, Modal, Table, TableBody, TableCell, TableContainer, TableHead, Typography } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, Typography } from '@mui/material';
 import TableHeader from '@/components/Table/TableHeader';
 import { TableColumnProps } from '@/utils/table-utils';
 import appIcons from '@/utils/icon-utils';
@@ -39,7 +39,7 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   const dispatchToStore = useDispatch<AppDispatch>();
 
-  const { handleStep, nextStep, previousStep } = useWizard();
+  const { nextStep } = useWizard();
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
@@ -51,23 +51,16 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   const [fetchQuery, { data, isFetching, error }] = useLazyDiscoverConnectorQuery();
 
-  const [showLoadingModal, setShowLoadingModal] = useState(false);
-
   const [traceError, setTraceError] = useState<any>(null);
   const [results, setResults] = useState(null);
 
   const [state, dispatch] = useReducer(streamsReducer, initialObjs);
 
-  useEffect(() => {
-    if (isFetching) {
-      setShowLoadingModal(true);
-    } else {
-      setShowLoadingModal(false);
-    }
-  }, [isFetching]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isObjectEmpty(config)) {
+      setIsLoading(true);
       const payload = {
         config,
         workspaceId: wid,
@@ -110,6 +103,7 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
       if (hasErrorsInData(data?.resultData)) {
         const traceError = getErrorsInData(data?.resultData);
         setTraceError(traceError);
+        setIsLoading(false);
       } else {
         setResults(data?.resultData);
         if (!isEditableFlow) {
@@ -120,10 +114,16 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
   }, [data]);
 
   useEffect(() => {
+    if (error) {
+      setIsLoading(false);
+    }
+  }, [error]);
+
+  useEffect(() => {
     if (results && !isObjectEmpty(state)) {
       setObjectsInStore(state, results);
     }
-  }, [state]);
+  }, [results, state]);
 
   const getSelectedStreams = (results: any) => {
     const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
@@ -174,6 +174,7 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
     };
 
     dispatchToStore(setEntities(obj));
+    setIsLoading(false);
     nextStep();
   };
 
@@ -230,38 +231,6 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
   };
 
   const isSelected = (id: string) => state.ids.indexOf(id) !== -1;
-
-  // handleStep(() => {
-  //   const entitiesInStore = connectionDataFlow?.entities ?? {};
-
-  // const { ids = [], entities = {} } = state;
-
-  // const streamsArr: any[] = [];
-
-  // if (ids.length > 0) {
-  //   ids.forEach((id: any) => {
-  //     streamsArr.push(entities[id]);
-  //   });
-  // }
-
-  //   let results = null;
-
-  //   if (objExistsInStore() && hasCatalogObj()) {
-  //     results = getCurrObjFromStore('catalog');
-  //   } else {
-  //     results = data?.resultData;
-  //   }
-
-  //   const obj = {
-  //     ...entitiesInStore,
-  //     [getCatalogObjKey(type)]: {
-  //       streams: streamsArr,
-  //       catalog: results
-  //     }
-  //   };
-
-  //   dispatchToStore(setEntities(obj));
-  // });
 
   const getSourceCursorField = (row: any) => {
     return row?.source_defined_cursor && row?.default_cursor_field ? row.default_cursor_field[0] : '';
@@ -358,7 +327,7 @@ const ConnectionDiscover = ({ params, isEditableFlow = false }: TConnectionUpser
 
   return (
     <>
-      {showLoadingModal && <Spinner />}
+      {isLoading && <Spinner />}
       {getDisplayComponent()}
       {/* <WizardFooter
         disabled={isFetching || state.ids.length < 1}
