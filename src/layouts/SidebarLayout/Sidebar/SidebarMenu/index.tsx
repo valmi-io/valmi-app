@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useCallback, useContext, useMemo } from 'react';
+import React, { memo, useCallback, useContext, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -71,6 +71,8 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
   const { closeSidebar } = useContext(SidebarContext);
 
+  const [selectedRoute, setSelectedRoute] = useState('');
+
   const sidebarRoutes = useMemo(() => {
     return getSidebarRoutes({ workspaceId, jitsuEnabled: isJitsuEnabled() });
   }, [workspaceId, isJitsuEnabled()]);
@@ -103,15 +105,21 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   const activeIndex = useMemo(() => {
     const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
 
-    const { id = 0 } = findPathInRoutes(sidebarRoutes, browserRoute);
+    // const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(selectedRoute as string);
+
+    const route = selectedRoute ?? browserRoute;
+
+    const { id = 0 } = findPathInRoutes(sidebarRoutes, route);
 
     return id;
-  }, [router.pathname, sidebarRoutes]);
+  }, [selectedRoute, router.pathname, sidebarRoutes]);
 
   const handleItemOnClick = useCallback(
     (path: string) => {
       // extracting current route from path
       const route = getRoute(path);
+
+      setSelectedRoute(route);
 
       // Navigate to route based on the name of the list item
       router.push(path);
