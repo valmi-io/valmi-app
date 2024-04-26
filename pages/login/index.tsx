@@ -165,7 +165,7 @@ const Login: NextPageWithLayout = () => {
       {/** Page layout */}
       <AuthenticationLayout>
         {/** Display form */}
-        <AuthenticationForm
+        {/* <AuthenticationForm
           fields={generateLoginFormFields()}
           control={control}
           handleSubmit={handleSubmit}
@@ -175,15 +175,15 @@ const Login: NextPageWithLayout = () => {
           buttonText={'Sign in'}
         />
         <Stack sx={{ mt: 1 }}>
-          <Stack spacing={2}>
-            {/** Display footer */}
-            <AuthenticationFormFooter
+          <Stack spacing={2}> */}
+        {/** Display footer */}
+        {/* <AuthenticationFormFooter
               isLoginPage={true}
               href={'/signup'}
               footerText={"Don't have an account? Sign up"}
             />
           </Stack>
-        </Stack>
+        </Stack> */}
         <Stack sx={{ marginTop: 2 }}>
           <GoogleSignInButton />
         </Stack>
