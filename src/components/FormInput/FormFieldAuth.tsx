@@ -54,11 +54,12 @@ const FormFieldAuth = (props: any) => {
     handleOnConfigureButtonClick
   } = props;
   const { oAuthConfigData } = useContext(OAuthContext);
-  const { isconfigured, requireConfiguration, isAuthorized } = oAuthConfigData;
+  const { isconfigured, requireConfiguration, isAuthorized, formValues } = oAuthConfigData;
+  const { credentials, ...otherFormData } = formValues;
 
   return (
     <>
-      <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+      <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'right' }}>
         <Label>{label}</Label>
         {requireConfiguration ? (
           !isconfigured ? (
@@ -101,16 +102,35 @@ const FormFieldAuth = (props: any) => {
               backgroundColor: getOauthColorCode({
                 oAuth: getOAuthProvider(oAuthProvider)
               }),
-              cursor: requireConfiguration && !isconfigured ? 'not-allowed' : 'pointer',
+              cursor:
+                requireConfiguration && !isconfigured
+                  ? 'not-allowed'
+                  : getOAuthProvider(oAuthProvider) !== 'shopify'
+                  ? 'pointer'
+                  : 'shop' in otherFormData && otherFormData.shop !== undefined
+                  ? 'pointer'
+                  : 'not-allowed',
               boxShadow: getOAuthProvider(oAuthProvider) === 'hubspot' ? '0px 0px 3px rgba(0, 0, 0, 0.4)' : 0,
               width: '100%',
-              opacity: requireConfiguration && !isconfigured ? 0.7 : 1
+              opacity:
+                requireConfiguration && !isconfigured
+                  ? 0.7
+                  : getOAuthProvider(oAuthProvider) !== 'shopify'
+                  ? 1
+                  : 'shop' in otherFormData && otherFormData.shop !== undefined
+                  ? 1
+                  : 0.7
             }}
             onClick={() => {
               if (!requireConfiguration) {
                 onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) });
               } else if (isconfigured) {
                 onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) });
+              } else if (
+                getOAuthProvider(oAuthProvider) === 'shopify' &&
+                'shop' in otherFormData &&
+                otherFormData.shop !== undefined
+              ) {
               }
               return null;
             }}
