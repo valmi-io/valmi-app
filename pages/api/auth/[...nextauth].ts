@@ -9,15 +9,15 @@ const nextAuthOptions = (req, res) => {
   return {
     providers: [
       GoogleProviders({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        clientId: process.env.NEXTAUTH_GOOGLE_CLIENT_ID,
+        clientSecret: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET,
         authorization: {
           params: {
             prompt: 'consent',
             access_type: 'offline',
             response_type: 'code',
             scope:
-              'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/spreadsheets.readonly'
+              'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets'
           }
         }
       })
