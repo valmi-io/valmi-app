@@ -124,13 +124,15 @@ const FormFieldAuth = (props: any) => {
             onClick={() => {
               if (!requireConfiguration) {
                 onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) });
-              } else if (isconfigured) {
+              } else if (isconfigured && getOAuthProvider(oAuthProvider) !== 'shopify') {
                 onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) });
               } else if (
+                isconfigured &&
                 getOAuthProvider(oAuthProvider) === 'shopify' &&
                 'shop' in otherFormData &&
                 otherFormData.shop !== undefined
               ) {
+                onClick({ oAuthProvider: getOAuthProvider(oAuthProvider) });
               }
               return null;
             }}
