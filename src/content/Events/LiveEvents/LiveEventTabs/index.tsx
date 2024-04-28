@@ -96,7 +96,7 @@ const LiveEventTabs = ({ state, onChange }: LiveEventsTabProps) => {
         <Box>
           <StyledTabs value={selectedValue} onChange={onChange} aria-label="styled tabs example">
             <StyledTab label="Incoming Events" />
-            <StyledTab label="Destination Warhouse Events" />
+            <StyledTab label="Destination Warehouse Events" />
           </StyledTabs>
         </Box>
       </Box>
