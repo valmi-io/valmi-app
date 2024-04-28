@@ -7,7 +7,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
 import { apiSlice } from '@store/api/apiSlice';
-import { user } from '@store/reducers/user';
 import { connectionFlow } from '@store/reducers/connectionFlow';
 import { syncFlow } from '@store/reducers/syncFlow';
 import { appFlow } from '@store/reducers/appFlow';
@@ -18,7 +17,6 @@ import { connectionDataFlow } from '@/store/reducers/connectionDataFlow';
 
 const rootReducer = combineReducers({
   [appFlow.name]: appFlow.reducer,
-  [user.name]: user.reducer,
   [connectionFlow.name]: connectionFlow.reducer,
   [syncFlow.name]: syncFlow.reducer,
   [streamFlowSlice.name]: streamFlowSlice.reducer,

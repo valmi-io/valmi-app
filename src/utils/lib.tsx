@@ -82,7 +82,6 @@ export const signOutUser = async (router) => {
   try {
     setCookie('AUTH', '', {
       expires: new Date(0),
-      sameSite: 'strict',
       path: '/'
     });
   } catch (err) {
@@ -118,6 +117,7 @@ export const getBrowserRoute = (path: string) => {
   if (widIndex !== -1) {
     return { route: route[widIndex + 1], subRoute: route[widIndex + 2] };
   }
+
   return { route: '', subRoute: '' };
 };
 
@@ -165,3 +165,15 @@ export const getCombinedConnectors = (data) => {
     return [...data.SRC, ...data.DEST];
   }
 };
+
+export function deepFlattenToObject(obj, prefix = '') {
+  return Object.keys(obj).reduce((acc, k) => {
+    const pre = prefix.length ? prefix + '_' : '';
+    if (typeof obj[k] === 'object' && obj[k] !== null) {
+      Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
+    } else {
+      acc[pre + k] = obj[k];
+    }
+    return acc;
+  }, {});
+}

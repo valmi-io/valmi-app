@@ -15,16 +15,18 @@ import { hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import { setConnectionFlow } from '@store/reducers/connectionFlow';
+import { setConnectionFlowState, setEntities } from '@/store/reducers/connectionDataFlow';
+import { getCatalogObjKey, getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 
 const OAuthRedirectPage = () => {
   const router = useRouter();
 
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatchToStore = useDispatch<AppDispatch>();
 
   /** Redux store */
-  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
-  const { flowState: {} = {} } = connection_flow;
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -55,7 +57,7 @@ const OAuthRedirectPage = () => {
   const getFbLongLivedToken = async (url: any, method: any, data: any) => {
     const { workspaceId = '' } = appState || {};
 
-    const { oauth_keys = 'private', type = '' } = connection_flow?.flowState?.selected_connector ?? {};
+    const { oauth_keys = 'private', type = '' } = selectedConnector ?? {};
 
     let obj = {
       workspace: workspaceId,
@@ -66,6 +68,7 @@ const OAuthRedirectPage = () => {
 
     let state = encodeURIComponent(JSON.stringify(obj));
 
+    const entitiesInStore = connectionDataFlow?.entities ?? {};
     try {
       const response = await axios.get('/api/getFbLongLivedToken', { params: { state: state } });
 
@@ -73,12 +76,15 @@ const OAuthRedirectPage = () => {
 
       if (hasErrorsInData(result)) {
         // TODO: Handle this error if needed.
-        dispatch(
-          setConnectionFlow({
-            ...connection_flow.flowState,
-            oauth_error: 'oautherror'
-          })
-        );
+        const obj = {
+          ...entitiesInStore,
+          [getSelectedConnectorKey()]: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()],
+            oauth_params: result
+          }
+        };
+
+        dispatchToStore(setEntities(obj));
         redirectToCreateConnection({ oAuthParams: {} });
       } else {
         const oAuthParams = {
@@ -90,27 +96,34 @@ const OAuthRedirectPage = () => {
     } catch (error) {
       // Handle any errors that occur during the API request
       // store error in redux store
-      dispatch(
-        setConnectionFlow({
-          ...connection_flow.flowState,
-          oauth_error: 'oautherror'
-        })
-      );
+      const obj = {
+        ...entitiesInStore,
+        [getSelectedConnectorKey()]: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          oauth_error: error
+        }
+      };
+
+      dispatchToStore(setEntities(obj));
       redirectToCreateConnection({ oAuthParams: {} });
     }
   };
 
   const redirectToCreateConnection = ({ oAuthParams }: any) => {
     const { workspaceId = '' } = appState || {};
+    const entitiesInStore = connectionDataFlow?.entities ?? {};
 
     // store oAuthparams in redux store
-    dispatch(
-      setConnectionFlow({
-        ...connection_flow.flowState,
+    const obj = {
+      ...entitiesInStore,
+      [getSelectedConnectorKey()]: {
+        ...connectionDataFlow.entities[getSelectedConnectorKey()],
         oauth_params: oAuthParams,
         oauth_error: ''
-      })
-    );
+      }
+    };
+
+    dispatchToStore(setEntities(obj));
 
     // navigate to create connection page
     router.push(`/spaces/${workspaceId}/connections/create`);

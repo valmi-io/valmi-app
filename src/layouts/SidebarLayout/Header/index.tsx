@@ -49,6 +49,7 @@ function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
   const { isLoggedIn } = useLoginStatus();
+  // const { data: session, status } = useSession();
 
   return (
     <HeaderWrapper
@@ -73,12 +74,12 @@ function Header() {
           >
             <iframe
               src="https://ghbtns.com/github-btn.html?user=valmi-io&repo=valmi-activation&type=star&count=true&size=large"
-              frameBorder="0"
               width="180"
               height="30"
               title="GitHub"
               style={{
-                alignSelf: 'center'
+                alignSelf: 'center',
+                border: 0
               }}
             />
 

@@ -30,7 +30,6 @@ import AlertComponent, { AlertStatus, AlertType } from '@components/Alert';
 
 import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
 import { AppDispatch } from '@store/store';
-import { setUserData } from '@store/reducers/user';
 import { setAppState } from '@store/reducers/appFlow';
 import { RootState } from '@store/reducers';
 
@@ -39,11 +38,15 @@ import { signinValidationSchema } from '@utils/validation-schema';
 import { useLoginStatus } from '@hooks/useLoginStatus';
 import { signOutUser } from '@utils/lib';
 import { queryHandler } from '@/services';
+import { GoogleSignInButton } from '@/components/AuthButtons';
+
+import { useSession } from 'next-auth/react';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
+  const { data: session } = useSession();
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -86,13 +89,19 @@ const Login: NextPageWithLayout = () => {
   const successCb = (data: any) => {
     handleAlertOpen({ message: 'Signed in successfully', alertType: 'success' as AlertStatus });
     setLoginData(data);
-    // store user data in redux.
-    dispatch(setUserData(data));
 
+    const { username = '', email = '' } = data ?? {};
     const workspaceID = data.organizations[0].workspaces[0].id;
+
+    let obj = {
+      workspaceId: workspaceID,
+      username: username,
+      email: email
+    };
+    initialiseAppState(dispatch, appState, obj);
+
     // initialise appState
-    initialiseAppState(dispatch, workspaceID);
-    router.push(`/spaces/${workspaceID}/onboarding`);
+    router.push(`/spaces/${workspaceID}/connections`);
   };
 
   const errorCb = (error: any) => {
@@ -156,7 +165,7 @@ const Login: NextPageWithLayout = () => {
       {/** Page layout */}
       <AuthenticationLayout>
         {/** Display form */}
-        <AuthenticationForm
+        {/* <AuthenticationForm
           fields={generateLoginFormFields()}
           control={control}
           handleSubmit={handleSubmit}
@@ -166,14 +175,17 @@ const Login: NextPageWithLayout = () => {
           buttonText={'Sign in'}
         />
         <Stack sx={{ mt: 1 }}>
-          <Stack spacing={2}>
-            {/** Display footer */}
-            <AuthenticationFormFooter
+          <Stack spacing={2}> */}
+        {/** Display footer */}
+        {/* <AuthenticationFormFooter
               isLoginPage={true}
               href={'/signup'}
               footerText={"Don't have an account? Sign up"}
             />
           </Stack>
+        </Stack> */}
+        <Stack sx={{ marginTop: 2 }}>
+          <GoogleSignInButton />
         </Stack>
       </AuthenticationLayout>
     </>

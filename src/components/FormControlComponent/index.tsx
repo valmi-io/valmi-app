@@ -5,11 +5,13 @@
  */
 
 import SubmitButton from '@/components/SubmitButton';
+import { OAuthContext } from '@/contexts/OAuthContext';
 import { FormContainer } from '@/layouts/FormLayout';
 import { FormStatus, jsonFormRemoveAdditionalFields, jsonFormValidator } from '@/utils/form-utils';
 import { materialCells } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
 import { Box } from '@mui/material';
+import { useContext } from 'react';
 
 type JsonFormsProps = {
   schema: any;
@@ -30,6 +32,7 @@ type FormControlComponentProps = {
   removeAdditionalFields?: boolean;
   containerStyles?: React.CSSProperties;
   displayActionButton?: boolean;
+  disabled?: boolean;
 };
 
 const FormControlComponent = ({
@@ -44,7 +47,8 @@ const FormControlComponent = ({
   removeAdditionalFields = false,
   containerStyles,
   onSubmitClick,
-  displayActionButton = true
+  displayActionButton = true,
+  disabled
 }: FormControlComponentProps) => {
   const { data, schema, renderers } = jsonFormsProps;
 
@@ -52,10 +56,12 @@ const FormControlComponent = ({
     ? jsonFormValidator(schema, jsonFormRemoveAdditionalFields(schema, data))
     : jsonFormValidator(schema, data);
 
+  const { isoAuthStepDone } = useContext(OAuthContext);
+
   return (
     <FormContainer>
       <JsonForms
-        readonly={!!(status === 'submitting')}
+        readonly={!!(status === 'submitting' || disabled)}
         schema={schema}
         data={data}
         renderers={renderers}
@@ -79,7 +85,7 @@ const FormControlComponent = ({
             buttonText={'Check'}
             data={status === 'success'}
             isFetching={status === 'submitting'}
-            disabled={!valid || status === 'submitting' || isDeleting}
+            disabled={!valid || status === 'submitting' || (isDeleting && !isoAuthStepDone)}
             onClick={onSubmitClick}
           />
         </Box>

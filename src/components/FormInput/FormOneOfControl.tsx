@@ -1,21 +1,34 @@
-import React, { useContext, useState } from 'react';
-import { CombinatorRendererProps, isDescriptionHidden, createCombinatorRenderInfos } from '@jsonforms/core';
-import { hasAuthorizedOAuth } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+// @ts-nocheck
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import {
+  CombinatorRendererProps,
+  isDescriptionHidden,
+  createCombinatorRenderInfos,
+  createDefaultValue
+} from '@jsonforms/core';
 import { JsonFormsDispatch, withJsonFormsOneOfProps } from '@jsonforms/react';
-import { Button, Card, FormControl, FormHelperText, Hidden, Tab, Tabs, TextField } from '@mui/material';
-import { merge } from 'lodash';
+import { Card, FormControl, FormHelperText, Hidden, Tab, Tabs } from '@mui/material';
+import { isEmpty, merge } from 'lodash';
 import { useFocus } from '@jsonforms/material-renderers';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import FormFieldAuth from '@/components/FormInput/FormFieldAuth';
+import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmDialog';
+import { isObjectEmpty } from '@/utils/lib';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/store/reducers';
+import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { AppDispatch } from '@/store/store';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
   const {
     handleOAuthButtonClick,
-    isConnectorConfigured,
     handleOnConfigureButtonClick,
-    isConfigurationRequired,
-    oAuthProvider
+    selectedConnector,
+    oAuthConfigData,
+    setOAuthConfigData,
+    setIsOuthStepDone
   } = useContext(OAuthContext);
 
   const {
@@ -39,14 +52,18 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
 
+  const dispatch = useDispatch<AppDispatch>();
+
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  const entitiesInStore = connectionDataFlow?.entities ?? {};
+
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [newSelectedIndex, setNewSelectedIndex] = useState(0);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const hasOneOfArr = !!schema?.oneOf;
 
-  const oAuthOptions = (hasOneOfArr && schema?.oneOf) || schema || [];
-  const selectedSchema = oAuthOptions[selectedIndex]?.properties || {};
-
-  // console.log('OAUTH OPTILNS :', oAuthOptions);
-  // console.log('selected schema :', selectedSchema);
+  const oAuthOptions: any = (hasOneOfArr && schema?.oneOf) || schema || [];
 
   const showDescription = !isDescriptionHidden(
     visible,
@@ -55,30 +72,77 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
     appliedUiSchemaOptions.showUnfocusedDescription
   );
 
+  //if oauth_params exists then set the index of tabbed to oauth after redirecting back
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      oAuthOptions.forEach((option: any, index: number) => {
+        if (option?.title?.toLowerCase() === 'oauth2.0') {
+          setSelectedIndex(index);
+        }
+      });
+    }
+  }, []);
+
+  const handleClose = useCallback(() => setConfirmDialogOpen(false), [setConfirmDialogOpen]);
+
+  const cancel = useCallback(() => {
+    setConfirmDialogOpen(false);
+  }, [setConfirmDialogOpen]);
+
+  const oneOfRenderInfos = hasOneOfArr
+    ? createCombinatorRenderInfos(oAuthOptions, rootSchema, 'oneOf', uischema, path, uischemas)
+    : [];
+
+  const openNewTab = (newIndex: number) => {
+    handleChange(path, createDefaultValue(oneOfRenderInfos[newIndex].schema, rootSchema));
+    setSelectedIndex(newIndex);
+  };
+
+  const getOAuthProviderName = (selectedConnector: object) => {
+    return selectedConnector?.type?.split('_')[1]?.split('-')[0].toLowerCase();
+  };
+
+  const confirm = useCallback(() => {
+    openNewTab(newSelectedIndex);
+    const authMethodValue = !!(oAuthOptions[newSelectedIndex].title?.toLowerCase() === 'oauth2.0')
+      ? 'oauth2.0'
+      : oAuthOptions[newSelectedIndex]?.properties?.auth_method?.const;
+    const obj = {
+      ...entitiesInStore,
+      [getSelectedConnectorKey()]: {
+        ...connectionDataFlow.entities[getSelectedConnectorKey()],
+        formValues: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+          credentials: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues?.credentials,
+            auth_method: authMethodValue
+          }
+        }
+      }
+    };
+    dispatch(setEntities(obj));
+
+    setConfirmDialogOpen(false);
+  }, [handleChange, createDefaultValue, newSelectedIndex]);
+
+  const handleTabChange = useCallback(
+    (_event: any, newOneOfIndex: number) => {
+      setNewSelectedIndex(newOneOfIndex);
+      if (isEmpty(data)) {
+        openNewTab(newOneOfIndex);
+      } else {
+        setConfirmDialogOpen(true);
+      }
+    },
+    [setConfirmDialogOpen, setSelectedIndex, data]
+  );
+
   const isOAuthSelected = (option: number) => {
     return !!(oAuthOptions[option].title?.toLowerCase() === 'oauth2.0');
   };
 
   const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
   const secondFormHelperText = showDescription && !isValid ? errors : null;
-
-  const handleTabChange = (_event: any, newOneOfIndex: number) => {
-    setSelectedIndex(newOneOfIndex);
-  };
-
-  // Add this function to check if form fields are filled
-  const areFieldsFilled = () => {
-    // Check if any field is filled
-    for (const key in selectedSchema) {
-      if (selectedSchema[key]) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const oneOfRenderInfos =
-    hasOneOfArr && createCombinatorRenderInfos(oAuthOptions, rootSchema, 'oneOf', uischema, path, uischemas);
 
   return (
     <Hidden xsUp={!visible}>
@@ -93,7 +157,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
           >
             <Tabs value={selectedIndex} onChange={handleTabChange}>
               {hasOneOfArr &&
-                oAuthOptions.map((option: any, index: number) => <Tab key={option?.title} label={option?.title} />)}
+                oneOfRenderInfos.map((option: any, index: number) => <Tab key={option?.label} label={option?.label} />)}
             </Tabs>
             {hasOneOfArr &&
               oAuthOptions[selectedIndex].title?.toLocaleLowerCase() !== 'oauth2.0' &&
@@ -112,31 +176,39 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                   )
               )}
 
-            {hasOneOfArr
-              ? isOAuthSelected(selectedIndex) && (
-                  <FormFieldAuth
-                    label={schema?.title}
-                    onClick={handleOAuthButtonClick}
-                    isConnectorConfigured={isConnectorConfigured}
-                    isConfigurationRequired={isConfigurationRequired}
-                    handleOnConfigureButtonClick={handleOnConfigureButtonClick}
-                    oAuthProvider={'facebook'}
-                    // oauth_error={oauth_error}
-                    hasOAuthAuthorized={hasAuthorizedOAuth}
-                  />
-                )
-              : isOAuthSelected(selectedIndex) && (
-                  <FormFieldAuth
-                    label={schema?.title}
-                    onClick={handleOAuthButtonClick}
-                    isConnectorConfigured={isConnectorConfigured}
-                    isConfigurationRequired={isConfigurationRequired}
-                    handleOnConfigureButtonClick={handleOnConfigureButtonClick}
-                    oAuthProvider={'facebook'}
-                    // oauth_error={oauth_error}
-                    hasOAuthAuthorized={hasAuthorizedOAuth}
-                  />
-                )}
+            {hasOneOfArr && isOAuthSelected(selectedIndex) && (
+              <FormFieldAuth
+                onClick={handleOAuthButtonClick}
+                isConfigurationRequired={oAuthConfigData?.requireConfiguration}
+                isConnectorConfigured={oAuthConfigData?.isconfigured}
+                handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+                oAuthProvider={getOAuthProviderName(selectedConnector)}
+                oauth_error={selectedConnector?.oauth_error}
+                hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
+                sx={{ mt: 2 }}
+              />
+            )}
+
+            {!hasOneOfArr && (
+              <FormFieldAuth
+                onClick={handleOAuthButtonClick}
+                isConfigurationRequired={oAuthConfigData?.requireConfiguration}
+                isConnectorConfigured={oAuthConfigData?.isconfigured}
+                handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+                oAuthProvider={getOAuthProviderName(selectedConnector)}
+                oauth_error={selectedConnector?.oauth_error}
+                hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
+                sx={{ mt: 2 }}
+              />
+            )}
+
+            <TabSwitchConfirmDialog
+              cancel={cancel}
+              confirm={confirm}
+              id={'oneOf-' + id}
+              open={confirmDialogOpen}
+              handleClose={handleClose}
+            />
             <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>

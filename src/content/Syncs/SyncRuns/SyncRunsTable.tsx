@@ -52,19 +52,14 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
 
   const navigateToSyncRunLogs = (syncRun, connection) => {
     router.push({
-      pathname: `/spaces/${workspaceId}/syncs/${syncId}/runs/${syncRun.run_id}/logs`,
+      pathname: `/spaces/${workspaceId}/connections/${syncId}/runs/${syncRun.run_id}/logs`,
       query: { connection_type: connection }
     });
   };
 
   return (
     <>
-      <AlertComponent
-        open={errorDialog}
-        onClose={handleClose}
-        message={syncErrorMessage}
-        isError={true}
-      />
+      <AlertComponent open={errorDialog} onClose={handleClose} message={syncErrorMessage} isError={true} />
       {/* Syncs Table*/}
       <TableContainer>
         <Table>

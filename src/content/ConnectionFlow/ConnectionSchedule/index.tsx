@@ -5,9 +5,9 @@
  */
 
 import FormControlComponent from '@/components/FormControlComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { JsonFormsCore } from '@jsonforms/core';
-import { FormStatus, jsonFormValidator } from '@/utils/form-utils';
+import { FormStatus } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
@@ -31,11 +31,11 @@ import {
 import { useRouter } from 'next/router';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import Spinner from '@/components/Spinner';
 
 const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) => {
   const router = useRouter();
   const { wid = '' } = params ?? {};
-  const { previousStep } = useWizard();
 
   const dispatch = useDispatch<AppDispatch>();
   let initialData = {};
@@ -50,13 +50,24 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
 
   const { type = '' } = selectedConnector;
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams;
+
+  if (streams) {
+    initialData = {
+      name: type?.toLocaleLowerCase(),
+      run_interval: 'Every 1 hour'
+    };
+  }
+
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { user } = appState ?? {};
 
   // create connection query
-  const [createConnection, { isFetching: isCreating }] = useLazyCreateConnectionQuery();
+  const [createConnection] = useLazyCreateConnectionQuery();
 
   // update connection query
-  const [updateConnection, { isFetching: isUpdating }] = useLazyUpdateConnectionQuery();
+  const [updateConnection] = useLazyUpdateConnectionQuery();
 
   const [data, setData] = useState<any>(initialData);
 
@@ -77,7 +88,11 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
     setData(data);
   };
 
-  const { valid } = jsonFormValidator(connectionScheduleSchema, data);
+  useEffect(() => {
+    if (streams) {
+      handleOnClick();
+    }
+  }, [streams]);
 
   /**
    * Responsible for opening alert dialog.
@@ -158,6 +173,7 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
 
   return (
     <>
+      {status === 'submitting' && <Spinner />}
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}
@@ -167,6 +183,7 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
       />
       <ConnectorLayout title={''}>
         <FormControlComponent
+          disabled={true}
           key={`ConnectionSchedule`}
           editing={false}
           onFormChange={handleFormChange}
@@ -177,14 +194,14 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
         />
       </ConnectorLayout>
 
-      <WizardFooter
+      {/* <WizardFooter
         status={status}
         disabled={!valid || isCreating || isUpdating}
         prevDisabled={isCreating || isUpdating}
         nextButtonTitle={isEditableFlow ? 'Update' : 'Create'}
         onNextClick={handleOnClick}
         onPrevClick={() => previousStep()}
-      />
+      /> */}
     </>
   );
 };

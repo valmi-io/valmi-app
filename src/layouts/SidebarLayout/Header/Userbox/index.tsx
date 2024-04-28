@@ -57,7 +57,9 @@ const HeaderUserbox = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
+
+  const { user: { username = '', email = '' } = {} } = appState ?? {};
 
   const ref = useRef<any>(null);
   // Popover states
@@ -77,13 +79,13 @@ const HeaderUserbox = () => {
   };
 
   const userAvatar = () => {
-    return <Avatar sx={{ width: 30, height: 30 }} {...stringAvatar(user?.email ? user.email : 'valmi.io')} />;
+    return <Avatar sx={{ width: 30, height: 30 }} {...stringAvatar(username ?? 'valmi')} />;
   };
 
   const userTitle = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">{user?.email ? user.email : 'valmi.io'}</UserBoxLabel>
+        <UserBoxLabel variant="body2">{email ?? 'valmi.io'}</UserBoxLabel>
       </UserBoxText>
     );
   };

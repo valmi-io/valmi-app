@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
-import { getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
+import { getOAuthObjInStore, getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
 
 interface ConnectorListProps {
   data: any;
@@ -37,7 +37,7 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     const objToDispatch = {
       ids: [key],
       entities: {
-        [key]: getSelectedConnectorObj(item, key)
+        [key]: { ...getSelectedConnectorObj(item, key), ...getOAuthObjInStore(item) } // initially setting oauth_params, oauth_error to empty in store
       }
     };
 

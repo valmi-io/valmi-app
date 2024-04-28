@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -30,7 +30,12 @@ import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
-import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { OAuthContext } from '@/contexts/OAuthContext';
+import { getCredentialObjKey, getSelectedConnectorKey, getFreePackageId } from '@/utils/connectionFlowUtils';
+import { isObjectEmpty } from '@/utils/lib';
+import { getOAuthParams } from '@/pagesauth/callback';
+import { useGetPackageByIdQuery } from '@/store/api/etlApiSlice';
+import { useFetch } from '@/hooks/useFetch';
 
 type TState = {
   error: string;
@@ -43,27 +48,28 @@ const Item = styled(Box)(({}) => ({
 }));
 
 const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '' } = params ?? {};
+  const { wid = '', connectionId = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
 
   const { nextStep } = useWizard();
 
-  let initialData = {};
+  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
 
-  const connection_flow = useSelector((state: RootState) => state.connectionFlow);
+  let initialData = {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const isEditableFlow = !!connectionId;
+  const entitiesInStore = connectionDataFlow?.entities ?? {};
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
 
   if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
     initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
-
-  const { flowState: {} = {} } = connection_flow;
 
   const [traceError, setTraceError] = useState<any>(null);
 
@@ -73,6 +79,14 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     /* query for connector configuration */
   }
   const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
+
+  const {
+    data: packageData,
+    error: packageError,
+    isLoading: isPackageLoading
+  } = useFetch({
+    query: useGetPackageByIdQuery({ packageId: getFreePackageId() })
+  });
 
   // Getting keys for the object
   const [fetchIntegrationOauthCredentials, { data: keys, isLoading: isKeysLoading, error: keysError }] =
@@ -84,8 +98,6 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   });
 
   const [results, setResults] = useState(null);
-
-  const handleOAuthButtonClick = () => alert('HELLOO');
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
@@ -125,6 +137,87 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       }
     }
   }, [spec]);
+
+  useEffect(() => {
+    if (keys) {
+      if (hasErrorsInData(keys)) {
+        const traceError = getErrorsInData(spec);
+        setTraceError(traceError);
+      } else {
+        const setOAuthData = () => {
+          //checking if connector configured for oAuth
+          const { entities = {} } = keys;
+          const { type = '', oauth_keys = 'private' } = selectedConnector;
+          if (entities[`${type}`]) {
+            oAuthConfigData = { ...oAuthConfigData, isconfigured: true };
+            setOAuthConfigData(oAuthConfigData);
+          }
+
+          //check if configuration required
+          if (oauth_keys === 'private') {
+            oAuthConfigData = { ...oAuthConfigData, requireConfiguration: true };
+            setOAuthConfigData(oAuthConfigData);
+          }
+
+          //check if hasAuthorizedOAuth
+          const hasAuthorizedOAuth = (oAuthParams: any, isEditableFlow: boolean) => {
+            let authorizedStatus = !isObjectEmpty(oAuthParams) || isEditableFlow ? true : false;
+            let authData = { ...oAuthConfigData, isAuthorized: authorizedStatus };
+            setOAuthConfigData(authData);
+          };
+          hasAuthorizedOAuth(selectedConnector?.oauth_params, isEditableFlow);
+        };
+        setOAuthData();
+      }
+    }
+  }, [spec]);
+
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+      const { isconfigured, isAuthorized } = oAuthConfigData;
+      const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
+      const obj = {
+        ...entitiesInStore,
+        [getSelectedConnectorKey()]: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          formValues: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              client_id,
+              client_secret,
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            }
+          }
+        },
+        [getCredentialObjKey(type)]: {
+          ...connectionDataFlow.entities[getCredentialObjKey(type)],
+          spec: spec,
+          config: {
+            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              ...getOAuthParams(oauth_params),
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            },
+            name: displayName
+          }
+        }
+      };
+      dispatch(setEntities(obj));
+      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
+    }
+  }, [spec]);
+
+  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
+  useEffect(() => {
+    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+      setData(formDataFromStore);
+    }
+  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
 
   const handleSubmit = () => {
     setState((state) => ({
@@ -174,7 +267,9 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
                 ...payload.config,
                 name: displayName
               },
-              spec: spec
+              spec: spec,
+              // set the package data in store
+              package: packageData?.entities[getFreePackageId().toLocaleUpperCase()]
             }
           };
 
@@ -186,8 +281,11 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+  const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
+
+    let formData = { ...oAuthConfigData, formValues: data };
+    await setOAuthConfigData(formData);
   };
 
   const getDisplayComponent = () => {

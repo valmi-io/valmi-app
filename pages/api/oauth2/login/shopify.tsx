@@ -17,7 +17,7 @@ export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }
       clientID: client_id as string,
       clientSecret: client_secret as string,
       shop: shop as string,
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/shopify` // this is the endpoint you registered on shopify while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `http://localhost:3000/api/oauth2/redirect/shopify` // this is the endpoint you registered on shopify while creating your app. This endpoint would exist on your application for verifying the authentication
     },
     async (accessToken, refreshToken, profile: any, cb: any) => {
       try {
@@ -43,7 +43,7 @@ router
 
     let json = JSON.parse(decodeURIComponent(state));
 
-    let { workspace = '', connector = '', oauth_keys = 'private', shop = '' } = json;
+    let { workspace = '', connector = '', oauth_keys = 'private', meta: { shop = '', scope = [] } = {} } = json;
 
     let credentials = {};
     let query_response = { ...(req.credentials ?? {}) };
@@ -74,7 +74,7 @@ router
     };
 
     return passport.authenticate(strategy, {
-      scope: ['read_orders', 'read_products', 'write_products'],
+      scope: scope,
       state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });

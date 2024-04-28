@@ -1,6 +1,7 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
-import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { generateAccountPayload } from '@/utils/account-utils';
 
 export type TStream = {
   name: string;
@@ -67,20 +68,6 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
     connector_config: config,
     name: name,
     account: generateAccountPayload(user)
-  };
-
-  return payload;
-};
-
-const generateAccountPayload = (user: any) => {
-  //@ts-ignore
-  const { email = '', first_name = '' } = user || {};
-
-  const payload = {
-    name: first_name,
-    external_id: email,
-    profile: '',
-    meta_data: {}
   };
 
   return payload;
@@ -275,10 +262,27 @@ export const getCatalogObjKey = (integrationType: string) => {
   return `${key}_catalog`;
 };
 
+export const getOAuthObjInStore = (item: NewConnectorType) => {
+  const obj: { oauth_params: object; oauth_error: string } = {
+    oauth_params: item?.oauth_params ?? {},
+    oauth_error: item?.oauth_error ?? ''
+  };
+
+  return obj;
+};
+
 export const getScheduleObjKey = () => {
   return 'schedule';
 };
 
 export const getExtrasObjKey = () => {
   return 'extras';
+};
+
+export const getFreePackageId = () => {
+  return 'p0';
+};
+
+export const getPremiuimPackageIds = () => {
+  return ['p0', 'p1'];
 };

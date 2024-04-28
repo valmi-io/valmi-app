@@ -4,11 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useCallback, useContext, useEffect, useMemo } from 'react';
+import React, { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Box, List, styled } from '@mui/material';
 
@@ -17,12 +17,8 @@ import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
 
 import { SidebarContext } from '@contexts/SidebarContext';
 
-import { RootState } from '@store/reducers';
-import { setAppState } from '@store/reducers/appFlow';
-
 import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
-import { AppState } from '@/store/store';
 import { getBrowserRoute, getRoute } from '@/utils/lib';
 import SidebarNestedItem from '@/layouts/SidebarLayout/Sidebar/SidebarNestedItem';
 
@@ -75,41 +71,12 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
 
   const { closeSidebar } = useContext(SidebarContext);
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { currentRoute = '' } = appState;
+  const [selectedRoute, setSelectedRoute] = useState('');
 
   useEffect(() => {
-    const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
-
-    const connectionRoutes = ['warehouses', 'destinations'];
-
-    const subRoutes = ['create', 'callback', '[sid]', 'warehouses', 'destinations', 'connections', 'live-events'];
-
-    if (!browserSubRoute && browserRoute !== currentRoute && browserRoute !== 'connections') {
-      // Handle non-sub-route case
-      handleRouteChange(browserRoute);
-    } else if (browserSubRoute && subRoutes.includes(browserSubRoute)) {
-      // Handle sub-routes
-
-      if (browserRoute !== currentRoute) {
-        if (browserRoute !== 'connections') {
-          if (browserRoute === 'events' && browserSubRoute === 'connections') {
-            handleRouteChange(browserSubRoute);
-          } else {
-            // Handle non-connections route
-            handleRouteChange(browserRoute);
-          }
-        } else if (connectionRoutes.includes(browserSubRoute) && browserSubRoute !== currentRoute) {
-          // Handle connections route with valid sub-route
-          handleRouteChange(browserSubRoute);
-        } else if (!connectionRoutes.includes(currentRoute)) {
-          // Handle create | callback route
-          handleRouteChange(connectionRoutes[0]);
-        }
-      } else if (browserRoute === 'events' && browserSubRoute === 'connections') {
-        handleRouteChange(browserSubRoute);
-      }
+    if (router.pathname) {
+      const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
+      setSelectedRoute(browserRoute);
     }
   }, [router.pathname]);
 
@@ -132,32 +99,30 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
         }
       }
     }
-    return { found: false }; // Path not found in this branch
-  };
 
-  const handleRouteChange = (route: string) => {
-    dispatch(
-      setAppState({
-        ...appState,
-        currentRoute: route
-      })
-    );
+    if (pathToCheck === 'prompts') {
+      const result: any = findPathInRoutes(routes, 'explores');
+
+      return { found: true, id: result.id };
+    } else {
+      return { found: false }; // Path not found in this branch
+    }
   };
 
   const activeIndex = useMemo(() => {
-    let currentStorePath = currentRoute;
+    const route = selectedRoute;
 
-    const { found, id = 0 } = findPathInRoutes(sidebarRoutes, currentStorePath);
+    const { id = 0 } = findPathInRoutes(sidebarRoutes, route);
 
     return id;
-  }, [currentRoute, sidebarRoutes]);
+  }, [selectedRoute, sidebarRoutes]);
 
   const handleItemOnClick = useCallback(
     (path: string) => {
       // extracting current route from path
-      const currentRoute = getRoute(path);
+      const route = getRoute(path);
 
-      handleRouteChange(currentRoute);
+      setSelectedRoute(route);
 
       // Navigate to route based on the name of the list item
       router.push(path);
