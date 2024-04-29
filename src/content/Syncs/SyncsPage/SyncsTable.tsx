@@ -7,16 +7,13 @@
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import { Table, TableBody, TableHead, TableContainer } from '@mui/material';
-
-import { RootState } from '@store/reducers';
 
 import SyncTableRow from './SyncTableRow';
 
 import { SyncColumns } from './SyncColumns';
 import TableHeader from '@components/Table/TableHeader';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 export interface SyncOnClickProps {
   syncId: string;
@@ -33,9 +30,7 @@ export interface SyncOnClickProps {
 const SyncsTable = ({ syncs }) => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const handleOnClick = ({ syncId }: SyncOnClickProps) => {
     // navigate to sync runs

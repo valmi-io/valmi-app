@@ -17,6 +17,7 @@ import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@compo
 
 import { RootState } from '@store/reducers';
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Item = styled(Box)(({}) => ({
   display: 'flex',
@@ -40,9 +41,7 @@ const ConnectionTest = ({ handleFormStatus }: ConnectionTestProps) => {
 
   const dispatch = useDispatch();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const [connectionTestState, setConnectionTestState] = useState<ConnectionTestState>({
     error: '',

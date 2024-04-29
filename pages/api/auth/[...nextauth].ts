@@ -75,7 +75,7 @@ export const nextAuthOptions = (req, res) => {
               await handleSocialLogin(
                 payload,
                 (data) => {
-                  // console.log('social login response: ', data);
+                  console.log('social login response: ', data);
                   const { auth_token, workspace_id } = data ?? {};
 
                   token.apiToken = auth_token;

@@ -40,6 +40,7 @@ import { RootState } from '@store/reducers';
 import { EditSyncFlowSteps, SyncFlowSteps } from '@utils/sync-utils';
 
 import constants from '@constants/index';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const InstructionsLayout = styled(Box)(({ theme }) => ({
   width: '40%',
@@ -54,9 +55,7 @@ const SyncFlow = () => {
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  const otherState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = otherState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const [createSyncQuery] = useLazyAddSyncQuery();
 

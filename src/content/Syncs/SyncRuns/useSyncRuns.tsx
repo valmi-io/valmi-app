@@ -34,8 +34,7 @@ export const useSyncRuns = ({ syncId, workspaceId }: UseSyncRunProps) => {
   const url = router.pathname;
   const query = router.query;
 
-  const [getSyncRuns, { data, isLoading, isError, error }] =
-    useLazyGetSyncRunsByIdQuery();
+  const [getSyncRuns, { data, isLoading, isError, error }] = useLazyGetSyncRunsByIdQuery();
 
   // sync run states
   const [lastSync, setLastSync] = useState(new Date().toISOString());
