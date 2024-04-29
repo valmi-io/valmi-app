@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Hidden, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 
@@ -23,6 +23,7 @@ import { RootState } from '@store/reducers';
 
 import { signOutUser, stringAvatar } from '@utils/lib';
 import { AppDispatch } from '@/store/store';
+import { useSession, signOut } from 'next-auth/react';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -57,9 +58,13 @@ const HeaderUserbox = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const { data: session, status } = useSession();
 
-  const { user: { username = '', email = '' } = {} } = appState ?? {};
+  console.log('header userbox session:_', session);
+
+  console.log('header userbox status:_', status);
+
+  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
   const ref = useRef<any>(null);
   // Popover states
@@ -75,17 +80,27 @@ const HeaderUserbox = () => {
 
   const handleSignoutClick = (): void => {
     dispatch({ type: 'RESET_STORE' });
+    // clear session.
+    signOut();
     signOutUser(router);
   };
 
   const userAvatar = () => {
-    return <Avatar sx={{ width: 30, height: 30 }} {...stringAvatar(username ?? 'valmi')} />;
+    return <Avatar sx={{ width: 30, height: 30 }} src={session?.user?.image ?? ''} />;
   };
 
   const userTitle = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">{email ?? 'valmi.io'}</UserBoxLabel>
+        <UserBoxLabel variant="body2">{session?.user?.name ?? 'valmi'}</UserBoxLabel>
+      </UserBoxText>
+    );
+  };
+
+  const userEmail = () => {
+    return (
+      <UserBoxText>
+        <UserBoxLabel variant="body2">{session?.user?.email ?? 'valmi.io'}</UserBoxLabel>
       </UserBoxText>
     );
   };
@@ -105,7 +120,7 @@ const HeaderUserbox = () => {
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
           <MenuUserBox sx={{ minWidth: 210 }} display="flex" alignItems="center">
             {userAvatar()}
-            {userTitle()}
+            {userEmail()}
           </MenuUserBox>
 
           <Divider />

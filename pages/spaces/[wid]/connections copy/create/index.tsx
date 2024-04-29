@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { ReactElement, useEffect, useMemo, useState } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -12,21 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Paper, CardActions, Button, CircularProgress } from '@mui/material';
 
-import { useForm } from 'react-hook-form';
-
 import axios from 'axios';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import { EtlConnectionSteps, RetlConnectionSteps } from '@content/Connections/ConnectionModel';
-import Connectors from '@content/ConnectionFlow/Connectors';
 import ConnectorConfig from '@content/ConnectionFlow/ConnectorConfig';
-import {
-  hasAuthorizedOAuth,
-  isConnectorRequiresOAuth
-} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 import AlertComponent from '@components/Alert';
 import HorizontalLinearStepper from '@components/Stepper';
@@ -55,6 +47,7 @@ export type TConnectionUpsertProps = {
 import { Wizard, useWizard } from 'react-use-wizard';
 import { setIds } from '@/store/reducers/connectionDataFlow';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Step2 = () => {
   return (
@@ -102,7 +95,9 @@ const ConnectionsUpsertPage = ({ params }: TConnectionUpsertProps) => {
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '', currentRoute = '' } = appState;
+  const { currentRoute = '' } = appState;
+
+  const { workspaceId = null } = useWorkspaceId();
 
   const connectionSteps = useMemo(() => {
     let steps: any[] = [];

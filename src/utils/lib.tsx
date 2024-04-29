@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, setCookie } from '@/lib/cookies';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -79,8 +79,9 @@ export const getConnectorImage = (connectorType) => {
 };
 
 export const signOutUser = async (router) => {
+  console.log('Sign out is called:_');
   try {
-    setCookie('AUTH', '', {
+    setCookie(getAuthTokenCookie(), '', {
       expires: new Date(0),
       path: '/'
     });

@@ -13,13 +13,12 @@ import { ReactElement } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { RootState } from '@store/reducers';
 import { useGetStreamsQuery } from '@/store/api/streamApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import { setStreamFlowState } from '@/store/reducers/streamFlow';
@@ -27,17 +26,16 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import StreamsTable from '@/content/Streams/StreamsTable';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
-import { AppState } from '@/store/store';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const StreamsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const { id = '' } = router.query;
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
   const dispatch = useDispatch();
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const { data, isLoading, traceError, error } = useFetch({ query: useGetStreamsQuery(workspaceId) });
 

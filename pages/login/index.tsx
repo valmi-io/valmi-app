@@ -41,12 +41,15 @@ import { queryHandler } from '@/services';
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
 import { useSession } from 'next-auth/react';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
+
+  console.log('Login session:_', session);
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
@@ -68,49 +71,27 @@ const Login: NextPageWithLayout = () => {
 
   const { isLoggedIn } = useLoginStatus();
 
+  const { workspaceId = null } = useWorkspaceId();
+
   useEffect(() => {
-    if (isLoggedIn) {
-      router.push('/');
+    if (workspaceId) {
+      router.push(`/spaces/${workspaceId}/connections`);
     } else {
       dispatch({ type: 'RESET_STORE' });
-      signOutUser(router);
     }
-  }, [isLoggedIn]);
+  }, [workspaceId]);
 
-  const onSubmit = (values: any) => {
-    {
-      /** Generate login payload */
-    }
-    const payload = generateAuthenticationPayload(values);
-    setUserEmail(values['email']);
-    loginHandler({ query: loginAndFetchWorkSpaces, payload: payload });
-  };
+  // useEffect(() => {
+  //   console.log('Signout user is called from login page:_');
 
-  const successCb = (data: any) => {
-    handleAlertOpen({ message: 'Signed in successfully', alertType: 'success' as AlertStatus });
-    setLoginData(data);
-
-    const { username = '', email = '' } = data ?? {};
-    const workspaceID = data.organizations[0].workspaces[0].id;
-
-    let obj = {
-      workspaceId: workspaceID,
-      username: username,
-      email: email
-    };
-    initialiseAppState(dispatch, appState, obj);
-
-    // initialise appState
-    router.push(`/spaces/${workspaceID}/connections`);
-  };
-
-  const errorCb = (error: any) => {
-    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
-  };
-
-  const loginHandler = async ({ query, payload }: { query: any; payload: any }) => {
-    await queryHandler({ query, payload, successCb, errorCb });
-  };
+  //   console.log('is logged in :_', isLoggedIn);
+  //   if (isLoggedIn) {
+  //     router.push('/');
+  //   } else {
+  //     dispatch({ type: 'RESET_STORE' });
+  //     signOutUser(router);
+  //   }
+  // }, [isLoggedIn]);
 
   /**
    * Responsible for opening alert dialog.

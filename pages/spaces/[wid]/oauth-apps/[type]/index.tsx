@@ -9,8 +9,6 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
-import { RootState } from '@store/reducers';
 import { useFetch } from '@/hooks/useFetch';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
@@ -29,7 +27,7 @@ import {
 } from '@/store/api/oauthApiSlice';
 import OAuthInstructions from '@/content/OAuthApps/OAuthInstructions';
 import { TData } from '@/utils/typings.d';
-import { capitalize, upperCase } from 'lodash';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CreateOAuthConfigurationLayout = () => {
   // Get type from router
@@ -58,8 +56,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
 
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   // Getting schema for the object
   const {

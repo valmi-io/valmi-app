@@ -21,11 +21,12 @@ import { LinkStateType } from '@/content/Events/CreateEventConnection';
 import EventsFieldsControl from '@/content/Events/EventFieldsControl';
 import EventInstructions from '@/content/Events/EventInstructions';
 import { useTheme } from '@mui/material/styles';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CreateEventXterior = () => {
   const theme = useTheme();
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+
+  const { workspaceId = '' } = useWorkspaceId();
   const { editing, id: linkId } = useSelector((state: RootState) => state.trackFlow);
 
   // Getting stream selectors for editing case specifically - not useful for create case

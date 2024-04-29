@@ -7,7 +7,6 @@
 import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -15,14 +14,12 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import Head from '@components/PageHead';
 
-import { RootState } from '@store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   useEffect(() => {
     router.push(`/spaces/${workspaceId}/connections/warehouses`);

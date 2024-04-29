@@ -9,8 +9,10 @@ import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 import constants from '@constants/index';
-import { getCookie, setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { getSession, useSession } from 'next-auth/react';
 
 const connectorsAdapter: any = createEntityAdapter();
 const initialConnectorsState = connectorsAdapter.getInitialState();
@@ -21,11 +23,20 @@ const staggeredBaseQueryWithBailOut = retry(
       baseUrl: constants.urls.API_URL,
       timeout: 60000, // 60 seconds
       prepareHeaders: async (headers, { getState }) => {
-        const accessToken = (await getCookie('AUTH')?.accessToken) ?? '';
+        const session = await getSession();
+        console.log('api slice Session:_', session);
 
-        if (accessToken) {
-          headers.set('authorization', `Bearer ${accessToken}`);
+        if (session) {
+          headers.set('authorization', `Bearer ${session?.apiToken ?? ''}`);
         }
+
+        // const { workspaceId } = useWorkspaceId();
+        // console.log('Prepare headers:_', workspaceId);
+        // const accessToken = (await getCookie(getAuthTokenCookie())) ?? '';
+
+        // if (accessToken) {
+        //   headers.set('authorization', `Bearer ${accessToken}`);
+        // }
 
         return headers;
       }

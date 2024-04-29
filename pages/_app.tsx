@@ -106,6 +106,8 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
     };
   }, []);
 
+  console.log('page props session:_', pageProps);
+
   return (
     <PersistGate persistor={store.__persistor}>
       <CacheProvider value={emotionCache}>
@@ -115,7 +117,7 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
         <SidebarProvider>
           <ThemeProviderWrapper>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <CssBaseline /> 
+              <CssBaseline />
               <SessionProvider session={pageProps.session}>
                 {/* <PostHogProvider client={posthog}> */}
                 {getLayout(<Component {...pageProps} />)}

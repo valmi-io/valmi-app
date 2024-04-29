@@ -3,14 +3,22 @@ import axios from 'axios';
 import NextAuth from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
 
-import Cookies from 'cookies';
+import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 
-const nextAuthOptions = (req, res) => {
+const GOOGLE_AUTHORIZATION_URL =
+  'https://accounts.google.com/o/oauth2/v2/auth?' +
+  new URLSearchParams({
+    prompt: 'consent',
+    access_type: 'offline',
+    response_type: 'code'
+  });
+
+export const nextAuthOptions = (req, res) => {
   return {
     providers: [
       GoogleProviders({
-        clientId: process.env.NEXTAUTH_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET,
+        clientId: process.env.NEXTAUTH_GOOGLE_CLIENT_ID as string,
+        clientSecret: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET as string,
         authorization: {
           params: {
             prompt: 'consent',
@@ -23,75 +31,74 @@ const nextAuthOptions = (req, res) => {
       })
     ],
 
-    authorizationUrl:
-      'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code',
+    authorizationUrl: GOOGLE_AUTHORIZATION_URL,
     session: { strategy: 'jwt', maxAge: 7 * 24 * 60 * 60 }, // this session lasts 7 days
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
       signIn: '/login'
     },
     callbacks: {
-      async signIn({ user, account, profile, email, credentials }) {
-        if (account?.provider === 'google' && profile?.email) {
-          const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
-          const { name, email } = profile;
+      async jwt({ token, trigger, account, profile, user, session }) {
+        // console.log('jwt callback', {
+        //   token,
+        //   trigger,
+        //   account,
+        //   profile,
+        //   user,
+        //   session
+        // });
+        if (account) {
+          if (account.provider === 'google') {
+            try {
+              const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
+              const { name, email } = token;
 
-          let payload = {
-            account: {
-              provider: provider,
-              type: type,
-              access_token: access_token,
-              expires_at: expires_at,
-              refresh_token: refresh_token,
-              scope: scope,
-              token_type: token_type,
-              id_token: id_token
-            },
-            user: {
-              name: name,
-              email: email
+              let payload = {
+                account: {
+                  provider: provider,
+                  type: type,
+                  access_token: access_token,
+                  expires_at: expires_at,
+                  refresh_token: refresh_token,
+                  scope: scope,
+                  token_type: token_type,
+                  id_token: id_token
+                },
+                user: {
+                  name: name,
+                  email: email
+                }
+              };
+
+              // console.log('jwt payload:_', payload);
+
+              await handleSocialLogin(
+                payload,
+                (data) => {
+                  // console.log('social login response: ', data);
+                  const { auth_token, workspace_id } = data ?? {};
+
+                  token.apiToken = auth_token;
+                  token.workspaceId = workspace_id ?? '';
+                },
+                (error) => {
+                  throw error;
+                  // token.error = err;
+                }
+              );
+            } catch (error) {
+              // token.error = err;
+              throw error;
             }
-          };
-
-          try {
-            const response = await axios.post('http://localhost:4000/api/auth/social/login', payload);
-            const { auth_token } = response.data;
-
-            const cookieObj = {
-              accessToken: auth_token
-            };
-
-            const cookies = new Cookies(req, res);
-
-            const auth = cookies.get('AUTH');
-
-            if (!auth) {
-              cookies.set('AUTH', JSON.stringify(cookieObj), {
-                maxAge: 60 * 60 * 24 * 7, // 1 week
-                path: '/',
-                httpOnly: false
-              });
-
-              try {
-                const result = await axios.get('http://localhost:4000/api/v1/spaces', {
-                  headers: {
-                    Authorization: `Bearer ${auth_token}`
-                  }
-                });
-
-                const { username = '', email = '' } = result.data ?? {};
-
-                const workspaceID = result.data.organizations[0].workspaces[0].id;
-
-                return `/login?wid=${workspaceID}&username=${username}&email=${email}`;
-              } catch (error) {
-                return '/login';
-              }
-            }
-          } catch (error) {
-            return '/login';
           }
         }
+
+        return token;
+      },
+      async session({ token, session }) {
+        session.apiToken = token.apiToken;
+        session.workspaceId = token.workspaceId;
+        return session;
       }
     }
   };
@@ -99,4 +106,22 @@ const nextAuthOptions = (req, res) => {
 
 export default (req, res) => {
   return NextAuth(req, res, nextAuthOptions(req, res));
+};
+
+const handleSocialLogin = async (payload, successCb, errorCb) => {
+  try {
+    const response = await axios.post('http://localhost:4000/api/auth/social/login', payload);
+
+    const result = response?.data ?? {};
+    if (hasErrorsInData(result)) {
+      const traceError = getErrorsInData(result);
+      errorCb(traceError);
+    } else {
+      successCb(result);
+    }
+  } catch (err) {
+    const errors = getErrorsInErrorObject(error);
+    const { message = '' } = errors || {};
+    errorCb(message);
+  }
 };

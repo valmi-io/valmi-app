@@ -7,61 +7,45 @@
 import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
 
 import Head from '@components/PageHead';
 import { RootState } from '@store/reducers';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { initialiseAppState } from '@/utils/login-utils';
+import { signOut, useSession } from 'next-auth/react';
+import { signOutUser } from '@/utils/lib';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
-const propTypes = {};
+const HomePage = () => {
+  const { data: session } = useSession();
 
-const defaultProps = {};
-
-const HomePageLayout = () => {
-  const searchParams = useSearchParams();
-
-  const params = getSearchParams(searchParams);
-
-  return <HomePage params={params} />;
-};
-
-const HomePage = ({ params }: { params: any }) => {
+  const { workspaceId = null } = useWorkspaceId();
   const router = useRouter();
 
-  const dispatch = useDispatch();
-
-  const { wid = '', username = '', email = '' } = params ?? {};
-
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
-
   useEffect(() => {
-    if (workspaceId) {
+    if (session) {
+      console.log('home page session', session);
+      console.log('Home page:_', workspaceId);
       router.push(`/spaces/${workspaceId}/connections`);
-    } else if (wid) {
-      let obj = {
-        workspaceId: wid,
-        username: username,
-        email: email
-      };
-      initialiseAppState(dispatch, appState, obj);
-
-      router.push(`/spaces/${wid}/connections`);
     }
-  }, [wid, workspaceId]);
+  }, [session]);
 
   return (
     <>
+      {/* {session && (
+        <button
+          onClick={() => {
+            signOut();
+            signOutUser(router);
+          }}
+        >
+          signout
+        </button>
+      )} */}
       <Head />
     </>
   );
 };
 
-HomePageLayout.propTypes = propTypes;
-
-HomePageLayout.defaultProps = defaultProps;
-
-export default HomePageLayout;
+export default HomePage;

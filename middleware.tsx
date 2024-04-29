@@ -8,19 +8,17 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { isPublicSync, publicRoutes } from '@utils/routes';
+import { getToken } from 'next-auth/jwt';
 
-export function middleware(request: NextRequest) {
-  let cookie = request.cookies.get('AUTH')?.value;
-  let bearerToken = '';
-  if (cookie) {
-    cookie = JSON.parse(cookie);
-    bearerToken = (cookie as { accessToken?: string })?.accessToken || '';
-  }
+export async function middleware(request: NextRequest, response: NextResponse) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  });
 
   const pathName = request.nextUrl.pathname;
-
   if (!isPublicSync(pathName)) {
-    if (bearerToken) {
+    if (token) {
       // user is authenticated.
       if (publicRoutes.includes(pathName) || isUserActivateRoute(pathName)) {
         return NextResponse.rewrite(new URL('/', request.url));
@@ -28,7 +26,6 @@ export function middleware(request: NextRequest) {
     } else {
       // user is not authenticated
       // checking if pathname is a protected route.
-
       if (!publicRoutes.includes(pathName)) {
         if (!isUserActivateRoute(pathName) && !isResetPasswordRoute(pathName)) {
           return NextResponse.rewrite(new URL('/login', request.url));
