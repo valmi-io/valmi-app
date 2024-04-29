@@ -81,9 +81,8 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
         <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
         {/** Stepper */}
 
-        <Wizard header={<HorizontalLinearStepper steps={connectionSteps} />} wrapper={<Paper variant="outlined" />}>
-          {getWizardStepContent()}
-        </Wizard>
+        {/* <Wizard header={<HorizontalLinearStepper steps={connectionSteps} />} wrapper={<Paper variant="outlined" />}> */}
+        <Wizard wrapper={<Paper variant="outlined" />}>{getWizardStepContent()}</Wizard>
       </PageLayout>
     </OAuthContextProvider>
   );

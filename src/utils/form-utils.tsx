@@ -166,6 +166,20 @@ export const inputControlTester = (uischema: any, schema: JsonSchema, context: T
   return false;
 };
 
+// export const constAuthMethodTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
+//   if (uischema.type !== 'Control') return false;
+//   //simple hack to get the control name. //TODO: find a better way
+//   const arr = uischema.scope.split('/');
+//   const controlName = arr[arr.length - 1];
+
+//   const dataType = schema?.properties?.[controlName]?.type;
+
+//   const isEnumType = schema?.properties?.[controlName]?.enum;
+//   if (isEnumType) return false;
+//   if (dataType === 'string' || dataType === 'number') return true;
+//   return false;
+// };
+
 // jsonforms dropdown control tester
 export const dropdownControlTester = (uischema: any, schema: JsonSchema, context: TesterContext) => {
   if (uischema.type !== 'Control') return false;

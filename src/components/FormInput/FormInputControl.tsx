@@ -62,6 +62,7 @@ export const FormInputControl = (props: ControlProps) => {
           >
             <TextField
               label={label}
+              type={schema?.format === 'date' ? 'date' : ''}
               required={required}
               value={inputText}
               disabled={!enabled}
