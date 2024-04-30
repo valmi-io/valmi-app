@@ -34,7 +34,7 @@ const OAuthRedirectPage = () => {
   useEffect(() => {
     if (router?.query) {
       const { provider = '', access_token = '' } = router.query;
-      if (provider) {
+      if (provider && workspaceId) {
         if (provider === 'facebook') {
           const data = {
             config: {
@@ -53,7 +53,7 @@ const OAuthRedirectPage = () => {
         }
       }
     }
-  }, [router]);
+  }, [router, workspaceId]);
 
   const getFbLongLivedToken = async (url: any, method: any, data: any) => {
     const { oauth_keys = 'private', type = '' } = selectedConnector ?? {};
@@ -123,7 +123,6 @@ const OAuthRedirectPage = () => {
 
     dispatchToStore(setEntities(obj));
 
-    // navigate to create connection page
     router.push(`/spaces/${workspaceId}/connections/create`);
   };
 };
