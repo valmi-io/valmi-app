@@ -91,6 +91,14 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
 
+  if (type === 'SRC_SHOPIFY') {
+    initialData = {
+      credentials: {
+        auth_method: 'api_password'
+      }
+    };
+  }
+
   if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
     initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
@@ -134,7 +142,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const [results, setResults] = useState(null);
 
   // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
 
   const handleSaveObj = (objs: any[]) => {
     dispatchToStore({
@@ -441,7 +449,6 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     }
 
     const query = isEditableFlow ? updateConnection : createConnection;
-    console.log('create Payload:', payload);
     const data = await query(payload).unwrap();
     router.push(`/spaces/${wid}/connections`);
   };
