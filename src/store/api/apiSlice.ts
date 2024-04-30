@@ -11,32 +11,18 @@ import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 import constants from '@constants/index';
 import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { getSession, useSession } from 'next-auth/react';
-
-const connectorsAdapter: any = createEntityAdapter();
-const initialConnectorsState = connectorsAdapter.getInitialState();
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
       baseUrl: constants.urls.API_URL,
-      timeout: 60000, // 60 seconds
+      timeout: 60000, // 60 seconds,
       prepareHeaders: async (headers, { getState }) => {
-        const session = await getSession();
-        console.log('api slice Session:_', session);
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (session) {
-          headers.set('authorization', `Bearer ${session?.apiToken ?? ''}`);
+        if (accessToken) {
+          headers.set('authorization', `Bearer ${accessToken}`);
         }
-
-        // const { workspaceId } = useWorkspaceId();
-        // console.log('Prepare headers:_', workspaceId);
-        // const accessToken = (await getCookie(getAuthTokenCookie())) ?? '';
-
-        // if (accessToken) {
-        //   headers.set('authorization', `Bearer ${accessToken}`);
-        // }
 
         return headers;
       }
@@ -54,6 +40,7 @@ const staggeredBaseQueryWithBailOut = retry(
     maxRetries: 3
   }
 );
+
 // Define our single API slice object
 export const apiSlice = createApi({
   tagTypes: [

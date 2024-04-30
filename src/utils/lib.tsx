@@ -87,7 +87,8 @@ export const signOutUser = async (router) => {
     });
   } catch (err) {
   } finally {
-    router.replace('/login');
+    console.log('login not happening');
+    router.push('/login');
   }
 };
 

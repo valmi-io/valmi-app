@@ -9,9 +9,9 @@ import { useRef, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { Avatar, Box, Button, Divider, Hidden, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 
@@ -19,9 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 import PopoverComponent from '@components/Popover';
 
-import { RootState } from '@store/reducers';
-
-import { signOutUser, stringAvatar } from '@utils/lib';
+import { signOutUser } from '@utils/lib';
 import { AppDispatch } from '@/store/store';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -58,13 +56,7 @@ const HeaderUserbox = () => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { data: session, status } = useSession();
-
-  console.log('header userbox session:_', session);
-
-  console.log('header userbox status:_', status);
-
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const { data: session } = useSession();
 
   const ref = useRef<any>(null);
   // Popover states
@@ -80,7 +72,7 @@ const HeaderUserbox = () => {
 
   const handleSignoutClick = (): void => {
     dispatch({ type: 'RESET_STORE' });
-    // clear session.
+    // clear nextauth session.
     signOut();
     signOutUser(router);
   };

@@ -5,6 +5,9 @@ import GoogleProviders from 'next-auth/providers/google';
 
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 
+import Cookies from 'cookies';
+import { getAuthTokenCookie } from '@/lib/cookies';
+
 const GOOGLE_AUTHORIZATION_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
   new URLSearchParams({
@@ -70,15 +73,26 @@ export const nextAuthOptions = (req, res) => {
                 }
               };
 
-              // console.log('jwt payload:_', payload);
-
               await handleSocialLogin(
                 payload,
                 (data) => {
-                  console.log('social login response: ', data);
                   const { auth_token, workspace_id } = data ?? {};
 
-                  token.apiToken = auth_token;
+                  const cookieObj = {
+                    accessToken: auth_token
+                  };
+
+                  const cookies = new Cookies(req, res);
+
+                  const auth = cookies.get(getAuthTokenCookie());
+
+                  if (!auth) {
+                    cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
+                      path: '/',
+                      httpOnly: false
+                    });
+                  }
+
                   token.workspaceId = workspace_id ?? '';
                 },
                 (error) => {

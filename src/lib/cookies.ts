@@ -11,7 +11,7 @@ type CookieOptions = {
   sameSite?: 'strict' | 'lax' | 'none';
 };
 
-const AUTH_TOKEN_COOKIE = 'auth-token';
+const AUTH_TOKEN_COOKIE = 'auth';
 
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
