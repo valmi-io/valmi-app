@@ -6,7 +6,9 @@
  */
 
 import { getAuthTokenCookie, setCookie } from '@/lib/cookies';
+import { queryHandler } from '@/services';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
+import { signOut } from 'next-auth/react';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -78,18 +80,30 @@ export const getConnectorImage = (connectorType) => {
   return `/connectors/${connectorType.toLowerCase()}.svg`;
 };
 
-export const signOutUser = async (router) => {
-  console.log('Sign out is called:_');
-  try {
-    setCookie(getAuthTokenCookie(), '', {
-      expires: new Date(0),
-      path: '/'
-    });
-  } catch (err) {
-  } finally {
-    console.log('login not happening');
-    router.push('/login');
-  }
+export const signOutUser = async (dispatch, query) => {
+  // clear redux store
+  dispatch({ type: 'RESET_STORE' });
+  // clear auth cookie
+
+  // destroy token in the api backend
+  await queryHandler({ query, payload: {}, successCb, errorCb });
+};
+
+const successCb = async (data: any) => {
+  await setCookie(getAuthTokenCookie(), '', {
+    expires: new Date(0),
+    path: '/'
+  });
+  // clear nextauth session
+  await signOut({ callbackUrl: '/login' });
+};
+
+const errorCb = async (error: any) => {
+  await setCookie(getAuthTokenCookie(), '', {
+    expires: new Date(0),
+    path: '/'
+  });
+  await signOut({ callbackUrl: '/login' });
 };
 
 export const splitNumberByCommas = (number) => {

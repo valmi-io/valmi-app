@@ -16,7 +16,6 @@ import Explores from '@/content/Explores';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ExploresPage: NextPageWithLayout = () => {
-  console.log('Explores page:_');
   const router = useRouter();
 
   const { workspaceId = null } = useWorkspaceId();
@@ -45,7 +44,7 @@ const ExploresPage: NextPageWithLayout = () => {
       handleButtonOnClick={handleButtonOnClick}
     >
       <ContentLayout
-        key={`prompts-page`}
+        key={`explores-page`}
         error={error}
         PageContent={<PageContent />}
         displayComponent={!!(!error && !isLoading && data)}

@@ -21,6 +21,8 @@ const HomePage = () => {
   useEffect(() => {
     if (session) {
       router.push(`/spaces/${workspaceId}/connections`);
+    } else {
+      router.push('/login');
     }
   }, [session]);
 

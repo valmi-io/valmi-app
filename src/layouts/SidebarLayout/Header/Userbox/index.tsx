@@ -22,7 +22,7 @@ import PopoverComponent from '@components/Popover';
 import { signOutUser } from '@utils/lib';
 import { AppDispatch } from '@/store/store';
 import { useSession, signOut } from 'next-auth/react';
-
+import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
         padding-left: ${theme.spacing(1)};
@@ -52,9 +52,10 @@ const UserBoxLabel = styled(Typography)(
 );
 
 const HeaderUserbox = () => {
-  const router = useRouter();
-
   const dispatch = useDispatch<AppDispatch>();
+
+  // logout user query
+  const [logoutUser] = useLazyLogoutUserQuery();
 
   const { data: session } = useSession();
 
@@ -70,11 +71,8 @@ const HeaderUserbox = () => {
     setAnchorEl(null);
   };
 
-  const handleSignoutClick = (): void => {
-    dispatch({ type: 'RESET_STORE' });
-    // clear nextauth session.
-    signOut();
-    signOutUser(router);
+  const handleSignoutClick = async (): void => {
+    signOutUser(dispatch, logoutUser);
   };
 
   const userAvatar = () => {

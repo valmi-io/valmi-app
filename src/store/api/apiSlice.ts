@@ -81,6 +81,15 @@ export const apiSlice = createApi({
       }
     }),
 
+    logoutUser: builder.query({
+      query: () => {
+        return {
+          url: '/token/logout/',
+          method: 'POST'
+        };
+      }
+    }),
+
     activateUser: builder.query({
       // The URL for the request is '/api/v1/users/activation/'
       query: (arg) => {
@@ -580,5 +589,6 @@ export const {
   useLazyAbortSyncRunByIdQuery,
   useLazyGetSyncRunLogsByIdQuery,
   useLazyCreateConnectionQuery,
-  useLazyUpdateConnectionQuery
+  useLazyUpdateConnectionQuery,
+  useLazyLogoutUserQuery
 } = apiSlice;

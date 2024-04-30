@@ -32,8 +32,6 @@ const Login: NextPageWithLayout = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
 
-  console.log('Login session:_', session);
-
   const { workspaceId = null } = useWorkspaceId();
 
   useEffect(() => {
