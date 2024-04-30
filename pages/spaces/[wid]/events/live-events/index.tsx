@@ -13,14 +13,11 @@ import { ReactElement, SyntheticEvent } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { RootState } from '@store/reducers';
 import { getBaseRoute } from '@/utils/lib';
-import { AppState } from '@/store/store';
 import LiveEventTabs, { eventTypes } from '@/content/Events/LiveEvents/LiveEventTabs';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const LiveEventsPageLayout = () => {
   // Get type from router
@@ -41,9 +38,8 @@ const LiveEventsPage = ({
   query: string | string[] | undefined;
 }) => {
   const router = useRouter();
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const handleOnChange = (event: SyntheticEvent, newValue: number) => {
     const type = eventTypes[newValue];

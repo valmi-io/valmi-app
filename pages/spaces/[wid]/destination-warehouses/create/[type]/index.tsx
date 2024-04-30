@@ -30,6 +30,7 @@ import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 import FormControlComponent from '@/components/FormControlComponent';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CreateDestinationXterior = () => {
   // Get type from router
@@ -42,8 +43,7 @@ const CreateDestinationXterior = () => {
 const CreateDestination = ({ type }: any) => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   // Getting schema for the object
   const {

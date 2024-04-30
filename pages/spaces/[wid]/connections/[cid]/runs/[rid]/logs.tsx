@@ -8,14 +8,11 @@ import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { RootState } from '@store/reducers';
 import ContentLayout from '@/layouts/ContentLayout';
 import SyncRunLogsTable from '@/content/Syncs/SyncRunLogs/SyncRunLogsTable';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
@@ -25,6 +22,7 @@ import { copy, isDataEmpty } from '@/utils/lib';
 import { generateLogsObject } from '@/content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 import Modal from '@/components/Modal';
 import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 /**
  * Responsible for rendering the logs page and its components.
@@ -43,9 +41,8 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
   const theme = useTheme();
 
   const { rid = '1', cid = '1', connection_type = '' } = router.query as any;
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const logProps = {
     syncId: cid,

@@ -1,8 +1,7 @@
 import React from 'react';
 import { InputLabel, styled, Stack, Button } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type NavigationBox = {
   label: string;
@@ -16,9 +15,7 @@ const Label = styled(InputLabel)(({ theme }) => ({
 const NavigationBox = ({ label, redirectRoute }: NavigationBox) => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
   const handleClick = () => {
     router.push(`/spaces/${workspaceId}/${redirectRoute}`);
   };

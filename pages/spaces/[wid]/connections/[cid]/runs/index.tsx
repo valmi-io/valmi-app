@@ -10,8 +10,6 @@ import { useRouter } from 'next/router';
 
 import { Grid } from '@mui/material';
 
-import { useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import SidebarLayout from '@layouts/SidebarLayout';
@@ -20,15 +18,14 @@ import PageLayout from '@layouts/PageLayout';
 import SyncRuns from '@content/Syncs/SyncRuns';
 import SyncDetails from '@content/Syncs/SyncDetails';
 
-import { RootState } from '@store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const SyncRunsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const { cid = '1' } = router.query;
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   return (
     <PageLayout pageHeadTitle="Sync Runs" title={'Sync Details'} displayButton={false}>

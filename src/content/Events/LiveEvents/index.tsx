@@ -11,22 +11,19 @@
 
 import { ChangeEvent, useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
-import { RootState } from '@store/reducers';
 import { useLazyGetConnectionLogsQuery, useLazyGetStreamLogsQuery } from '@/store/api/streamApiSlice';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { copy, getBaseRoute } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
-import { AppState } from '@/store/store';
 import Modal from '@/components/Modal';
 import IncomingEventsTable from '@/content/Events/LiveEvents/IncomingEventsTable';
 import BulkerEventsTable from '@/content/Events/LiveEvents/BulkerEventsTable';
 import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 import TextFieldDropdown from '@/components/SelectDropdown/TextFieldDropdown';
-import { Stack, Typography, Button } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type EventTypes = 'incoming.all' | 'bulker_batch.all';
 
@@ -47,9 +44,7 @@ const LiveEvents = ({
 
   const { query } = router.query;
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const [
     getStreamLogs,

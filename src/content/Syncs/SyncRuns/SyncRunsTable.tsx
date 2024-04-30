@@ -9,18 +9,16 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import { Table, TableBody, TableContainer, TableHead } from '@mui/material';
 
 import { getErrorInSyncRun } from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
 import AlertComponent from '@components/Alert';
 
-import { RootState } from '@store/reducers';
 import { SyncRunColumns } from './SyncRunColumns';
 import SyncRunTableRow from './SyncRunTableRow';
 import TableHeader from '@components/Table/TableHeader';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
@@ -30,9 +28,7 @@ type SyncRunsTableProps = {
 const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');

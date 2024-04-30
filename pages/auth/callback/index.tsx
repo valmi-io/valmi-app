@@ -15,8 +15,9 @@ import { hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import { setConnectionFlowState, setEntities } from '@/store/reducers/connectionDataFlow';
-import { getCatalogObjKey, getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
+import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const OAuthRedirectPage = () => {
   const router = useRouter();
@@ -28,7 +29,7 @@ const OAuthRedirectPage = () => {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const { workspaceId = null } = useWorkspaceId();
 
   useEffect(() => {
     if (router?.query) {
@@ -55,8 +56,6 @@ const OAuthRedirectPage = () => {
   }, [router]);
 
   const getFbLongLivedToken = async (url: any, method: any, data: any) => {
-    const { workspaceId = '' } = appState || {};
-
     const { oauth_keys = 'private', type = '' } = selectedConnector ?? {};
 
     let obj = {
@@ -110,7 +109,6 @@ const OAuthRedirectPage = () => {
   };
 
   const redirectToCreateConnection = ({ oAuthParams }: any) => {
-    const { workspaceId = '' } = appState || {};
     const entitiesInStore = connectionDataFlow?.entities ?? {};
 
     // store oAuthparams in redux store

@@ -8,6 +8,7 @@ import { getBaseRoute } from '@/utils/lib';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { getOAuthObjInStore, getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 interface ConnectorListProps {
   data: any;
@@ -18,11 +19,7 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
-
-  const { workspaceId } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const handleItemOnClick = (item: ConnectorType) => {
     const { type = '', mode = [] } = item ?? {};

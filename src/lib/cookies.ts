@@ -11,6 +11,8 @@ type CookieOptions = {
   sameSite?: 'strict' | 'lax' | 'none';
 };
 
+const AUTH_TOKEN_COOKIE = 'auth';
+
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
   try {
@@ -33,4 +35,8 @@ export function getCookie(name: string) {
 // Function to clear a cookie
 export function clearCookie(name: string, options: CookieOptions = {}): void {
   Cookies.remove(name, options);
+}
+
+export function getAuthTokenCookie() {
+  return AUTH_TOKEN_COOKIE;
 }

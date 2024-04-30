@@ -24,7 +24,7 @@ type TPostRequestHandlerprops = {
 };
 
 // rtk query handler
-export const queryHandler = async ({ query, payload, successCb, errorCb }: QueryHandlerprops) => {
+export const queryHandler = async ({ query, payload = {}, successCb, errorCb }: QueryHandlerprops) => {
   try {
     const result = await query(payload).unwrap();
 

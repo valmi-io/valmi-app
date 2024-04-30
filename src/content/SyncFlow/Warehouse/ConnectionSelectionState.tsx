@@ -10,6 +10,7 @@ import { setSelectedValue, setVarsinSubStep } from '@content/SyncFlow/stateManag
 
 import { useLazyFetchCredentialsQuery } from '@store/api/apiSlice';
 
+// get workspaceId from session object.
 export function ConnectionSelectionState(refreshKey, dispatch, flowState, otherState, next, step, subStep) {
   const resultsFilter = (results) => {
     if (step === 0) {

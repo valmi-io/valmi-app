@@ -15,11 +15,7 @@ import {
   getSelectedDestinationMode,
   getSelectedSourceMode
 } from '@content/SyncFlow/Mapping/mappingManagement';
-import {
-  HOUR,
-  getSyncName,
-  getSchedule
-} from '@content/SyncFlow/Schedule/scheduleManagement';
+import { HOUR, getSyncName, getSchedule } from '@content/SyncFlow/Schedule/scheduleManagement';
 
 export const generateSyncPayload = (flowState, workspaceId) => {
   const { isEditableFlow = false, extra = null } = flowState;
@@ -53,10 +49,7 @@ const generateUIState = (flowState) => {
 };
 
 const getRunInterval = (flowState) => {
-  const runInterval =
-    getSchedule(flowState).value *
-    (getSchedule(flowState).type == HOUR ? 3600 : 60) *
-    1000; // inteval in milliseconds.
+  const runInterval = getSchedule(flowState).value * (getSchedule(flowState).type == HOUR ? 3600 : 60) * 1000; // inteval in milliseconds.
   return runInterval;
 };
 
@@ -72,11 +65,7 @@ const isElementFieldsMapped = (element) => {
   return false;
 };
 
-const generateFieldsMapping = (
-  flowState,
-  unknownType,
-  isDestinationPayload
-) => {
+const generateFieldsMapping = (flowState, unknownType, isDestinationPayload) => {
   const mapping = getMapping(flowState);
 
   let fieldsMapped = {};
@@ -117,10 +106,7 @@ const generateTemplateFieldsMapping = (flowState) => {
 };
 
 export const generateSourcePayload = (flowState, isEditableFlow) => {
-  const {
-    sourceCatalog: { json_schema, name, supported_sync_modes } = {},
-    extra = null
-  } = flowState || {};
+  const { sourceCatalog: { json_schema, name, supported_sync_modes } = {}, extra = null } = flowState || {};
 
   const { id: credentialId, name: credentialName } = isEditableFlow
     ? extra?.source.credential || {}
@@ -145,9 +131,7 @@ export const generateSourcePayload = (flowState, isEditableFlow) => {
           sync_mode: getSelectedSourceMode(flowState),
           destination_sync_mode: getSelectedDestinationMode(flowState),
           id_key: getSourceIdKey(flowState),
-          mapping_hash: generateMappingHash(
-            generateFieldsMapping(flowState, {}, true)
-          ),
+          mapping_hash: generateMappingHash(generateFieldsMapping(flowState, {}, true)),
           stream: {
             name,
             supported_sync_modes,
@@ -186,9 +170,7 @@ export const generateDestinationPayload = (flowState, isEditableFlow) => {
           mapping: sprucedMapping,
           template_fields: templateFields,
           destination_sync_mode: getSelectedDestinationMode(flowState),
-          mapping_hash: generateMappingHash(
-            generateFieldsMapping(flowState, {}, true)
-          ),
+          mapping_hash: generateMappingHash(generateFieldsMapping(flowState, {}, true)),
           destination_id: getDestinationIdKey(flowState),
           sink: destinationCatalog
         }
@@ -216,9 +198,7 @@ const transformMappingArr = (mappingArr) => {
 };
 
 const generateMappingHash = (mappingArr) => {
-  const sortedJson = JSON.stringify(
-    transformMappingArr(mappingArr).sort((a, b) => a.sink.localeCompare(b.sink))
-  );
+  const sortedJson = JSON.stringify(transformMappingArr(mappingArr).sort((a, b) => a.sink.localeCompare(b.sink)));
 
   return sha256(sortedJson).toString();
 };

@@ -8,22 +8,19 @@ import { ReactElement, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { RootState } from '@store/reducers';
 import { useFetch } from '@/hooks/useFetch';
 import { flattenObjectValuesToArray, getBaseRoute } from '@/utils/lib';
 import { Box, Grid } from '@mui/material';
 import SubmitButton from '@/components/SubmitButton';
 import { useGetConfiguredConnectorsQuery, useGetNotConfiguredConnectorsQuery } from '@/store/api/oauthApiSlice';
-import { AppDispatch, AppState } from '@/store/store';
 
 import OAuthApps from '@/content/OAuthApps';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type ConnectorType = {
   display_name: string;
@@ -50,9 +47,7 @@ export type OnConnectorClickProps = {
 const OAuthAppsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const {
     data: configuredConnectors,

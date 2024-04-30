@@ -1,4 +1,4 @@
-import { signIn } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { Box, Typography } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import {
@@ -8,8 +8,14 @@ import {
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 
 export function GoogleSignInButton() {
+  const { data: session } = useSession();
+
   const handleClick = () => {
-    signIn('google');
+    if (session) {
+      signOut();
+    } else {
+      signIn('google', { callbackUrl: '/' });
+    }
   };
   return (
     <Box
@@ -59,10 +65,11 @@ export function GoogleSignInButton() {
             color: 'black'
           }}
         >
-          {' '}
-          {getOauthLoginText({
-            oAuth: 'google'
-          })}
+          {session
+            ? 'Logout'
+            : getOauthLoginText({
+                oAuth: 'google'
+              })}
         </Typography>
       </Box>
     </Box>

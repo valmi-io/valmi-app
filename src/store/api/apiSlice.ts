@@ -9,19 +9,16 @@ import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 import constants from '@constants/index';
-import { getCookie, setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
-
-const connectorsAdapter: any = createEntityAdapter();
-const initialConnectorsState = connectorsAdapter.getInitialState();
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
       baseUrl: constants.urls.API_URL,
-      timeout: 60000, // 60 seconds
+      timeout: 60000, // 60 seconds,
       prepareHeaders: async (headers, { getState }) => {
-        const accessToken = (await getCookie('AUTH')?.accessToken) ?? '';
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
         if (accessToken) {
           headers.set('authorization', `Bearer ${accessToken}`);
@@ -43,6 +40,7 @@ const staggeredBaseQueryWithBailOut = retry(
     maxRetries: 3
   }
 );
+
 // Define our single API slice object
 export const apiSlice = createApi({
   tagTypes: [
@@ -79,6 +77,15 @@ export const apiSlice = createApi({
           url: '/users/',
           method: 'POST',
           body: arg
+        };
+      }
+    }),
+
+    logoutUser: builder.query({
+      query: () => {
+        return {
+          url: '/token/logout/',
+          method: 'POST'
         };
       }
     }),
@@ -582,5 +589,6 @@ export const {
   useLazyAbortSyncRunByIdQuery,
   useLazyGetSyncRunLogsByIdQuery,
   useLazyCreateConnectionQuery,
-  useLazyUpdateConnectionQuery
+  useLazyUpdateConnectionQuery,
+  useLazyLogoutUserQuery
 } = apiSlice;

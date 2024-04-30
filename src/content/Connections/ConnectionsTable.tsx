@@ -40,6 +40,7 @@ import { setConnectionFlow } from '@store/reducers/connectionFlow';
 import { stringAvatar } from '@utils/lib';
 import { ConnectionColumns } from './ConnectionColumns';
 import TableHeader from '../../components/Table/TableHeader';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 interface ConnectionsTableProps {
   className?: string;
@@ -59,9 +60,7 @@ const ConnectionsTable = ({ connections = [], connectionType = '' }: Connections
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
   const { flowState: {} = {} } = connection_flow;
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const handleEditConnectionClick = (connection) => {
     // setconnectionflow

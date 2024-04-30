@@ -10,5 +10,6 @@ export const getSearchParams = (params: any) => {
 };
 
 export const apiRoutes = {
-  check: `/api/checkConnection`
+  check: `/api/checkConnection`,
+  default: `/`
 };

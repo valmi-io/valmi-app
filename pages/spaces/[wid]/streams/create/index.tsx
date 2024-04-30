@@ -32,12 +32,12 @@ import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getErrorsInErrorObject } from '@/components/Error/ErrorUtils';
 import FormControlComponent from '@/components/FormControlComponent';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CreateStream = () => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   // Getting schema for the object
   const { data: schema, isLoading, traceError, error } = useFetch({ query: useStreamSchemaQuery(workspaceId) });

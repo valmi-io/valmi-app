@@ -15,14 +15,11 @@ import { Box, Card, Stack, Tooltip, Typography, useTheme } from '@mui/material';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { RootState } from '@store/reducers';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { useFetch } from '@/hooks/useFetch';
 import { useGetDestinationsQuery, useGetLinksQuery, useGetStreamsQuery } from '@/store/api/streamApiSlice';
@@ -32,11 +29,11 @@ import Image from 'next/image';
 
 import Xarrow, { Xwrapper } from 'react-xarrows';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import { AppState } from '@/store/store';
 import { extStreams } from '@/constants/extDestinations';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import appIcons from '@/utils/icon-utils';
 import { TData } from '@/utils/typings.d';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type EventConnectionType = 'STREAM' | 'DESTINATION' | 'ANALYTICS-DESTINATION';
 
@@ -145,9 +142,7 @@ const EventsPage: NextPageWithLayout = () => {
 
   const theme = useTheme();
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   // getStreams
   const {
