@@ -16,18 +16,19 @@ import BaseLayout from '@layouts/BaseLayout';
 
 import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 
-import Head from '@components/PageHead';
+import Head from '@components/PageHead'; 
 
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
 import { useSession } from 'next-auth/react';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
   const { data: session } = useSession();
 
-  useEffect(() => {
+   useEffect(() => {
     if (session) {
       //@ts-ignore
       router.push(`/spaces/${session?.workspaceId}/connections`);
@@ -35,6 +36,7 @@ const Login: NextPageWithLayout = () => {
       router.push('/login');
     }
   }, [session]);
+  
 
   return (
     <>

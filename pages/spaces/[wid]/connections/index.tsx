@@ -32,7 +32,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = null } = useWorkspaceId(); 
 
   const {
     data: syncs,

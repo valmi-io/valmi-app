@@ -33,6 +33,8 @@ type FormControlComponentProps = {
   containerStyles?: React.CSSProperties;
   displayActionButton?: boolean;
   disabled?: boolean;
+  enableCreate?: boolean;
+  onCreateAutomation?: () => void;
 };
 
 const FormControlComponent = ({
@@ -48,7 +50,9 @@ const FormControlComponent = ({
   containerStyles,
   onSubmitClick,
   displayActionButton = true,
-  disabled
+  disabled,
+  enableCreate,
+  onCreateAutomation
 }: FormControlComponentProps) => {
   const { data, schema, renderers } = jsonFormsProps;
 
@@ -70,7 +74,14 @@ const FormControlComponent = ({
       />
 
       {displayActionButton && (
-        <Box style={{ display: 'flex', flexDirection: 'row', justifyContent: editing ? 'space-between' : 'flex-end' }}>
+        <Box
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: editing ? 'space-between' : 'flex-end',
+            gap: 3
+          }}
+        >
           {editing && (
             <SubmitButton
               buttonText={'Delete'}
@@ -88,6 +99,15 @@ const FormControlComponent = ({
             disabled={!valid || status === 'submitting' || (isDeleting && !isoAuthStepDone)}
             onClick={onSubmitClick}
           />
+          {enableCreate && (
+            <SubmitButton
+              buttonText={'Create'}
+              data={''}
+              isFetching={false}
+              disabled={!enableCreate}
+              onClick={onCreateAutomation}
+            />
+          )}
         </Box>
       )}
     </FormContainer>

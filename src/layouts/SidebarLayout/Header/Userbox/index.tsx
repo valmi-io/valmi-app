@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-
+ 
 import { useDispatch } from 'react-redux';
 
 import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
@@ -22,7 +22,7 @@ import { AppDispatch } from '@/store/store';
 import { useSession, signIn } from 'next-auth/react';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useRouter } from 'next/router';
-
+ 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
         padding-left: ${theme.spacing(1)};
@@ -52,8 +52,8 @@ const UserBoxLabel = styled(Typography)(
 );
 
 const HeaderUserbox = () => {
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
+   const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
 
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
@@ -79,8 +79,9 @@ const HeaderUserbox = () => {
   };
 
   const handleSignoutClick = async (): void => {
-    signOutUser(router, dispatch, logoutUser);
-  };
+     signOutUser(router, dispatch, logoutUser);
+ 
+   };
 
   const userAvatar = () => {
     return <Avatar sx={{ width: 30, height: 30 }} src={session?.user?.image ?? ''} />;

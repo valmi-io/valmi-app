@@ -81,12 +81,13 @@ export const getConnectorImage = (connectorType) => {
 };
 
 export const signOutUser = async (router, dispatch, query) => {
+ 
   // clear redux store
   dispatch({ type: 'RESET_STORE' });
   // clear auth cookie
 
   // destroy token in the api backend
-  await queryHandler({
+   await queryHandler({
     query,
     payload: {},
     successCb: async () => {
