@@ -34,8 +34,6 @@ const ConnectionsPage: NextPageWithLayout = () => {
 
   const { workspaceId = null } = useWorkspaceId();
 
-  console.log('Connections page - workspaceId', workspaceId);
-
   const {
     data: syncs,
     error,

@@ -8,8 +8,6 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch } from 'react-redux';
-
 import { Stack } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
@@ -19,28 +17,24 @@ import BaseLayout from '@layouts/BaseLayout';
 import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 
 import Head from '@components/PageHead';
-import { AppDispatch } from '@store/store';
 
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
 import { useSession } from 'next-auth/react';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const dispatch = useDispatch<AppDispatch>();
   const { data: session } = useSession();
 
-  const { workspaceId = null } = useWorkspaceId();
-
   useEffect(() => {
-    if (workspaceId) {
-      router.push(`/spaces/${workspaceId}/connections`);
+    if (session) {
+      //@ts-ignore
+      router.push(`/spaces/${session?.workspaceId}/connections`);
     } else {
-      dispatch({ type: 'RESET_STORE' });
+      router.push('/login');
     }
-  }, [workspaceId]);
+  }, [session]);
 
   return (
     <>

@@ -22,7 +22,6 @@ const GOOGLE_AUTHORIZATION_URL =
  * returns the old token and an error property
  */
 async function refreshAccessToken(token) {
-  console.log('refreshing access token:_', token);
   try {
     const url =
       'https://oauth2.googleapis.com/token?' +
@@ -53,8 +52,6 @@ async function refreshAccessToken(token) {
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken // Fall back to old refresh token
     };
   } catch (error) {
-    console.log(error);
-
     return {
       ...token,
       error: 'RefreshAccessTokenError'
@@ -99,69 +96,62 @@ export const nextAuthOptions = (req, res) => {
         // Initial sign in
 
         if (account && user) {
-          let workspaceId = '';
           if (account.provider === 'google') {
-            try {
-              const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
-              const { name, email } = token;
+            const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
+            const { name, email } = token;
 
-              let payload = {
-                account: {
-                  provider: provider,
-                  type: type,
-                  access_token: access_token,
-                  expires_at: expires_at,
-                  refresh_token: refresh_token,
-                  scope: scope,
-                  token_type: token_type,
-                  id_token: id_token
-                },
-                user: {
-                  name: name,
-                  email: email
+            let payload = {
+              account: {
+                provider: provider,
+                type: type,
+                access_token: access_token,
+                expires_at: expires_at,
+                refresh_token: refresh_token,
+                scope: scope,
+                token_type: token_type,
+                id_token: id_token
+              },
+              user: {
+                name: name,
+                email: email
+              }
+            };
+
+            await handleSocialLogin(
+              payload,
+              (data) => {
+                const { auth_token, workspace_id } = data ?? {};
+
+                const cookieObj = {
+                  accessToken: auth_token
+                };
+
+                const cookies = new Cookies(req, res);
+
+                const auth = cookies.get(getAuthTokenCookie());
+
+                if (!auth) {
+                  cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
+                    path: '/',
+                    httpOnly: false
+                  });
                 }
-              };
 
-              await handleSocialLogin(
-                payload,
-                (data) => {
-                  const { auth_token, workspace_id } = data ?? {};
+                // workspaceId = workspace_id ?? '';
 
-                  const cookieObj = {
-                    accessToken: auth_token
-                  };
-
-                  const cookies = new Cookies(req, res);
-
-                  const auth = cookies.get(getAuthTokenCookie());
-
-                  if (!auth) {
-                    cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
-                      path: '/',
-                      httpOnly: false
-                    });
-                  }
-
-                  workspaceId = workspace_id ?? '';
-
-                  // token.workspaceId = workspace_id ?? '';
-                },
-                (error) => {
-                  throw error;
-                  // token.error = err;
-                }
-              );
-            } catch (error) {
-              // token.error = err;
-              throw error;
-            }
+                token.workspaceId = workspace_id ?? '';
+              },
+              (error) => {
+                token.error = error;
+              }
+            );
           }
+
           return {
+            ...token,
             accessToken: account.accessToken,
             accessTokenExpires: Date.now() + account.expires_in * 1000,
-            refreshToken: account.refresh_token,
-            workspaceId: workspaceId ?? '',
-            user
+            refreshToken: account.refresh_token
           };
         }
 
@@ -173,15 +163,13 @@ export const nextAuthOptions = (req, res) => {
         // Access token has expired, try to update it
         return await refreshAccessToken(token);
       },
-      async session({ token, session }) {
-        if (token) {
-          session.user = token.user;
-          session.accessToken = token.accessToken;
-          session.error = token.error;
-          session.workspaceId = token.workspaceId;
-        }
 
-        return session;
+      async session({ token, session }) {
+        session.error = token.error;
+        return {
+          ...session,
+          ...token
+        };
       }
     }
   };

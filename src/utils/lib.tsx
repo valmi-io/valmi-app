@@ -66,7 +66,7 @@ export const isObject = (value) => {
 };
 
 export const isObjectEmpty = (obj: Record<string, any>): boolean => {
-  return Object.keys(obj).length === 0;
+  return obj && Object.keys(obj).length === 0;
 };
 
 export const connectorTypes = {
@@ -80,30 +80,33 @@ export const getConnectorImage = (connectorType) => {
   return `/connectors/${connectorType.toLowerCase()}.svg`;
 };
 
-export const signOutUser = async (dispatch, query) => {
+export const signOutUser = async (router, dispatch, query) => {
   // clear redux store
   dispatch({ type: 'RESET_STORE' });
   // clear auth cookie
 
   // destroy token in the api backend
-  await queryHandler({ query, payload: {}, successCb, errorCb });
+  await queryHandler({
+    query,
+    payload: {},
+    successCb: async () => {
+      await clearCookie();
+      router.push('/login');
+    },
+    errorCb: async () => {
+      await clearCookie();
+      router.push('/login');
+    }
+  });
 };
 
-const successCb = async (data: any) => {
+const clearCookie = async () => {
   await setCookie(getAuthTokenCookie(), '', {
     expires: new Date(0),
     path: '/'
   });
   // clear nextauth session
-  await signOut({ callbackUrl: '/login' });
-};
-
-const errorCb = async (error: any) => {
-  await setCookie(getAuthTokenCookie(), '', {
-    expires: new Date(0),
-    path: '/'
-  });
-  await signOut({ callbackUrl: '/login' });
+  await signOut({ redirect: false, callbackUrl: '/login' });
 };
 
 export const splitNumberByCommas = (number) => {
