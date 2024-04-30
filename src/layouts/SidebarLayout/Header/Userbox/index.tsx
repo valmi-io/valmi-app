@@ -5,10 +5,8 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { useRef, useState } from 'react';
-
-import { useRouter } from 'next/router';
-
+import { useEffect, useRef, useState } from 'react';
+ 
 import { useDispatch } from 'react-redux';
 
 import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
@@ -21,8 +19,10 @@ import PopoverComponent from '@components/Popover';
 
 import { signOutUser } from '@utils/lib';
 import { AppDispatch } from '@/store/store';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
+import { useRouter } from 'next/router';
+ 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
         padding-left: ${theme.spacing(1)};
@@ -52,7 +52,8 @@ const UserBoxLabel = styled(Typography)(
 );
 
 const HeaderUserbox = () => {
-  const dispatch = useDispatch<AppDispatch>();
+   const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
 
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
@@ -63,6 +64,12 @@ const HeaderUserbox = () => {
   // Popover states
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      signIn('google', { callbackUrl: '/' }); // Force sign in to hopefully resolve error
+    }
+  }, [session]);
+
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -72,8 +79,9 @@ const HeaderUserbox = () => {
   };
 
   const handleSignoutClick = async (): void => {
-    signOutUser(dispatch, logoutUser);
-  };
+     signOutUser(router, dispatch, logoutUser);
+ 
+   };
 
   const userAvatar = () => {
     return <Avatar sx={{ width: 30, height: 30 }} src={session?.user?.image ?? ''} />;
