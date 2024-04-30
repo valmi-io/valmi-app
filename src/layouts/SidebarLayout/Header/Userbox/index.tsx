@@ -59,6 +59,7 @@ const HeaderUserbox = () => {
 
   const { data: session } = useSession();
 
+  console.log('Session:_', session);
   const ref = useRef<any>(null);
   // Popover states
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
