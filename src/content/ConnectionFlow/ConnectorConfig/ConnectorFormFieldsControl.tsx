@@ -11,6 +11,7 @@ import {
   hasAuthorizedOAuth
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { FormContainer } from '@/layouts/FormLayout';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { RootState } from '@/store/reducers';
@@ -41,7 +42,7 @@ const ConnectorFormFieldsControl = (props: any) => {
     } = {}
   } = connection_flow;
 
-  const workspaceId = useSelector((state: RootState) => state.appFlow.appState.workspaceId);
+  const { workspaceId = null } = useWorkspaceId();
 
   const fields = data ? processFields(data) : [];
 

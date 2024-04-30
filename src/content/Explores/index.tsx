@@ -4,14 +4,12 @@ import { Grid } from '@mui/material';
 import Explore from '@/content/Explores/Explore';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Explores = ({ data }: { data: TData }) => {
   const router = useRouter();
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
   const src = `/connectors/google-sheets.svg`;
 
   const handleOnClick = (item: any) => {

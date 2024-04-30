@@ -3,30 +3,25 @@ import { ReactElement } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useSelector } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { RootState } from '@store/reducers';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
-import { AppState } from '@/store/store';
 import { useGetExploresQuery } from '@/store/api/etlApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import Explores from '@/content/Explores';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ExploresPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const appState: AppState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
   });
 
   const handleButtonOnClick = () => {
@@ -49,7 +44,7 @@ const ExploresPage: NextPageWithLayout = () => {
       handleButtonOnClick={handleButtonOnClick}
     >
       <ContentLayout
-        key={`prompts-page`}
+        key={`explores-page`}
         error={error}
         PageContent={<PageContent />}
         displayComponent={!!(!error && !isLoading && data)}

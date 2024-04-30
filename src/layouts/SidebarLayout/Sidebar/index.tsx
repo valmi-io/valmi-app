@@ -13,8 +13,7 @@ import SidebarMenu from '@layouts/SidebarLayout/Sidebar/SidebarMenu';
 import { SidebarContext } from '@contexts/SidebarContext';
 
 import Logo from '@components/LogoSign';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -31,7 +30,7 @@ const SidebarWrapper = styled(Box)(
 const Sidebar = () => {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
-  const workspaceId = useSelector((state: RootState) => state.appFlow.appState.workspaceId);
+  const { workspaceId = null } = useWorkspaceId();
 
   const theme = useTheme();
 

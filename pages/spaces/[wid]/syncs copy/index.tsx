@@ -29,6 +29,7 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 /**
  * Responsible for rendering the syncs page and its components.
@@ -44,12 +45,10 @@ const SyncsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const {
     data: syncs,

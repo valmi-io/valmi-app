@@ -23,17 +23,18 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
   /** Redux store */
   const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
+
+  console.log('Connections page - workspaceId', workspaceId);
 
   const {
     data: syncs,
@@ -41,7 +42,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
     isFetching,
     traceError
   } = useFetch({
-    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
   });
 
   const handleCreateConnectionOnClick = () => {

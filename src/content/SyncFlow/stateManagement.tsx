@@ -273,6 +273,7 @@ export const changeStepsArray = (steps, currentStep, newSubSteps, clearSubsequen
 
 export const generateCreateConfigObject = (flowState, value, appState) => {
   const { currentStep } = flowState;
+  // get the workspaceId from session object.
   const { workspaceId } = appState;
   const connectorType = flowState?.destinationCredentialId?.connector_type;
 

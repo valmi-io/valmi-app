@@ -107,25 +107,26 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
   }, []);
 
   return (
-    <PersistGate persistor={store.__persistor}>
-      <CacheProvider value={emotionCache}>
-        <Head>
-          <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        </Head>
-        <SidebarProvider>
-          <ThemeProviderWrapper>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <CssBaseline /> 
-              <SessionProvider session={pageProps.session}>
+    <SessionProvider session={pageProps.session}>
+      <PersistGate persistor={store.__persistor}>
+        <CacheProvider value={emotionCache}>
+          <Head>
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+          </Head>
+          <SidebarProvider>
+            <ThemeProviderWrapper>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <CssBaseline />
+
                 {/* <PostHogProvider client={posthog}> */}
                 {getLayout(<Component {...pageProps} />)}
                 {/* </PostHogProvider> */}
-              </SessionProvider>
-            </LocalizationProvider>
-          </ThemeProviderWrapper>
-        </SidebarProvider>
-      </CacheProvider>
-    </PersistGate>
+              </LocalizationProvider>
+            </ThemeProviderWrapper>
+          </SidebarProvider>
+        </CacheProvider>
+      </PersistGate>
+    </SessionProvider>
   );
 };
 

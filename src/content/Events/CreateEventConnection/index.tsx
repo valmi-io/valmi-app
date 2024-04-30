@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import {
@@ -29,6 +29,7 @@ import FormControlComponent from '@/components/FormControlComponent';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { queryHandler } from '@/services';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 export type LinkStateType = {
   fromId: string;
@@ -44,8 +45,8 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
   const { fromId, toId, type } = linkState;
 
   const router = useRouter();
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+
+  const { workspaceId = null } = useWorkspaceId();
 
   // Getting from redux to decide creating/editing
   const { editing, id: linkId } = useSelector((state: RootState) => state.trackFlow);

@@ -4,14 +4,12 @@ import { Grid } from '@mui/material';
 import Prompt, { TPrompt } from '@/content/Prompts/Prompt';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Prompts = ({ data }: { data: TData }) => {
   const router = useRouter();
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const src = `/connectors/shopify.svg`;
 

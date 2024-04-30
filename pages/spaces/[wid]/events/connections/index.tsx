@@ -13,14 +13,13 @@ import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { RootState } from '@store/reducers';
 import { useGetDestinationsQuery, useGetLinksQuery, useGetStreamsQuery } from '@/store/api/streamApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
@@ -28,13 +27,14 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import ContentLayout from '@/layouts/ContentLayout';
 import EventConnectionsTable from '@/content/Events/EventConnectionsTable';
 import { setEventFlowState } from '@/store/reducers/trackFlow';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+
 const EventConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
   const dispatch = useDispatch();
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   // getStreams
   const {

@@ -23,6 +23,7 @@ import { setConnectionFlow } from '@store/reducers/connectionFlow';
 
 import { initialiseConnectionFlowState } from '@utils/connection-utils';
 import ContentLayout from '@/layouts/ContentLayout';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 type ConnectionLayoutProps = {
   pageHeadTitle: string;
@@ -37,13 +38,10 @@ const Connections = (props: ConnectionLayoutProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // Redux store state.
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
   /** Redux store */
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = null } = useWorkspaceId();
 
   const { connectionsError, filteredConnectionsData, isFetching, traceError } = useFilteredConnectionsData(
     workspaceId,
