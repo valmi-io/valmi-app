@@ -16,12 +16,13 @@ import Explores from '@/content/Explores';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ExploresPage: NextPageWithLayout = () => {
+  console.log('Explores page:_');
   const router = useRouter();
 
   const { workspaceId = null } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
   });
 
   const handleButtonOnClick = () => {

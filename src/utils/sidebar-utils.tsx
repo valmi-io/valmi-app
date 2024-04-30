@@ -30,16 +30,8 @@ export type TSidebarRoutePropsOut = TSidebarRoute[];
 
 export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn): TSidebarRoutePropsOut => {
   const routes: TSidebarRoute[] = [
-    jitsuEnabled && {
+    {
       id: 0,
-      path: `/spaces/${workspaceId}/insights`,
-      sidebarProps: {
-        displayText: 'INSIGHTS',
-        icon: appIcons.TRACK
-      }
-    },
-    jitsuEnabled && {
-      id: 1,
       path: `/spaces/${workspaceId}/explores`,
       sidebarProps: {
         displayText: 'EXPLORES',
@@ -47,7 +39,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       }
     },
     {
-      id: 2,
+      id: 1,
       path: `/spaces/${workspaceId}/connections`,
       sidebarProps: {
         displayText: 'CONNECTIONS',
@@ -56,7 +48,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
 
     {
-      id: 3,
+      id: 2,
       path: `/spaces/${workspaceId}/catalog`,
       sidebarProps: {
         displayText: 'CATALOG',
@@ -65,7 +57,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
 
     {
-      id: 4,
+      id: 3,
       path: `/spaces/${workspaceId}/oauth-apps`,
       sidebarProps: {
         displayText: 'CONFIGURE APPS',
