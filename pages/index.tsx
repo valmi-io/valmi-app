@@ -10,17 +10,16 @@ import { useRouter } from 'next/router';
 
 import Head from '@components/PageHead';
 import { useSession } from 'next-auth/react';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const HomePage = () => {
   const { data: session } = useSession();
 
-  const { workspaceId = null } = useWorkspaceId();
   const router = useRouter();
 
   useEffect(() => {
     if (session) {
-      router.push(`/spaces/${workspaceId}/connections`);
+      // @ts-ignore
+      router.push(`/spaces/${session?.workspaceId ?? ''}/connections`);
     } else {
       router.push('/login');
     }

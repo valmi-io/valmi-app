@@ -8,17 +8,19 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { isPublicSync, publicRoutes } from '@utils/routes';
-import { getToken } from 'next-auth/jwt';
+import { getAuthTokenCookie } from '@/lib/cookies';
 
 export async function middleware(request: NextRequest, response: NextResponse) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET
-  });
+  let cookie = request.cookies.get(getAuthTokenCookie())?.value;
+  let bearerToken = '';
+  if (cookie) {
+    cookie = JSON.parse(cookie);
+    bearerToken = (cookie as { accessToken?: string })?.accessToken || '';
+  }
 
   const pathName = request.nextUrl.pathname;
   if (!isPublicSync(pathName)) {
-    if (token) {
+    if (bearerToken) {
       // user is authenticated.
       if (publicRoutes.includes(pathName) || isUserActivateRoute(pathName)) {
         return NextResponse.rewrite(new URL('/', request.url));
