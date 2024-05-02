@@ -57,8 +57,10 @@ export const useSyncRuns = ({ syncId, workspaceId }: UseSyncRunProps) => {
 
       getSyncRuns(payload);
     };
-    fetchSyncRuns();
-  }, [lastSync, syncId, router.isReady]);
+    if (workspaceId) {
+      fetchSyncRuns();
+    }
+  }, [lastSync, syncId, router.isReady, workspaceId]);
 
   const updateLastSync = () => {
     setLastSync(new Date().toISOString());
