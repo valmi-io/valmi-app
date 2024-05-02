@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Card } from '@mui/material';
 
@@ -19,12 +19,9 @@ import ErrorComponent, { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
 
 import { useLazyGetSyncByIdQuery, useLazyToggleSyncQuery } from '@store/api/apiSlice';
-import { setFlowState } from '@store/reducers/syncFlow';
-import { RootState } from '@store/reducers';
-
 import { getRouterPathname, isPublicSync } from '@utils/routes';
-import { convertDurationToMinutesOrHours, getBaseRoute } from '@/utils/lib';
-import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { getBaseRoute } from '@/utils/lib';
+import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import {
   getCatalogObjKey,
   getCredentialObjKey,
@@ -46,8 +43,6 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
   const [traceError, setTraceError] = useState<any>(null);
   const [syncDetails, setSyncDetails] = useState(null);
 
-  const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
-
   const [getSyncDetails, { data, isFetching, isError, error }] = useLazyGetSyncByIdQuery();
 
   const [toggleSync, { data: updateSyncData }] = useLazyToggleSyncQuery();
@@ -56,7 +51,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
 
   useEffect(() => {
     if (updateSyncData) {
-      if (!isPublicSync(getRouterPathname(query, url))) {
+      if (!isPublicSync(getRouterPathname(query, url)) && workspaceId) {
         const payload = {
           syncId: syncId,
           workspaceId: workspaceId
@@ -64,19 +59,20 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
         getSyncDetails(payload);
       }
     }
-  }, [updateSyncData]);
+  }, [updateSyncData, workspaceId]);
 
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (!publicSync) {
+    if (!publicSync && workspaceId) {
       const payload = {
         syncId: syncId,
         workspaceId: workspaceId
       };
+
       getSyncDetails(payload);
     }
-  }, [router.isReady]);
+  }, [router.isReady, workspaceId]);
 
   useEffect(() => {
     if (data) {

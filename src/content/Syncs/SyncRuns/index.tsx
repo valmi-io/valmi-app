@@ -38,6 +38,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    *
    * @returns states needed to update the UI.
    */
+
   const {
     data: syncRuns,
     error,
