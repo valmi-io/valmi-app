@@ -59,6 +59,15 @@ async function refreshAccessToken(token) {
   }
 }
 
+const SCOPES = [
+  'https://www.googleapis.com/auth/userinfo.profile',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/drive.readonly',
+  'https://www.googleapis.com/auth/spreadsheets'
+];
+
 export const nextAuthOptions = (req, res) => {
   return {
     providers: [
@@ -70,8 +79,7 @@ export const nextAuthOptions = (req, res) => {
             prompt: 'consent',
             access_type: 'offline',
             response_type: 'code',
-            scope:
-              'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets'
+            scope: SCOPES.join(' ')
           }
         }
       })
