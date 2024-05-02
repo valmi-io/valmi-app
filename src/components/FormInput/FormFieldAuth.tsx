@@ -38,8 +38,8 @@ const Label = styled(InputLabel)(({ theme }) => ({
   marginBottom: theme.spacing(1)
 }));
 
-const getOAuthProvider = (oAuthProvider: any) => {
-  return oAuthProvider.split('$$')[0];
+const getOAuthProvider = (oAuthProvider: any = '') => {
+  return oAuthProvider.includes('$$') ? oAuthProvider.split('$$')[0] : oAuthProvider;
 };
 
 const FormFieldAuth = (props: any) => {
