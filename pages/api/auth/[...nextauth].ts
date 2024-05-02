@@ -120,7 +120,7 @@ export const nextAuthOptions = (req, res) => {
             await handleSocialLogin(
               payload,
               (data) => {
-                const { auth_token, workspace_id } = data ?? {};
+                const { auth_token, organizations = [] } = data ?? {};
 
                 const cookieObj = {
                   accessToken: auth_token
@@ -137,9 +137,10 @@ export const nextAuthOptions = (req, res) => {
                   });
                 }
 
-                // workspaceId = workspace_id ?? '';
+                const workspaceId =
+                  organizations.length > 0 ? organizations[0]?.organizations[0]?.workspaces[0]?.id : '';
 
-                token.workspaceId = workspace_id ?? '';
+                token.workspaceId = workspaceId;
               },
               (error) => {
                 token.error = error;
@@ -166,6 +167,7 @@ export const nextAuthOptions = (req, res) => {
 
       async session({ token, session }) {
         session.error = token.error;
+
         return {
           ...session,
           ...token
