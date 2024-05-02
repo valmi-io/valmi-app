@@ -121,25 +121,24 @@ export const nextAuthOptions = (req, res) => {
               payload,
               (data) => {
                 const { auth_token, organizations = [] } = data ?? {};
-
-                const cookieObj = {
-                  accessToken: auth_token
-                };
-
-                const cookies = new Cookies(req, res);
-
-                const auth = cookies.get(getAuthTokenCookie());
-
-                if (!auth) {
-                  cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
-                    path: '/',
-                    httpOnly: false
-                  });
-                }
-
                 const workspaceId =
                   organizations.length > 0 ? organizations[0]?.organizations[0]?.workspaces[0]?.id : '';
+                if (workspaceId) {
+                  const cookieObj = {
+                    accessToken: auth_token
+                  };
 
+                  const cookies = new Cookies(req, res);
+
+                  const auth = cookies.get(getAuthTokenCookie());
+
+                  if (!auth) {
+                    cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
+                      path: '/',
+                      httpOnly: false
+                    });
+                  }
+                }
                 token.workspaceId = workspaceId;
               },
               (error) => {
@@ -167,6 +166,7 @@ export const nextAuthOptions = (req, res) => {
 
       async session({ token, session }) {
         session.error = token.error;
+        if (!token?.workspaceId) return {};
 
         return {
           ...session,
