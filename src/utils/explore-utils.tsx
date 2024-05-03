@@ -7,9 +7,7 @@ export const generateExplorePayload = (wid: string, pid: string, user: any) => {
       name: '',
       prompt_id: pid,
       ready: false,
-      account: generateAccountPayload(user),
-      refresh_token:
-        '1//04-3EPBsjabP3CgYIARAAGAQSNwF-L9IrD2d-9DGpUop1OA6QmCQ73eMBUQUpssfUfc3OfL3BtWxRaqAgs-nbIhJMFiFjH8gCK9k'
+      account: generateAccountPayload(user)
     }
   };
 };
