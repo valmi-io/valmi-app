@@ -1,11 +1,11 @@
 export const generateAccountPayload = (user: any) => {
   //@ts-ignore
-  const { email = '', first_name = '' } = user || {};
+  const { email = '', name = '', image = '' } = user || {};
 
   const payload = {
-    name: first_name,
+    name: name,
     external_id: email,
-    profile: '',
+    profile: image,
     meta_data: {}
   };
 

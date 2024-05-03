@@ -18,14 +18,14 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 const ExploresPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
   });
 
   const handleButtonOnClick = () => {
-    router.push(`${getBaseRoute(workspaceId)}/prompts`);
+    router.push(`${getBaseRoute(workspaceId!)}/prompts`);
   };
 
   const PageContent = () => {
