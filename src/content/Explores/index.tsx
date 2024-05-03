@@ -17,7 +17,7 @@ const Explores = ({ data }: { data: TData }) => {
   };
 
   const handlePreviewOnClick = (item: any) => {
-    router.push(`${getBaseRoute(workspaceId)}/explores/${item.id}`);
+    router.push(`${getBaseRoute(workspaceId!)}/explores/${item.id}`);
   };
 
   return (

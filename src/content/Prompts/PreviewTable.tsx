@@ -17,6 +17,7 @@ import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import { TData } from '@/utils/typings.d';
 import { JsonFormsCore } from '@jsonforms/core';
 import { Box, Stack } from '@mui/material';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -30,9 +31,8 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 
   const [createObject] = useCreateExploreMutation();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { user } = appState ?? {};
+  const { data: session } = useSession();
+  const { user = {} } = session ?? {};
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
