@@ -7,9 +7,15 @@
 //@ts-nocheck
 
 import { createRouter } from 'next-connect';
+
 import passport from 'passport';
-import { Strategy as ShopifyStrategy } from 'passport-shopify';
+// import { Strategy as ShopifyStrategy } from 'passport-shopify';
+
+import { Strategy as ShopifyStrategy } from '@lib/passport-shopify/index';
+
 import { oauthKeys } from '@/lib/oauth_middleware';
+
+const SCOPES = ['read_orders', 'read_products', 'write_products', 'read_customers'];
 
 export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }) => {
   const strategy = new ShopifyStrategy(
@@ -19,11 +25,20 @@ export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }
       shop: shop as string,
       callbackURL: `http://localhost:3000/api/oauth2/redirect/shopify` // this is the endpoint you registered on shopify while creating your app. This endpoint would exist on your application for verifying the authentication
     },
-    async (accessToken, refreshToken, profile: any, cb: any) => {
+    async (accessToken, refreshToken, profile: any, done: any) => {
+      // console.log('Shopify Verify callback:_', {
+      //   req,
+      //   accessToken,
+      //   refreshToken,
+      //   profile,
+      //   done
+      // });
+
       try {
         profile['_accessToken'] = accessToken;
         profile['_refreshToken'] = refreshToken;
-        return cb(null, profile);
+
+        return done(null, profile);
       } catch (e: any) {
         throw new Error(e);
       }
@@ -73,8 +88,8 @@ router
       shop: shop
     };
 
-    return passport.authenticate(strategy, {
-      scope: scope,
+    passport.authenticate(strategy, {
+      scope: SCOPES,
       state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });
