@@ -13,9 +13,9 @@ export const useLoginStatus = () => {
   const { data: session } = useSession();
 
   useEffect(() => {
-    const getLoginStatus = () => {
+    const getLoginStatus = async () => {
       try {
-        const accessToken = getCookie(getAuthTokenCookie())?.accessToken ?? '';
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
         if (accessToken && session) {
           setIsLoggedIn(true);
@@ -29,7 +29,7 @@ export const useLoginStatus = () => {
     };
 
     getLoginStatus();
-  }, [getCookie]);
+  }, [getCookie, session]);
 
   //@ts-ignore
   const workspaceId = session?.workspaceId ?? '';
