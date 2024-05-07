@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next/types';
 
-const SCOPES = ['read_orders', 'read_products', 'write_products', 'read_customers'];
+const SCOPES = ['read_orders', 'read_products', 'write_products'];
 
 const authorize = async (req: NextApiRequest, res: NextApiResponse) => {
   let store = '';

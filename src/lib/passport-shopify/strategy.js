@@ -16,6 +16,8 @@ class Strategy extends OAuth2Strategy {
       shop: 'example'
     });
 
+    console.log('Strategy constructor');
+
     let shopName;
     if (options.shop.match(SHOP_NAME_SLUG)) {
       shopName = `${options.shop}.myshopify.com`;
@@ -39,6 +41,7 @@ class Strategy extends OAuth2Strategy {
     super(options, verify);
     this.name = 'shopify';
 
+    this._authorizationURL = options.authorizationURL;
     this._profileURL = options.profileURL;
     this._clientID = options.clientID;
     this._clientSecret = options.clientSecret;
@@ -46,6 +49,7 @@ class Strategy extends OAuth2Strategy {
   }
 
   userProfile(accessToken, done) {
+    console.log('fetching user profile:_', accessToken);
     this._oauth2.get(this._profileURL, accessToken, (err, body) => {
       if (err) {
         return done(new InternalOAuthError('Failed to fetch user profile', err));
@@ -76,19 +80,6 @@ class Strategy extends OAuth2Strategy {
       }
     });
   }
-  authorizationParams = function (options) {
-    // let extras = {};
-    // if (options.extra_params) {
-    //   extras = options.extra_params;
-    // }
-    // if (options.user_scope) {
-    //   extras.user_scope = options.user_scope.join(',');
-    // }
-
-    // return extras;
-    console.log('authorizationParams', options);
-    return {};
-  };
 
   async logout(req) {
     console.log('Logout req', req);
@@ -105,9 +96,27 @@ class Strategy extends OAuth2Strategy {
   }
 
   async authenticate(req, options) {
-    console.log('is user authenticated', req.isAuthenticated());
+    console.log('is user authenticated', req);
 
     console.log('auth info', req.authInfo);
+
+    // await this.logout(req);
+
+    if ((req.query && req.query.code) || (req.body && req.body.code)) {
+      const code = (req.query && req.query.code) || (req.body && req.body.code);
+
+      console.log('Code--------------------', code);
+      console.log('call accesstoken url:_');
+    } else {
+      console.log('call authorization url:_');
+      // this._oauth2.get(this._authorizationURL, accessToken, (err, body) => {
+      //   if (err) {
+      //     return done(new InternalOAuthError('Failed to fetch user profile', err));
+      //   }
+
+      //   // check if the user has all the permissions
+      // });
+    }
 
     // If shop is defined
     // with authentication
