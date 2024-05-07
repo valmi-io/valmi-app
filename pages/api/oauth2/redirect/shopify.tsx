@@ -48,7 +48,7 @@ router
 
     const strategy = createStrategy(query);
 
-    return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
+    passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
       const params = new URLSearchParams({
         provider: user?.provider ?? 'shopify',
         access_token: user?._accessToken ?? '',
@@ -60,7 +60,7 @@ router
         unique_id: user.emails[0].value
       });
 
-      res.redirect('/auth/callback?' + params.toString());
+      return res.redirect('/auth/callback?' + params.toString());
     })(req, res, next);
   });
 

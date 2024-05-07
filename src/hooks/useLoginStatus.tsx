@@ -4,18 +4,20 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie } from '@/lib/cookies';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 export const useLoginStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    const getLoginStatus = () => {
+    const getLoginStatus = async () => {
       try {
-        const accessToken = getCookie('AUTH')?.accessToken ?? '';
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (accessToken) {
+        if (accessToken && session) {
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
@@ -27,7 +29,10 @@ export const useLoginStatus = () => {
     };
 
     getLoginStatus();
-  }, [getCookie]);
+  }, [getCookie, session]);
 
-  return { isLoggedIn };
+  //@ts-ignore
+  const workspaceId = session?.workspaceId ?? '';
+
+  return { isLoggedIn, workspaceId };
 };

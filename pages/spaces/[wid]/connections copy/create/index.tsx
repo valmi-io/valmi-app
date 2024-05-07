@@ -3,7 +3,7 @@
  * Created Date: Friday, April 28th 2023, 5:13:16 pm
  * Author: Nagendra S @ valmi.io
  */
-
+//@ts-nocheck
 import React, { ReactElement, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';

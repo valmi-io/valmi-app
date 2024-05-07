@@ -8,7 +8,9 @@
 
 import { createRouter } from 'next-connect';
 import passport from 'passport';
-import { Strategy as ShopifyStrategy } from 'passport-shopify';
+
+import { Strategy as ShopifyStrategy } from '@lib/passport-shopify/index';
+
 import { oauthKeys } from '@/lib/oauth_middleware';
 
 export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }) => {
@@ -23,6 +25,7 @@ export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }
       try {
         profile['_accessToken'] = accessToken;
         profile['_refreshToken'] = refreshToken;
+
         return cb(null, profile);
       } catch (e: any) {
         throw new Error(e);
@@ -73,8 +76,9 @@ router
       shop: shop
     };
 
-    return passport.authenticate(strategy, {
+    passport.authenticate(strategy, {
       scope: scope,
+      session: false,
       state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
   });

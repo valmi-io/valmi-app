@@ -20,22 +20,32 @@ import Head from '@components/PageHead';
 
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
-import { useSession } from 'next-auth/react';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { useLoginStatus } from '@/hooks/useLoginStatus';
+import { signOutUser } from '@/utils/lib';
+import { useDispatch } from 'react-redux';
+import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const { data: session } = useSession();
+  // logout user query
+  const [logoutUser] = useLazyLogoutUserQuery();
+
+  const { isLoggedIn, workspaceId } = useLoginStatus();
 
   useEffect(() => {
-    if (session) {
+    if (isLoggedIn) {
       //@ts-ignore
-      router.push(`/spaces/${session?.workspaceId}/connections`);
+      router.push(`/spaces/${workspaceId}/connections`);
     } else {
-      router.push('/login');
+      if (workspaceId) {
+        signOutUser(router, dispatch, logoutUser);
+      } else {
+        router.push('/login');
+      }
     }
-  }, [session]);
+  }, [isLoggedIn]);
 
   return (
     <>
