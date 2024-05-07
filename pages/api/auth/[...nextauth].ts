@@ -93,14 +93,6 @@ export const nextAuthOptions = (req, res) => {
     },
     callbacks: {
       async jwt({ token, trigger, account, profile, user, session }) {
-        // console.log('jwt callback', {
-        //   token,
-        //   trigger,
-        //   account,
-        //   profile,
-        //   user,
-        //   session
-        // });
         // Initial sign in
 
         if (account && user) {

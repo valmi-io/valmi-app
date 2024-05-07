@@ -3,7 +3,7 @@
  */
 //@ts-nocheck
 import { InternalOAuthError, Strategy as OAuth2Strategy } from 'passport-oauth2';
-import { isUndefined, defaults } from 'lodash';
+import { defaults } from 'lodash';
 
 const SHOP_NAME_SLUG = /^[a-z0-9-_]+$/i;
 
@@ -16,8 +16,6 @@ class Strategy extends OAuth2Strategy {
       shop: 'example'
     });
 
-    console.log('Strategy constructor');
-
     let shopName;
     if (options.shop.match(SHOP_NAME_SLUG)) {
       shopName = `${options.shop}.myshopify.com`;
@@ -26,7 +24,7 @@ class Strategy extends OAuth2Strategy {
     }
 
     defaults(options, {
-      authorizationURL: `https://${shopName}/admin/oauth/authorize?grant_options[]=per-user`,
+      authorizationURL: `https://${shopName}/admin/oauth/authorize`,
       tokenURL: `https://${shopName}/admin/oauth/access_token`,
       profileURL: `https://${shopName}/admin/shop.json`,
       userAgent: 'passport-shopify',
@@ -49,13 +47,10 @@ class Strategy extends OAuth2Strategy {
   }
 
   userProfile(accessToken, done) {
-    console.log('fetching user profile:_', accessToken);
     this._oauth2.get(this._profileURL, accessToken, (err, body) => {
       if (err) {
         return done(new InternalOAuthError('Failed to fetch user profile', err));
       }
-
-      // check if the user has all the permissions
 
       try {
         const json = JSON.parse(body);
@@ -81,58 +76,110 @@ class Strategy extends OAuth2Strategy {
     });
   }
 
-  async logout(req) {
-    console.log('Logout req', req);
-    await req.logout(function (err) {
-      if (err) {
-        console.log('error while logging out', err);
-        // return next(err);
-      } else {
-        console.log('session logged out');
-      }
+  _loadUserProfile = function (accessToken, done) {
+    var self = this;
 
-      // res.redirect('/');
-    });
-  }
+    function loadIt() {
+      return self.userProfile(accessToken, done);
+    }
+    function skipIt() {
+      return done(null);
+    }
+
+    if (typeof this._skipUserProfile == 'function' && this._skipUserProfile.length > 1) {
+      // async
+      this._skipUserProfile(accessToken, function (err, skip) {
+        if (err) {
+          return done(err);
+        }
+        if (!skip) {
+          return loadIt();
+        }
+        return skipIt();
+      });
+    } else {
+      var skip = typeof this._skipUserProfile == 'function' ? this._skipUserProfile() : this._skipUserProfile;
+      if (!skip) {
+        return loadIt();
+      }
+      return skipIt();
+    }
+  };
 
   async authenticate(req, options) {
-    console.log('is user authenticated', req);
+    var self = this;
 
-    console.log('auth info', req.authInfo);
+    const redirectToAuthorization = () => {
+      const redirectURL = self._oauth2.getAuthorizeUrl({
+        redirect_uri: this._callbackURL,
+        scope: options.scope || [],
+        state: options.state
+      });
 
-    // await this.logout(req);
+      self.redirect(redirectURL);
+    };
 
     if ((req.query && req.query.code) || (req.body && req.body.code)) {
       const code = (req.query && req.query.code) || (req.body && req.body.code);
 
-      console.log('Code--------------------', code);
-      console.log('call accesstoken url:_');
+      // Exchange code for access token
+      self._oauth2.getOAuthAccessToken(code, {}, (err, accessToken, refreshToken, params) => {
+        if (err) {
+          return self.error(self._createOAuthError('Failed to obtain access token', err));
+        }
+        if (!accessToken) {
+          return self.error(new Error('Failed to obtain access token'));
+        }
+
+        // Now you have the accessToken, you can save it or use it as needed
+
+        // Continue with authentication logic, e.g., fetching user profile
+
+        self._loadUserProfile(accessToken, function (err, profile) {
+          if (err) {
+            return self.error(err);
+          }
+
+          function verified(err, user, info) {
+            if (err) {
+              return self.error(err);
+            }
+            if (!user) {
+              return self.fail(info);
+            }
+
+            info = info || {};
+
+            self.success(user, info);
+          }
+
+          try {
+            if (self._passReqToCallback) {
+              var arity = self._verify.length;
+              if (arity == 6) {
+                self._verify(req, accessToken, refreshToken, params, profile, verified);
+              } else {
+                // arity == 5
+                self._verify(req, accessToken, refreshToken, profile, verified);
+              }
+            } else {
+              var arity = self._verify.length;
+
+              if (arity == 5) {
+                self._verify(accessToken, refreshToken, params, profile, verified);
+              } else {
+                // arity == 4
+                self._verify(accessToken, refreshToken, profile, verified);
+              }
+            }
+          } catch (ex) {
+            return self.error(ex);
+          }
+        });
+      });
     } else {
-      console.log('call authorization url:_');
-      // this._oauth2.get(this._authorizationURL, accessToken, (err, body) => {
-      //   if (err) {
-      //     return done(new InternalOAuthError('Failed to fetch user profile', err));
-      //   }
-
-      //   // check if the user has all the permissions
-      // });
+      redirectToAuthorization();
     }
-
-    // If shop is defined
-    // with authentication
-    if (!isUndefined(options.shop)) {
-      const shopName = this.normalizeShopName(options.shop);
-
-      // update _oauth2 settings
-      this._oauth2._authorizeUrl = `https://${shopName}/admin/oauth/authorize?grant_options[]=per-user`;
-      this._oauth2._accessTokenUrl = `https://${shopName}/admin/oauth/access_token`;
-      this._profileURL = `https://${shopName}/admin/shop.json`;
-    }
-
-    // console.log('calling super authenticate ====================', req);
-
-    // Call superclass
-    return super.authenticate(req, options);
   }
 
   normalizeShopName(shop) {

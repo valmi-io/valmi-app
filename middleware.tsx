@@ -18,8 +18,6 @@ export async function middleware(request: NextRequest, response: NextResponse) {
     bearerToken = (cookie as { accessToken?: string })?.accessToken || '';
   }
 
-  console.log('bearer token: ', bearerToken);
-
   const pathName = request.nextUrl.pathname;
   if (!isPublicSync(pathName)) {
     if (bearerToken) {

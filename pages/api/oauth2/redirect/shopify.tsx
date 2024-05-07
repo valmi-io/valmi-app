@@ -48,9 +48,7 @@ router
 
     const strategy = createStrategy(query);
 
-    console.log('--------------------------------         authenticating again:_ --------------------');
     passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
-      console.log('================== redirect callback =======================', user);
       const params = new URLSearchParams({
         provider: user?.provider ?? 'shopify',
         access_token: user?._accessToken ?? '',
