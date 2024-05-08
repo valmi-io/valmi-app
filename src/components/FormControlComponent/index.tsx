@@ -16,6 +16,7 @@ import { useContext } from 'react';
 type JsonFormsProps = {
   schema: any;
   data: any;
+  uischema?: any;
   renderers?: any;
 };
 

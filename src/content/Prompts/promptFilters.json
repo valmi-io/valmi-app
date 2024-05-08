@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["timeWindow", "sourceId"],
+  "properties": {
+    "sourceId": {
+      "type": "string",
+      "enum": ["123", "321"]
+    },
+    "timeWindow": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "enum": ["custom", "Last 7 days", "Last 15 days", "Last 30 days", "Last 90 days", "Last 2 months"]
+        },
+        "range": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string" },
+            "end": { "type": "string" }
+          },
+          "required": ["start", "end"]
+        }
+      },
+      "required": ["range"]
+    },
+    "filters": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "value": { "type": "string" },
+              "operator": { "type": "string", "enum": ["=", "!="] }
+            },
+            "required": ["label", "name", "type", "value", "operator"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "name": { "type": "string" },
+              "type": { "type": "string" },
+              "values": { "type": "array", "items": { "type": "string" } },
+              "operator": { "type": "string", "enum": ["in", "not in"] }
+            },
+            "required": ["label", "name", "type", "values", "operator"]
+          }
+        ]
+      }
+    }
+  }
+}

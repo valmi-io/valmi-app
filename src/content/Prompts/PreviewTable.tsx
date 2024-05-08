@@ -22,6 +22,10 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import promptFiltersSchema from './promptFilters.json';
+import { JsonForms } from '@jsonforms/react';
+import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
+
 const PreviewTable = ({ params }: { params: IPreviewPage }) => {
   const { pid = '', wid = '', filter = '' } = params;
 
@@ -165,6 +169,126 @@ const promptFilterSchema = {
   }
 };
 
+import { Generate } from '@jsonforms/core';
+
+interface JsonSchema {
+  $schema: string;
+  type: string;
+  required: string[];
+  properties: {
+    sourceId: {
+      type: string;
+      enum: string[];
+    };
+    timeWindow: {
+      type: string;
+      properties: {
+        label: {
+          type: string;
+          enum: string[];
+        };
+        range: {
+          type: string;
+          properties: {
+            start: { type: string };
+            end: { type: string };
+          };
+          required: string[];
+        };
+      };
+      required: string[];
+    };
+    filters: {
+      type: string;
+      items: {
+        anyOf: [
+          {
+            type: string;
+            properties: {
+              label: { type: string };
+              name: { type: string };
+              type: { type: string };
+              value: { type: string };
+              operator: { type: string; enum: string[] };
+            };
+            required: string[];
+          },
+          {
+            type: string;
+            properties: {
+              label: { type: string };
+              name: { type: string };
+              type: { type: string };
+              values: { type: string; items: { type: string } };
+              operator: { type: string; enum: string[] };
+            };
+            required: string[];
+          }
+        ];
+      };
+    };
+  };
+}
+
+const schema: JsonSchema = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  type: 'object',
+  required: ['timeWindow', 'sourceId'],
+  properties: {
+    sourceId: {
+      type: 'string',
+      enum: ['123', '321']
+    },
+    timeWindow: {
+      type: 'object',
+      properties: {
+        label: {
+          type: 'string',
+          enum: ['custom', 'Last 7 days', 'Last 15 days', 'Last 30 days', 'Last 90 days', 'Last 2 months']
+        },
+        range: {
+          type: 'object',
+          properties: {
+            start: { type: 'string' },
+            end: { type: 'string' }
+          },
+          required: ['start', 'end']
+        }
+      },
+      required: ['range']
+    },
+    filters: {
+      type: 'array',
+      items: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              label: { type: 'string' },
+              name: { type: 'string' },
+              type: { type: 'string' },
+              value: { type: 'string' },
+              operator: { type: 'string', enum: ['=', '!='] }
+            },
+            required: ['label', 'name', 'type', 'value', 'operator']
+          },
+          {
+            type: 'object',
+            properties: {
+              label: { type: 'string' },
+              name: { type: 'string' },
+              type: { type: 'string' },
+              values: { type: 'array', items: { type: 'string' } },
+              operator: { type: 'string', enum: ['in', 'not in'] }
+            },
+            required: ['label', 'name', 'type', 'values', 'operator']
+          }
+        ]
+      }
+    }
+  }
+};
+
 const Filters = ({
   val,
   params,
@@ -201,37 +325,53 @@ const Filters = ({
     );
   };
 
+  const uischema = Generate.uiSchema(schema);
+
+  console.log('ui schema:_', uischema);
+
+  uischema['type'] = 'HorizontalLayout';
+
   return (
-    <Stack
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'center'
-      }}
-      gap={4}
-    >
-      <SubmitButton
-        buttonText={'Save as explore'}
-        data={status === 'success'}
-        isFetching={status === 'submitting'}
-        disabled={isDataFetching || status === 'submitting'}
-        onClick={handleSaveAsExplore}
-        styles={{ margin: 0 }}
-        size="medium"
+    <>
+      <JsonForms
+        schema={schema}
+        uischema={uischema}
+        data={data}
+        renderers={customRenderers}
+        cells={materialCells}
+        onChange={() => {}}
       />
-      <Box sx={{ width: 300 }}>
-        <FormControlComponent
+
+      <Stack
+        sx={{
+          alignSelf: 'flex-end'
+        }}
+        // gap={4}
+      >
+        <SubmitButton
+          buttonText={'Save as explore'}
+          data={status === 'success'}
+          isFetching={status === 'submitting'}
+          disabled={isDataFetching || status === 'submitting'}
+          onClick={handleSaveAsExplore}
+          styles={{ margin: 0, alignSelf: 'flex-end' }}
+          size="medium"
+        />
+        {/* <Box sx={{ width: 300 }}> */}
+        {/* <FormControlComponent
           key={`promptFilters`}
           editing={false}
           onFormChange={handleFormChange}
           error={false}
-          jsonFormsProps={{ data: data, schema: promptFilterSchema, renderers: customRenderers }}
+          // jsonFormsProps={{ data: data, schema: promptFiltersSchema, renderers: customRenderers }}
+          jsonFormsProps={{ data: data, schema: promptFiltersSchema, uischema: uischema, renderers: customRenderers }}
           removeAdditionalFields={false}
           displayActionButton={false}
           disabled={isDataFetching}
-        />
-      </Box>
-    </Stack>
+        /> */}
+
+        {/* </Box> */}
+      </Stack>
+    </>
   );
 };
