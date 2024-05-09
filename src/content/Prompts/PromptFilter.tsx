@@ -8,7 +8,7 @@ import { schema } from '@content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
-const PromptFilter = () => {
+const PromptFilter = ({ applyFilters }: { applyFilters: (data: any) => void }) => {
   let initialData = {};
 
   const [data, setData] = useState<any>(initialData);
@@ -28,7 +28,9 @@ const PromptFilter = () => {
   }, [schema]);
 
   const handleOnClick = () => {
+    data.filters = [];
     console.log('form data:_', data);
+    applyFilters(data);
   };
 
   return (

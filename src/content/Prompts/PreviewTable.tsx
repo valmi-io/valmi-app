@@ -99,6 +99,8 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
     });
   };
 
+  const applyFilters = (data: any) => {};
+
   return (
     <>
       <AlertComponent
@@ -119,7 +121,7 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
         displayStartIcon={false}
       />
 
-      <PromptFilter />
+      <PromptFilter applyFilters={applyFilters} />
 
       <ContentLayout
         key={`PreviewPage`}

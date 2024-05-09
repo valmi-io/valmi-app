@@ -16,10 +16,10 @@ import { TData } from '@/utils/typings.d';
 import { Card, Stack, Typography } from '@mui/material';
 
 const PreviewDetails = ({ params }: { params: IPreviewPage }) => {
-  const { pid = '', filter = '' } = params;
+  const { pid = '', filter = '', wid = '' } = params;
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetPromptByIdQuery({ promptId: pid })
+    query: useGetPromptByIdQuery({ promptId: pid, workspaceId: wid })
   });
 
   return (
