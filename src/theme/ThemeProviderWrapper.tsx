@@ -4,16 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, {
-  FC,
-  useState,
-  createContext,
-  useEffect,
-  PropsWithChildren
-} from 'react';
+import React, { FC, useState, createContext, useEffect, PropsWithChildren } from 'react';
 
-import { ThemeProvider } from '@mui/material';
+// import { ThemeProvider } from '@mui/material';
 import { StylesProvider } from '@mui/styles';
+import { ThemeProvider } from '@mui/material/styles';
 
 import { themeCreator } from '@theme/base';
 
@@ -27,8 +22,7 @@ const ThemeProviderWrapper: FC<PropsWithChildren<Props>> = ({ children }) => {
   const [themeName, _setThemeName] = useState('AppFlowyTheme');
 
   useEffect(() => {
-    const curThemeName =
-      window.localStorage.getItem('valmiTheme') || 'AppFlowyTheme';
+    const curThemeName = window.localStorage.getItem('valmiTheme') || 'AppFlowyTheme';
     _setThemeName(curThemeName);
   }, []);
 
