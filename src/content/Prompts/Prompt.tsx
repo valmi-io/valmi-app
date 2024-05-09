@@ -42,13 +42,6 @@ const Prompt = ({ item, handleOnClick, src }: TPromptProps) => {
         }
         title={name}
         desc={description}
-        footer={
-          <>
-            {Object.keys(parameters).map((val, i) => (
-              <PromptFilterChip key={`${i.toString()}`} label={'LAST 7 DAYS'} size="medium" />
-            ))}
-          </>
-        }
       />
     </Grid>
   );
