@@ -9,6 +9,11 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
+import moment from 'moment';
+
+const isDateFormat = (schema: any) => {
+  return !!(schema?.format === 'date-time');
+};
 
 export const FormInputControl = (props: ControlProps) => {
   const [focused, onFocus, onBlur] = useFocus();
@@ -42,12 +47,29 @@ export const FormInputControl = (props: ControlProps) => {
   // input gets disabled & displays error after this delay.
   let timeout = 1000;
 
-  const eventToValue = (ev: any) => (ev.target.value === '' ? undefined : ev.target.value);
+  const eventToValue = (ev: any) => {
+    const val = ev.target.value;
+
+    if (!val) return undefined;
+
+    if (isDateFormat(schema)) return new Date(val).toISOString();
+    return val;
+  };
 
   const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
   const secondFormHelperText = showDescription && !isValid ? errors : null;
 
   const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue, timeout);
+
+  let val = inputText;
+
+  if (isDateFormat(schema)) {
+    const date = moment(val);
+
+    const formattedDate = date.format('YYYY-MM-DD');
+
+    val = formattedDate.toString();
+  }
 
   return (
     <Hidden xsUp={!visible}>
@@ -62,9 +84,9 @@ export const FormInputControl = (props: ControlProps) => {
           >
             <TextField
               label={label}
-              type={schema?.format === 'date' ? 'date' : ''}
+              type={schema?.format === 'date-time' ? 'date' : ''}
               required={required}
-              value={inputText}
+              value={val}
               disabled={!enabled}
               title={schema.title}
               error={!isValid}

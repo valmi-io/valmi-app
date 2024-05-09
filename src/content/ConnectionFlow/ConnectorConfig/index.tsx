@@ -191,7 +191,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   useEffect(() => {
     if (keys) {
       if (hasErrorsInData(keys)) {
-        const traceError = getErrorsInData(spec);
+        const traceError = getErrorsInData(keys);
         setTraceError(traceError);
       } else {
         const setOAuthData = () => {
