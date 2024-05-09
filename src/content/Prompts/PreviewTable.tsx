@@ -6,7 +6,11 @@ import PageTitle from '@/components/PageTitle';
 import ContentLayout from '@/layouts/ContentLayout';
 import { IPreviewPage } from '@/pagesspaces/[wid]/prompts/[pid]';
 import { queryHandler } from '@/services';
-import { useCreateExploreMutation, useLazyGetPreviewDataQuery } from '@/store/api/etlApiSlice';
+import {
+  useCreateExploreMutation,
+  useGetPromptPreviewMutation,
+  useLazyGetPreviewDataQuery
+} from '@/store/api/etlApiSlice';
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
@@ -22,7 +26,10 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 
   const router = useRouter();
 
-  const [preview, { data, isFetching, error }] = useLazyGetPreviewDataQuery();
+  // const [preview, { data, isFetching, error }] = useLazyGetPreviewDataQuery();
+
+  // Mutation for creating stream
+  const [preview, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewMutation();
 
   const [createObject] = useCreateExploreMutation();
 
@@ -40,15 +47,22 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
   });
 
   useEffect(() => {
-    if (filter) {
-      getData();
+    if (pid) {
+      getData({});
     }
-  }, [filter]);
+  }, [pid]);
 
-  const getData = () => {
+  // useEffect(() => {
+  //   if (filter) {
+  //     getData();
+  //   }
+  // }, [filter]);
+
+  const getData = (data: any) => {
     preview({
       workspaceId: wid,
-      promptId: pid
+      promptId: pid,
+      prompt: data
     });
   };
 
@@ -99,7 +113,13 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
     });
   };
 
-  const applyFilters = (data: any) => {};
+  const applyFilters = (data: any) => {
+    preview({
+      workspaceId: wid,
+      promptId: pid,
+      prompt: data
+    });
+  };
 
   return (
     <>
@@ -112,13 +132,13 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 
       <PageTitle
         title={'Data table'}
-        displayButton={true}
-        buttonTitle={'Save as explore'}
-        disabled={isFetching || status === 'submitting'}
-        onClick={handleSaveAsExplore}
-        link={false}
-        isFetching={status === 'submitting'}
-        displayStartIcon={false}
+        displayButton={false}
+        // buttonTitle={'Save as explore'}
+        // disabled={isLoading || status === 'submitting'}
+        // onClick={handleSaveAsExplore}
+        // link={false}
+        // isFetching={status === 'submitting'}
+        // displayStartIcon={false}
       />
 
       <PromptFilter applyFilters={applyFilters} />
@@ -127,8 +147,8 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
         key={`PreviewPage`}
         error={error}
         PageContent={<PageContent data={data} />}
-        displayComponent={!error && !isFetching && data}
-        isLoading={isFetching}
+        displayComponent={!error && !isLoading && data}
+        isLoading={isLoading}
         traceError={false}
       />
     </>
@@ -138,6 +158,8 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 export default PreviewTable;
 
 const PageContent = ({ data }: { data: TData }) => {
+  console.log('data:_', data);
+  return null;
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }

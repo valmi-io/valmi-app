@@ -41,6 +41,7 @@ export default PreviewDetails;
 
 const PageContent = ({ data, filter }: { data: TData; filter: string }) => {
   const { ids, entities } = data;
+  console.log('pagecontent ', data);
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }
