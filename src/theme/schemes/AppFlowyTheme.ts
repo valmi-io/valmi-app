@@ -286,8 +286,8 @@ export const AppFlowyTheme = createTheme({
       hover: '#0d0d0d',
       selected: '#1a1a1a',
       focus: '#262626',
-      disabled: '#e6e6e6',
-      disabledBackground: '#d9d9d9'
+      disabled: '#666666',
+      disabledBackground: '#cccccc'
     },
     tonalOffset: 0.5
   },
