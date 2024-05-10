@@ -21,6 +21,9 @@ import { PromptFilterChip, TPrompt } from '@/content/Prompts/Prompt';
 import { StackLayout } from '@/components/Layouts/Layouts';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
+import PromptDetails from '@/content/Prompts/PromptDetails';
+import PromptFilter from '@/content/Prompts/PromptFilter';
+import PreviewTable from '@/content/Prompts/PreviewTable';
 
 export interface IPreviewPage extends IParams {
   pid: string;
@@ -48,7 +51,7 @@ const PreviewPage = ({ params }: { params: IPreviewPage }) => {
       <ContentLayout
         key={`prompt-preview-page`}
         error={error}
-        PageContent={<PageContent data={data} filter={filter} />}
+        PageContent={<PageContent data={data} filter={filter} params={params} />}
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -63,44 +66,24 @@ PreviewPageLayout.getLayout = function getLayout(page: ReactElement) {
 
 export default PreviewPageLayout;
 
-const PageContent = ({ data, filter }: { data: TData; filter: string }) => {
+const PageContent = ({ data, filter, params }: { data: TData; filter: string; params: IPreviewPage }) => {
   const { ids, entities } = data;
+
+  console.log('data:_', data);
 
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }
 
-  const prevDate = getLastNthDate(getPromptFilter(filter));
-
-  const currDate = getLastNthDate(1);
-
-  const chip = `${prevDate} - ${currDate} `;
-
   return ids.map((id: string) => {
     const item: TPrompt = entities[id];
+
     return (
-      <StackLayout key={id} spacing={2}>
-        {/** Prompt name */}
-
-        <Stack spacing={1} direction="row">
-          {appIcons.NAME}
-          <Typography variant="body1" color="text.primary">
-            {item.name}
-          </Typography>
-        </Stack>
-
-        {/** Prompt description */}
-
-        <Stack spacing={1} direction="row">
-          {appIcons.NAME}
-          <Typography variant="body2">{item.description}</Typography>
-        </Stack>
-
-        <Stack spacing={1} direction="row" alignItems="center">
-          <CustomIcon icon={appIcons.SCHEDULE} />
-          <PromptFilterChip label={chip} size="medium" />
-        </Stack>
-      </StackLayout>
+      <Stack key={id} sx={{ m: 2 }} spacing={2}>
+        <PromptDetails item={item} />
+        <PreviewTable params={params} sources={item.sources} />
+        {/* <PromptFilter spec={item.spec} applyFilters={() => {}} /> */}
+      </Stack>
     );
   });
 };

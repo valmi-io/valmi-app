@@ -6,11 +6,7 @@ import PageTitle from '@/components/PageTitle';
 import ContentLayout from '@/layouts/ContentLayout';
 import { IPreviewPage } from '@/pagesspaces/[wid]/prompts/[pid]';
 import { queryHandler } from '@/services';
-import {
-  useCreateExploreMutation,
-  useGetPromptPreviewMutation,
-  useLazyGetPreviewDataQuery
-} from '@/store/api/etlApiSlice';
+import { useCreateExploreMutation, useGetPromptPreviewMutation } from '@/store/api/etlApiSlice';
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
@@ -20,13 +16,16 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
+import { Paper } from '@mui/material';
+import moment from 'moment';
+import { TPromptSource } from '@/content/Prompts/Prompt';
 
-const PreviewTable = ({ params }: { params: IPreviewPage }) => {
+const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPromptSource[] }) => {
   const { pid = '', wid = '', filter = '' } = params;
 
-  const router = useRouter();
+  console.log('Preview table sources:_', sources);
 
-  // const [preview, { data, isFetching, error }] = useLazyGetPreviewDataQuery();
+  const router = useRouter();
 
   // Mutation for creating stream
   const [preview, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewMutation();
@@ -48,7 +47,27 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
 
   useEffect(() => {
     if (pid) {
-      getData({});
+      const initialData = {
+        source_id: sources[0].id,
+        filters: [
+          {
+            label: '',
+            operator: '',
+            name: '',
+            value: ''
+          }
+        ],
+        time_window: {
+          label: 'custom',
+          range: {
+            start: moment().subtract(1, 'days').toISOString(),
+            end: moment().toISOString()
+          }
+        }
+      };
+
+      console.log('initialData: ', initialData);
+      getData(initialData);
     }
   }, [pid]);
 
@@ -114,15 +133,16 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
   };
 
   const applyFilters = (data: any) => {
-    preview({
-      workspaceId: wid,
-      promptId: pid,
-      prompt: data
-    });
+    console.log('data', data);
+    // preview({
+    //   workspaceId: wid,
+    //   promptId: pid,
+    //   prompt: data
+    // });
   };
 
   return (
-    <>
+    <Paper variant="outlined">
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}
@@ -130,18 +150,7 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
         isError={alertState.type === 'error'}
       />
 
-      <PageTitle
-        title={'Data table'}
-        displayButton={false}
-        // buttonTitle={'Save as explore'}
-        // disabled={isLoading || status === 'submitting'}
-        // onClick={handleSaveAsExplore}
-        // link={false}
-        // isFetching={status === 'submitting'}
-        // displayStartIcon={false}
-      />
-
-      <PromptFilter applyFilters={applyFilters} />
+      <PromptFilter spec={''} applyFilters={applyFilters} />
 
       <ContentLayout
         key={`PreviewPage`}
@@ -151,7 +160,7 @@ const PreviewTable = ({ params }: { params: IPreviewPage }) => {
         isLoading={isLoading}
         traceError={false}
       />
-    </>
+    </Paper>
   );
 };
 

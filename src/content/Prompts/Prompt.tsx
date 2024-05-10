@@ -4,13 +4,18 @@ import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import appIcons from '@/utils/icon-utils';
 import { Chip, Grid, IconButton, Tooltip, styled } from '@mui/material';
 
+export type TPromptSource = { id: string; name: string };
+
 export type TPrompt = {
   id: string;
   name: string;
   gated: boolean;
   package_id: string;
-  parameters: any;
   query: string;
+  sources: TPromptSource[];
+  spec: any;
+  table: string;
+  type: string;
   description: string;
 };
 
@@ -27,7 +32,7 @@ type TPromptProps = {
 };
 
 const Prompt = ({ item, handleOnClick, src }: TPromptProps) => {
-  const { description, name, parameters } = item ?? {};
+  const { description, name } = item ?? {};
 
   return (
     <Grid item xs={'auto'} sm={4} md={4}>

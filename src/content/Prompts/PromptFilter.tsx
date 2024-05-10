@@ -2,13 +2,13 @@ import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { jsonFormValidator } from '@/utils/form-utils';
 import { Generate, JsonFormsCore } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
-import { Stack } from '@mui/material';
+import { Card, Paper, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { schema } from '@content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
-const PromptFilter = ({ applyFilters }: { applyFilters: (data: any) => void }) => {
+const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: any) => void }) => {
   let initialData = {};
 
   const [data, setData] = useState<any>(initialData);
@@ -34,7 +34,7 @@ const PromptFilter = ({ applyFilters }: { applyFilters: (data: any) => void }) =
   };
 
   return (
-    <Stack sx={{ display: 'flex' }}>
+    <Paper variant="outlined">
       <JsonForms
         schema={schema}
         uischema={customUISchema}
@@ -60,7 +60,7 @@ const PromptFilter = ({ applyFilters }: { applyFilters: (data: any) => void }) =
           onClick={handleOnClick}
         />
       </Stack>
-    </Stack>
+    </Paper>
   );
 };
 
