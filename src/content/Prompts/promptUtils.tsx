@@ -1,13 +1,11 @@
+import { TPromptSource } from '@/content/Prompts/Prompt';
+
 interface JsonSchema {
   $schema: string;
   type: string;
   required: string[];
   properties: {
-    sourceId: {
-      type: string;
-      enum: string[];
-    };
-    timeWindow: {
+    time_window: {
       type: string;
       properties: {
         label: {
@@ -62,11 +60,7 @@ export const schema: JsonSchema = {
   type: 'object',
   required: ['timeWindow', 'sourceId'],
   properties: {
-    sourceId: {
-      type: 'string',
-      enum: ['s1', 's2']
-    },
-    timeWindow: {
+    time_window: {
       type: 'object',
       properties: {
         label: {
@@ -120,4 +114,28 @@ export const schema: JsonSchema = {
       }
     }
   }
+};
+
+type TimeWindowType = { label: string; range: { start: string; end: string } };
+
+type TPayloadIn = {
+  sources: TPromptSource[];
+  filters: {}[];
+  time_window: TimeWindowType;
+};
+
+export type TPayloadOut = {
+  source_id: string;
+  filters: {}[];
+  time_window: TimeWindowType;
+};
+
+export const generatePreviewPayload = ({ sources, filters, time_window }: TPayloadIn) => {
+  const payload: TPayloadOut = {
+    source_id: sources[0].id,
+    filters: filters,
+    time_window: time_window
+  };
+
+  return payload;
 };

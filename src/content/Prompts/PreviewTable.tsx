@@ -2,7 +2,6 @@
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import DataTable from '@/components/DataTable';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import PageTitle from '@/components/PageTitle';
 import ContentLayout from '@/layouts/ContentLayout';
 import { IPreviewPage } from '@/pagesspaces/[wid]/prompts/[pid]';
 import { queryHandler } from '@/services';
@@ -13,12 +12,13 @@ import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import { TData } from '@/utils/typings.d';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Paper } from '@mui/material';
 import moment from 'moment';
 import { TPromptSource } from '@/content/Prompts/Prompt';
+import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 
 const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPromptSource[] }) => {
   const { pid = '', wid = '', filter = '' } = params;
@@ -47,16 +47,9 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
 
   useEffect(() => {
     if (pid) {
-      const initialData = {
-        source_id: sources[0].id,
-        filters: [
-          {
-            label: '',
-            operator: '',
-            name: '',
-            value: ''
-          }
-        ],
+      const payload: TPayloadOut = generatePreviewPayload({
+        sources,
+        filters: [],
         time_window: {
           label: 'custom',
           range: {
@@ -64,10 +57,10 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
             end: moment().toISOString()
           }
         }
-      };
+      });
 
-      console.log('initialData: ', initialData);
-      getData(initialData);
+      console.log('initialData: ', payload);
+      previewPrompt(payload);
     }
   }, [pid]);
 
@@ -77,11 +70,11 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
   //   }
   // }, [filter]);
 
-  const getData = (data: any) => {
+  const previewPrompt = (payload: TPayloadOut) => {
     preview({
       workspaceId: wid,
       promptId: pid,
-      prompt: data
+      prompt: payload
     });
   };
 
