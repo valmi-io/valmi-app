@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Stack } from '@mui/material';
+import { Box, Container } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -21,7 +21,28 @@ import Head from '@components/PageHead';
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
 import { useSession } from 'next-auth/react';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import styled from '@emotion/styled';
+
+const ContainerWrapper = styled(Container)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '1312px',
+  height: '364.25px',
+  border: '1px solid rgba(0, 0, 0, 0.25)'
+}));
+
+const BoxContainer = styled(Box)(({}) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '648px',
+  height: '364.25px',
+  border: '1px solid rgba(0, 0, 0, 0.25)'
+}));
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
@@ -40,13 +61,14 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
-
-      {/** Page layout */}
-      <AuthenticationLayout>
-        <Stack sx={{ marginTop: 2 }}>
+      <ContainerWrapper>
+        <BoxContainer sx={{ gap: (theme) => theme.spacing(2) }}>
+          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+        </BoxContainer>
+        <AuthenticationLayout>
           <GoogleSignInButton />
-        </Stack>
-      </AuthenticationLayout>
+        </AuthenticationLayout>
+      </ContainerWrapper>
     </>
   );
 };

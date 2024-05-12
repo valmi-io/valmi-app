@@ -11,7 +11,8 @@ export enum ImageSize {
   small = '20',
   medium = '32',
   large = '48',
-  logo = '200'
+  logo = '200',
+  extralarge = '320'
 }
 
 export interface ImageComponentProps {
@@ -37,7 +38,7 @@ const ImageComponent = (props: ImageComponentProps) => {
   };
 
   return (
-    <BoxLayout>
+    <>
       <Image
         priority={true}
         src={src}
@@ -51,7 +52,7 @@ const ImageComponent = (props: ImageComponentProps) => {
           {title}
         </Typography>
       )}
-    </BoxLayout>
+    </>
   );
 };
 

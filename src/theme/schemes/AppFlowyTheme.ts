@@ -383,6 +383,17 @@ export const AppFlowyTheme = createTheme({
         outlined: {}
       }
     },
+    MuiContainer: {
+      defaultProps: {
+        disableGutters: true
+      },
+      styleOverrides: {
+        root: {
+          paddingRight: '0px',
+          paddingLeft: '0px'
+        }
+      }
+    },
     //modifies button
     MuiButton: {
       defaultProps: {
@@ -509,43 +520,43 @@ export const AppFlowyTheme = createTheme({
     fontFamily: poppins.style.fontFamily,
     h1: {
       fontWeight: 700,
-      lineHeight: 1.4,
-      fontSize: 44
+      lineHeight: 1.16,
+      fontSize: 96
     },
     h2: {
       fontWeight: 600,
-      lineHeight: 1.4,
-      fontSize: 32
+      lineHeight: 1.2,
+      fontSize: 60
     },
     h3: {
       fontWeight: 600,
-      fontSize: 24,
-      lineHeight: 1.4,
+      fontSize: 48,
+      lineHeight: 1.16,
       color: colors.alpha.black[100]
     },
     h4: {
       fontWeight: 600,
-      lineHeight: 1.4,
-      fontSize: 20
+      lineHeight: 1.23,
+      fontSize: 34
     },
     h5: {
       fontWeight: 600,
-      lineHeight: 1.4,
-      fontSize: 14
+      lineHeight: 1.33,
+      fontSize: 24
     },
     h6: {
-      fontSize: 13,
-      lineHeight: 1.4,
+      fontSize: 20,
+      lineHeight: 1.6,
       fontWeight: 600
     },
     body1: {
       fontSize: 16,
-      lineHeight: 1.4,
+      lineHeight: 1.5,
       fontWeight: 500
     },
     body2: {
       fontSize: 14,
-      lineHeight: 1.4,
+      lineHeight: 1.43,
       fontWeight: 500
     },
     button: {
@@ -553,24 +564,28 @@ export const AppFlowyTheme = createTheme({
       lineHeight: 1.4
     },
     caption: {
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 400,
       textTransform: 'uppercase',
+      lineHeight: 1.66,
       color: colors.alpha.black[50]
     },
     subtitle1: {
-      fontSize: 13,
+      fontSize: 16,
       fontWeight: 600,
+      lineHeight: 1.75,
       color: colors.alpha.black[70]
     },
     subtitle2: {
       fontWeight: 600,
-      fontSize: 12,
+      fontSize: 14,
+      lineHeight: 1.57,
       color: colors.alpha.black[70]
     },
     overline: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: 700,
+      lineHeight: 2.66,
       textTransform: 'uppercase'
     }
   }
