@@ -69,7 +69,12 @@ const AuthenticationLayout = (props) => {
     <ContainerLayout>
       {/** valmi - logo */}
       <Stack alignItems="center">
-        <ImageComponent src={'/images/valmi_logo_text_black.svg'} alt="Logo" size={ImageSize.logo} />
+        <ImageComponent
+          src={'/images/valmi_logo_text_black.svg'}
+          alt="Logo"
+          size={ImageSize.logo}
+          style={{ height: '55px', width: '273px' }}
+        />
       </Stack>
       <TextLayout variant="body1">
         Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and
