@@ -89,13 +89,15 @@ export const schema = {
       items: {
         type: 'object',
         properties: {
-          // label: { type: 'string' },
-          name: { type: 'string', enum: ['customer_name', 'location'] },
+ 
+          label: { type: 'string' },
+          name: { type: 'string', enum: ['title'] },
           // type: { type: 'string' },
           operator: { type: 'string', enum: ['=', '!='] },
           value: { type: 'string' }
         },
-        required: ['name', 'value', 'operator']
+ 
+        required: ['label', 'name', 'value', 'operator']
       }
     }
   }
@@ -104,20 +106,23 @@ export const schema = {
 type TimeWindowType = { label: string; range: { start: string; end: string } };
 
 type TPayloadIn = {
-  sources: TPromptSource[];
+  schema: TPromptSource[];
   filters: {}[];
   time_window: TimeWindowType;
 };
 
 export type TPayloadOut = {
-  source_id: string;
+ 
+  schema_id: string;
   filters: {}[];
   time_window: TimeWindowType;
 };
 
-export const generatePreviewPayload = ({ sources, filters, time_window }: TPayloadIn) => {
+ 
+export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
   const payload: TPayloadOut = {
-    source_id: sources[0].id,
+    schema_id: schema.length ? schema[0].id : '',
+
     filters: filters,
     time_window: time_window
   };
