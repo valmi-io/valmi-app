@@ -455,7 +455,7 @@ export const AppFlowyTheme = createTheme({
         }
       }
     },
-    //modifies sidebar button
+    //modifies sidebar button border-radius
     MuiButtonBase: {
       defaultProps: {
         disableRipple: false
@@ -507,7 +507,7 @@ export const AppFlowyTheme = createTheme({
             backgroundColor: alpha(colors.alpha.trueWhite[100], 0.04)
           },
           '&:active, &.active, &.Mui-selected': {
-            backgroundColor: colors.primary.main
+            color: colors.primary.main
           }
         }
       }

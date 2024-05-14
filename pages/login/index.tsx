@@ -65,16 +65,16 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
-      <GridLayout>
-        <ContainerWrapper>
-          <ImageBoxContainer>
-            <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
-          </ImageBoxContainer>
-          <AuthenticationLayout>
-            <GoogleSignInButton />
-          </AuthenticationLayout>
-        </ContainerWrapper>
-      </GridLayout>
+      {/* <GridLayout> */}
+      <ContainerWrapper>
+        <ImageBoxContainer>
+          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+        </ImageBoxContainer>
+        <AuthenticationLayout>
+          <GoogleSignInButton />
+        </AuthenticationLayout>
+      </ContainerWrapper>
+      {/* </GridLayout> */}
     </>
   );
 };
