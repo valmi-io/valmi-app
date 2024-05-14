@@ -23,24 +23,28 @@ import { GoogleSignInButton } from '@/components/AuthButtons';
 import { useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import styled from '@emotion/styled';
+import GridLayout from '@/components/grid';
 
 const ContainerWrapper = styled(Container)(({ theme }) => ({
-  boxSizing: 'border-box',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  width: '1312px',
-  height: '364.25px',
+  gap: theme.spacing(2),
+  margin: 0,
+  minWidth: '1024px',
+  maxWidth: '1312px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
-const BoxContainer = styled(Box)(({}) => ({
+const ImageBoxContainer = styled(Box)(({}) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '648px',
+  width: '100%',
+  minWidth: '440px',
   height: '364.25px',
+  padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
@@ -61,14 +65,16 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
+      {/* <GridLayout> */}
       <ContainerWrapper>
-        <BoxContainer sx={{ gap: (theme) => theme.spacing(2) }}>
+        <ImageBoxContainer>
           <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
-        </BoxContainer>
+        </ImageBoxContainer>
         <AuthenticationLayout>
           <GoogleSignInButton />
         </AuthenticationLayout>
       </ContainerWrapper>
+      {/* </GridLayout> */}
     </>
   );
 };

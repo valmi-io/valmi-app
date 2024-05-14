@@ -37,9 +37,21 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '648px',
-  height: '364.25px',
-  padding: theme.spacing(2, 8, 2, 8),
+  Width: '100%',
+  minWidth: '440px',
+  padding: 0,
+  gap: theme.spacing(2),
+  border: '1px solid rgba(0, 0, 0, 0.25)'
+}));
+
+const DetailBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  Width: '100%',
+  padding: 0,
+  padding: theme.spacing(2, 8),
   gap: theme.spacing,
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
@@ -54,7 +66,8 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: theme.spacing(1, 0, 1, 0)
+  padding: theme.spacing(1, 0, 1, 0),
+  width: '100%'
 }));
 
 const AuthenticationLayout = (props) => {
@@ -67,32 +80,34 @@ const AuthenticationLayout = (props) => {
   };
   return (
     <ContainerLayout>
-      {/** valmi - logo */}
-      <Stack alignItems="center">
-        <ImageComponent
-          src={'/images/valmi_logo_text_black.svg'}
-          alt="Logo"
-          size={ImageSize.logo}
-          style={{ height: '55px', width: '273px' }}
-        />
-      </Stack>
-      <TextLayout variant="body1">
-        Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and
-        engage with your customers.
-      </TextLayout>
-      <FormLayout>
-        <FormControlComponent
-          key={`signInPage`}
-          editing={false}
-          onFormChange={handleFormChange}
-          error={false}
-          jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-          removeAdditionalFields={false}
-          displayActionButton={false}
-          disabled={false}
-        />
-        {props.children}
-      </FormLayout>
+      <DetailBox>
+        {/** valmi - logo */}
+        <Stack alignItems="center">
+          <ImageComponent
+            src={'/images/valmi_logo_text_black.svg'}
+            alt="Logo"
+            size={ImageSize.logo}
+            style={{ height: '55px', width: '273px' }}
+          />
+        </Stack>
+        <TextLayout variant="body1">
+          Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze
+          and engage with your customers.
+        </TextLayout>
+        <FormLayout>
+          <FormControlComponent
+            key={`signInPage`}
+            editing={false}
+            onFormChange={handleFormChange}
+            error={false}
+            jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+            removeAdditionalFields={false}
+            displayActionButton={false}
+            disabled={false}
+          />
+          {props.children}
+        </FormLayout>
+      </DetailBox>
     </ContainerLayout>
   );
 };

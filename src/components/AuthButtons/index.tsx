@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
-  width: '520px',
+  width: '100%',
   height: '41px',
   flexDirection: 'row',
   justifyContent: 'center',
