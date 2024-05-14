@@ -21,7 +21,7 @@ import { TPrompt, TPromptSource } from '@/content/Prompts/Prompt';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 
-const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
+const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => { 
   const { pid = '', wid = '', filter = '' } = params;
 
   const router = useRouter();
@@ -71,7 +71,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   //     getData();
   //   }
   // }, [filter]);
-
+ 
   const previewPrompt = (payload: TPayloadOut) => {
     preview({
       workspaceId: wid,
@@ -128,9 +128,9 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   const applyFilters = (payload: any) => {
-    const { schemas = [] } = prompt;
+     const { schemas = [] } = prompt;
     payload.schema_id = schemas.length ? schemas[0].id : '';
-
+ 
     previewPrompt(payload);
   };
 
@@ -148,11 +148,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       <ContentLayout
         key={`PreviewPage`}
         error={error}
-        PageContent={
+         PageContent={
           <PageContent
             prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
           />
         }
+ 
         displayComponent={!error && !isLoading && data}
         isLoading={isLoading}
         traceError={false}
@@ -174,12 +175,12 @@ const PageContent = ({
   };
 }) => {
   const { data, isLoading, handleSaveAsExplore, status } = prompt;
-
+ 
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }
 
-  return (
+   return (
     <>
       <SubmitButton
         buttonText={'Save as explore'}
@@ -191,7 +192,7 @@ const PageContent = ({
       <DataTable data={data} />
     </>
   );
-};
+ };
 
 // import * as React from 'react';
 // import { DataGrid, GridColDef, GridFilterModel, GridToolbar } from '@mui/x-data-grid';

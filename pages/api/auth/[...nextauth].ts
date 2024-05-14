@@ -193,7 +193,7 @@ const handleSocialLogin = async (payload, successCb, errorCb) => {
       successCb(result);
     }
   } catch (err) {
-    const errors = getErrorsInErrorObject(error);
+    const errors = getErrorsInErrorObject(err);
     const { message = '' } = errors || {};
     errorCb(message);
   }

@@ -77,7 +77,6 @@ const PageContent = ({ data, filter, params }: { data: TData; filter: string; pa
   return ids.map((id: string) => {
     const item: TPrompt = entities[id];
 
-    console.log('item:_', item);
     return (
       <Stack key={id} sx={{ m: 2 }} spacing={2}>
         <PromptDetails item={item} />

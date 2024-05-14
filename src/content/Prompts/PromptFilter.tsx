@@ -33,6 +33,7 @@ const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: 
       obj.filters = [];
     }
     applyFilters(obj);
+ 
   };
 
   return (
