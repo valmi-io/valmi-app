@@ -50,10 +50,8 @@ const DetailBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   Width: '100%',
-  padding: 0,
   padding: theme.spacing(2, 8),
-  gap: theme.spacing,
-  border: '1px solid rgba(0, 0, 0, 0.25)'
+  gap: theme.spacing
 }));
 
 const TextLayout = styled(Typography)(({ theme }) => ({

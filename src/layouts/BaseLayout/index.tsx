@@ -19,7 +19,7 @@ const BoxContainer = styled(Paper)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   gap: '10px',
-  width: '100%',
+  minWidth: '1024px',
   height: '100%',
   padding: theme.spacing(0, 8)
 }));

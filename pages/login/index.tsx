@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Container } from '@mui/material';
+import { Box, Container, Paper } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -25,14 +25,15 @@ import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import styled from '@emotion/styled';
 import GridLayout from '@/components/grid';
 
-const ContainerWrapper = styled(Container)(({ theme }) => ({
+const ContainerWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   gap: theme.spacing(2),
   margin: 0,
-  minWidth: '1024px',
-  maxWidth: '1312px',
+  width: '100%',
+  // minWidth: '896px',
+  // maxWidth: '1312px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
