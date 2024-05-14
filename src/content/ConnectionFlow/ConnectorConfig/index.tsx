@@ -16,11 +16,7 @@ import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 
 import { AppDispatch } from '@store/store';
-import {
-  useLazyCreateConnectionQuery,
-  useLazyDiscoverConnectorQuery,
-  useLazyFetchIntegrationSpecQuery
-} from '@store/api/apiSlice';
+import { useLazyDiscoverConnectorQuery, useLazyFetchIntegrationSpecQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
 import FormControlComponent from '@/components/FormControlComponent';
@@ -50,6 +46,12 @@ import { useGetPackageByIdQuery } from '@/store/api/etlApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import streamsReducer from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
+import {
+  useLazyCreateConnectionQuery,
+  useLazyCreateDefaultWarehouseConnectionQuery,
+  useLazyUpdateConnectionQuery
+} from '@/store/api/connectionApiSlice';
+import { getShopifyIntegrationType } from '@/content/ConnectionFlow/ConnectionFlowUtils';
 
 type TState = {
   error: string;
@@ -121,6 +123,12 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   //creating connection query
   const [createConnection] = useLazyCreateConnectionQuery();
+
+  //creating connection query
+  const [createDefaultWarehouseConnection] = useLazyCreateDefaultWarehouseConnectionQuery();
+
+  // update connection query
+  const [updateConnection] = useLazyUpdateConnectionQuery();
 
   const {
     data: packageData,
@@ -421,7 +429,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   };
 
   const onCreateAutomation = async () => {
-    const shcedulePayload = {
+    const schedulePayload = {
       name: type?.toLocaleLowerCase(),
       run_interval: 'Every 1 hour'
     };
@@ -434,7 +442,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     let credentialPayload = null;
     let destCredentialPayload = null;
 
-    const connectionPayload = generateConnectionPayload(streams, shcedulePayload, wid, isEditableFlow, extras);
+    const connectionPayload = generateConnectionPayload(streams, schedulePayload, wid, isEditableFlow, extras);
 
     const payload: any = {
       workspaceId: wid,
@@ -448,9 +456,24 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       payload['destCredentialPayload'] = destCredentialPayload;
     }
 
-    const query = isEditableFlow ? updateConnection : createConnection;
-    const data = await query(payload).unwrap();
-    router.push(`/spaces/${wid}/connections`);
+    const query = getConnectionQuery({ integrationType: type, isEditable: isEditableFlow });
+
+    console.log('create connection payload', {
+      payload,
+      type,
+      query
+    });
+    // const data = await query(payload).unwrap();
+    // router.push(`/spaces/${wid}/connections`);
+  };
+
+  const getConnectionQuery = ({ isEditable, integrationType }: { isEditable: boolean; integrationType: string }) => {
+    if (type === getShopifyIntegrationType()) {
+      // TODO: handle update default warehouse connection
+      return !isEditableFlow ? createDefaultWarehouseConnection : updateConnection;
+    } else {
+      return !isEditableFlow ? createConnection : updateConnection;
+    }
   };
 
   const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {

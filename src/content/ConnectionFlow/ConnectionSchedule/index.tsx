@@ -15,7 +15,6 @@ import { useWizard } from 'react-use-wizard';
 import { WizardFooter } from '@/components/Wizard/Footer';
 import { RootState } from '@/store/reducers';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
-import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/apiSlice';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import {
@@ -32,6 +31,7 @@ import { useRouter } from 'next/router';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import Spinner from '@/components/Spinner';
+import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/connectionApiSlice';
 
 const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) => {
   const router = useRouter();
