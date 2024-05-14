@@ -68,7 +68,10 @@ export const etlApiSlice = apiSlice.injectEndpoints({
         url: `/prompts/workspaces/${workspaceId}/prompts/${promptId}/preview`,
         method: 'POST',
         body: prompt
-      })
+      }),
+      transformResponse: (responseData) => {
+        return previewAdapter.setAll(initialPreviewState, responseData);
+      }
     }),
 
     getExplores: builder.query({

@@ -28,8 +28,6 @@ const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: 
   }, [schema]);
 
   const handleOnClick = () => {
-    data.filters = [];
-    console.log('form data:_', data);
     applyFilters(data);
   };
 

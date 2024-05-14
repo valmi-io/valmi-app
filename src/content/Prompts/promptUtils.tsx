@@ -55,10 +55,10 @@ interface JsonSchema {
   };
 }
 
-export const schema: JsonSchema = {
+export const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   type: 'object',
-  required: ['timeWindow', 'sourceId'],
+  required: ['time_window'],
   properties: {
     time_window: {
       type: 'object',
@@ -87,30 +87,15 @@ export const schema: JsonSchema = {
     filters: {
       type: 'array',
       items: {
-        anyOf: [
-          {
-            type: 'object',
-            properties: {
-              label: { type: 'string' },
-              name: { type: 'string' },
-              type: { type: 'string' },
-              value: { type: 'string' },
-              operator: { type: 'string', enum: ['=', '!='] }
-            },
-            required: ['label', 'name', 'type', 'value', 'operator']
-          },
-          {
-            type: 'object',
-            properties: {
-              label: { type: 'string' },
-              name: { type: 'string' },
-              type: { type: 'string' },
-              values: { type: 'array', items: { type: 'string' } },
-              operator: { type: 'string', enum: ['in', 'not in'] }
-            },
-            required: ['label', 'name', 'type', 'values', 'operator']
-          }
-        ]
+        type: 'object',
+        properties: {
+          // label: { type: 'string' },
+          name: { type: 'string', enum: ['customer_name', 'location'] },
+          // type: { type: 'string' },
+          operator: { type: 'string', enum: ['=', '!='] },
+          value: { type: 'string' }
+        },
+        required: ['name', 'value', 'operator']
       }
     }
   }
