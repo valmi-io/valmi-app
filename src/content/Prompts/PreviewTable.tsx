@@ -17,13 +17,12 @@ import { useEffect, useState } from 'react';
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Paper } from '@mui/material';
 import moment from 'moment';
-import { TPromptSource } from '@/content/Prompts/Prompt';
+import { TPrompt, TPromptSource } from '@/content/Prompts/Prompt';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
+import SubmitButton from '@/components/SubmitButton';
 
-const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPromptSource[] }) => {
+const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
   const { pid = '', wid = '', filter = '' } = params;
-
-  console.log('Preview table sources:_', sources);
 
   const router = useRouter();
 
@@ -47,8 +46,10 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
 
   useEffect(() => {
     if (pid) {
+      const { schemas = [] } = prompt;
+
       const payload: TPayloadOut = generatePreviewPayload({
-        sources,
+        schema: schemas,
         filters: [],
         time_window: {
           label: 'custom',
@@ -127,7 +128,8 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
   };
 
   const applyFilters = (payload: any) => {
-    payload.source_id = sources[0].id;
+    const { schemas = [] } = prompt;
+    payload.schema_id = schemas.length ? schemas[0].id : '';
 
     previewPrompt(payload);
   };
@@ -146,7 +148,11 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
       <ContentLayout
         key={`PreviewPage`}
         error={error}
-        PageContent={<PageContent data={data} />}
+        PageContent={
+          <PageContent
+            prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
+          />
+        }
         displayComponent={!error && !isLoading && data}
         isLoading={isLoading}
         traceError={false}
@@ -157,14 +163,34 @@ const PreviewTable = ({ params, sources }: { params: IPreviewPage; sources: TPro
 
 export default PreviewTable;
 
-const PageContent = ({ data }: { data: TData }) => {
-  console.log('data:_', data);
+const PageContent = ({
+  prompt
+}: {
+  prompt: {
+    isLoading: boolean;
+    status: FormStatus;
+    data: TData;
+    handleSaveAsExplore: () => void;
+  };
+}) => {
+  const { data, isLoading, handleSaveAsExplore, status } = prompt;
 
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }
 
-  return <DataTable data={data} />;
+  return (
+    <>
+      <SubmitButton
+        buttonText={'Save as explore'}
+        data={status === 'success'}
+        isFetching={status === 'submitting'}
+        disabled={isLoading || status === 'submitting'}
+        onClick={handleSaveAsExplore}
+      />
+      <DataTable data={data} />
+    </>
+  );
 };
 
 // import * as React from 'react';

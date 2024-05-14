@@ -100,7 +100,7 @@ function DataTable({ data }: { data: TData }) {
   // );
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    <Paper sx={{ width: '100%', height: 400, overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 500 }}>
         <Table stickyHeader>
           <TableHead>

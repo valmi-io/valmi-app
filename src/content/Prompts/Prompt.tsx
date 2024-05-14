@@ -6,13 +6,15 @@ import { Chip, Grid, IconButton, Tooltip, styled } from '@mui/material';
 
 export type TPromptSource = { id: string; name: string };
 
+export type TPromptSchema = { id: string; name: string; sources: TPromptSource[] };
+
 export type TPrompt = {
   id: string;
   name: string;
   gated: boolean;
   package_id: string;
   query: string;
-  sources: TPromptSource[];
+  schemas: TPromptSchema[];
   spec: any;
   table: string;
   type: string;

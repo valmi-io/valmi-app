@@ -22,7 +22,6 @@ import { StackLayout } from '@/components/Layouts/Layouts';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import PromptDetails from '@/content/Prompts/PromptDetails';
-import PromptFilter from '@/content/Prompts/PromptFilter';
 import PreviewTable from '@/content/Prompts/PreviewTable';
 
 export interface IPreviewPage extends IParams {
@@ -78,10 +77,11 @@ const PageContent = ({ data, filter, params }: { data: TData; filter: string; pa
   return ids.map((id: string) => {
     const item: TPrompt = entities[id];
 
+    console.log('item:_', item);
     return (
       <Stack key={id} sx={{ m: 2 }} spacing={2}>
         <PromptDetails item={item} />
-        <PreviewTable params={params} sources={item.sources} />
+        <PreviewTable params={params} prompt={item} />
         {/* <PromptFilter spec={item.spec} applyFilters={() => {}} /> */}
       </Stack>
     );
