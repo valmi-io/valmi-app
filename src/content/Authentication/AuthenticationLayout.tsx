@@ -38,6 +38,8 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   Width: '100%',
+  height: '100%',
+  minHeight: '364.25px',
   minWidth: '440px',
   padding: 0,
   gap: theme.spacing(2),
@@ -50,6 +52,7 @@ const DetailBox = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   Width: '100%',
+  height: '100%',
   padding: theme.spacing(2, 8),
   gap: theme.spacing
 }));
@@ -64,7 +67,7 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: theme.spacing(1, 0, 1, 0),
+  padding: theme.spacing(1, 0),
   width: '100%'
 }));
 

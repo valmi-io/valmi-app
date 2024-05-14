@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Container, Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -32,8 +32,7 @@ const ContainerWrapper = styled(Paper)(({ theme }) => ({
   gap: theme.spacing(2),
   margin: 0,
   width: '100%',
-  // minWidth: '896px',
-  // maxWidth: '1312px',
+  height: '364.25px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
@@ -43,8 +42,8 @@ const ImageBoxContainer = styled(Box)(({}) => ({
   alignItems: 'center',
   justifyContent: 'center',
   width: '100%',
+  height: '100%',
   minWidth: '440px',
-  height: '364.25px',
   padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
@@ -66,16 +65,16 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
-      {/* <GridLayout> */}
-      <ContainerWrapper>
-        <ImageBoxContainer>
-          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
-        </ImageBoxContainer>
-        <AuthenticationLayout>
-          <GoogleSignInButton />
-        </AuthenticationLayout>
-      </ContainerWrapper>
-      {/* </GridLayout> */}
+      <GridLayout>
+        <ContainerWrapper>
+          <ImageBoxContainer>
+            <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+          </ImageBoxContainer>
+          <AuthenticationLayout>
+            <GoogleSignInButton />
+          </AuthenticationLayout>
+        </ContainerWrapper>
+      </GridLayout>
     </>
   );
 };
