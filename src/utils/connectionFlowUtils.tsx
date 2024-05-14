@@ -73,29 +73,74 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
   return payload;
 };
 
-export const generateConnectionPayload = (
-  streams: any[],
-  state: any,
-  wid: string,
-  isEditableFlow: boolean = false,
-  extras: any
-) => {
-  let connectionPayload: any = {};
+export const generateConnectionPayload = ({
+  connectionDataFlow,
+  user,
+  isEditableFlow,
+  schedulePayload,
+  type,
+  workspaceId
+}: {
+  connectionDataFlow: any;
+  user: any;
+  type: string;
+  schedulePayload: { name: string; run_interval: string };
+  workspaceId: string;
+  isEditableFlow: boolean;
+}) => {
+  let payload: Record<string, any> = {};
 
-  const { name = '', run_interval = '' } = state ?? {};
-  connectionPayload['src'] = generateSourcePayload(streams, isEditableFlow, extras);
-  connectionPayload['dest'] = generateDestinationPayload(streams, isEditableFlow, extras);
-  connectionPayload['schedule'] = { run_interval: getRunInterval(run_interval) };
-  connectionPayload['uiState'] = {};
-  connectionPayload['connectionName'] = name;
+  let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
+  const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
 
-  connectionPayload['workspaceId'] = wid;
+  const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
 
-  if (isEditableFlow) {
-    connectionPayload['connId'] = extras?.connId ?? '';
+  const { name = '', run_interval = '' } = schedulePayload ?? {};
+
+  if (type === getShopifyIntegrationType()) {
+    // TODO: handle for isEditableFlow=true
+    const { name, ...config } = credentialObj;
+    payload = {
+      workspaceId: workspaceId,
+      connectionPayload: {
+        account: generateAccountPayload(user),
+        source_connector_type: type,
+        source_connector_config: config,
+        name: config?.shop ?? name,
+        source_catalog: generateSourcePayload(streams, isEditableFlow, extras),
+        schedule: { run_interval: getRunInterval(run_interval) }
+      }
+    };
+    return payload;
   }
 
-  return connectionPayload;
+  //TODO: handle payload for regular connections.
+  let credentialPayload = null;
+  let destCredentialPayload = null;
+
+  payload = {
+    workspaceId: workspaceId,
+    connectionPayload: {
+      src: generateSourcePayload(streams, isEditableFlow, extras),
+      dest: generateDestinationPayload(streams, isEditableFlow, extras),
+      schedule: { run_interval: getRunInterval(run_interval) },
+      uiState: {},
+      connectionName: name
+    }
+  };
+
+  if (isEditableFlow) {
+    payload.connectionPayload.connId = extras?.connId ?? '';
+  }
+
+  if (!isEditableFlow) {
+    credentialPayload = generateCredentialPayload(credentialObj, type, user);
+    destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
+    payload.credentialPayload = credentialPayload;
+    payload.destCredentialPayload = destCredentialPayload;
+  }
+
+  return payload;
 };
 
 const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: any) => {
@@ -285,4 +330,12 @@ export const getFreePackageId = () => {
 
 export const getPremiuimPackageIds = () => {
   return ['p0', 'p1'];
+};
+
+export const getShopifyIntegrationType = () => {
+  return 'SRC_SHOPIFY';
+};
+
+export const generateDefaultWarehouseConnectionPayload = ({}: { type: string }) => {
+  return {};
 };

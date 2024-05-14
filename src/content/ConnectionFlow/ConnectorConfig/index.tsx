@@ -28,7 +28,7 @@ import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { Box, CircularProgress, styled } from '@mui/material';
 import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
-import { httpPostRequestHandler } from '@/services';
+import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import {
@@ -38,7 +38,8 @@ import {
   getCatalogObjKey,
   generateConnectionPayload,
   getExtrasObjKey,
-  generateCredentialPayload
+  generateCredentialPayload,
+  getShopifyIntegrationType
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { getOAuthParams } from '@/pagesauth/callback';
@@ -51,7 +52,7 @@ import {
   useLazyCreateDefaultWarehouseConnectionQuery,
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
-import { getShopifyIntegrationType } from '@/content/ConnectionFlow/ConnectionFlowUtils';
+import { useSession } from 'next-auth/react';
 
 type TState = {
   error: string;
@@ -74,6 +75,8 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
+  const { data: session } = useSession();
+
   const { nextStep } = useWizard();
 
   let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
@@ -82,7 +85,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
 
   const appState = useSelector((state: RootState) => state.appFlow.appState);
 
-  const { user } = appState ?? {};
+  // const { user } = appState ?? {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
@@ -434,40 +437,30 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       run_interval: 'Every 1 hour'
     };
 
-    let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
-    const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
-
-    const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
-
-    let credentialPayload = null;
-    let destCredentialPayload = null;
-
-    const connectionPayload = generateConnectionPayload(streams, schedulePayload, wid, isEditableFlow, extras);
-
-    const payload: any = {
-      workspaceId: wid,
-      connectionPayload
-    };
-
-    if (!isEditableFlow) {
-      credentialPayload = generateCredentialPayload(credentialObj, type, user);
-      destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
-      payload['credentialPayload'] = credentialPayload;
-      payload['destCredentialPayload'] = destCredentialPayload;
-    }
-
-    const query = getConnectionQuery({ integrationType: type, isEditable: isEditableFlow });
-
-    console.log('create connection payload', {
-      payload,
-      type,
-      query
+    const payload = generateConnectionPayload({
+      connectionDataFlow: connectionDataFlow,
+      isEditableFlow: isEditableFlow,
+      schedulePayload: schedulePayload,
+      type: type,
+      user: session?.user ?? {},
+      workspaceId: wid
     });
-    // const data = await query(payload).unwrap();
-    // router.push(`/spaces/${wid}/connections`);
+
+    const query = getConnectionQuery({ type: type, isEditableFlow: isEditableFlow });
+
+    await queryHandler({ query: query, payload: payload, successCb, errorCb });
   };
 
-  const getConnectionQuery = ({ isEditable, integrationType }: { isEditable: boolean; integrationType: string }) => {
+  const successCb = (data: any) => {
+    router.push(`/spaces/${wid}/connections`);
+  };
+
+  const errorCb = (error: any) => {
+    //TODO: handle error
+    console.error('error', error);
+  };
+
+  const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
     if (type === getShopifyIntegrationType()) {
       // TODO: handle update default warehouse connection
       return !isEditableFlow ? createDefaultWarehouseConnection : updateConnection;
