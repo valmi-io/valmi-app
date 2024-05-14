@@ -108,6 +108,7 @@ export const generateConnectionPayload = ({
         source_connector_config: config,
         name: config?.shop ?? name,
         source_catalog: generateSourcePayload(streams, isEditableFlow, extras),
+        destination_catalog: generateSourcePayload(streams, isEditableFlow, extras),
         schedule: { run_interval: getRunInterval(run_interval) }
       }
     };
