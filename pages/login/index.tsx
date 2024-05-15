@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Stack } from '@mui/material';
+import { Box, Paper, styled } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -20,11 +20,39 @@ import Head from '@components/PageHead';
 
 import { GoogleSignInButton } from '@/components/AuthButtons';
 
+import { useSession } from 'next-auth/react';
+import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import GridLayout from '@/components/grid';
 import { useLoginStatus } from '@/hooks/useLoginStatus';
 import { signOutUser } from '@/utils/lib';
 import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 
+        
+const ContainerWrapper = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: theme.spacing(2),
+  margin: 0,
+  width: '100%',
+  height: '364.25px',
+  border: '1px solid rgba(0, 0, 0, 0.25)'
+}));
+
+const ImageBoxContainer = styled(Box)(({}) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%',
+  minWidth: '440px',
+  padding: '1px 0px',
+  border: '1px solid rgba(0, 0, 0, 0.25)'
+}));
+  
+ 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -50,13 +78,16 @@ const Login: NextPageWithLayout = () => {
   return (
     <>
       <Head title="Login" />
-
-      {/** Page layout */}
-      <AuthenticationLayout>
-        <Stack sx={{ marginTop: 2 }}>
+      {/* <GridLayout> */}
+      <ContainerWrapper>
+        <ImageBoxContainer>
+          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+        </ImageBoxContainer>
+        <AuthenticationLayout>
           <GoogleSignInButton />
-        </Stack>
-      </AuthenticationLayout>
+        </AuthenticationLayout>
+      </ContainerWrapper>
+      {/* </GridLayout> */}
     </>
   );
 };

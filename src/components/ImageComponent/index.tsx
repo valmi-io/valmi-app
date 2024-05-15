@@ -4,14 +4,15 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, Typography, styled } from '@mui/material';
+import { Typography } from '@mui/material';
 import Image from 'next/image';
 
 export enum ImageSize {
   small = '20',
   medium = '32',
   large = '48',
-  logo = '200'
+  logo = '200',
+  extralarge = '320'
 }
 
 export interface ImageComponentProps {
@@ -21,11 +22,6 @@ export interface ImageComponentProps {
   title?: string;
   style?: React.CSSProperties;
 }
-
-const BoxLayout = styled(Box)(({}) => ({
-  display: 'flex',
-  alignItems: 'center'
-}));
 
 const ImageComponent = (props: ImageComponentProps) => {
   const { src, alt, title, style, size } = props;
@@ -37,7 +33,7 @@ const ImageComponent = (props: ImageComponentProps) => {
   };
 
   return (
-    <BoxLayout>
+    <>
       <Image
         priority={true}
         src={src}
@@ -51,7 +47,7 @@ const ImageComponent = (props: ImageComponentProps) => {
           {title}
         </Typography>
       )}
-    </BoxLayout>
+    </>
   );
 };
 

@@ -25,7 +25,9 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     const params = new URLSearchParams();
 
     params.set('mode', mode.length > 0 ? mode[0] : '');
-    const pathname = `${getBaseRoute(workspaceId as string)}/connections/create`;
+ 
+    const pathname = `${getBaseRoute(workspaceId!)}/connections/create`;
+
 
     const key = getSelectedConnectorKey();
 
