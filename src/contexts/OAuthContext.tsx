@@ -1,12 +1,10 @@
 // @ts-nocheck
 import { useRouter } from 'next/router';
 import { ReactNode, createContext, useState } from 'react';
-import { FormObject } from '@/utils/form-utils';
-import { TData } from '@/utils/typings.d';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
-import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
+import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { getOauthRoute } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
@@ -44,9 +42,9 @@ function OAuthContextProvider({ children }: Props) {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  let { oauth_keys = 'private', type = '', oauth_params = {} } = selectedConnector;
+  let { oauth_keys = 'private', type = '' } = selectedConnector;
 
-  const { wid = '', mode = 'etl' } = params ?? {};
+  const { wid = '' } = params ?? {};
 
   const [oAuthConfigData, setOAuthConfigData] = useState({
     isconfigured: false,

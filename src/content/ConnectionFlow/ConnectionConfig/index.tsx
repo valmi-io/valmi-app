@@ -1,26 +1,12 @@
-// @ts-nocheck
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, May 26th 2023, 12:12:53 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { useContext, useEffect, useReducer, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import ConnectorLayout from '@layouts/ConnectorLayout';
 
-import SkeletonLoader from '@components/SkeletonLoader';
-import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
-import ErrorComponent, { ErrorStatusText } from '@components/Error';
-
 import { AppDispatch } from '@store/store';
-import { useLazyDiscoverConnectorQuery, useLazyFetchIntegrationSpecQuery } from '@store/api/apiSlice';
+import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
-import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
-import { JsonFormsCore } from '@jsonforms/core';
-import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useWizard } from 'react-use-wizard';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
@@ -37,9 +23,6 @@ import {
   isConnectionAutomationFlow
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
-import { getOAuthParams } from '@/pagesauth/callback';
-import { useGetPackageByIdQuery } from '@/store/api/etlApiSlice';
-import { useFetch } from '@/hooks/useFetch';
 import streamsReducer from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
@@ -48,15 +31,11 @@ import {
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
 import { useSession } from 'next-auth/react';
-import ConnectionCheck, {
-  TConnectionCheckState
-} from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
-import { JsonForms } from '@jsonforms/react';
-import { materialCells } from '@jsonforms/material-renderers';
-import { jsonFormValidator } from '@/utils/form-utils';
-import { Stack } from '@mui/material';
-import SubmitButton from '@/components/SubmitButton';
+import { TConnectionCheckState } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
 import { useCombinedIntegrationConfigQuery } from '@/content/ConnectionFlow/useCombinedQuery';
+import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
+import { getOAuthParams } from '@/pagesauth/callback';
+import { TData } from '@/utils/typings.d';
 
 const initialObjs: TData = {
   ids: [],
@@ -98,17 +77,10 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
 
-  const [traceError, setTraceError] = useState<any>(null);
-
   const [data, setData] = useState<any>(initialData);
 
   const [enableCreate, setEnableCreate] = useState<boolean>(false);
   const [reducerState, dispatchToStore] = useReducer(streamsReducer, initialObjs);
-
-  {
-    /* query for connector configuration */
-  }
-  const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // discover call query
   const [fetchObjects, { data: discoverData, isFetching: isDiscovering, error: discoverError }] =
@@ -130,27 +102,12 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     traceError: combinedConfigTraceError
   } = useCombinedIntegrationConfigQuery({ oauthKeys: oauthKeys, type: type, workspaceId: wid });
 
-  const {
-    data: packageData,
-    error: packageError,
-    isLoading: isPackageLoading
-  } = useFetch({
-    query: useGetPackageByIdQuery({ packageId: getFreePackageId() })
-  });
-
-  // Getting keys for the object
-  const [fetchIntegrationOauthCredentials, { data: keys, isLoading: isKeysLoading, error: keysError }] =
-    useLazyGetOAuthApiConfigQuery();
-
   const [state, setState] = useState<TConnectionCheckState>({
     error: '',
     status: 'empty'
   });
 
   const [results, setResults] = useState(null);
-
-  // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
 
   const handleSaveObj = (objs: any[]) => {
     dispatchToStore({
@@ -164,62 +121,21 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   useEffect(() => {
     if (combinedConfigData) {
       console.log('combinedConfigData', combinedConfigData);
-    }
-  }, [combinedConfigData]);
+      const { spec } = combinedConfigData ?? {};
+      setResults(spec);
 
-  useEffect(() => {
-    // fetch integration spec
-
-    if (type && wid) {
-      if (connectionDataFlow?.entities[getCredentialObjKey[type]]?.spec) {
-        setResults(connectionDataFlow?.entities[getCredentialObjKey[type]]?.spec);
-      } else {
-        fetchIntegrationSpec({
-          type: type,
-          workspaceId: wid
-        });
-      }
-    }
-  }, [type, wid]);
-
-  useEffect(() => {
-    // fetch connector oauth credentials
-    if (oauthKeys === 'private') {
-      fetchIntegrationOauthCredentials({
-        workspaceId: wid,
-        type: type
-      });
-    }
-  }, [oauthKeys]);
-
-  useEffect(() => {
-    if (spec) {
-      if (hasErrorsInData(spec)) {
-        const traceError = getErrorsInData(spec);
-        setTraceError(traceError);
-      } else {
-        setResults(spec);
-      }
-    }
-  }, [spec]);
-
-  useEffect(() => {
-    if (keys) {
-      if (hasErrorsInData(keys)) {
-        const traceError = getErrorsInData(keys);
-        setTraceError(traceError);
-      } else {
+      if (combinedConfigData.oauthKeysData) {
         const setOAuthData = () => {
           //checking if connector configured for oAuth
-          const { entities = {} } = keys;
-          const { type = '', oauth_keys = 'private' } = selectedConnector;
+          const { entities = {} } = combinedConfigData?.oauthKeysData ?? {};
+
           if (entities[`${type}`]) {
             oAuthConfigData = { ...oAuthConfigData, isconfigured: true };
             setOAuthConfigData(oAuthConfigData);
           }
 
           //check if configuration required
-          if (oauth_keys === 'private') {
+          if (oauthKeys === 'private') {
             oAuthConfigData = { ...oAuthConfigData, requireConfiguration: true };
             setOAuthConfigData(oAuthConfigData);
           }
@@ -235,54 +151,49 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         setOAuthData();
       }
     }
-  }, [keys]);
+  }, [combinedConfigData]);
 
-  useEffect(() => {
-    if (spec && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-      const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
-      const { isconfigured, isAuthorized } = oAuthConfigData;
-      const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
-      const obj = {
-        ...entitiesInStore,
-        [getSelectedConnectorKey()]: {
-          ...connectionDataFlow.entities[getSelectedConnectorKey()],
-          formValues: {
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-            credentials: {
-              client_id,
-              client_secret,
-              auth_method: 'oauth2.0',
-              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-            }
-          }
-        },
-        [getCredentialObjKey(type)]: {
-          ...connectionDataFlow.entities[getCredentialObjKey(type)],
-          spec: spec,
-          config: {
-            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-            credentials: {
-              ...getOAuthParams(oauth_params),
-              auth_method: 'oauth2.0',
-              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-            },
-            name: displayName
-          }
-        }
-      };
-      dispatch(setEntities(obj));
-      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
-    }
-  }, [spec]);
-
-  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
-  useEffect(() => {
-    if (spec && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-      setData(formDataFromStore);
-    }
-  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
+  // useEffect(() => {
+  //   if (
+  //     combinedConfigData?.spec &&
+  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
+  //   ) {
+  //     const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+  //     const { isconfigured, isAuthorized } = oAuthConfigData;
+  //     const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
+  //     const obj = {
+  //       ...entitiesInStore,
+  //       [getSelectedConnectorKey()]: {
+  //         ...connectionDataFlow.entities[getSelectedConnectorKey()],
+  //         formValues: {
+  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+  //           credentials: {
+  //             client_id,
+  //             client_secret,
+  //             auth_method: 'oauth2.0',
+  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+  //           }
+  //         }
+  //       },
+  //       [getCredentialObjKey(type)]: {
+  //         ...connectionDataFlow.entities[getCredentialObjKey(type)],
+  //         spec: combinedConfigData?.spec,
+  //         config: {
+  //           ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+  //           credentials: {
+  //             ...getOAuthParams(oauth_params),
+  //             auth_method: 'oauth2.0',
+  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+  //           },
+  //           name: displayName
+  //         }
+  //       }
+  //     };
+  //     dispatch(setEntities(obj));
+  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
+  //   }
+  // }, [combinedConfigData?.spec]);
 
   const handleSubmit = () => {
     setState((state) => ({
@@ -306,7 +217,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         setState((state) => ({
           ...state,
           status: 'error',
-          error: error
+          error: err
         }));
       },
       successCb: (res) => {
@@ -327,9 +238,9 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
                 ...payload.config,
                 name: displayName
               },
-              spec: spec,
+              spec: combinedConfigData?.spec ?? {},
               // set the package data in store
-              package: packageData?.entities[getFreePackageId().toLocaleUpperCase()]
+              package: combinedConfigData?.packages?.entities[getFreePackageId().toLocaleUpperCase()]
             }
           };
 
@@ -485,82 +396,17 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     }
   };
 
-  const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
-
-    let formData = { ...oAuthConfigData, formValues: data };
-    await setOAuthConfigData(formData);
-  };
-
-  const getButtonTitle = () => {
-    return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
-  };
-
-  const getComponentToDisplay = () => {
-    if (error || keysError) {
-      return <ErrorComponent error={error || keysError} />;
-    }
-
-    if (traceError) {
-      return <ErrorStatusText>{traceError}</ErrorStatusText>;
-    }
-
-    if (isFetching || isKeysLoading) {
-      return <SkeletonLoader loading={isFetching || isKeysLoading} />;
-    }
-
-    if (results) {
-      const schema = results?.spec?.connectionSpecification ?? {};
-
-      const { valid } = jsonFormValidator(schema, data);
-
-      return (
-        <>
-          <JsonForms
-            schema={schema}
-            data={data}
-            renderers={customRenderers}
-            cells={materialCells}
-            onChange={handleFormChange}
-          />
-          <Stack
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              alignItems: 'center'
-            }}
-          >
-            <SubmitButton
-              buttonText={getButtonTitle()}
-              data={false}
-              isFetching={false}
-              disabled={!valid}
-              onClick={handleSubmit}
-            />
-          </Stack>
-          {/* <FormControlComponent
-            key={`SourceConfig`}
-            deleteTooltip="Delete source"
-            editing={false}
-            onDelete={() => {}}
-            onFormChange={handleFormChange}
-            onSubmitClick={handleSubmit}
-            isDeleting={false}
-            status={state.status}
-            error={!!state.error}
-            jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-            removeAdditionalFields={false}
-            enableCreate={enableCreate}
-            onCreateAutomation={onCreateAutomation}
-          /> */}
-          <ConnectionCheck key={'ConnectionCheck'} state={state} isDiscovering={isDiscovering} />
-        </>
-      );
-    }
-  };
-
-  return <ConnectorLayout title={`Connect to ${displayName}`}>{getComponentToDisplay()}</ConnectorLayout>;
+  return (
+    <ConnectorLayout title={`Connect to ${displayName}`}>
+      <IntegrationSpec
+        error={combinedConfigError}
+        isLoading={combinedConfigIsLoading}
+        traceError={combinedConfigTraceError}
+        specData={combinedConfigData?.spec ?? {}}
+        key={'IntegrationSpec'}
+      />
+    </ConnectorLayout>
+  );
 };
 
 export default ConnectionConfig;
