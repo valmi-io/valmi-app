@@ -1,5 +1,4 @@
-import AlertComponent from '@/components/Alert';
-import { Step } from '@/components/Stepper';
+import HorizontalLinearStepper, { Step } from '@/components/Stepper';
 import constants from '@/constants';
 import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
@@ -9,25 +8,33 @@ import PageLayout from '@/layouts/PageLayout';
 import { RootState } from '@/store/reducers';
 import { setIds } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
-import { getConnectionFlowSteps } from '@/utils/connectionFlowUtils';
+import {
+  getConnectionFlowSteps,
+  getSelectedConnectorKey,
+  getShopifyIntegrationType
+} from '@/utils/connectionFlowUtils';
 import { Paper } from '@mui/material';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Wizard } from 'react-use-wizard';
 
-const ConnectionFormComponent = ({ params }: { params: any }) => {
+const ConnectionFlowComponent = ({ params }: { params: any }) => {
   const { cid = '', mode = 'etl' } = params ?? {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const { type = '' } = selectedConnector;
+
   const isEditableFlow = !!cid;
 
-  // states
-  const [alertMessage, setAlertMessage] = useState<string>('');
-  const [alertDialog, showAlertDialog] = useState(false);
-  const [isErrorAlert, setIsErrorAlert] = useState(false);
-
   const dispatch = useDispatch<AppDispatch>();
+
+  console.log('type:_', {
+    type,
+    mode
+  });
 
   const connectionSteps = useMemo(() => {
     const steps: Step[] = getConnectionFlowSteps(mode, isEditableFlow);
@@ -51,24 +58,32 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
     return steps;
   }, [cid, mode]);
 
-  const handleClose = () => {
-    setAlertMessage('');
-    showAlertDialog(false);
+  const getWizardStepContent = ({ automationFlow }: { automationFlow: boolean }) => {
+    const steps = [
+      <ConnectionConfig key="connectorconfig" params={params} isEditableFlow={isEditableFlow} />,
+      <ConnectionDiscover key="connectiondiscover" params={params} isEditableFlow={isEditableFlow} />,
+      <ConnectionSchedule key="connectionschedule" params={params} isEditableFlow={isEditableFlow} />
+    ];
+
+    if (automationFlow) {
+      return steps[0];
+    }
+
+    if (isEditableFlow) return steps.slice(1, steps.length);
+    return steps;
   };
 
-  const getWizardStepContent = () => {
-    if (isEditableFlow) {
-      return [
-        <ConnectionDiscover key="connectiondiscover" params={params} isEditableFlow={isEditableFlow} />,
-        <ConnectionSchedule key="connectionschedule" params={params} isEditableFlow={isEditableFlow} />
-      ];
-    } else {
-      return [
-        <ConnectionConfig key="connectorconfig" params={params} isEditableFlow={isEditableFlow} />,
-        <ConnectionDiscover key="connectiondiscover" params={params} isEditableFlow={isEditableFlow} />,
-        <ConnectionSchedule key="connectionschedule" params={params} isEditableFlow={isEditableFlow} />
-      ];
-    }
+  const renderComponent = () => {
+    const automationFlow = !!(mode === 'etl' && type === getShopifyIntegrationType());
+
+    return (
+      <Wizard
+        header={!automationFlow && <HorizontalLinearStepper steps={connectionSteps} />}
+        wrapper={<Paper variant="outlined" />}
+      >
+        {getWizardStepContent({ automationFlow })}
+      </Wizard>
+    );
   };
 
   return (
@@ -78,14 +93,11 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
         title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
         displayButton={false}
       >
-        <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
         {/** Stepper */}
-
-        {/* <Wizard header={<HorizontalLinearStepper steps={connectionSteps} />} wrapper={<Paper variant="outlined" />}> */}
-        <Wizard wrapper={<Paper variant="outlined" />}>{getWizardStepContent()}</Wizard>
+        {renderComponent()}
       </PageLayout>
     </OAuthContextProvider>
   );
 };
 
-export default ConnectionFormComponent;
+export default ConnectionFlowComponent;

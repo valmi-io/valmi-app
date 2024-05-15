@@ -50,7 +50,7 @@ import {
 import { useSession } from 'next-auth/react';
 import ConnectionCheck, {
   TConnectionCheckState
-} from '@/content/ConnectionFlow/ConnectionFormComponent/ConnectionCheck';
+} from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
 
 const initialObjs: TData = {
   ids: [],
