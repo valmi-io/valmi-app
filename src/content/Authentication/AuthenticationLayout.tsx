@@ -47,7 +47,8 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   minWidth: '440px',
   padding: 0,
   gap: theme.spacing(2),
-  border: '1px solid rgba(0, 0, 0, 0.25)'
+  border: '1px solid rgba(0, 0, 0, 0.25)',
+  flexGrow: 1
 }));
 
 const DetailBox = styled(Box)(({ theme }) => ({
@@ -63,7 +64,7 @@ const DetailBox = styled(Box)(({ theme }) => ({
 
 const TextLayout = styled(Typography)(({ theme }) => ({
   color: theme.colors.primary.dark,
-  display: 'block'
+  maxWidth: '520px'
 }));
 
 const FormLayout = styled(Paper)(({ theme }) => ({
@@ -71,7 +72,9 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '100%'
+  width: '100%',
+  padding: theme.spacing(1, 0),
+  maxWidth: '520px'
 }));
 
 const AuthenticationLayout = () => {

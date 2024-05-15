@@ -18,8 +18,9 @@ const BoxContainer = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: '10px',
-  minWidth: '1120px',
+  position: 'relative',
+  gap: theme.spacing(2),
+  minWidth: '1024px',
   maxWidth: '1440px',
   height: '100%',
   padding: theme.spacing(0, 8)

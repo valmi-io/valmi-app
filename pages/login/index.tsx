@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Paper, styled } from '@mui/material';
+import { Box, Container, Paper, styled } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -29,21 +29,22 @@ import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 
 const ContainerWrapper = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   // gap: theme.spacing(2),
-  margin: 0,
   width: '100%',
-  height: '364.25px',
+  minHeight: '364.25px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
-const ImageBoxContainer = styled(Box)(({}) => ({
+const ImageBoxContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  gap: theme.spacing(2),
   width: '100%',
   height: '100%',
   minWidth: '440px',
