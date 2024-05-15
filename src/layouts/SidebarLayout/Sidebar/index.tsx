@@ -49,7 +49,7 @@ const Sidebar = () => {
           boxShadow: theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
         }}
       >
-        <Box mt={2}>
+        <Box sx={{ padding: theme.spacing(2) }}>
           <Box
             sx={{
               width: '100%'

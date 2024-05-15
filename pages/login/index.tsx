@@ -28,12 +28,11 @@ import { signOutUser } from '@/utils/lib';
 import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 
-        
 const ContainerWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  gap: theme.spacing(2),
+  // gap: theme.spacing(2),
   margin: 0,
   width: '100%',
   height: '364.25px',
@@ -48,12 +47,11 @@ const ImageBoxContainer = styled(Box)(({}) => ({
   width: '100%',
   height: '100%',
   minWidth: '440px',
-   maxWidth: '648px',
-   padding: '1px 0px',
+  maxWidth: '648px',
+  padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
-  
- 
+
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -84,7 +82,7 @@ const Login: NextPageWithLayout = () => {
         <ImageBoxContainer>
           <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
         </ImageBoxContainer>
-         <AuthenticationLayout />
+        <AuthenticationLayout />
       </ContainerWrapper>
       {/* </GridLayout> */}
     </>

@@ -5,17 +5,17 @@
  * Author: Nagendra S @ valmi.io
  */
 
- 
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
+
 import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
-import FormControlComponent from '@/components/FormControlComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
- 
 import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
 import { GoogleSignInButton } from '@/components/AuthButtons';
- 
+import { JsonForms } from '@jsonforms/react';
+import { materialCells } from '@jsonforms/material-renderers';
+import { jsonFormValidator } from '@/utils/form-utils';
 
 const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -23,8 +23,7 @@ const schema = {
   properties: {
     promotion: {
       type: 'boolean',
-      title: 'Check to receive latest product updates over email',
-      default: false
+      title: 'Check to receive latest product updates over email'
     },
     role: {
       type: 'string',
@@ -33,11 +32,11 @@ const schema = {
       enumNames: ['Engineering', 'Marketing', 'Other']
     }
   },
-  required: ['promotion', 'meta']
+  required: ['promotion', 'role']
 };
 
 const ContainerLayout = styled(Box)(({ theme }) => ({
- 
+  boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -50,7 +49,7 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
- 
+
 const DetailBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -72,25 +71,22 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-   width: '100%'
+  width: '100%'
 }));
- 
-const AuthenticationLayout = (props) => {
+
+const AuthenticationLayout = () => {
   const initialData = {};
   const [data, setData] = useState<any>(initialData);
- 
   const [isNewUser, setIsNewUser] = useState<boolean>(true);
-
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+  const { valid, errors } = jsonFormValidator(schema, data);
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
   };
   return (
     <ContainerLayout>
- 
       <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
-
         {/** valmi - logo */}
         <Stack alignItems="center">
           <ImageComponent
@@ -107,27 +103,25 @@ const AuthenticationLayout = (props) => {
         </TextLayout>
         {isNewUser && (
           <FormLayout>
-            <FormControlComponent
-              key={`signInPage`}
-              editing={false}
-              onFormChange={handleFormChange}
-              error={false}
-              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-              removeAdditionalFields={false}
-              displayActionButton={false}
-              disabled={false}
+            <JsonForms
+              schema={schema}
+              data={data}
+              renderers={customRenderers}
+              cells={materialCells}
+              onChange={handleFormChange}
             />
           </FormLayout>
         )}
-        <Stack sx={{ width: '100%', mt: '2px' }}>
-          <GoogleSignInButton />
-          <Button onClick={() => setIsNewUser(!isNewUser)}>
+        <Stack sx={{ width: '100%' }}>
+          <Button disabled={isNewUser && !valid} fullWidth sx={{ padding: 0 }}>
+            <GoogleSignInButton />
+          </Button>
+          <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
             <AuthenticationFormFooter
               footerText={isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             />
           </Button>
         </Stack>
- 
       </DetailBox>
     </ContainerLayout>
   );

@@ -221,7 +221,7 @@ export const AppFlowyTheme = createTheme({
     menuItemIconColorActive: colors.layout.sidebar.menuItemIconColorActive,
     menuItemHeadingColor: colors.layout.sidebar.menuItemHeadingColor,
     boxShadow: '2px 0 3px rgba(159, 162, 191, .18), 1px 0 1px rgba(159, 162, 191, 0.32)',
-    width: '256px'
+    width: '248px'
   },
   header: {
     height: '60px',
@@ -509,6 +509,14 @@ export const AppFlowyTheme = createTheme({
           '&:active, &.active, &.Mui-selected': {
             color: colors.primary.main
           }
+        }
+      }
+    },
+    //modifies form helper text
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none'
         }
       }
     }
