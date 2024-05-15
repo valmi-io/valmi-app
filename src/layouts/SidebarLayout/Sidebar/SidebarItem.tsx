@@ -31,7 +31,7 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
     >
       <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} gap={2}>
         {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
-        <Button size="medium">{displayText}</Button>
+        {displayText}
       </Stack>
     </ListItemButton>
   );
