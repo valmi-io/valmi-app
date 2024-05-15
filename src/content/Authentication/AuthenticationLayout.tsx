@@ -5,15 +5,17 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { useEffect, useState } from 'react';
-
+ 
+import React, {  useState } from 'react';
 import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import FormControlComponent from '@/components/FormControlComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
+ 
 import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
 import { GoogleSignInButton } from '@/components/AuthButtons';
+ 
 
 const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -35,6 +37,7 @@ const schema = {
 };
 
 const ContainerLayout = styled(Box)(({ theme }) => ({
+ 
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -47,7 +50,7 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
-
+ 
 const DetailBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -69,13 +72,15 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '100%'
+   width: '100%'
 }));
-
+ 
 const AuthenticationLayout = (props) => {
   const initialData = {};
   const [data, setData] = useState<any>(initialData);
+ 
   const [isNewUser, setIsNewUser] = useState<boolean>(true);
+
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
@@ -83,7 +88,9 @@ const AuthenticationLayout = (props) => {
   };
   return (
     <ContainerLayout>
+ 
       <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
+
         {/** valmi - logo */}
         <Stack alignItems="center">
           <ImageComponent
@@ -120,6 +127,7 @@ const AuthenticationLayout = (props) => {
             />
           </Button>
         </Stack>
+ 
       </DetailBox>
     </ContainerLayout>
   );
