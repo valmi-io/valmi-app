@@ -176,7 +176,7 @@ const SignupPage: NextPageWithLayout = () => {
         <Stack sx={{ mt: 1 }}>
           <Stack spacing={2}>
             {/** Display footer */}
-            <AuthenticationFormFooter href={'/login'} footerText={'Already have an account? Sign in'} />
+            {/* <AuthenticationFormFooter href={'/login'} footerText={'Already have an account? Sign in'} /> */}
           </Stack>
         </Stack>
       </AuthenticationLayout>
