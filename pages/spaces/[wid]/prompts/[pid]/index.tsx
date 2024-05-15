@@ -7,10 +7,21 @@ import { useSearchParams } from 'next/navigation';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
-import { IParams } from '@/utils/typings.d';
+import { IParams, TData } from '@/utils/typings.d';
 import PageLayout from '@/layouts/PageLayout';
-import { Grid } from '@mui/material';
-import PreviewDetails from '@/content/Prompts/PreviewDetails';
+import { Stack, Typography } from '@mui/material';
+import { useFetch } from '@/hooks/useFetch';
+import { useGetPromptByIdQuery } from '@/store/api/etlApiSlice';
+import ContentLayout from '@/layouts/ContentLayout';
+import { isDataEmpty } from '@/utils/lib';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import { getLastNthDate } from '@/utils/date-utils';
+import { getPromptFilter } from '@/utils/explore-utils';
+import { PromptFilterChip, TPrompt } from '@/content/Prompts/Prompt';
+import { StackLayout } from '@/components/Layouts/Layouts';
+import appIcons from '@/utils/icon-utils';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import PromptDetails from '@/content/Prompts/PromptDetails';
 import PreviewTable from '@/content/Prompts/PreviewTable';
 
 export interface IPreviewPage extends IParams {
@@ -28,16 +39,22 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 };
 
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
+  const { pid = '', filter = '', wid = '' } = params;
+
+  const { data, error, isLoading, traceError } = useFetch({
+    query: useGetPromptByIdQuery({ promptId: pid, workspaceId: wid })
+  });
+
   return (
-    <PageLayout pageHeadTitle="Preview" title="Preview" displayButton={false}>
-      <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
-        <Grid item xs={12}>
-          <PreviewDetails params={params} />
-        </Grid>
-        <Grid item xs={12}>
-          <PreviewTable params={params} />
-        </Grid>
-      </Grid>
+    <PageLayout pageHeadTitle="DATA PREVIEW" title="DATA PREVIEW" displayButton={false}>
+      <ContentLayout
+        key={`prompt-preview-page`}
+        error={error}
+        PageContent={<PageContent data={data} filter={filter} params={params} />}
+        displayComponent={!!(!error && !isLoading && data)}
+        isLoading={isLoading}
+        traceError={traceError}
+      />
     </PageLayout>
   );
 };
@@ -47,3 +64,25 @@ PreviewPageLayout.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default PreviewPageLayout;
+
+const PageContent = ({ data, filter, params }: { data: TData; filter: string; params: IPreviewPage }) => {
+  const { ids, entities } = data;
+
+  console.log('data:_', data);
+
+  if (isDataEmpty(data)) {
+    return <ListEmptyComponent description={'No data found for this prompt'} />;
+  }
+
+  return ids.map((id: string) => {
+    const item: TPrompt = entities[id];
+
+    return (
+      <Stack key={id} sx={{ m: 2 }} spacing={2}>
+        <PromptDetails item={item} />
+        <PreviewTable params={params} prompt={item} />
+        {/* <PromptFilter spec={item.spec} applyFilters={() => {}} /> */}
+      </Stack>
+    );
+  });
+};

@@ -93,14 +93,6 @@ export const nextAuthOptions = (req, res) => {
     },
     callbacks: {
       async jwt({ token, trigger, account, profile, user, session }) {
-        // console.log('jwt callback', {
-        //   token,
-        //   trigger,
-        //   account,
-        //   profile,
-        //   user,
-        //   session
-        // });
         // Initial sign in
 
         if (account && user) {
@@ -201,7 +193,7 @@ const handleSocialLogin = async (payload, successCb, errorCb) => {
       successCb(result);
     }
   } catch (err) {
-    const errors = getErrorsInErrorObject(error);
+    const errors = getErrorsInErrorObject(err);
     const { message = '' } = errors || {};
     errorCb(message);
   }

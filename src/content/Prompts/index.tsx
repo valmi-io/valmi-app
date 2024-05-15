@@ -9,14 +9,14 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 const Prompts = ({ data }: { data: TData }) => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const src = `/connectors/shopify.svg`;
 
   const handleOnClick = (prompt: TPrompt) => {
     // redirect to preview page
 
-    router.push(`${getBaseRoute(workspaceId)}/prompts/${prompt.id}?filter=Last 7 days`);
+    router.push(`${getBaseRoute(workspaceId!)}/prompts/${prompt.id}?filter=Last 7 days`);
   };
 
   return (

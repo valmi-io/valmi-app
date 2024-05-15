@@ -33,7 +33,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getPromptById: builder.query({
-      query: ({ promptId }) => `/prompts/${promptId}`,
+      query: ({ workspaceId, promptId }) => `/prompts/workspaces/${workspaceId}/prompts/${promptId}`,
       transformResponse: (responseData) => {
         return promptsAdapter.setOne(initialPromptsState, responseData);
       },
@@ -47,7 +47,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getPreviewData: builder.query({
-      query: ({ workspaceId, promptId }) => `/explores/workspaces/${workspaceId}/prompts/${promptId}/preview`,
+      query: ({ workspaceId, promptId }) => `/prompts/workspaces/${workspaceId}/prompts/${promptId}/preview`,
       transformResponse: (responseData) => {
         return previewAdapter.setAll(initialPreviewState, responseData);
       },
@@ -60,6 +60,17 @@ export const etlApiSlice = apiSlice.injectEndpoints({
           : [{ type: 'Preview' as const }];
 
         return tags;
+      }
+    }),
+
+    getPromptPreview: builder.mutation({
+      query: ({ workspaceId, promptId, prompt }) => ({
+        url: `/prompts/workspaces/${workspaceId}/prompts/${promptId}/preview`,
+        method: 'POST',
+        body: prompt
+      }),
+      transformResponse: (responseData) => {
+        return previewAdapter.setAll(initialPreviewState, responseData);
       }
     }),
 
@@ -138,5 +149,7 @@ export const {
   useCreateExploreMutation,
   useGetExploreByIdQuery,
   useGetExploreStatusByIdQuery,
-  useGetPackageByIdQuery
+  useGetPackageByIdQuery,
+  useGetPromptPreviewMutation
+
 } = etlApiSlice;

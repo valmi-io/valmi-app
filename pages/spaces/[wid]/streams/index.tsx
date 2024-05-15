@@ -41,7 +41,7 @@ const StreamsPage: NextPageWithLayout = () => {
 
   const handleEditClick = ({ edit = false, streamId = '' }) => {
     dispatch(setStreamFlowState({ editing: edit, streamId: streamId }));
-    router.push(`${getBaseRoute(workspaceId)}/streams/create`);
+    router.push(`${getBaseRoute(workspaceId!)}/streams/create`);
   };
 
   const handleLiveEventsClick = ({ streamId = '' }) => {
@@ -55,7 +55,7 @@ const StreamsPage: NextPageWithLayout = () => {
     };
 
     router.push({
-      pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
+      pathname: `${getBaseRoute(workspaceId!)}/events/live-events`,
       query: { query: JSON.stringify(queryArgs) }
     });
   };

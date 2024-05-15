@@ -8,7 +8,7 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Paper } from '@mui/material';
+import { Box, Paper, styled } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -22,9 +22,13 @@ import { GoogleSignInButton } from '@/components/AuthButtons';
 
 import { useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import styled from '@emotion/styled';
 import GridLayout from '@/components/grid';
+import { useLoginStatus } from '@/hooks/useLoginStatus';
+import { signOutUser } from '@/utils/lib';
+import { useDispatch } from 'react-redux';
+import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 
+        
 const ContainerWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -47,20 +51,29 @@ const ImageBoxContainer = styled(Box)(({}) => ({
   padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
-
+  
+ 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const { data: session } = useSession();
+  // logout user query
+  const [logoutUser] = useLazyLogoutUserQuery();
+
+  const { isLoggedIn, workspaceId } = useLoginStatus();
 
   useEffect(() => {
-    if (session) {
+    if (isLoggedIn) {
       //@ts-ignore
-      router.push(`/spaces/${session?.workspaceId}/connections`);
+      router.push(`/spaces/${workspaceId}/connections`);
     } else {
-      router.push('/login');
+      if (workspaceId) {
+        signOutUser(router, dispatch, logoutUser);
+      } else {
+        router.push('/login');
+      }
     }
-  }, [session]);
+  }, [isLoggedIn]);
 
   return (
     <>

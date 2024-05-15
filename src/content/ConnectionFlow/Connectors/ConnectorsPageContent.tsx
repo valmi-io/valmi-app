@@ -1,12 +1,10 @@
-import { useDispatch, useSelector } from 'react-redux';
-
-import { RootState } from '@store/reducers';
+import { useDispatch } from 'react-redux';
 
 import ConnectorsList, { ConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
 import { AppDispatch } from '@/store/store';
-import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { getOAuthObjInStore, getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
@@ -19,7 +17,7 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const handleItemOnClick = (item: ConnectorType) => {
     const { type = '', mode = [] } = item ?? {};
@@ -27,7 +25,9 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     const params = new URLSearchParams();
 
     params.set('mode', mode.length > 0 ? mode[0] : '');
+ 
     const pathname = `${getBaseRoute(workspaceId!)}/connections/create`;
+
 
     const key = getSelectedConnectorKey();
 
