@@ -5,13 +5,15 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Box, styled, Stack, Typography, Paper } from '@mui/material';
+import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import FormControlComponent from '@/components/FormControlComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
+import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
+import { GoogleSignInButton } from '@/components/AuthButtons';
 
 const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -50,7 +52,7 @@ const DetailBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  // justifyContent: 'center',
   Width: '100%',
   height: '100%',
   padding: theme.spacing(2, 8),
@@ -67,13 +69,13 @@ const FormLayout = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: theme.spacing(1, 0),
   width: '100%'
 }));
 
 const AuthenticationLayout = (props) => {
   const initialData = {};
   const [data, setData] = useState<any>(initialData);
+  const [isNewUser, setIsNewUser] = useState<boolean>(true);
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
@@ -81,7 +83,7 @@ const AuthenticationLayout = (props) => {
   };
   return (
     <ContainerLayout>
-      <DetailBox>
+      <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
         {/** valmi - logo */}
         <Stack alignItems="center">
           <ImageComponent
@@ -92,22 +94,34 @@ const AuthenticationLayout = (props) => {
           />
         </Stack>
         <TextLayout variant="body1">
-          Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze
-          and engage with your customers.
+          {isNewUser
+            ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets,analyze and engage with your customers.'
+            : 'Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'}
         </TextLayout>
-        <FormLayout>
-          <FormControlComponent
-            key={`signInPage`}
-            editing={false}
-            onFormChange={handleFormChange}
-            error={false}
-            jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-            removeAdditionalFields={false}
-            displayActionButton={false}
-            disabled={false}
-          />
-          {props.children}
-        </FormLayout>
+        {isNewUser && (
+          <FormLayout>
+            <FormControlComponent
+              key={`signInPage`}
+              editing={false}
+              onFormChange={handleFormChange}
+              error={false}
+              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+              removeAdditionalFields={false}
+              displayActionButton={false}
+              disabled={false}
+            />
+          </FormLayout>
+        )}
+        <Stack sx={{ width: '100%', mt: '2px' }}>
+          <GoogleSignInButton />
+          <Button onClick={() => setIsNewUser(!isNewUser)}>
+            <AuthenticationFormFooter
+              footerText={
+                isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up using google"
+              }
+            />
+          </Button>
+        </Stack>
       </DetailBox>
     </ContainerLayout>
   );
