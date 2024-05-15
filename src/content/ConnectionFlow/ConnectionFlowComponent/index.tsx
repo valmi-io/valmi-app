@@ -11,7 +11,8 @@ import { AppDispatch } from '@/store/store';
 import {
   getConnectionFlowSteps,
   getSelectedConnectorKey,
-  getShopifyIntegrationType
+  getShopifyIntegrationType,
+  isConnectionAutomationFlow
 } from '@/utils/connectionFlowUtils';
 import { Paper } from '@mui/material';
 import { useMemo } from 'react';
@@ -53,14 +54,14 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
     return steps;
   }, [cid, mode]);
 
-  const getWizardStepContent = ({ automationFlow }: { automationFlow: boolean }) => {
+  const getWizardStepContent = ({ isAutomationFlow }: { isAutomationFlow: boolean }) => {
     const steps = [
       <ConnectionConfig key="connectorconfig" params={params} isEditableFlow={isEditableFlow} />,
       <ConnectionDiscover key="connectiondiscover" params={params} isEditableFlow={isEditableFlow} />,
       <ConnectionSchedule key="connectionschedule" params={params} isEditableFlow={isEditableFlow} />
     ];
 
-    if (automationFlow) {
+    if (isAutomationFlow) {
       return steps[0];
     }
 
@@ -69,14 +70,14 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
   };
 
   const renderComponent = () => {
-    const automationFlow = !!(mode === 'etl' && type === getShopifyIntegrationType());
+    const isAutomationFlow = isConnectionAutomationFlow({ mode, type });
 
     return (
       <Wizard
-        header={!automationFlow && <HorizontalLinearStepper steps={connectionSteps} />}
+        header={!isAutomationFlow && <HorizontalLinearStepper steps={connectionSteps} />}
         wrapper={<Paper variant="outlined" />}
       >
-        {getWizardStepContent({ automationFlow })}
+        {getWizardStepContent({ isAutomationFlow })}
       </Wizard>
     );
   };

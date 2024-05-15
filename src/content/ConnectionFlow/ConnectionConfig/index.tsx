@@ -80,6 +80,11 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
 
+  console.log('ConnectionConfig Params:_', {
+    params,
+    type
+  });
+
   if (type === 'SRC_SHOPIFY') {
     initialData = {
       credentials: {

@@ -340,3 +340,7 @@ export const getShopifyIntegrationType = () => {
 export const generateDefaultWarehouseConnectionPayload = ({}: { type: string }) => {
   return {};
 };
+
+export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
+  return !!(mode === 'etl' && type === getShopifyIntegrationType());
+};
