@@ -10,7 +10,7 @@ import {
   getOauthColorCode,
   getOauthImage,
   getOauthLoginText
-} from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+} from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 
 import { ErrorStatusText } from '@components/Error';
 

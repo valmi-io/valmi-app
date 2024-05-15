@@ -20,14 +20,11 @@ import { useLazyDiscoverConnectorQuery, useLazyFetchIntegrationSpecQuery } from 
 import { RootState } from '@store/reducers';
 import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
 import FormControlComponent from '@/components/FormControlComponent';
-import { FormStatus } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useWizard } from 'react-use-wizard';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
-import { Box, CircularProgress, styled } from '@mui/material';
-import { CheckOutlined, ErrorOutline } from '@mui/icons-material';
 import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';
@@ -37,8 +34,6 @@ import {
   getFreePackageId,
   getCatalogObjKey,
   generateConnectionPayload,
-  getExtrasObjKey,
-  generateCredentialPayload,
   getShopifyIntegrationType
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
@@ -62,7 +57,7 @@ const initialObjs: TData = {
   entities: {}
 };
 
-const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
+const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
@@ -513,4 +508,4 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   return <ConnectorLayout title={`Connect to ${displayName}`}>{getComponentToDisplay()}</ConnectorLayout>;
 };
 
-export default ConnectorConfig;
+export default ConnectionConfig;

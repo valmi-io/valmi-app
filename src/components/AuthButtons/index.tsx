@@ -5,7 +5,7 @@ import {
   getOauthColorCode,
   getOauthImage,
   getOauthLoginText
-} from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+} from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 
 export function GoogleSignInButton() {
   const { data: session } = useSession();

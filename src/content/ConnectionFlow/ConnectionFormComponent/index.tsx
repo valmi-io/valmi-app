@@ -1,9 +1,9 @@
 import AlertComponent from '@/components/Alert';
-import HorizontalLinearStepper, { Step } from '@/components/Stepper';
+import { Step } from '@/components/Stepper';
 import constants from '@/constants';
 import ConnectionDiscover from '@/content/ConnectionFlow/ConnectionDiscover';
 import ConnectionSchedule from '@/content/ConnectionFlow/ConnectionSchedule';
-import ConnectorConfig from '@/content/ConnectionFlow/ConnectorConfig';
+import ConnectionConfig from '@/content/ConnectionFlow/ConnectionConfig';
 import { OAuthContextProvider } from '@/contexts/OAuthContext';
 import PageLayout from '@/layouts/PageLayout';
 import { RootState } from '@/store/reducers';
@@ -64,7 +64,7 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
       ];
     } else {
       return [
-        <ConnectorConfig key="connectorconfig" params={params} isEditableFlow={isEditableFlow} />,
+        <ConnectionConfig key="connectorconfig" params={params} isEditableFlow={isEditableFlow} />,
         <ConnectionDiscover key="connectiondiscover" params={params} isEditableFlow={isEditableFlow} />,
         <ConnectionSchedule key="connectionschedule" params={params} isEditableFlow={isEditableFlow} />
       ];

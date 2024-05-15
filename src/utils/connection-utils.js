@@ -6,7 +6,7 @@
 
 import { getOAuthParams } from 'pages/auth/callback';
 
-import { isConnectorRequiresOAuth } from '@content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { isConnectorRequiresOAuth } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { ConnectionType } from '@content/Connections/ConnectionModel';
 
 import { setConnectionFlow } from '@store/reducers/connectionFlow';

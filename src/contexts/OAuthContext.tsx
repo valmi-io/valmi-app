@@ -9,7 +9,7 @@ import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connection
 import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
-import { getOauthRoute } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { getOauthRoute } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 type OAuthContextType = {
