@@ -71,10 +71,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   let initialData = {};
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  // const { user } = appState ?? {};
-
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
