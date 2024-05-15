@@ -116,9 +116,7 @@ const AuthenticationLayout = (props) => {
           <GoogleSignInButton />
           <Button onClick={() => setIsNewUser(!isNewUser)}>
             <AuthenticationFormFooter
-              footerText={
-                isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up using google"
-              }
+              footerText={isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             />
           </Button>
         </Stack>
