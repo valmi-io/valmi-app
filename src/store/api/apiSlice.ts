@@ -430,6 +430,9 @@ export const {
   useLazyFetchWorkSpacesQuery,
   useLazyLoginAndFetchWorkSpacesQuery,
   useLazyFetchIntegrationSpecQuery,
+
+  useFetchIntegrationSpecQuery,
+
   useFetchConnectorsQuery,
   useLazySignupUserQuery,
   useLazyActivateUserQuery,

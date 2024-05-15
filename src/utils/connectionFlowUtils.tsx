@@ -51,11 +51,12 @@ export const connectionScheduleSchema = {
 };
 
 export const getSelectedConnectorObj = (item: ConnectorType, key: string) => {
-  const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string } = {
+  const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string; mode: string } = {
     type: item.type ?? item.connector_type ?? {},
     display_name: item.display_name,
     oauth: !!item.oauth,
-    oauth_keys: item.oauth_keys ?? ''
+    oauth_keys: item.oauth_keys ?? '',
+    mode: item.mode ? item.mode[0] : ''
   };
 
   return obj;
@@ -108,7 +109,7 @@ export const generateConnectionPayload = ({
         source_connector_config: config,
         name: config?.shop ?? name,
         source_catalog: generateSourcePayload(streams, isEditableFlow, extras),
-        destination_catalog: generateSourcePayload(streams, isEditableFlow, extras),
+        destination_catalog: generateDestinationPayload(streams, isEditableFlow, extras),
         schedule: { run_interval: getRunInterval(run_interval) }
       }
     };

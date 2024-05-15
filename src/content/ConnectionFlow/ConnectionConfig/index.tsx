@@ -19,7 +19,6 @@ import { AppDispatch } from '@store/store';
 import { useLazyDiscoverConnectorQuery, useLazyFetchIntegrationSpecQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useLazyGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
-import FormControlComponent from '@/components/FormControlComponent';
 import { JsonFormsCore } from '@jsonforms/core';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useWizard } from 'react-use-wizard';
@@ -34,7 +33,8 @@ import {
   getFreePackageId,
   getCatalogObjKey,
   generateConnectionPayload,
-  getShopifyIntegrationType
+  getShopifyIntegrationType,
+  isConnectionAutomationFlow
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { getOAuthParams } from '@/pagesauth/callback';
@@ -51,6 +51,12 @@ import { useSession } from 'next-auth/react';
 import ConnectionCheck, {
   TConnectionCheckState
 } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
+import { JsonForms } from '@jsonforms/react';
+import { materialCells } from '@jsonforms/material-renderers';
+import { jsonFormValidator } from '@/utils/form-utils';
+import { Stack } from '@mui/material';
+import SubmitButton from '@/components/SubmitButton';
+import { useCombinedIntegrationConfigQuery } from '@/content/ConnectionFlow/useCombinedQuery';
 
 const initialObjs: TData = {
   ids: [],
@@ -78,12 +84,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const isEditableFlow = !!connectionId;
   const entitiesInStore = connectionDataFlow?.entities ?? {};
 
-  const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '' } = selectedConnector;
-
-  console.log('ConnectionConfig Params:_', {
-    params,
-    type
-  });
+  const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '', mode = '' } = selectedConnector;
 
   if (type === 'SRC_SHOPIFY') {
     initialData = {
@@ -110,17 +111,24 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const [fetchIntegrationSpec, { data: spec, isFetching, error }] = useLazyFetchIntegrationSpecQuery();
 
   // discover call query
-  const [fetchQuery, { data: discoverData, isFetching: isDiscovering, error: discoverError }] =
+  const [fetchObjects, { data: discoverData, isFetching: isDiscovering, error: discoverError }] =
     useLazyDiscoverConnectorQuery();
 
-  //creating connection query
+  //create connection query
   const [createConnection] = useLazyCreateConnectionQuery();
 
-  //creating connection query
+  //create default warehouse connection query
   const [createDefaultWarehouseConnection] = useLazyCreateDefaultWarehouseConnectionQuery();
 
   // update connection query
   const [updateConnection] = useLazyUpdateConnectionQuery();
+
+  const {
+    data: combinedConfigData,
+    error: combinedConfigError,
+    isLoading: combinedConfigIsLoading,
+    traceError: combinedConfigTraceError
+  } = useCombinedIntegrationConfigQuery({ oauthKeys: oauthKeys, type: type, workspaceId: wid });
 
   const {
     data: packageData,
@@ -152,6 +160,12 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
       }
     });
   };
+
+  useEffect(() => {
+    if (combinedConfigData) {
+      console.log('combinedConfigData', combinedConfigData);
+    }
+  }, [combinedConfigData]);
 
   useEffect(() => {
     // fetch integration spec
@@ -304,11 +318,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
             error: message
           }));
         } else {
-          setState((state) => ({
-            ...state,
-            status: 'success'
-          }));
-
           const entities = {
             ...connectionDataFlow.entities,
             [getCredentialObjKey(type)]: {
@@ -325,7 +334,14 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           };
 
           dispatch(setEntities(entities));
-          if (type !== 'SRC_SHOPIFY') {
+          if (isConnectionAutomationFlow({ mode, type })) {
+            // discover objects
+            discoverObjects();
+          } else {
+            setState((state) => ({
+              ...state,
+              status: 'success'
+            }));
             nextStep();
           }
         }
@@ -333,18 +349,46 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  // Automating discovery flow for shopify
-  useEffect(() => {
-    if (type === 'SRC_SHOPIFY') {
-      //is check done and packages fetched? Then call automateDiscovery
-      if (state.status === 'success' && !isPackageLoading) {
-        automateDiscovery();
-        if (!isDiscovering && discoverError === undefined) {
-          getSelectedStreams(discoverData?.resultData);
-        }
-      }
+  const discoverObjects = () => {
+    const payload = {
+      config: initialData,
+      workspaceId: wid,
+      connectorType: type,
+      queryId: 1
+    };
+
+    console.log('discovering objects...');
+
+    if (!isEditableFlow) {
+      handleSaveObj([]);
+    } else {
+      const streams: any[] = connectionDataFlow?.entities[getCatalogObjKey(type)]('streams');
+      handleSaveObj(streams);
     }
-  }, [state, discoverData]);
+
+    fetchObjects(payload);
+  };
+
+  // Automating discovery flow for shopify
+  // useEffect(() => {
+  //   if (type === 'SRC_SHOPIFY') {
+  //     //is check done and packages fetched? Then call automateDiscovery
+  //     if (state.status === 'success' && !isPackageLoading) {
+  //       automateDiscovery();
+  //       if (!isDiscovering && discoverError === undefined) {
+  //         getSelectedStreams(discoverData?.resultData);
+  //       }
+  //     }
+  //   }
+  // }, [state, discoverData]);
+
+  useEffect(() => {
+    if (discoverData) {
+      console.log('getting selected streams:-');
+
+      getSelectedStreams(discoverData?.resultData);
+    }
+  }, [discoverData]);
 
   useEffect(() => {
     const entitiesInStore = connectionDataFlow?.entities ?? {};
@@ -379,25 +423,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
     dispatch(setEntities(obj));
   }, [isDiscovering]);
-
-  // prepare payload for discover and make discover call
-  const automateDiscovery = () => {
-    const payload = {
-      config: initialData,
-      workspaceId: wid,
-      connectorType: type,
-      queryId: 1
-    };
-
-    if (!isEditableFlow) {
-      handleSaveObj([]);
-    } else {
-      const streams: any[] = connectionDataFlow?.entities[getCatalogObjKey(type)]('streams');
-      handleSaveObj(streams);
-    }
-
-    fetchQuery(payload);
-  };
 
   // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
   const getSelectedStreams = (results: any) => {
@@ -467,6 +492,10 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     await setOAuthConfigData(formData);
   };
 
+  const getButtonTitle = () => {
+    return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
+  };
+
   const getComponentToDisplay = () => {
     if (error || keysError) {
       return <ErrorComponent error={error || keysError} />;
@@ -483,9 +512,34 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     if (results) {
       const schema = results?.spec?.connectionSpecification ?? {};
 
+      const { valid } = jsonFormValidator(schema, data);
+
       return (
         <>
-          <FormControlComponent
+          <JsonForms
+            schema={schema}
+            data={data}
+            renderers={customRenderers}
+            cells={materialCells}
+            onChange={handleFormChange}
+          />
+          <Stack
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              alignItems: 'center'
+            }}
+          >
+            <SubmitButton
+              buttonText={getButtonTitle()}
+              data={false}
+              isFetching={false}
+              disabled={!valid}
+              onClick={handleSubmit}
+            />
+          </Stack>
+          {/* <FormControlComponent
             key={`SourceConfig`}
             deleteTooltip="Delete source"
             editing={false}
@@ -499,7 +553,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
             removeAdditionalFields={false}
             enableCreate={enableCreate}
             onCreateAutomation={onCreateAutomation}
-          />
+          /> */}
           <ConnectionCheck key={'ConnectionCheck'} state={state} isDiscovering={isDiscovering} />
         </>
       );

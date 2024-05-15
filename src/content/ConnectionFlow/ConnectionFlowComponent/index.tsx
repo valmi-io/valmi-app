@@ -20,13 +20,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Wizard } from 'react-use-wizard';
 
 const ConnectionFlowComponent = ({ params }: { params: any }) => {
-  const { cid = '', mode = 'etl' } = params ?? {};
+  console.log('ConnectionFlowComponent', params);
+  const { cid = '' } = params ?? {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { type = '' } = selectedConnector;
+  const { type = '', mode = '' } = selectedConnector;
 
   const isEditableFlow = !!cid;
 
