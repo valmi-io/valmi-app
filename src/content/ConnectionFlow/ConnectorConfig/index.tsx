@@ -53,21 +53,14 @@ import {
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
 import { useSession } from 'next-auth/react';
-
-type TState = {
-  error: string;
-  status: FormStatus;
-};
+import ConnectionCheck, {
+  TConnectionCheckState
+} from '@/content/ConnectionFlow/ConnectionFormComponent/ConnectionCheck';
 
 const initialObjs: TData = {
   ids: [],
   entities: {}
 };
-
-const Item = styled(Box)(({}) => ({
-  display: 'flex',
-  alignItems: 'center'
-}));
 
 const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -145,7 +138,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
   const [fetchIntegrationOauthCredentials, { data: keys, isLoading: isKeysLoading, error: keysError }] =
     useLazyGetOAuthApiConfigQuery();
 
-  const [state, setState] = useState<TState>({
+  const [state, setState] = useState<TConnectionCheckState>({
     error: '',
     status: 'empty'
   });
@@ -163,6 +156,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       }
     });
   };
+
   useEffect(() => {
     // fetch integration spec
 
@@ -231,7 +225,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
         setOAuthData();
       }
     }
-  }, [spec]);
+  }, [keys]);
 
   useEffect(() => {
     if (spec && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
@@ -342,6 +336,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
       }
     });
   };
+
   // Automating discovery flow for shopify
   useEffect(() => {
     if (type === 'SRC_SHOPIFY') {
@@ -476,7 +471,7 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     await setOAuthConfigData(formData);
   };
 
-  const getDisplayComponent = () => {
+  const getComponentToDisplay = () => {
     if (error || keysError) {
       return <ErrorComponent error={error || keysError} />;
     }
@@ -509,46 +504,13 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
             enableCreate={enableCreate}
             onCreateAutomation={onCreateAutomation}
           />
-          <CheckConnectionPageContent state={state} isDiscovering={isDiscovering} />
+          <ConnectionCheck key={'ConnectionCheck'} state={state} isDiscovering={isDiscovering} />
         </>
       );
     }
   };
 
-  return <ConnectorLayout title={`Connect to ${displayName}`}>{getDisplayComponent()}</ConnectorLayout>;
+  return <ConnectorLayout title={`Connect to ${displayName}`}>{getComponentToDisplay()}</ConnectorLayout>;
 };
 
 export default ConnectorConfig;
-
-const CheckConnectionPageContent = ({
-  state: { error = '', status = '' },
-  isDiscovering
-}: {
-  state: TState;
-  isDiscovering: any;
-}) => {
-  if (status === 'empty' || !status) return null;
-  const isFetching = !!(status === 'submitting');
-
-  return (
-    <Item>
-      {isFetching ? (
-        <Item>
-          <CircularProgress size={20} sx={{ mx: 1 }} />
-          <p>Testing connection...</p>
-        </Item>
-      ) : isDiscovering ? (
-        <Item>
-          <CircularProgress size={20} sx={{ mx: 1 }} />
-          <p>Discovering objects from connection...</p>
-        </Item>
-      ) : (
-        <>
-          {status === 'error' && <ErrorOutline color="error" sx={{ mx: 1 }} />}
-          {status === 'success' && <CheckOutlined color="primary" sx={{ mx: 1 }} />}
-          <p>{status === 'error' ? error : 'Test success'}</p>
-        </>
-      )}
-    </Item>
-  );
-};
