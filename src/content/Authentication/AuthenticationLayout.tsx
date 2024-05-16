@@ -84,6 +84,10 @@ const AuthenticationLayout = () => {
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
   const { valid, errors } = jsonFormValidator(schema, data);
 
+  console.log('isNewUser:-', isNewUser);
+  console.log('valid:-', valid);
+  console.log('promotion:-', data);
+
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
   };
@@ -116,7 +120,7 @@ const AuthenticationLayout = () => {
           </FormLayout>
         )}
         <Stack sx={{ width: '100%' }}>
-          <Button disabled={isNewUser && !valid} fullWidth sx={{ padding: 0 }}>
+          <Button disabled={!(isNewUser && valid && !!data?.promotion)} fullWidth sx={{ padding: 0 }}>
             <GoogleSignInButton />
           </Button>
           <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
