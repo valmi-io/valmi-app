@@ -131,6 +131,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
           if (entities[`${type}`]) {
             oAuthConfigData = { ...oAuthConfigData, isconfigured: true };
+
             setOAuthConfigData(oAuthConfigData);
           }
 
@@ -195,7 +196,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   //   }
   // }, [combinedConfigData?.spec]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (data: any) => {
+    console.log('handle submit:_', data);
     setState((state) => ({
       ...state,
       status: 'submitting'
@@ -297,7 +299,17 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     if (discoverData) {
       console.log('getting selected streams:-');
 
-      getSelectedStreams(discoverData?.resultData);
+      const filteredStreams = filterStreamsBasedOnScope(discoverData?.resultData);
+
+      dispatchToStore({
+        type: 'TOGGLE_SELECT_ALL',
+        payload: {
+          checked: true,
+          objs: filteredStreams
+        }
+      });
+
+      onCreateAutomation();
     }
   }, [discoverData]);
 
@@ -336,26 +348,18 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   }, [isDiscovering]);
 
   // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
-  const getSelectedStreams = (results: any) => {
+  const filterStreamsBasedOnScope = (results: any) => {
     const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
 
     const rows = results?.catalog?.streams ?? [];
 
     const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
 
-    const authorizedScopesRows = rows.filter(({ name }: { name: string }) => {
+    const streams = rows.filter(({ name }: { name: string }) => {
       if (namesInScopes.includes(name)) return true;
     });
 
-    dispatchToStore({
-      type: 'TOGGLE_SELECT_ALL',
-      payload: {
-        checked: true,
-        objs: authorizedScopesRows
-      }
-    });
-
-    !isDiscovering && !!discoverData && setEnableCreate(true);
+    return streams;
   };
 
   const onCreateAutomation = async () => {
@@ -379,10 +383,19 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   };
 
   const successCb = (data: any) => {
+    setState((state) => ({
+      ...state,
+      status: 'success'
+    }));
     router.push(`/spaces/${wid}/connections`);
   };
 
   const errorCb = (error: any) => {
+    setState((state) => ({
+      ...state,
+      status: 'error',
+      error: error
+    }));
     //TODO: handle error
     console.error('error', error);
   };
@@ -403,6 +416,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         isLoading={combinedConfigIsLoading}
         traceError={combinedConfigTraceError}
         specData={combinedConfigData?.spec ?? {}}
+        handleSubmit={handleSubmit}
+        status={state.status}
         key={'IntegrationSpec'}
       />
     </ConnectorLayout>

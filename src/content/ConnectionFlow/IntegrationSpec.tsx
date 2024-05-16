@@ -4,6 +4,7 @@ import SubmitButton from '@/components/SubmitButton';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import { RootState } from '@/store/reducers';
 import {
+  getCredentialObjKey,
   getSelectedConnectorKey,
   getShopifyIntegrationType,
   isConnectionAutomationFlow
@@ -18,23 +19,33 @@ import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { isObjectEmpty } from '@/utils/lib';
+import { TConnectionCheckState } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
+import { httpPostRequestHandler } from '@/services';
+import { apiRoutes } from '@/utils/router-utils';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const IntegrationSpec = ({
   error,
   traceError,
   isLoading,
-  specData
+  specData,
+  handleSubmit,
+  status
 }: {
   error: any;
   traceError: any;
   isLoading: boolean;
   specData: any;
+  status: string;
+  handleSubmit: (payload: any) => void;
 }) => {
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
   const { type = '', mode = '' } = selectedConnector;
+
+  const { workspaceId = '' } = useWorkspaceId();
 
   let initialData = {};
 
@@ -48,10 +59,23 @@ const IntegrationSpec = ({
 
   const [data, setData] = useState<any>(initialData);
 
+  const [state, setState] = useState<TConnectionCheckState>({
+    error: '',
+    status: 'empty'
+  });
+
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
 
   let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
+
+  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
+  useEffect(() => {
+    if (specData && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+      setData(formDataFromStore);
+    }
+  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
 
   const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
@@ -66,28 +90,20 @@ const IntegrationSpec = ({
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
 
-  const handleSubmit = () => {
-    // setState((state) => ({
-    //   ...state,
-    //   status: 'submitting'
-    // }));
+  // const handleSubmit = () => {
+  //   // setState((state) => ({
+  //   //   ...state,
+  //   //   status: 'submitting'
+  //   // }));
 
-    const payload = {
-      config: data
-    };
+  //   const payload = {
+  //     config: data
+  //   };
 
-    console.log('handle submit:_', payload);
+  //   console.log('handle submit:_', payload);
 
-    // checkConnection(`/workspaces/${wid}/connectors/${type}/check`, 'POST', payload);
-  };
-
-  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
-  useEffect(() => {
-    if (specData && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-      setData(formDataFromStore);
-    }
-  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
+  //   checkConnection(`/workspaces/${workspaceId}/connectors/${type}/check`, 'POST', payload);
+  // };
 
   const renderComponent = () => {
     if (error) {
@@ -127,9 +143,9 @@ const IntegrationSpec = ({
             <SubmitButton
               buttonText={getButtonTitle()}
               data={false}
-              isFetching={false}
-              disabled={!valid}
-              onClick={handleSubmit}
+              isFetching={status === 'submitting'}
+              disabled={!valid || status === 'submitting'}
+              onClick={() => handleSubmit(data)}
             />
           </Stack>
 

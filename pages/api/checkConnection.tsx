@@ -21,6 +21,8 @@ const checkConnection = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const bearerToken = (await getAccessTokenCookie(req)) || '';
 
+  console.log('bearer token: ', bearerToken);
+
   try {
     const response = await axios.post(url, payload, {
       headers: {
