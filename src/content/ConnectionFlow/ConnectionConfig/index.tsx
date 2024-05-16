@@ -59,6 +59,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
+  const entitiesInStore = connectionDataFlow?.entities ?? {};
+
   const isEditableFlow = !!connectionId;
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '', mode = '' } = selectedConnector;
@@ -136,47 +138,47 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     }
   }, [combinedConfigData]);
 
-  // useEffect(() => {
-  //   if (
-  //     combinedConfigData?.spec &&
-  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
-  //   ) {
-  //     const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
-  //     const { isconfigured, isAuthorized } = oAuthConfigData;
-  //     const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
-  //     const obj = {
-  //       ...entitiesInStore,
-  //       [getSelectedConnectorKey()]: {
-  //         ...connectionDataFlow.entities[getSelectedConnectorKey()],
-  //         formValues: {
-  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-  //           credentials: {
-  //             client_id,
-  //             client_secret,
-  //             auth_method: 'oauth2.0',
-  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-  //           }
-  //         }
-  //       },
-  //       [getCredentialObjKey(type)]: {
-  //         ...connectionDataFlow.entities[getCredentialObjKey(type)],
-  //         spec: combinedConfigData?.spec,
-  //         config: {
-  //           ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
-  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-  //           credentials: {
-  //             ...getOAuthParams(oauth_params),
-  //             auth_method: 'oauth2.0',
-  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-  //           },
-  //           name: displayName
-  //         }
-  //       }
-  //     };
-  //     dispatch(setEntities(obj));
-  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
-  //   }
-  // }, [combinedConfigData?.spec]);
+  useEffect(() => {
+    if (
+      combinedConfigData?.spec &&
+      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
+    ) {
+      const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+      const { isconfigured, isAuthorized } = oAuthConfigData;
+      const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
+      const obj = {
+        ...entitiesInStore,
+        [getSelectedConnectorKey()]: {
+          ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          formValues: {
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              client_id,
+              client_secret,
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            }
+          }
+        },
+        [getCredentialObjKey(type)]: {
+          ...connectionDataFlow.entities[getCredentialObjKey(type)],
+          spec: combinedConfigData?.spec,
+          config: {
+            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+            credentials: {
+              ...getOAuthParams(oauth_params),
+              auth_method: 'oauth2.0',
+              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+            },
+            name: displayName
+          }
+        }
+      };
+      dispatch(setEntities(obj));
+      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
+    }
+  }, [combinedConfigData?.spec]);
 
   const handleSubmit = (data: any) => {
     console.log('handle submit:_', data);

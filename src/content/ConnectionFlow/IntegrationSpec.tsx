@@ -4,6 +4,7 @@ import SubmitButton from '@/components/SubmitButton';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import { RootState } from '@/store/reducers';
 import {
+  getCredentialObjKey,
   getSelectedConnectorKey,
   getShopifyIntegrationType,
   isConnectionAutomationFlow
@@ -38,7 +39,9 @@ const IntegrationSpec = ({
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { type = '', mode = '' } = selectedConnector;
+  const { type = '', mode = '', oauth_params = {} } = selectedConnector;
+
+  const config = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
 
   let initialData = {};
 
@@ -48,6 +51,10 @@ const IntegrationSpec = ({
         auth_method: 'api_password'
       }
     };
+  }
+
+  if (!isObjectEmpty(oauth_params)) {
+    initialData = config;
   }
 
   const [data, setData] = useState<any>(initialData);
@@ -72,7 +79,7 @@ const IntegrationSpec = ({
     await setOAuthConfigData(formData);
   };
 
-  // console.log('data:_', data);
+  console.log('data:_', data);
 
   const getButtonTitle = () => {
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
@@ -94,7 +101,12 @@ const IntegrationSpec = ({
     if (specData) {
       const schema: any = specData?.spec?.connectionSpecification ?? {};
 
-      const { valid } = jsonFormValidator(schema, data);
+      const { valid, errors } = jsonFormValidator(schema, data);
+
+      console.log('valid', {
+        valid,
+        errors
+      });
 
       return (
         <>
