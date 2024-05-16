@@ -23,7 +23,8 @@ const schema = {
   properties: {
     promotion: {
       type: 'boolean',
-      title: 'Check to receive latest product updates over email'
+      title: 'Check to receive latest product updates over email',
+      default: true
     },
     role: {
       type: 'string',
@@ -120,7 +121,7 @@ const AuthenticationLayout = () => {
           </FormLayout>
         )}
         <Stack sx={{ width: '100%' }}>
-          <Button disabled={!(isNewUser && valid && !!data?.promotion)} fullWidth sx={{ padding: 0 }}>
+          <Button disabled={isNewUser && !valid && !!data?.promotion} fullWidth sx={{ padding: 0 }}>
             <GoogleSignInButton />
           </Button>
           <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
