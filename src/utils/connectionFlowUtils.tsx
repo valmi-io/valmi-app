@@ -76,6 +76,7 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
 
 export const generateConnectionPayload = ({
   connectionDataFlow,
+  streams,
   user,
   isEditableFlow,
   schedulePayload,
@@ -83,6 +84,7 @@ export const generateConnectionPayload = ({
   workspaceId
 }: {
   connectionDataFlow: any;
+  streams: any;
   user: any;
   type: string;
   schedulePayload: { name: string; run_interval: string };
@@ -92,7 +94,7 @@ export const generateConnectionPayload = ({
   let payload: Record<string, any> = {};
 
   let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
-  const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
+  // const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
 
   const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
 
@@ -145,7 +147,7 @@ export const generateConnectionPayload = ({
   return payload;
 };
 
-const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: any) => {
+export const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: any) => {
   const sourcePayload: any = {
     catalog: {
       streams: streams
@@ -160,7 +162,7 @@ const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: 
   return sourcePayload;
 };
 
-const generateDestinationPayload = (streams: TConfiguredStream[], isEditableFlow: boolean, extras: any) => {
+export const generateDestinationPayload = (streams: TConfiguredStream[], isEditableFlow: boolean, extras: any) => {
   const newStreams = streams.map((stream) => {
     let obj = { ...stream };
     if (!obj['primary_key']) {
@@ -344,4 +346,19 @@ export const generateDefaultWarehouseConnectionPayload = ({}: { type: string }) 
 
 export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
+};
+
+// filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
+export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
+  const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+
+  const rows = results?.catalog?.streams ?? [];
+
+  const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
+
+  const streams = rows.filter(({ name }: { name: string }) => {
+    if (namesInScopes.includes(name)) return true;
+  });
+
+  return streams;
 };

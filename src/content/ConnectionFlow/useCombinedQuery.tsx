@@ -17,30 +17,30 @@ export const useCombinedIntegrationConfigQuery = ({
   const {
     data: spec,
     error: specError,
-    isLoading: specIsLoading,
+    isFetching: specIsLoading,
     traceError: specTraceError
   } = useFetch({
-    query: useFetchIntegrationSpecQuery({ type, workspaceId })
+    query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
   const {
     data: oauthKeysData,
     error: oauthKeysError,
-    isLoading: oauthKeysIsLoading,
+    isFetching: oauthKeysIsLoading,
     traceError: oauthKeysTraceError
   } = useFetch({
-    query: useGetOAuthApiConfigQuery({ type, workspaceId }, { skip: !spec })
+    query: useGetOAuthApiConfigQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true, skip: !spec })
   });
 
   const {
     data: packages,
     error: packageError,
-    isLoading: packageIsLoading,
+    isFetching: packageIsLoading,
     traceError: packageTraceError
   } = useFetch({
     query: useGetPackageByIdQuery(
       { packageId: getFreePackageId() },
-      { skip: oauthKeys === 'private' && !!oauthKeysData }
+      { refetchOnMountOrArgChange: true, skip: oauthKeys === 'private' && !!oauthKeysData }
     )
   });
 

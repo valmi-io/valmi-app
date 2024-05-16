@@ -4,7 +4,6 @@ import SubmitButton from '@/components/SubmitButton';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import { RootState } from '@/store/reducers';
 import {
-  getCredentialObjKey,
   getSelectedConnectorKey,
   getShopifyIntegrationType,
   isConnectionAutomationFlow
@@ -19,10 +18,6 @@ import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { isObjectEmpty } from '@/utils/lib';
-import { TConnectionCheckState } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
-import { httpPostRequestHandler } from '@/services';
-import { apiRoutes } from '@/utils/router-utils';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const IntegrationSpec = ({
   error,
@@ -45,8 +40,6 @@ const IntegrationSpec = ({
 
   const { type = '', mode = '' } = selectedConnector;
 
-  const { workspaceId = '' } = useWorkspaceId();
-
   let initialData = {};
 
   if (type === getShopifyIntegrationType()) {
@@ -58,11 +51,6 @@ const IntegrationSpec = ({
   }
 
   const [data, setData] = useState<any>(initialData);
-
-  const [state, setState] = useState<TConnectionCheckState>({
-    error: '',
-    status: 'empty'
-  });
 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
@@ -84,26 +72,11 @@ const IntegrationSpec = ({
     await setOAuthConfigData(formData);
   };
 
-  console.log('data:_', data);
+  // console.log('data:_', data);
 
   const getButtonTitle = () => {
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
-
-  // const handleSubmit = () => {
-  //   // setState((state) => ({
-  //   //   ...state,
-  //   //   status: 'submitting'
-  //   // }));
-
-  //   const payload = {
-  //     config: data
-  //   };
-
-  //   console.log('handle submit:_', payload);
-
-  //   checkConnection(`/workspaces/${workspaceId}/connectors/${type}/check`, 'POST', payload);
-  // };
 
   const renderComponent = () => {
     if (error) {
@@ -126,6 +99,7 @@ const IntegrationSpec = ({
       return (
         <>
           <JsonForms
+            readonly={status === 'submitting'}
             schema={schema}
             data={data}
             renderers={customRenderers}
@@ -142,7 +116,7 @@ const IntegrationSpec = ({
           >
             <SubmitButton
               buttonText={getButtonTitle()}
-              data={false}
+              data={status === 'success'}
               isFetching={status === 'submitting'}
               disabled={!valid || status === 'submitting'}
               onClick={() => handleSubmit(data)}

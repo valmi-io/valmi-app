@@ -20,10 +20,14 @@ import {
   getCatalogObjKey,
   generateConnectionPayload,
   getShopifyIntegrationType,
-  isConnectionAutomationFlow
+  isConnectionAutomationFlow,
+  getExtrasObjKey,
+  generateSourcePayload,
+  generateDestinationPayload,
+  filterStreamsBasedOnScope
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
-import streamsReducer from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
+import streamsReducer, { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
   useLazyCreateConnectionQuery,
@@ -36,11 +40,6 @@ import { useCombinedIntegrationConfigQuery } from '@/content/ConnectionFlow/useC
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { TData } from '@/utils/typings.d';
-
-const initialObjs: TData = {
-  ids: [],
-  entities: {}
-};
 
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -61,7 +60,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
   const isEditableFlow = !!connectionId;
-  const entitiesInStore = connectionDataFlow?.entities ?? {};
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '', mode = '' } = selectedConnector;
 
@@ -77,14 +75,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
 
-  const [data, setData] = useState<any>(initialData);
-
-  const [enableCreate, setEnableCreate] = useState<boolean>(false);
-  const [reducerState, dispatchToStore] = useReducer(streamsReducer, initialObjs);
-
   // discover call query
-  const [fetchObjects, { data: discoverData, isFetching: isDiscovering, error: discoverError }] =
-    useLazyDiscoverConnectorQuery();
+  const [fetchObjects] = useLazyDiscoverConnectorQuery();
 
   //create connection query
   const [createConnection] = useLazyCreateConnectionQuery();
@@ -109,18 +101,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const [results, setResults] = useState(null);
 
-  const handleSaveObj = (objs: any[]) => {
-    dispatchToStore({
-      type: 'SAVE',
-      payload: {
-        objs: objs
-      }
-    });
-  };
-
   useEffect(() => {
     if (combinedConfigData) {
-      console.log('combinedConfigData', combinedConfigData);
       const { spec } = combinedConfigData ?? {};
       setResults(spec);
 
@@ -262,107 +244,42 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  const discoverObjects = () => {
+  // discovering integration objects
+  const discoverObjects = async () => {
+    const { formValues = {} } = oAuthConfigData ?? {};
     const payload = {
-      config: initialData,
+      config: formValues,
       workspaceId: wid,
       connectorType: type,
       queryId: 1
     };
 
-    console.log('discovering objects...');
+    await queryHandler({
+      query: fetchObjects,
+      payload: payload,
+      successCb: (data) => {
+        const results = data?.resultData ?? {};
+        const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
 
-    if (!isEditableFlow) {
-      handleSaveObj([]);
-    } else {
-      const streams: any[] = connectionDataFlow?.entities[getCatalogObjKey(type)]('streams');
-      handleSaveObj(streams);
-    }
+        let streams = [];
 
-    fetchObjects(payload);
-  };
-
-  // Automating discovery flow for shopify
-  // useEffect(() => {
-  //   if (type === 'SRC_SHOPIFY') {
-  //     //is check done and packages fetched? Then call automateDiscovery
-  //     if (state.status === 'success' && !isPackageLoading) {
-  //       automateDiscovery();
-  //       if (!isDiscovering && discoverError === undefined) {
-  //         getSelectedStreams(discoverData?.resultData);
-  //       }
-  //     }
-  //   }
-  // }, [state, discoverData]);
-
-  useEffect(() => {
-    if (discoverData) {
-      console.log('getting selected streams:-');
-
-      const filteredStreams = filterStreamsBasedOnScope(discoverData?.resultData);
-
-      dispatchToStore({
-        type: 'TOGGLE_SELECT_ALL',
-        payload: {
-          checked: true,
-          objs: filteredStreams
+        for (let i = 0; i < filteredStreams.length; i++) {
+          streams.push(generateStreamObj(filteredStreams[i], 'stream'));
         }
-      });
 
-      onCreateAutomation();
-    }
-  }, [discoverData]);
-
-  useEffect(() => {
-    const entitiesInStore = connectionDataFlow?.entities ?? {};
-
-    let resultsFromStore = null;
-    const { ids = [], entities = {} } = reducerState;
-
-    const streamsArr: any[] = [];
-
-    if (ids.length > 0) {
-      ids.forEach((id: any) => {
-        streamsArr.push(entities[id]);
-      });
-    }
-
-    if (
-      !!connectionDataFlow?.entities[getCatalogObjKey(type)] &&
-      !!connectionDataFlow?.entities[getCatalogObjKey(type)]?.catalog
-    ) {
-      resultsFromStore = connectionDataFlow?.entities[getCatalogObjKey(type)]?.catalog;
-    } else {
-      resultsFromStore = results;
-    }
-
-    const obj = {
-      ...entitiesInStore,
-      [getCatalogObjKey(type)]: {
-        streams: streamsArr,
-        catalog: resultsFromStore
+        onCreateAutomation(streams);
+      },
+      errorCb: (err) => {
+        setState((state) => ({
+          ...state,
+          status: 'error',
+          error: err
+        }));
       }
-    };
-
-    dispatch(setEntities(obj));
-  }, [isDiscovering]);
-
-  // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
-  const filterStreamsBasedOnScope = (results: any) => {
-    const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
-
-    const rows = results?.catalog?.streams ?? [];
-
-    const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
-
-    const streams = rows.filter(({ name }: { name: string }) => {
-      if (namesInScopes.includes(name)) return true;
     });
-
-    return streams;
   };
 
-  const onCreateAutomation = async () => {
+  const onCreateAutomation = async (streams: any) => {
     const schedulePayload = {
       name: type?.toLocaleLowerCase(),
       run_interval: 'Every 1 hour'
@@ -370,6 +287,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
     const payload = generateConnectionPayload({
       connectionDataFlow: connectionDataFlow,
+      streams: streams,
       isEditableFlow: isEditableFlow,
       schedulePayload: schedulePayload,
       type: type,
@@ -396,8 +314,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
       status: 'error',
       error: error
     }));
-    //TODO: handle error
-    console.error('error', error);
   };
 
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
