@@ -50,7 +50,7 @@ const PageTitle: FC<PageTitleProps> = ({
       {...rest}
     >
       <Grid item>
-        <Typography variant="h4" component="h4" sx={{ mr: link ? 2 : 0 }}>
+        <Typography variant="h6" component="h6" sx={{ mr: link ? 2 : 0 }}>
           {title}
         </Typography>
       </Grid>

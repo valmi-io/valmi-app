@@ -7,6 +7,7 @@ import {
   getOauthLoginText
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import styled from '@emotion/styled';
+import { setCookie } from '@/lib/cookies';
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -23,14 +24,25 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
   borderRadius: theme.spacing(0.4)
 }));
 
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ meta }: { meta: any }) {
   const { data: session } = useSession();
 
   const handleClick = () => {
     if (session) {
       signOut();
     } else {
-      signIn('google', { callbackUrl: '/' });
+      setCookie(
+        'additionalAuthParams',
+        JSON.stringify({
+          meta: meta
+        })
+      );
+      signIn('google', {
+        callbackUrl: '/',
+        authorizationParams: {
+          state: JSON.stringify(meta)
+        }
+      });
     }
   };
   return (
