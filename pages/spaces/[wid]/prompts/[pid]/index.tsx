@@ -68,7 +68,7 @@ export default PreviewPageLayout;
 const PageContent = ({ data, filter, params }: { data: TData; filter: string; params: IPreviewPage }) => {
   const { ids, entities } = data;
 
-  console.log('data:_', data);
+  // console.log('data:_', data);
 
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No data found for this prompt'} />;

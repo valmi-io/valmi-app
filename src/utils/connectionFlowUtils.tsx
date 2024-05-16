@@ -1,6 +1,8 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
 import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
+import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
 
 export type TStream = {
@@ -75,15 +77,17 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
 };
 
 export const generateConnectionPayload = ({
-  connectionDataFlow,
+  sourceCredentials,
   streams,
+  extras,
   user,
   isEditableFlow,
   schedulePayload,
   type,
   workspaceId
 }: {
-  connectionDataFlow: any;
+  sourceCredentials: any;
+  extras: any;
   streams: any;
   user: any;
   type: string;
@@ -93,16 +97,11 @@ export const generateConnectionPayload = ({
 }) => {
   let payload: Record<string, any> = {};
 
-  let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
-  // const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
-
-  const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
-
   const { name = '', run_interval = '' } = schedulePayload ?? {};
 
   if (type === getShopifyIntegrationType()) {
     // TODO: handle for isEditableFlow=true
-    const { name, ...config } = credentialObj;
+    const { name, ...config } = sourceCredentials;
     payload = {
       workspaceId: workspaceId,
       connectionPayload: {
@@ -138,8 +137,8 @@ export const generateConnectionPayload = ({
   }
 
   if (!isEditableFlow) {
-    credentialPayload = generateCredentialPayload(credentialObj, type, user);
-    destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
+    credentialPayload = generateCredentialPayload(sourceCredentials, type, user);
+    destCredentialPayload = generateCredentialPayload(sourceCredentials, 'DEST_POSTGRES-DEST', user);
     payload.credentialPayload = credentialPayload;
     payload.destCredentialPayload = destCredentialPayload;
   }
@@ -285,7 +284,7 @@ export const getConnectionFlowSteps = (mode: string, isEditableFlow: boolean) =>
   ];
 
   //@ts-ignore
-  const { create = [], edit = [] } = steps.find((step) => mode === step.type);
+  const { create = [], edit = [] } = steps?.find((step) => mode === step.type) ?? {};
 
   return isEditableFlow ? edit : create;
 };
@@ -361,4 +360,28 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
   });
 
   return streams;
+};
+
+export const initializeConnectionConfigDataFlow = ({
+  connectionDataFlow,
+  dispatch,
+  spec,
+  package: scopes,
+  type
+}: {
+  connectionDataFlow: any;
+  dispatch: AppDispatch;
+  spec: any;
+  package: any;
+  type: string;
+}) => {
+  const obj = {
+    ...connectionDataFlow.entities,
+    [getCredentialObjKey(type)]: {
+      ...connectionDataFlow.entities[getCredentialObjKey(type)],
+      spec: spec,
+      package: scopes
+    }
+  };
+  dispatch(setEntities(obj));
 };

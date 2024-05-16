@@ -8,7 +8,7 @@ import { AppDispatch } from '@store/store';
 import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useWizard } from 'react-use-wizard';
-import { setEntities } from '@/store/reducers/connectionDataFlow';
+import { clearConnectionFlowState, setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
@@ -24,7 +24,8 @@ import {
   getExtrasObjKey,
   generateSourcePayload,
   generateDestinationPayload,
-  filterStreamsBasedOnScope
+  filterStreamsBasedOnScope,
+  initializeConnectionConfigDataFlow
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import streamsReducer, { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
@@ -40,6 +41,8 @@ import { useCombinedIntegrationConfigQuery } from '@/content/ConnectionFlow/useC
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { TData } from '@/utils/typings.d';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { FormStatus } from '@/utils/form-utils';
 
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -65,18 +68,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '', mode = '' } = selectedConnector;
 
-  if (type === 'SRC_SHOPIFY') {
-    initialData = {
-      credentials: {
-        auth_method: 'api_password'
-      }
-    };
-  }
-
-  if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
-    initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
-  }
-
   // discover call query
   const [fetchObjects] = useLazyDiscoverConnectorQuery();
 
@@ -96,19 +87,39 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     traceError: combinedConfigTraceError
   } = useCombinedIntegrationConfigQuery({ oauthKeys: oauthKeys, type: type, workspaceId: wid });
 
-  const [state, setState] = useState<TConnectionCheckState>({
-    error: '',
-    status: 'empty'
+  // form state
+  const [status, setStatus] = useState<FormStatus>('empty');
+
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
   });
 
-  const [results, setResults] = useState(null);
-
   useEffect(() => {
+    if (connectionDataFlow) {
+      console.log('connectionDataFlow is updated', connectionDataFlow);
+    }
+  }, [connectionDataFlow]);
+  useEffect(() => {
+    console.log('inside useeffect');
     if (combinedConfigData) {
-      const { spec } = combinedConfigData ?? {};
-      setResults(spec);
+      console.log('inside combine');
+      const { spec, packages, oauthKeysData } = combinedConfigData ?? {};
 
-      if (combinedConfigData.oauthKeysData) {
+      // initializing connection config data flow
+      initializeConnectionConfigDataFlow({
+        connectionDataFlow: connectionDataFlow,
+        dispatch: dispatch,
+        package: packages?.entities[getFreePackageId().toLocaleUpperCase()],
+        spec: spec,
+        type: type
+      });
+
+      // console.log('Combined config data usefffect', combinedConfigData);
+
+      if (oauthKeysData) {
         const setOAuthData = () => {
           //checking if connector configured for oAuth
           const { entities = {} } = combinedConfigData?.oauthKeysData ?? {};
@@ -138,107 +149,96 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     }
   }, [combinedConfigData]);
 
-  useEffect(() => {
-    if (
-      combinedConfigData?.spec &&
-      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
-    ) {
-      const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
-      const { isconfigured, isAuthorized } = oAuthConfigData;
-      const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
-      const obj = {
-        ...entitiesInStore,
-        [getSelectedConnectorKey()]: {
-          ...connectionDataFlow.entities[getSelectedConnectorKey()],
-          formValues: {
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-            credentials: {
-              client_id,
-              client_secret,
-              auth_method: 'oauth2.0',
-              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-            }
-          }
-        },
-        [getCredentialObjKey(type)]: {
-          ...connectionDataFlow.entities[getCredentialObjKey(type)],
-          spec: combinedConfigData?.spec,
-          config: {
-            ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-            credentials: {
-              ...getOAuthParams(oauth_params),
-              auth_method: 'oauth2.0',
-              access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-            },
-            name: displayName
-          }
-        }
-      };
-      dispatch(setEntities(obj));
-      !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
-    }
-  }, [combinedConfigData?.spec]);
+  // useEffect(() => {
+  //   if (
+  //     combinedConfigData?.spec &&
+  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
+  //   ) {
+  //     const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
+  //     const { isconfigured, isAuthorized } = oAuthConfigData;
+  //     const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
+  //     const obj = {
+  //       ...entitiesInStore,
+  //       [getSelectedConnectorKey()]: {
+  //         ...connectionDataFlow.entities[getSelectedConnectorKey()],
+  //         formValues: {
+  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+  //           credentials: {
+  //             client_id,
+  //             client_secret,
+  //             auth_method: 'oauth2.0',
+  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+  //           }
+  //         }
+  //       },
+  //       [getCredentialObjKey(type)]: {
+  //         ...connectionDataFlow.entities[getCredentialObjKey(type)],
+  //         spec: combinedConfigData?.spec,
+  //         config: {
+  //           ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
+  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
+  //           credentials: {
+  //             ...getOAuthParams(oauth_params),
+  //             auth_method: 'oauth2.0',
+  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
+  //           },
+  //           name: displayName
+  //         }
+  //       }
+  //     };
+  //     dispatch(setEntities(obj));
+  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
+  //   }
+  // }, [combinedConfigData?.spec]);
 
   const handleSubmit = (data: any) => {
     console.log('handle submit:_', data);
-    setState((state) => ({
-      ...state,
-      status: 'submitting'
-    }));
+
+    setStatus('submitting');
 
     const payload = {
       config: data
     };
 
-    checkConnection(`/workspaces/${wid}/connectors/${type}/check`, 'POST', payload);
+    checkConnection(`/workspaces/${wid}/connectors/${type}/check`, payload);
   };
 
-  const checkConnection = async (url: string, method: string, payload: any) => {
+  const checkConnection = async (url: string, payload: any) => {
     await httpPostRequestHandler({
       route: apiRoutes['check'],
       url,
       payload,
       errorCb: (err) => {
-        setState((state) => ({
-          ...state,
-          status: 'error',
-          error: err
-        }));
+        setStatus('error');
+
+        handleAlertOpen({ message: err, alertType: 'error' });
       },
-      successCb: (res) => {
+      successCb: async (res) => {
         const { connectionStatus: { status = '', message = '' } = {} } = res ?? {};
         if (status === 'FAILED') {
-          setState((state) => ({
-            ...state,
-            status: 'error',
-            error: message
-          }));
-        } else {
-          const entities = {
-            ...connectionDataFlow.entities,
-            [getCredentialObjKey(type)]: {
-              ...connectionDataFlow.entities[getCredentialObjKey(type)],
-              //TODO : after check, get the name from the response and send it here instead displayName
-              config: {
-                ...payload.config,
-                name: displayName
-              },
-              spec: combinedConfigData?.spec ?? {},
-              // set the package data in store
-              package: combinedConfigData?.packages?.entities[getFreePackageId().toLocaleUpperCase()]
-            }
-          };
+          setStatus('error');
 
-          dispatch(setEntities(entities));
+          handleAlertOpen({ message: message, alertType: 'error' });
+        } else {
           if (isConnectionAutomationFlow({ mode, type })) {
             // discover objects
-            discoverObjects();
+            await discoverObjects();
           } else {
-            setState((state) => ({
-              ...state,
-              status: 'success'
-            }));
+            const entities = {
+              ...connectionDataFlow.entities,
+              [getCredentialObjKey(type)]: {
+                ...connectionDataFlow.entities[getCredentialObjKey(type)],
+                //TODO : after check, get the name from the response and send it here instead displayName
+                config: {
+                  ...payload.config,
+                  name: displayName
+                }
+              }
+            };
+
+            dispatch(setEntities(entities));
+            setStatus('success');
+
             nextStep();
           }
         }
@@ -259,7 +259,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     await queryHandler({
       query: fetchObjects,
       payload: payload,
-      successCb: (data) => {
+      successCb: async (data) => {
         const results = data?.resultData ?? {};
         const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
 
@@ -269,26 +269,27 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           streams.push(generateStreamObj(filteredStreams[i], 'stream'));
         }
 
-        onCreateAutomation(streams);
+        await handleConnectionOnCreate(streams);
       },
       errorCb: (err) => {
-        setState((state) => ({
-          ...state,
-          status: 'error',
-          error: err
-        }));
+        setStatus('error');
+
+        handleAlertOpen({ message: err, alertType: 'error' });
       }
     });
   };
 
-  const onCreateAutomation = async (streams: any) => {
+  const handleConnectionOnCreate = async (streams: any) => {
     const schedulePayload = {
       name: type?.toLocaleLowerCase(),
       run_interval: 'Every 1 hour'
     };
 
+    const { formValues: sourceCredentials = {} } = oAuthConfigData ?? {};
+
     const payload = generateConnectionPayload({
-      connectionDataFlow: connectionDataFlow,
+      sourceCredentials: sourceCredentials,
+      extras: connectionDataFlow?.entities[getExtrasObjKey()] ?? {},
       streams: streams,
       isEditableFlow: isEditableFlow,
       schedulePayload: schedulePayload,
@@ -297,25 +298,24 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
       workspaceId: wid
     });
 
+    console.log('generateConnectionPayload payload:_', payload);
     const query = getConnectionQuery({ type: type, isEditableFlow: isEditableFlow });
 
-    await queryHandler({ query: query, payload: payload, successCb, errorCb });
-  };
+    await queryHandler({
+      query: query,
+      payload: payload,
+      successCb: (data: any) => {
+        setStatus('success');
+        handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
+        // dispatch(clearConnectionFlowState());
+        router.push(`/spaces/${wid}/connections`);
+      },
+      errorCb: (err) => {
+        setStatus('error');
 
-  const successCb = (data: any) => {
-    setState((state) => ({
-      ...state,
-      status: 'success'
-    }));
-    router.push(`/spaces/${wid}/connections`);
-  };
-
-  const errorCb = (error: any) => {
-    setState((state) => ({
-      ...state,
-      status: 'error',
-      error: error
-    }));
+        handleAlertOpen({ message: err, alertType: 'error' });
+      }
+    });
   };
 
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
@@ -327,15 +327,44 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     }
   };
 
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
+  };
+
   return (
     <ConnectorLayout title={`Connect to ${displayName}`}>
+      <AlertComponent
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        displayButton={false}
+        isError={alertState.type === 'error'}
+      />
       <IntegrationSpec
         error={combinedConfigError}
         isLoading={combinedConfigIsLoading}
         traceError={combinedConfigTraceError}
-        specData={combinedConfigData?.spec ?? {}}
+        specData={combinedConfigData?.spec ?? undefined}
         handleSubmit={handleSubmit}
-        status={state.status}
+        status={status}
         key={'IntegrationSpec'}
       />
     </ConnectorLayout>

@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Wizard } from 'react-use-wizard';
 
 const ConnectionFlowComponent = ({ params }: { params: any }) => {
-  console.log('ConnectionFlowComponent', params);
   const { cid = '' } = params ?? {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
@@ -34,6 +33,8 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const connectionSteps = useMemo(() => {
+    console.log('get connection steps:_', getConnectionFlowSteps(mode, isEditableFlow));
+
     const steps: Step[] = getConnectionFlowSteps(mode, isEditableFlow);
 
     let newIds = steps

@@ -53,8 +53,8 @@ const IntegrationSpec = ({
     };
   }
 
-  if (!isObjectEmpty(oauth_params)) {
-    initialData = config;
+  if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
+    initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
   }
 
   const [data, setData] = useState<any>(initialData);
@@ -79,8 +79,6 @@ const IntegrationSpec = ({
     await setOAuthConfigData(formData);
   };
 
-  console.log('data:_', data);
-
   const getButtonTitle = () => {
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
@@ -102,11 +100,6 @@ const IntegrationSpec = ({
       const schema: any = specData?.spec?.connectionSpecification ?? {};
 
       const { valid, errors } = jsonFormValidator(schema, data);
-
-      console.log('valid', {
-        valid,
-        errors
-      });
 
       return (
         <>
