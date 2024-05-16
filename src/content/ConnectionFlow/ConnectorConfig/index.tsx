@@ -404,8 +404,14 @@ const ConnectorConfig = ({ params }: TConnectionUpsertProps) => {
     const rows = results?.catalog?.streams ?? [];
 
     const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
+    /*
+    the above line needs to be changed. Its not the correct way to read streams from scopes.\
+    For now i have added abandoned_checkouts manually to the streams
+    */
+    namesInScopes.push('abandoned_checkouts');
 
     const authorizedScopesRows = rows.filter(({ name }: { name: string }) => {
+      console.log(name);
       if (namesInScopes.includes(name)) return true;
     });
 

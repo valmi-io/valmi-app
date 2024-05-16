@@ -6,7 +6,7 @@
 
 import { memo } from 'react';
 
-import { Button, Icon, ListItemButton, Stack, Typography, styled } from '@mui/material';
+import { Button, Container, Icon, ListItemButton, Stack, Typography, styled, Box } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
@@ -24,16 +24,16 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <ListItemButton
-      sx={{ my: 1, height: 50 }}
-      onClick={() => onClick(path)}
-      className={currentRoute === id ? 'active' : ''}
-    >
-      <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} gap={2}>
+    <Box>
+      <ListItemButton
+        sx={{ my: 1, height: 50 }}
+        onClick={() => onClick(path)}
+        className={currentRoute === id ? 'active' : ''}
+      >
         {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
-        {displayText}
-      </Stack>
-    </ListItemButton>
+        <Typography>{displayText}</Typography>
+      </ListItemButton>
+    </Box>
   );
 };
 

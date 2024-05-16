@@ -17,17 +17,28 @@ const LogoWrapper = styled(Link)(({ theme }) => ({
   fontWeight: theme.typography.fontWeightBold
 }));
 
+type LogoProps = {
+  width: number;
+  height: number;
+};
+
 function Logo() {
   return (
     <LogoWrapper href="/">
-      <Image
-        priority={true}
-        src="/images/valmi_logo_text_white.svg"
-        alt="Logo"
-        width={140}
-        height={40}
-      />
+      <Image priority={true} src="/images/valmi_logo_text_white.svg" alt="Logo" width={140} height={40} />
     </LogoWrapper>
+  );
+}
+
+export function LogoImage(props: LogoProps) {
+  return (
+    <Image
+      priority={true}
+      src="/images/valmi_logo_text_white.svg"
+      alt="Logo"
+      width={props.width || 140}
+      height={props.height || 40}
+    />
   );
 }
 

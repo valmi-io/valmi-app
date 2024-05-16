@@ -49,6 +49,10 @@ function Header() {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
   const { isLoggedIn } = useLoginStatus();
+<<<<<<< Updated upstream
+=======
+  // const { data: session, status } = useSession();
+>>>>>>> Stashed changes
 
   return (
     <HeaderWrapper
