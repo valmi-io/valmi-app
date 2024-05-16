@@ -14,6 +14,56 @@ const Label = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[70]
 }));
 
+const MenuContainer = styled(Container)(
+  ({ theme }) => `
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 16px;
+    width: 248px;
+    height: 48px;
+
+`
+);
+
+const IconBox = styled(Box)(
+  ({ theme }) => `
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+
+  width: 56px;
+  min-width: 56px;
+  height: 24px;
+
+  `
+);
+
+const InnerIconBox = styled(Box)(
+  ({ theme }) => `
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+
+    width: 24px;
+    height: 24px;
+`
+);
+
+const TextBox = styled(Box)(
+  ({ theme }) => `
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 4px 0px;
+    width: 160px;
+    height: 32px;
+
+  `
+);
+
 export type TSidebarItemProps = {
   item: TSidebarRoute;
   currentRoute: any;
@@ -24,16 +74,18 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <Box>
+    <MenuContainer>
       <ListItemButton
-        sx={{ my: 1, height: 50 }}
+        sx={{ my: 1, height: 50, p: 0 }}
         onClick={() => onClick(path)}
         className={currentRoute === id ? 'active' : ''}
       >
-        {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
+        <IconBox>
+          <InnerIconBox> {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}</InnerIconBox>
+        </IconBox>
         <Typography>{displayText}</Typography>
       </ListItemButton>
-    </Box>
+    </MenuContainer>
   );
 };
 

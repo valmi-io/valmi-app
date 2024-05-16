@@ -17,11 +17,6 @@ const LogoWrapper = styled(Link)(({ theme }) => ({
   fontWeight: theme.typography.fontWeightBold
 }));
 
-type LogoProps = {
-  width: number;
-  height: number;
-};
-
 function Logo() {
   return (
     <LogoWrapper href="/">
@@ -30,16 +25,8 @@ function Logo() {
   );
 }
 
-export function LogoImage(props: LogoProps) {
-  return (
-    <Image
-      priority={true}
-      src="/images/valmi_logo_text_white.svg"
-      alt="Logo"
-      width={props.width || 140}
-      height={props.height || 40}
-    />
-  );
+export function SidebarLogo() {
+  return <Image priority={true} src="/images/valmi_logo_sidebar.svg" alt="Logo" width={156.8} height={32} />;
 }
 
 export default Logo;
