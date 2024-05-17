@@ -114,10 +114,10 @@ export const nextAuthOptions = (req, res) => {
               },
               user: {
                 name: name,
-                email: email
-              },
-              meta: {
-                ...additionalAuthParams.meta
+                email: email,
+                meta: {
+                  ...additionalAuthParams.meta
+                }
               }
             };
 

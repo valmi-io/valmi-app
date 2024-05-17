@@ -24,7 +24,7 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
   borderRadius: theme.spacing(0.4)
 }));
 
-export function GoogleSignInButton({ meta }: { meta: any }) {
+export function GoogleSignInButton({ meta = {} }: { meta: any }) {
   const { data: session } = useSession();
 
   const handleClick = () => {
@@ -38,10 +38,7 @@ export function GoogleSignInButton({ meta }: { meta: any }) {
         })
       );
       signIn('google', {
-        callbackUrl: '/',
-        authorizationParams: {
-          state: JSON.stringify(meta)
-        }
+        callbackUrl: '/'
       });
     }
   };
