@@ -4,6 +4,8 @@ import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connec
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
+import { isObjectEmpty } from '@/utils/lib';
+import { TData } from '@/utils/typings.d';
 
 export type TStream = {
   name: string;
@@ -339,10 +341,6 @@ export const getShopifyIntegrationType = () => {
   return 'SRC_SHOPIFY';
 };
 
-export const generateDefaultWarehouseConnectionPayload = ({}: { type: string }) => {
-  return {};
-};
-
 export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
 };
@@ -367,12 +365,14 @@ export const initializeConnectionConfigDataFlow = ({
   dispatch,
   spec,
   package: scopes,
+  oauthCredentials,
   type
 }: {
   connectionDataFlow: any;
   dispatch: AppDispatch;
   spec: any;
   package: any;
+  oauthCredentials: any;
   type: string;
 }) => {
   const obj = {
@@ -380,8 +380,20 @@ export const initializeConnectionConfigDataFlow = ({
     [getCredentialObjKey(type)]: {
       ...connectionDataFlow.entities[getCredentialObjKey(type)],
       spec: spec,
-      package: scopes
+      package: scopes,
+      oauthCredentials: oauthCredentials
     }
   };
   dispatch(setEntities(obj));
+};
+
+export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
+
+export const isIntegrationConfigured = (data: TData, type: string) => {
+  console.log('returning ...........', !!data?.entities[type]);
+  return !!data?.entities[type];
+};
+
+export const isIntegrationAuthorized = (oAuthParams: any, isEditableFlow: boolean) => {
+  return !!(!isObjectEmpty(oAuthParams) || isEditableFlow);
 };

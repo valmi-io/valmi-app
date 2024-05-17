@@ -16,7 +16,7 @@ import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmD
 import { isObjectEmpty } from '@/utils/lib';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 import { AppDispatch } from '@/store/store';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 
@@ -25,7 +25,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const {
     handleOAuthButtonClick,
     handleOnConfigureButtonClick,
-    selectedConnector,
+    // selectedConnector,
     oAuthConfigData,
     setOAuthConfigData,
     setIsOuthStepDone
@@ -56,7 +56,13 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
   const entitiesInStore = connectionDataFlow?.entities ?? {};
+
+  const { type = '', oauth_keys: oauthKeys = '' } = selectedConnector;
+
+  const { oauthCredentials = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [newSelectedIndex, setNewSelectedIndex] = useState(0);
@@ -82,6 +88,8 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
       });
     }
   }, []);
+
+  // console.log('Form one of control Oauth credentials:_', oauthCredentials);
 
   const handleClose = useCallback(() => setConfirmDialogOpen(false), [setConfirmDialogOpen]);
 
@@ -136,6 +144,21 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
     },
     [setConfirmDialogOpen, setSelectedIndex, data]
   );
+
+  const renderOAuthButton = () => {
+    return (
+      <FormFieldAuth
+        onClick={handleOAuthButtonClick}
+        isConfigurationRequired={oAuthConfigData?.requireConfiguration}
+        isConnectorConfigured={oAuthConfigData?.isconfigured}
+        handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+        oAuthProvider={getOAuthProviderName(selectedConnector)}
+        oauth_error={selectedConnector?.oauth_error}
+        hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
+        sx={{ mt: 2 }}
+      />
+    );
+  };
 
   const isOAuthSelected = (option: number) => {
     return !!(oAuthOptions[option].title?.toLowerCase() === 'oauth2.0');

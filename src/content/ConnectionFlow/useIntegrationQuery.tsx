@@ -5,7 +5,7 @@ import { useGetOAuthApiConfigQuery } from '@/store/api/oauthApiSlice';
 import { getFreePackageId } from '@/utils/connectionFlowUtils';
 import { useMemo } from 'react';
 
-export const useCombinedIntegrationConfigQuery = ({
+export const useIntegrationQuery = ({
   type,
   workspaceId,
   oauthKeys
@@ -17,17 +17,17 @@ export const useCombinedIntegrationConfigQuery = ({
   const {
     data: spec,
     error: specError,
-    isFetching: specIsLoading,
+    isFetching: isSpecLoading,
     traceError: specTraceError
   } = useFetch({
     query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true, skip: false })
   });
 
   const {
-    data: oauthKeysData,
-    error: oauthKeysError,
-    isFetching: oauthKeysIsLoading,
-    traceError: oauthKeysTraceError
+    data: oauthCredentials,
+    error: oauthCredentialsError,
+    isFetching: isOauthCredentialsLoading,
+    traceError: oauthCredentialsTraceError
   } = useFetch({
     query: useGetOAuthApiConfigQuery(
       { type, workspaceId },
@@ -40,9 +40,9 @@ export const useCombinedIntegrationConfigQuery = ({
 
   const {
     data: packages,
-    error: packageError,
-    isFetching: packageIsLoading,
-    traceError: packageTraceError
+    error: packagesError,
+    isFetching: isPackagesLoading,
+    traceError: packagesTraceError
   } = useFetch({
     query: useGetPackageByIdQuery(
       { packageId: getFreePackageId() },
@@ -53,16 +53,16 @@ export const useCombinedIntegrationConfigQuery = ({
   });
 
   const data = useMemo(() => {
-    if (spec && oauthKeysData && packages) {
-      return { spec, oauthKeysData, packages };
+    if (spec && oauthCredentials && packages) {
+      return { spec, oauthCredentials, packages };
     }
-  }, [spec, oauthKeysData, packages]);
+  }, [spec, oauthCredentials, packages]);
 
-  const error = specError || oauthKeysError || packageError;
+  const error = specError || oauthCredentialsError || packagesError;
 
-  const traceError = specTraceError || oauthKeysTraceError || packageTraceError;
+  const traceError = specTraceError || oauthCredentialsTraceError || packagesTraceError;
 
-  const isLoading = specIsLoading || oauthKeysIsLoading || packageIsLoading;
+  const isLoading = isSpecLoading || isOauthCredentialsLoading || isPackagesLoading;
 
   return { data, error, traceError, isLoading };
 };

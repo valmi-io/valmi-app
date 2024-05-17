@@ -7,7 +7,10 @@ import {
   getCredentialObjKey,
   getSelectedConnectorKey,
   getShopifyIntegrationType,
-  isConnectionAutomationFlow
+  isConnectionAutomationFlow,
+  isIntegrationAuthorized,
+  isIntegrationConfigured,
+  isOAuthConfigurationRequired
 } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { jsonFormValidator } from '@/utils/form-utils';
@@ -25,21 +28,25 @@ const IntegrationSpec = ({
   traceError,
   isLoading,
   specData,
+  oauthCredentials,
   handleSubmit,
+  isEditableFlow,
   status
 }: {
   error: any;
   traceError: any;
   isLoading: boolean;
   specData: any;
+  oauthCredentials: any;
   status: string;
+  isEditableFlow: boolean;
   handleSubmit: (payload: any) => void;
 }) => {
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { type = '', mode = '', oauth_params = {} } = selectedConnector;
+  const { type = '', mode = '', oauth_params = {}, oauth_keys: oauthKeys = '' } = selectedConnector;
 
   const config = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
 
@@ -62,26 +69,30 @@ const IntegrationSpec = ({
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
 
-  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
+  // let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
 
   // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
-  useEffect(() => {
-    if (specData && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-      const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-      setData(formDataFromStore);
-    }
-  }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
+  // useEffect(() => {
+  //   if (specData && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+  //     const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+  //     setData(formDataFromStore);
+  //   }
+  // }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
 
   const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
 
-    let formData = { ...oAuthConfigData, formValues: data };
-    await setOAuthConfigData(formData);
+    // let formData = { ...oAuthConfigData, formValues: data };
+    // await setOAuthConfigData(formData);
   };
 
   const getButtonTitle = () => {
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
+
+  // console.log('initial data:_', initialData);
+
+  // console.log('data:_', data);
 
   const renderComponent = () => {
     if (error) {

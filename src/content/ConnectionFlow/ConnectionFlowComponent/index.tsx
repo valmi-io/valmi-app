@@ -33,8 +33,6 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const connectionSteps = useMemo(() => {
-    console.log('get connection steps:_', getConnectionFlowSteps(mode, isEditableFlow));
-
     const steps: Step[] = getConnectionFlowSteps(mode, isEditableFlow);
 
     let newIds = steps

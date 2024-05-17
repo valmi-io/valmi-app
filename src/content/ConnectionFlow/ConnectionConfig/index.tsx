@@ -25,7 +25,10 @@ import {
   generateSourcePayload,
   generateDestinationPayload,
   filterStreamsBasedOnScope,
-  initializeConnectionConfigDataFlow
+  initializeConnectionConfigDataFlow,
+  isIntegrationConfigured,
+  isOAuthConfigurationRequired,
+  isIntegrationAuthorized
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import streamsReducer, { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
@@ -37,7 +40,7 @@ import {
 } from '@/store/api/connectionApiSlice';
 import { useSession } from 'next-auth/react';
 import { TConnectionCheckState } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
-import { useCombinedIntegrationConfigQuery } from '@/content/ConnectionFlow/useCombinedQuery';
+import { useIntegrationQuery } from '@/content/ConnectionFlow/useIntegrationQuery';
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import { getOAuthParams } from '@/pagesauth/callback';
 import { TData } from '@/utils/typings.d';
@@ -54,7 +57,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const { nextStep } = useWizard();
 
-  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
+  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone, isoAuthStepDone } = useContext(OAuthContext);
 
   let initialData = {};
 
@@ -80,12 +83,11 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   // update connection query
   const [updateConnection] = useLazyUpdateConnectionQuery();
 
-  const {
-    data: combinedConfigData,
-    error: combinedConfigError,
-    isLoading: combinedConfigIsLoading,
-    traceError: combinedConfigTraceError
-  } = useCombinedIntegrationConfigQuery({ oauthKeys: oauthKeys, type: type, workspaceId: wid });
+  const { data, error, isLoading, traceError } = useIntegrationQuery({
+    oauthKeys: oauthKeys,
+    type: type,
+    workspaceId: wid
+  });
 
   // form state
   const [status, setStatus] = useState<FormStatus>('empty');
@@ -98,15 +100,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   });
 
   useEffect(() => {
-    if (connectionDataFlow) {
-      console.log('connectionDataFlow is updated', connectionDataFlow);
-    }
-  }, [connectionDataFlow]);
-  useEffect(() => {
-    console.log('inside useeffect');
-    if (combinedConfigData) {
-      console.log('inside combine');
-      const { spec, packages, oauthKeysData } = combinedConfigData ?? {};
+    if (data) {
+      const { spec, packages, oauthCredentials } = data ?? {};
 
       // initializing connection config data flow
       initializeConnectionConfigDataFlow({
@@ -114,40 +109,50 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         dispatch: dispatch,
         package: packages?.entities[getFreePackageId().toLocaleUpperCase()],
         spec: spec,
+        oauthCredentials: oauthCredentials,
         type: type
       });
 
-      // console.log('Combined config data usefffect', combinedConfigData);
+      if (oauthCredentials) {
+        console.log('trying to set OAuth data');
 
-      if (oauthKeysData) {
-        const setOAuthData = () => {
-          //checking if connector configured for oAuth
-          const { entities = {} } = combinedConfigData?.oauthKeysData ?? {};
-
-          if (entities[`${type}`]) {
-            oAuthConfigData = { ...oAuthConfigData, isconfigured: true };
-
-            setOAuthConfigData(oAuthConfigData);
-          }
-
-          //check if configuration required
-          if (oauthKeys === 'private') {
-            oAuthConfigData = { ...oAuthConfigData, requireConfiguration: true };
-            setOAuthConfigData(oAuthConfigData);
-          }
-
-          //check if hasAuthorizedOAuth
-          const hasAuthorizedOAuth = (oAuthParams: any, isEditableFlow: boolean) => {
-            let authorizedStatus = !isObjectEmpty(oAuthParams) || isEditableFlow ? true : false;
-            let authData = { ...oAuthConfigData, isAuthorized: authorizedStatus };
-            setOAuthConfigData(authData);
-          };
-          hasAuthorizedOAuth(selectedConnector?.oauth_params, isEditableFlow);
-        };
-        setOAuthData();
+        // setOAuthData();
       }
     }
-  }, [combinedConfigData]);
+  }, [data]);
+
+  // useEffect(() => {
+  //   if (data && oAuthConfigData) {
+  //     console.log('OAuth config data', { data, oAuthConfigData });
+  //   }
+  // }, [oAuthConfigData]);
+
+  useEffect(() => {
+    if (oAuthConfigData) {
+      console.log('updated oauth config data:_', { oAuthConfigData });
+    }
+  }, [oAuthConfigData]);
+
+  // useEffect(() => {
+  //   console.log('isOAuthStrpDone', isoAuthStepDone);
+  // }, [isoAuthStepDone]);
+
+  // const setOAuthData = () => {
+  //   console.log('setting oauth data:_ ---------------');
+
+  //   // console.log('Object', {
+  //   //   isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
+  //   //   requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
+  //   //   isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
+  //   // });
+
+  //   setOAuthConfigData((oAuthConfigData: any) => ({
+  //     ...oAuthConfigData,
+  //     isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
+  //     requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
+  //     isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
+  //   }));
+  // };
 
   // useEffect(() => {
   //   if (
@@ -192,8 +197,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   // }, [combinedConfigData?.spec]);
 
   const handleSubmit = (data: any) => {
-    console.log('handle submit:_', data);
-
     setStatus('submitting');
 
     const payload = {
@@ -219,24 +222,25 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           setStatus('error');
 
           handleAlertOpen({ message: message, alertType: 'error' });
+
+          const entities = {
+            ...connectionDataFlow.entities,
+            [getCredentialObjKey(type)]: {
+              ...connectionDataFlow.entities[getCredentialObjKey(type)],
+              //TODO : after check, get the name from the response and send it here instead displayName
+              config: {
+                ...payload.config,
+                name: displayName
+              }
+            }
+          };
+
+          dispatch(setEntities(entities));
         } else {
           if (isConnectionAutomationFlow({ mode, type })) {
             // discover objects
             await discoverObjects();
           } else {
-            const entities = {
-              ...connectionDataFlow.entities,
-              [getCredentialObjKey(type)]: {
-                ...connectionDataFlow.entities[getCredentialObjKey(type)],
-                //TODO : after check, get the name from the response and send it here instead displayName
-                config: {
-                  ...payload.config,
-                  name: displayName
-                }
-              }
-            };
-
-            dispatch(setEntities(entities));
             setStatus('success');
 
             nextStep();
@@ -298,7 +302,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
       workspaceId: wid
     });
 
-    console.log('generateConnectionPayload payload:_', payload);
     const query = getConnectionQuery({ type: type, isEditableFlow: isEditableFlow });
 
     await queryHandler({
@@ -359,12 +362,14 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         isError={alertState.type === 'error'}
       />
       <IntegrationSpec
-        error={combinedConfigError}
-        isLoading={combinedConfigIsLoading}
-        traceError={combinedConfigTraceError}
-        specData={combinedConfigData?.spec ?? undefined}
+        error={error}
+        isLoading={isLoading}
+        traceError={traceError}
+        specData={data?.spec ?? undefined}
+        oauthCredentials={data?.oauthCredentials ?? undefined}
         handleSubmit={handleSubmit}
         status={status}
+        isEditableFlow={isEditableFlow}
         key={'IntegrationSpec'}
       />
     </ConnectorLayout>

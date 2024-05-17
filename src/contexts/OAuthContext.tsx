@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useRouter } from 'next/router';
-import { ReactNode, createContext, useState } from 'react';
+import { ReactNode, createContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
@@ -29,6 +29,13 @@ type Props = {
   children: ReactNode;
 };
 
+export type TOAuthContextState = {
+  isconfigured: boolean;
+  requireConfiguration: boolean;
+  isAuthorized: boolean;
+  formValues: any;
+};
+
 function OAuthContextProvider({ children }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -46,7 +53,7 @@ function OAuthContextProvider({ children }: Props) {
 
   const { wid = '' } = params ?? {};
 
-  const [oAuthConfigData, setOAuthConfigData] = useState({
+  const [oAuthConfigData, setOAuthConfigData] = useState<TOAuthContextState>({
     isconfigured: false,
     requireConfiguration: true,
     isAuthorized: false,
