@@ -72,7 +72,7 @@ function DataTable({ data }: { data: TData }) {
   const tableData = convertToTableFormat(data.entities[id]);
 
   // Output tableData to console
-  console.log('table data', tableData);
+  // console.log('table data', tableData);
 
   // console.log('Object.keys(getHeaders(data)[0]', Object.keys(getHeaders(data)[0]));
   let headers = Object.keys(getHeaders(data)[0]);

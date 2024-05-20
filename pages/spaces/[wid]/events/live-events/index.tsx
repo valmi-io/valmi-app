@@ -77,7 +77,7 @@ const LiveEventsPage = ({
 
     router.push(
       {
-        pathname: `${getBaseRoute(workspaceId)}/events/live-events`,
+        pathname: `${getBaseRoute(workspaceId!)}/events/live-events`,
         query: { query: JSON.stringify(queryState) }
       },
       undefined,

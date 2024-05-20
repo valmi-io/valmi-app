@@ -9,33 +9,19 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import Head from '@components/PageHead';
-import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useLoginStatus } from '@/hooks/useLoginStatus';
-import { signOutUser } from '@/utils/lib';
-import { useDispatch } from 'react-redux';
 
 const HomePage = () => {
-  const dispatch = useDispatch();
-
   const router = useRouter();
-
-  // logout user query
-  const [logoutUser] = useLazyLogoutUserQuery();
 
   const { isLoggedIn, workspaceId } = useLoginStatus();
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && workspaceId) {
       //@ts-ignore
       router.push(`/spaces/${workspaceId}/connections`);
-    } else {
-      if (workspaceId) {
-        signOutUser(router, dispatch, logoutUser);
-      } else {
-        router.push('/login');
-      }
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, workspaceId]);
 
   return (
     <>

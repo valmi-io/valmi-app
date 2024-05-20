@@ -16,20 +16,19 @@ import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmD
 import { isObjectEmpty } from '@/utils/lib';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import {
+  getCredentialObjKey,
+  getSelectedConnectorKey,
+  isIntegrationAuthorized,
+  isIntegrationConfigured,
+  isOAuthConfigurationRequired
+} from '@/utils/connectionFlowUtils';
 import { AppDispatch } from '@/store/store';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
-  const {
-    handleOAuthButtonClick,
-    handleOnConfigureButtonClick,
-    selectedConnector,
-    oAuthConfigData,
-    setOAuthConfigData,
-    setIsOuthStepDone
-  } = useContext(OAuthContext);
+  const { handleOAuthButtonClick, handleOnConfigureButtonClick, setFormState, formState } = useContext(OAuthContext);
 
   const {
     data,
@@ -56,7 +55,13 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
   const entitiesInStore = connectionDataFlow?.entities ?? {};
+
+  const { type = '', oauth_keys: oauthKeys = '', oauth_error = '', oauth_params = null } = selectedConnector;
+
+  const { oauthCredentials = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [newSelectedIndex, setNewSelectedIndex] = useState(0);
@@ -74,14 +79,14 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   //if oauth_params exists then set the index of tabbed to oauth after redirecting back
   useEffect(() => {
-    if (!isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
+    if (!isObjectEmpty(oauth_params)) {
       oAuthOptions.forEach((option: any, index: number) => {
         if (option?.title?.toLowerCase() === 'oauth2.0') {
           setSelectedIndex(index);
         }
       });
     }
-  }, []);
+  }, [oauth_params]);
 
   const handleClose = useCallback(() => setConfirmDialogOpen(false), [setConfirmDialogOpen]);
 
@@ -103,39 +108,65 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   };
 
   const confirm = useCallback(() => {
-    openNewTab(newSelectedIndex);
     const authMethodValue = !!(oAuthOptions[newSelectedIndex].title?.toLowerCase() === 'oauth2.0')
       ? 'oauth2.0'
       : oAuthOptions[newSelectedIndex]?.properties?.auth_method?.const;
+
+    // Updating auth_method in formState
+    setFormState((formState) => ({
+      ...formState,
+      credentials: {
+        auth_method: authMethodValue
+      }
+    }));
+
+    // Remove oAuthparams in redux store
     const obj = {
       ...entitiesInStore,
       [getSelectedConnectorKey()]: {
         ...connectionDataFlow.entities[getSelectedConnectorKey()],
-        formValues: {
-          ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-          credentials: {
-            ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues?.credentials,
-            auth_method: authMethodValue
-          }
-        }
+        oauth_params: null
       }
     };
+
     dispatch(setEntities(obj));
 
+    // Close the confirm dialog
     setConfirmDialogOpen(false);
+
+    // open new tab
+    openNewTab(newSelectedIndex);
   }, [handleChange, createDefaultValue, newSelectedIndex]);
 
   const handleTabChange = useCallback(
     (_event: any, newOneOfIndex: number) => {
+      console.log('new one of index:_', newOneOfIndex);
       setNewSelectedIndex(newOneOfIndex);
-      if (isEmpty(data)) {
-        openNewTab(newOneOfIndex);
-      } else {
-        setConfirmDialogOpen(true);
-      }
+      // if (isEmpty(data)) {
+      //   openNewTab(newOneOfIndex);
+      // } else {
+      //   setConfirmDialogOpen(true);
+      // }
+
+      setConfirmDialogOpen(true);
     },
     [setConfirmDialogOpen, setSelectedIndex, data]
   );
+
+  const renderOAuthButton = () => {
+    return (
+      <FormFieldAuth
+        onClick={handleOAuthButtonClick}
+        isConfigurationRequired={isOAuthConfigurationRequired(oauthKeys)}
+        isConnectorConfigured={isIntegrationConfigured(oauthCredentials, type)}
+        handleOnConfigureButtonClick={handleOnConfigureButtonClick}
+        oAuthProvider={getOAuthProviderName(selectedConnector)}
+        oauth_error={oauth_error}
+        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, false)}
+        sx={{ mt: 2 }}
+      />
+    );
+  };
 
   const isOAuthSelected = (option: number) => {
     return !!(oAuthOptions[option].title?.toLowerCase() === 'oauth2.0');
@@ -176,31 +207,9 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                   )
               )}
 
-            {hasOneOfArr && isOAuthSelected(selectedIndex) && (
-              <FormFieldAuth
-                onClick={handleOAuthButtonClick}
-                isConfigurationRequired={oAuthConfigData?.requireConfiguration}
-                isConnectorConfigured={oAuthConfigData?.isconfigured}
-                handleOnConfigureButtonClick={handleOnConfigureButtonClick}
-                oAuthProvider={getOAuthProviderName(selectedConnector)}
-                oauth_error={selectedConnector?.oauth_error}
-                hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
-                sx={{ mt: 2 }}
-              />
-            )}
+            {hasOneOfArr && isOAuthSelected(selectedIndex) && renderOAuthButton()}
 
-            {!hasOneOfArr && (
-              <FormFieldAuth
-                onClick={handleOAuthButtonClick}
-                isConfigurationRequired={oAuthConfigData?.requireConfiguration}
-                isConnectorConfigured={oAuthConfigData?.isconfigured}
-                handleOnConfigureButtonClick={handleOnConfigureButtonClick}
-                oAuthProvider={getOAuthProviderName(selectedConnector)}
-                oauth_error={selectedConnector?.oauth_error}
-                hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
-                sx={{ mt: 2 }}
-              />
-            )}
+            {!hasOneOfArr && renderOAuthButton()}
 
             <TabSwitchConfirmDialog
               cancel={cancel}
