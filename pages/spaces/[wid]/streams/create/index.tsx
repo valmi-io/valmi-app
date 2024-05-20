@@ -192,7 +192,7 @@ const CreateStream = () => {
     <PageLayout
       pageHeadTitle={editing ? 'Edit Stream' : 'Create Stream'}
       title={editing ? 'Edit Stream' : 'Create a new Stream'}
-      displayButton={false}
+      displayButtonInHeader={false}
     >
       <AlertComponent
         open={alertState.show}

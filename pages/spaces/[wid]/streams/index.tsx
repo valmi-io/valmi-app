@@ -79,8 +79,8 @@ const StreamsPage: NextPageWithLayout = () => {
     <PageLayout
       pageHeadTitle="Streams"
       title="Streams"
-      buttonTitle="Stream"
-      handleButtonOnClick={() => handleEditClick({ edit: false, streamId: '' })}
+      buttonTitleInHeader="Stream"
+      handleButtonInHeaderOnClick={() => handleEditClick({ edit: false, streamId: '' })}
     >
       <ContentLayout
         key={`streamsPage`}

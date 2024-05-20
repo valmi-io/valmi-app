@@ -41,10 +41,11 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  Width: '100%',
+  width: '100%',
   height: '100%',
   minHeight: '364.25px',
   minWidth: '440px',
+  maxWidth: '648px',
   padding: 0,
   gap: theme.spacing(2),
   border: '1px solid rgba(0, 0, 0, 0.25)',
@@ -115,9 +116,17 @@ const AuthenticationLayout = () => {
             />
           </FormLayout>
         )}
-        <Stack sx={{ width: '100%' }}>
+        <Stack
+          sx={{
+            width: '100%',
+            cursor: isNewUser ? (!(valid && data.promotion === true) ? 'not-allowed' : 'pointer') : 'not-allowed'
+          }}
+        >
           <Button disabled={isNewUser ? !(valid && data.promotion === true) : false} fullWidth sx={{ padding: 0 }}>
-            <GoogleSignInButton meta={{ ...data }} />
+            <GoogleSignInButton
+              meta={{ ...data }}
+              isDisabled={isNewUser ? !(valid && data.promotion === true) : false}
+            />
           </Button>
           <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
             <AuthenticationFormFooter

@@ -86,7 +86,7 @@ const LiveEventsPage = ({
   };
 
   return (
-    <PageLayout pageHeadTitle="LiveEvents" title="Live Events" displayButton={false}>
+    <PageLayout pageHeadTitle="LiveEvents" title="Live Events" displayButtonInHeader={false}>
       <LiveEventTabs state={JSON.parse(query as string)} onChange={handleOnChange} />
     </PageLayout>
   );

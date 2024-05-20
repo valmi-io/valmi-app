@@ -18,13 +18,13 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
   padding: '1px 10px 1px 1px',
   gap: '10px',
-  border: '1px solid rgba(0, 0, 0, 0.5)',
+  // border: '1px solid rgba(0, 0, 0, 0.5)',
   boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.084), 0px 1px 1px rgba(0, 0, 0, 0.168)',
-  cursor: 'pointer',
+  // cursor: 'pointer',
   borderRadius: theme.spacing(0.4)
 }));
 
-export function GoogleSignInButton({ meta = {} }: { meta: any }) {
+export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDisabled: boolean }) {
   const { data: session } = useSession();
 
   const handleClick = () => {
@@ -43,14 +43,21 @@ export function GoogleSignInButton({ meta = {} }: { meta: any }) {
     }
   };
   return (
-    <PaperWrapper onClick={handleClick}>
+    <PaperWrapper
+      onClick={handleClick}
+      sx={{
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
+        border: isDisabled ? '1px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(0, 0, 0, 0.5)'
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
           height: '100%',
           width: 60,
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          opacity: isDisabled ? 0.5 : 1
         }}
       >
         {' '}
@@ -66,13 +73,15 @@ export function GoogleSignInButton({ meta = {} }: { meta: any }) {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          opacity: isDisabled ? 0.5 : 1
         }}
       >
         <Typography
-          variant="body1"
+          variant="h6"
           sx={{
-            color: 'black'
+            color: 'black',
+            opacity: isDisabled ? 0.5 : 0.6
           }}
         >
           {session

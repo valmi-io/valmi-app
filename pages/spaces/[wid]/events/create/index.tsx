@@ -95,7 +95,7 @@ const CreateEventXterior = () => {
     <PageLayout
       pageHeadTitle={editing ? 'Edit Connection' : 'Create Connection'}
       title={editing ? 'Edit Connection' : 'Create a new Connection'}
-      displayButton={false}
+      displayButtonInHeader={false}
     >
       <ContentLayout
         key={`createConnection`}

@@ -32,7 +32,7 @@ const ContentLayout = ({
   return (
     <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
       <Grid item xs={12}>
-        <Card variant={cardVariant ? 'outlined' : undefined} style={cardStyles}>
+        <Card variant={cardVariant ? 'elevation' : undefined} style={cardStyles}>
           {/** Display error */}
           {!isLoading && error && <ErrorContainer error={error} />}
 

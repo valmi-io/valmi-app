@@ -35,8 +35,8 @@ const ContainerWrapper = styled(Paper)(({ theme }) => ({
   alignItems: 'flex-start',
   // gap: theme.spacing(2),
   width: '100%',
-  minHeight: '364.25px',
-  border: '1px solid rgba(0, 0, 0, 0.25)'
+  minHeight: '364.25px'
+  // border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
 const ImageBoxContainer = styled(Box)(({ theme }) => ({
@@ -80,7 +80,14 @@ const Login: NextPageWithLayout = () => {
       <Head title="Login" />
       {/* <GridLayout> */}
       <ContainerWrapper>
-        <ImageBoxContainer>
+        <ImageBoxContainer
+          sx={{
+            display: {
+              xs: 'none',
+              sm: 'flex'
+            }
+          }}
+        >
           <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
         </ImageBoxContainer>
         <AuthenticationLayout />

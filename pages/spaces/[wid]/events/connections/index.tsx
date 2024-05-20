@@ -140,8 +140,8 @@ const EventConnectionsPage: NextPageWithLayout = () => {
     <PageLayout
       pageHeadTitle="Connections"
       title="Connections"
-      buttonTitle="Connection"
-      handleButtonOnClick={() => handleEditClick({ edit: false, id: '' })}
+      buttonTitleInHeader="Connection"
+      handleButtonInHeaderOnClick={() => handleEditClick({ edit: false, id: '' })}
     >
       <ContentLayout
         key={`eventConnectionsPage`}

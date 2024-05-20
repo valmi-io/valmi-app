@@ -555,7 +555,7 @@ export const AppFlowyTheme = createTheme({
     h6: {
       fontSize: 20,
       lineHeight: 1.6,
-      fontWeight: 600
+      fontWeight: 500
     },
     body1: {
       fontSize: 16,

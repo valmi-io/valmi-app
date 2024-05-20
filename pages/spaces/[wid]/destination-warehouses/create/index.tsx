@@ -29,7 +29,7 @@ const CreateWarehousePage = () => {
     setSelectedType(type);
   };
 
-  const warehouseDestinations = ["postgres", "snowflake", "redshift", "clickhouse", "bigquery", "mysql", "mongodb"];
+  const warehouseDestinations = ['postgres', 'snowflake', 'redshift', 'clickhouse', 'bigquery', 'mysql', 'mongodb'];
 
   const onSubmitClick = () => {
     router.push(`${getBaseRoute(wid as string)}/destination-warehouses/create/${selectedType}`);
@@ -45,42 +45,39 @@ const CreateWarehousePage = () => {
 
     if (warehouseDestinations.includes(type)) {
       warehouses.push(
-
-          <ConnectorCard
-            item={extDestination}
-            handleConnectorOnClick={handleItemOnClick}
-            selected={selectedType === type}
-            src={src}
-            displayName={displayName}
-          />
-
+        <ConnectorCard
+          item={extDestination}
+          handleConnectorOnClick={handleItemOnClick}
+          selected={selectedType === type}
+          src={src}
+          displayName={displayName}
+        />
       );
     } else {
       analytics.push(
-          <ConnectorCard
-            item={extDestination}
-            handleConnectorOnClick={handleItemOnClick}
-            selected={selectedType === type}
-            src={src}
-            displayName={displayName}
-          />
-
+        <ConnectorCard
+          item={extDestination}
+          handleConnectorOnClick={handleItemOnClick}
+          selected={selectedType === type}
+          src={src}
+          displayName={displayName}
+        />
       );
     }
   });
 
   return (
-    <PageLayout pageHeadTitle={'Select Destination'} title={'Select Destination'} displayButton={false}>
+    <PageLayout pageHeadTitle={'Select Destination'} title={'Select Destination'} displayButtonInHeader={false}>
       <Paper variant="outlined">
         <ConnectorLayout title={''} layoutStyles={{ margin: theme.spacing(3) }}>
           {/** Display page content */}
           <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-          <Grid item xs={12} sm={12} md={12}>
-            <Box textAlign="left" marginBottom={2}>
-              <h3>Warehouse Destinations</h3>
-            </Box>
-          </Grid>
-          {warehouses}
+            <Grid item xs={12} sm={12} md={12}>
+              <Box textAlign="left" marginBottom={2}>
+                <h3>Warehouse Destinations</h3>
+              </Box>
+            </Grid>
+            {warehouses}
             {/* Render ANALYTICS */}
             <Grid item xs={12} sm={12} md={12}>
               <Box textAlign="left" marginTop={4} marginBottom={2}>

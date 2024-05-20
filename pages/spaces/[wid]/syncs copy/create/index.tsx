@@ -189,7 +189,7 @@ const SyncFlow = () => {
     <PageLayout
       pageHeadTitle={'Create sync'}
       title={flowState.length ? 'Edit sync' : 'Create a new sync'}
-      displayButton={false}
+      displayButtonInHeader={false}
     >
       <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
       {/** Stepper */}

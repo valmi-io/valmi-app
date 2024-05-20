@@ -68,8 +68,8 @@ const DestinationsPage: NextPageWithLayout = () => {
       <PageLayout
         pageHeadTitle="Destinations"
         title="Destinations"
-        buttonTitle="Destination"
-        handleButtonOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
+        buttonTitleInHeader="Destination"
+        handleButtonInHeaderOnClick={() => handleButtonOnClick({ edit: false, id: '', supertype: '', type: '' })}
       >
         <ContentLayout
           key={`destinationsWarehousesPage`}
