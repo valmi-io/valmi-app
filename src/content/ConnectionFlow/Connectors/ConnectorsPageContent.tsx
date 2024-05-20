@@ -20,15 +20,7 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleItemOnClick = (item: ConnectorType) => {
-    const { type = '', mode = [] } = item ?? {};
-
-    const params = new URLSearchParams();
-
-    params.set('mode', mode.length > 0 ? mode[0] : '');
- 
-    const pathname = `${getBaseRoute(workspaceId!)}/connections/create`;
-
-
+    const pathname = `${getBaseRoute(workspaceId as string)}/connections/create`;
     const key = getSelectedConnectorKey();
 
     const objToDispatch = {
@@ -40,7 +32,7 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
 
     dispatch(setConnectionFlowState(objToDispatch));
 
-    router.push(pathname + '?' + params);
+    router.push(pathname);
   };
 
   return <ConnectorsList key={`connectorsList`} data={data} handleItemOnClick={handleItemOnClick} selectedType={''} />;

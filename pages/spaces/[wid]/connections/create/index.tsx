@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 
-import ConnectionFormComponent from '@/content/ConnectionFlow/ConnectionFormComponent';
+import ConnectionFlowComponent from '@/content/ConnectionFlow/ConnectionFlowComponent';
 
 type TConnectionUpsertParams = {
   type: string;
@@ -36,7 +36,7 @@ const ConnectionCreatePageLayout = () => {
 };
 
 const ConnectionCreatePage = ({ params }: TConnectionUpsertProps) => {
-  return <ConnectionFormComponent params={params} />;
+  return <ConnectionFlowComponent params={params} />;
 };
 
 ConnectionCreatePageLayout.getLayout = function getLayout(page: ReactElement) {

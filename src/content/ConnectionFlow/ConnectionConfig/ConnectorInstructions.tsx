@@ -5,7 +5,7 @@
  */
 
 import Instructions from '@/components/Instructions';
-import { getConnectorDocumentationUrl } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { getConnectorDocumentationUrl } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { memo } from 'react';
 
 const ConnectorInstuctions = ({ data, selected_connector }: { data: any; selected_connector: any }) => {
