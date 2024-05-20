@@ -20,15 +20,13 @@ const LogoWrapper = styled(Link)(({ theme }) => ({
 function Logo() {
   return (
     <LogoWrapper href="/">
-      <Image
-        priority={true}
-        src="/images/valmi_logo_text_white.svg"
-        alt="Logo"
-        width={140}
-        height={40}
-      />
+      <Image priority={true} src="/images/valmi_logo_text_white.svg" alt="Logo" width={140} height={40} />
     </LogoWrapper>
   );
+}
+
+export function SidebarLogo() {
+  return <Image priority={true} src="/images/valmi_logo_sidebar.svg" alt="Logo" width={156.8} height={32} />;
 }
 
 export default Logo;

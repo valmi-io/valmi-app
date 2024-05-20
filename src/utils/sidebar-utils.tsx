@@ -35,15 +35,17 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       path: `/spaces/${workspaceId}/explores`,
       sidebarProps: {
         displayText: 'EXPLORES',
-        icon: appIcons.STREAM
+        icon: appIcons.EXPLORES,
+        muiIcon: true
       }
     },
     {
       id: 1,
       path: `/spaces/${workspaceId}/connections`,
       sidebarProps: {
-        displayText: 'CONNECTIONS',
-        icon: appIcons.SYNC
+        displayText: 'DATA FLOWS',
+        icon: appIcons.DATA_FLOWS,
+        muiIcon: true
       }
     },
 
@@ -52,7 +54,8 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       path: `/spaces/${workspaceId}/catalog`,
       sidebarProps: {
         displayText: 'CATALOG',
-        icon: appIcons.CONNECTION
+        icon: appIcons.CATALOG,
+        muiIcon: true
       }
     },
 
