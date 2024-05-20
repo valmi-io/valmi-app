@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -8,7 +8,7 @@ import { AppDispatch } from '@store/store';
 import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useWizard } from 'react-use-wizard';
-import { clearConnectionFlowState, setEntities } from '@/store/reducers/connectionDataFlow';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
@@ -17,21 +17,16 @@ import {
   getCredentialObjKey,
   getSelectedConnectorKey,
   getFreePackageId,
-  getCatalogObjKey,
   generateConnectionPayload,
   getShopifyIntegrationType,
   isConnectionAutomationFlow,
   getExtrasObjKey,
-  generateSourcePayload,
-  generateDestinationPayload,
   filterStreamsBasedOnScope,
-  initializeConnectionConfigDataFlow,
-  isIntegrationConfigured,
-  isOAuthConfigurationRequired,
-  isIntegrationAuthorized
+  initializeConnectionFlowState,
+  generateConfigFromSpec
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
-import streamsReducer, { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
+import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
   useLazyCreateConnectionQuery,
@@ -39,13 +34,13 @@ import {
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
 import { useSession } from 'next-auth/react';
-import { TConnectionCheckState } from '@/content/ConnectionFlow/ConnectionFlowComponent/ConnectionCheck';
 import { useIntegrationQuery } from '@/content/ConnectionFlow/useIntegrationQuery';
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import { getOAuthParams } from '@/pagesauth/callback';
-import { TData } from '@/utils/typings.d';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { FormStatus } from '@/utils/form-utils';
+
+import spec from '../spec.json';
 
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -57,7 +52,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const { nextStep } = useWizard();
 
-  let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone, isoAuthStepDone } = useContext(OAuthContext);
+  let { setFormState } = useContext(OAuthContext);
 
   let initialData = {};
 
@@ -69,7 +64,13 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const isEditableFlow = !!connectionId;
 
-  const { type = '', display_name: displayName = '', oauth_keys: oauthKeys = '', mode = '' } = selectedConnector;
+  const {
+    type = '',
+    display_name: displayName = '',
+    oauth_keys: oauthKeys = '',
+    mode = '',
+    oauth_params: oAuthParams = {}
+  } = selectedConnector;
 
   // discover call query
   const [fetchObjects] = useLazyDiscoverConnectorQuery();
@@ -103,8 +104,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     if (data) {
       const { spec, packages, oauthCredentials } = data ?? {};
 
-      // initializing connection config data flow
-      initializeConnectionConfigDataFlow({
+      // initializing connection flow state.
+      initializeConnectionFlowState({
         connectionDataFlow: connectionDataFlow,
         dispatch: dispatch,
         package: packages?.entities[getFreePackageId().toLocaleUpperCase()],
@@ -112,78 +113,33 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         oauthCredentials: oauthCredentials,
         type: type
       });
-
-      if (oauthCredentials) {
-        // console.log('trying to set OAuth data');
-        // setOAuthData();
-      }
     }
   }, [data]);
 
-  // useEffect(() => {
-  //   if (data && oAuthConfigData) {
-  //     console.log('OAuth config data', { data, oAuthConfigData });
-  //   }
-  // }, [oAuthConfigData]);
+  useEffect(() => {
+    if (oAuthParams && !isObjectEmpty(oAuthParams)) {
+      oAuthConfiguredState().run();
+    }
+  }, [oAuthParams]);
 
-  // const setOAuthData = () => {
-  //   console.log('setting oauth data:_ ---------------');
+  const oAuthConfiguredState = () => {
+    return {
+      run: () => {
+        // const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
+        const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+        let combinedValues = {
+          ...formDataFromStore,
+          ...getOAuthParams(oAuthParams)
+        };
 
-  //   // console.log('Object', {
-  //   //   isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
-  //   //   requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
-  //   //   isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
-  //   // });
+        let config = generateConfigFromSpec(spec, combinedValues);
 
-  //   setOAuthConfigData((oAuthConfigData: any) => ({
-  //     ...oAuthConfigData,
-  // isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
-  // requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
-  // isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
-  //   }));
-  // };
+        setFormState(config);
 
-  // useEffect(() => {
-  //   if (
-  //     combinedConfigData?.spec &&
-  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)
-  //   ) {
-  //     const { oauth_params = {} } = connectionDataFlow.entities[getSelectedConnectorKey()];
-  //     const { isconfigured, isAuthorized } = oAuthConfigData;
-  //     const { client_id, client_secret } = getOAuthParams(oauth_params) || {};
-  //     const obj = {
-  //       ...entitiesInStore,
-  //       [getSelectedConnectorKey()]: {
-  //         ...connectionDataFlow.entities[getSelectedConnectorKey()],
-  //         formValues: {
-  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-  //           credentials: {
-  //             client_id,
-  //             client_secret,
-  //             auth_method: 'oauth2.0',
-  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-  //           }
-  //         }
-  //       },
-  //       [getCredentialObjKey(type)]: {
-  //         ...connectionDataFlow.entities[getCredentialObjKey(type)],
-  //         spec: combinedConfigData?.spec,
-  //         config: {
-  //           ...connectionDataFlow.entities[getCredentialObjKey(type)]?.config,
-  //           ...connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues,
-  //           credentials: {
-  //             ...getOAuthParams(oauth_params),
-  //             auth_method: 'oauth2.0',
-  //             access_token: connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params?.access_token
-  //           },
-  //           name: displayName
-  //         }
-  //       }
-  //     };
-  //     dispatch(setEntities(obj));
-  //     !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params) && setIsOAuthStepDone(true);
-  //   }
-  // }, [combinedConfigData?.spec]);
+        return;
+      }
+    };
+  };
 
   // STATE: Trigger to get into Checking Credential State - BEGIN
   const handleSubmit = (data: any) => {
@@ -207,8 +163,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         handleAlertOpen({ message: err, alertType: 'error' });
       },
       successCb: async (res) => {
-        console.log('Check credential is successfully done');
-
         const { connectionStatus: { status = '', message = '' } = {} } = res ?? {};
         if (status === 'FAILED') {
           setStatus('error');
@@ -256,9 +210,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     // discovering integration objects
     return {
       run: async () => {
-        const { formValues = {} } = oAuthConfigData ?? {};
         const payload = {
-          config: formValues,
+          config: connectionDataFlow.entities[getCredentialObjKey(type)]?.config ?? {},
           workspaceId: wid,
           connectorType: type,
           queryId: 1
@@ -377,10 +330,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         isLoading={isLoading}
         traceError={traceError}
         specData={data?.spec ?? undefined}
-        oauthCredentials={data?.oauthCredentials ?? undefined}
         handleSubmit={handleSubmit}
         status={status}
-        isEditableFlow={isEditableFlow}
         key={'IntegrationSpec'}
       />
     </ConnectorLayout>

@@ -35,7 +35,6 @@ const Login: NextPageWithLayout = () => {
   const { isLoggedIn, workspaceId } = useLoginStatus();
 
   useEffect(() => {
-    console.log('Is logged in:_', isLoggedIn, workspaceId);
     if (isLoggedIn && workspaceId) {
       //@ts-ignore
       router.push(`/spaces/${workspaceId}/connections`);

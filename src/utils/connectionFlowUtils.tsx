@@ -360,7 +360,7 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
   return streams;
 };
 
-export const initializeConnectionConfigDataFlow = ({
+export const initializeConnectionFlowState = ({
   connectionDataFlow,
   dispatch,
   spec,
@@ -390,10 +390,59 @@ export const initializeConnectionConfigDataFlow = ({
 export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
 
 export const isIntegrationConfigured = (data: TData, type: string) => {
-  console.log('returning ...........', !!data?.entities[type]);
   return !!data?.entities[type];
 };
 
 export const isIntegrationAuthorized = (oAuthParams: any, isEditableFlow: boolean) => {
-  return !!(!isObjectEmpty(oAuthParams) || isEditableFlow);
+  return !!((oAuthParams && !isObjectEmpty(oAuthParams)) || isEditableFlow);
+};
+
+export const generateConfigFromSpec = (spec: any, values: any) => {
+  return createJsonObject(
+    spec.spec.connectionSpecification.required,
+    spec.spec.connectionSpecification.properties,
+    values
+  );
+};
+
+const createJsonObject = (required: any, properties_def: any, values: any) => {
+  let obj: any = {};
+
+  if (required) {
+    for (const field of required) {
+      if (properties_def[field].oneOf) {
+        // Determine which oneOf schema to use based on the auth_method value
+        const method = values?.credentials?.auth_method ?? '';
+        const selectedSchema = properties_def[field].oneOf.find(
+          (schema: any) => schema.properties.auth_method.const === method
+        );
+
+        // Merge nested credentials from top-level values
+        const nestedValues = { ...values.credentials, ...extractNestedCredentials(values) };
+        obj[field] = createJsonObject(selectedSchema?.required, selectedSchema?.properties, nestedValues);
+      } else if (properties_def[field].type === 'object') {
+        if (properties_def[field].required) {
+          obj[field] = createJsonObject(
+            properties_def[field].required,
+            properties_def[field].properties,
+            values[field]
+          );
+        } else {
+          obj[field] = values[field];
+        }
+      } else {
+        obj[field] = values[field];
+      }
+    }
+  }
+
+  return obj;
+};
+
+const extractNestedCredentials = (values: any) => {
+  return {
+    client_id: values.client_id,
+    client_secret: values.client_secret,
+    access_token: values.access_token
+  };
 };

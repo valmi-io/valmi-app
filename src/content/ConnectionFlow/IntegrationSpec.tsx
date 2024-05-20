@@ -3,96 +3,52 @@ import SkeletonLoader from '@/components/SkeletonLoader';
 import SubmitButton from '@/components/SubmitButton';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import { RootState } from '@/store/reducers';
-import {
-  getCredentialObjKey,
-  getSelectedConnectorKey,
-  getShopifyIntegrationType,
-  isConnectionAutomationFlow,
-  isIntegrationAuthorized,
-  isIntegrationConfigured,
-  isOAuthConfigurationRequired
-} from '@/utils/connectionFlowUtils';
+import { getSelectedConnectorKey, isConnectionAutomationFlow } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { jsonFormValidator } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
 import { materialCells } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
 import { Stack } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
-import { isObjectEmpty } from '@/utils/lib';
+import spec from './spec.json';
 
 const IntegrationSpec = ({
   error,
   traceError,
   isLoading,
   specData,
-  oauthCredentials,
   handleSubmit,
-  isEditableFlow,
   status
 }: {
   error: any;
   traceError: any;
   isLoading: boolean;
   specData: any;
-  oauthCredentials: any;
   status: string;
-  isEditableFlow: boolean;
+
   handleSubmit: (payload: any) => void;
 }) => {
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { type = '', mode = '', oauth_params = {}, oauth_keys: oauthKeys = '' } = selectedConnector;
-
-  const config = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
-
-  let initialData = {};
-
-  if (type === getShopifyIntegrationType()) {
-    initialData = {
-      credentials: {
-        auth_method: 'api_password'
-      }
-    };
-  }
-
-  if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
-    initialData = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config;
-  }
-
-  const [data, setData] = useState<any>(initialData);
+  const { type = '', mode = '' } = selectedConnector;
 
   // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days', 'auth_method'] });
+  const customRenderers = getCustomRenderers({ invisibleFields: ['auth_method'] });
 
-  // let { oAuthConfigData, setOAuthConfigData, setIsOAuthStepDone } = useContext(OAuthContext);
-
-  // run this effect as initially the credentials will be empty, upon redirecting after oAuth, credentials other and form fields are filled and will be available in formValues
-  // useEffect(() => {
-  //   if (specData && !isObjectEmpty(connectionDataFlow.entities[getSelectedConnectorKey()]?.oauth_params)) {
-  //     const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-  //     setData(formDataFromStore);
-  //   }
-  // }, [connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues]);
+  const { formState, setFormState } = useContext(OAuthContext);
 
   const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
-
-    // let formData = { ...oAuthConfigData, formValues: data };
-    // await setOAuthConfigData(formData);
+    setFormState(data);
   };
 
   const getButtonTitle = () => {
     return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
-
-  // console.log('initial data:_', initialData);
-
-  // console.log('data:_', data);
 
   const renderComponent = () => {
     if (error) {
@@ -108,16 +64,19 @@ const IntegrationSpec = ({
     }
 
     if (specData) {
-      const schema: any = specData?.spec?.connectionSpecification ?? {};
+      // const schema: any = specData?.spec?.connectionSpecification ?? {};
 
-      const { valid, errors } = jsonFormValidator(schema, data);
+      // TODO: replace spec with specData
+      const schema: any = spec?.spec?.connectionSpecification ?? {};
+
+      const { valid, errors } = jsonFormValidator(schema, formState);
 
       return (
         <>
           <JsonForms
             readonly={status === 'submitting'}
             schema={schema}
-            data={data}
+            data={formState}
             renderers={customRenderers}
             cells={materialCells}
             onChange={handleFormChange}
@@ -135,7 +94,7 @@ const IntegrationSpec = ({
               data={status === 'success'}
               isFetching={status === 'submitting'}
               disabled={!valid || status === 'submitting'}
-              onClick={() => handleSubmit(data)}
+              onClick={() => handleSubmit(formState)}
             />
           </Stack>
 

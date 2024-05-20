@@ -17,7 +17,7 @@ import { ErrorStatusText } from '@components/Error';
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 
 import CustomIcon from '@components/Icon/CustomIcon';
-import { faCheckCircle, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useContext } from 'react';
 import { OAuthContext } from '@/contexts/OAuthContext';
 
@@ -54,14 +54,9 @@ const FormFieldAuth = (props: any) => {
     handleOnConfigureButtonClick
   } = props;
 
-  const { oAuthConfigData } = useContext(OAuthContext);
-  const {
-    // isconfigured,
-    // requireConfiguration,
-    // isAuthorized,
-    formValues
-  } = oAuthConfigData;
-  const { credentials, ...otherFormData } = formValues;
+  const { formState } = useContext(OAuthContext);
+
+  const { credentials, ...otherFormData } = formState;
 
   return (
     <>
