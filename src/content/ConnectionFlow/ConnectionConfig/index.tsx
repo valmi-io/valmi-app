@@ -40,8 +40,6 @@ import { getOAuthParams } from '@/pagesauth/callback';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { FormStatus } from '@/utils/form-utils';
 
-import spec from '../spec.json';
-
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
 
@@ -125,7 +123,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const oAuthConfiguredState = () => {
     return {
       run: () => {
-        // const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
+        const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
         const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
         let combinedValues = {
           ...formDataFromStore,
