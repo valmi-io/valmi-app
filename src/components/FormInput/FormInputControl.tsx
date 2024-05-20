@@ -6,10 +6,12 @@
 
 import { ControlProps, JsonSchema, isDescriptionHidden } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
+import { Card, FormControl, Hidden, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
 import moment from 'moment';
+import { useState } from 'react';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const isDateFormat = (schema: any) => {
   return !!(schema?.format === 'date');
@@ -51,6 +53,10 @@ export const FormInputControl = (props: ControlProps) => {
     appliedUiSchemaOptions.showUnfocusedDescription
   );
 
+  const [showInput, setShowInput] = useState(false);
+
+  const handleClick = () => setShowInput((show) => !show);
+
   // delay in milliseconds
   // input gets disabled & displays error after this delay.
   let timeout = 1000;
@@ -64,8 +70,7 @@ export const FormInputControl = (props: ControlProps) => {
     return val;
   };
 
-  const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
-  const secondFormHelperText = showDescription && !isValid ? errors : null;
+  const formErrorHelperText = showDescription && !isValid ? errors : null;
 
   const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue, timeout);
 
@@ -79,12 +84,12 @@ export const FormInputControl = (props: ControlProps) => {
     val = formattedDate.toString();
   }
 
-  const getInputType = (schema: JsonSchema) => {
+  const getInputType = (schema: JsonSchema, show: boolean) => {
     if (isDateFormat(schema) || isDateTimeFormat(schema)) {
       return 'date';
     }
 
-    if (isPasswordFormat(schema)) return 'password';
+    if (isPasswordFormat(schema)) return show ? 'text' : 'password';
     return '';
   };
 
@@ -92,31 +97,42 @@ export const FormInputControl = (props: ControlProps) => {
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
         {visible && (
-          <FormControl
-            fullWidth={!appliedUiSchemaOptions.trim}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            id={id}
-            variant={'standard'}
-          >
-            <TextField
-              label={label}
-              // type={isDateFormat(schema) || isDateTimeFormat(schema) ? 'date' : ''}
-              type={getInputType(schema)}
-              required={required}
-              value={val}
-              disabled={!enabled}
-              title={schema.title}
-              error={!isValid}
-              onChange={onChange}
-              fullWidth
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-            <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
-            <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
-          </FormControl>
+          <Tooltip title={description ? description : ''} placement="top-start">
+            <FormControl
+              fullWidth={!appliedUiSchemaOptions.trim}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              id={id}
+              variant={'standard'}
+            >
+              <TextField
+                label={label}
+                type={getInputType(schema, showInput)}
+                required={required}
+                value={val}
+                disabled={!enabled}
+                title={schema.title}
+                error={!isValid}
+                onChange={onChange}
+                fullWidth
+                InputLabelProps={{
+                  shrink: true
+                }}
+                InputProps={{
+                  endAdornment: isPasswordFormat(schema) && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleClick} edge="end">
+                        {showInput ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <Typography color={!isValid ? 'error.main' : 'primary.main'} variant="body2">
+                {formErrorHelperText?.toLowerCase() ?? ''}
+              </Typography>
+            </FormControl>
+          </Tooltip>
         )}
       </Card>
     </Hidden>
