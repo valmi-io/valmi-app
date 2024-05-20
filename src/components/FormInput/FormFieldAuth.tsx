@@ -47,14 +47,20 @@ const FormFieldAuth = (props: any) => {
     label,
     onClick,
     oAuthProvider,
-    hasOAuthAuthorized,
+    hasOAuthAuthorized: isAuthorized,
     oauth_error = '',
-    isConnectorConfigured,
-    isConfigurationRequired,
+    isConnectorConfigured: isconfigured,
+    isConfigurationRequired: requireConfiguration,
     handleOnConfigureButtonClick
   } = props;
+
   const { oAuthConfigData } = useContext(OAuthContext);
-  const { isconfigured, requireConfiguration, isAuthorized, formValues } = oAuthConfigData;
+  const {
+    // isconfigured,
+    // requireConfiguration,
+    // isAuthorized,
+    formValues
+  } = oAuthConfigData;
   const { credentials, ...otherFormData } = formValues;
 
   return (

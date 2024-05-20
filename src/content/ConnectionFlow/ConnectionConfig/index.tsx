@@ -114,8 +114,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
       });
 
       if (oauthCredentials) {
-        console.log('trying to set OAuth data');
-
+        // console.log('trying to set OAuth data');
         // setOAuthData();
       }
     }
@@ -126,16 +125,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   //     console.log('OAuth config data', { data, oAuthConfigData });
   //   }
   // }, [oAuthConfigData]);
-
-  useEffect(() => {
-    if (oAuthConfigData) {
-      console.log('updated oauth config data:_', { oAuthConfigData });
-    }
-  }, [oAuthConfigData]);
-
-  // useEffect(() => {
-  //   console.log('isOAuthStrpDone', isoAuthStepDone);
-  // }, [isoAuthStepDone]);
 
   // const setOAuthData = () => {
   //   console.log('setting oauth data:_ ---------------');
@@ -148,9 +137,9 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   //   setOAuthConfigData((oAuthConfigData: any) => ({
   //     ...oAuthConfigData,
-  //     isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
-  //     requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
-  //     isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
+  // isconfigured: isIntegrationConfigured(data?.oauthKeysData, type),
+  // requireConfiguration: isOAuthConfigurationRequired(oauthKeys),
+  // isAuthorized: isIntegrationAuthorized(selectedConnector?.oauth_params, isEditableFlow)
   //   }));
   // };
 
@@ -196,6 +185,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   //   }
   // }, [combinedConfigData?.spec]);
 
+  // STATE: Trigger to get into Checking Credential State - BEGIN
   const handleSubmit = (data: any) => {
     setStatus('submitting');
 
@@ -217,12 +207,14 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         handleAlertOpen({ message: err, alertType: 'error' });
       },
       successCb: async (res) => {
+        console.log('Check credential is successfully done');
+
         const { connectionStatus: { status = '', message = '' } = {} } = res ?? {};
         if (status === 'FAILED') {
           setStatus('error');
 
           handleAlertOpen({ message: message, alertType: 'error' });
-
+        } else {
           const entities = {
             ...connectionDataFlow.entities,
             [getCredentialObjKey(type)]: {
@@ -236,13 +228,9 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           };
 
           dispatch(setEntities(entities));
-        } else {
-          if (isConnectionAutomationFlow({ mode, type })) {
-            // discover objects
-            await discoverObjects();
-          } else {
-            setStatus('success');
 
+          if (!isConnectionAutomationFlow({ mode, type })) {
+            setStatus('success');
             nextStep();
           }
         }
@@ -250,77 +238,100 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     });
   };
 
-  // discovering integration objects
-  const discoverObjects = async () => {
-    const { formValues = {} } = oAuthConfigData ?? {};
-    const payload = {
-      config: formValues,
-      workspaceId: wid,
-      connectorType: type,
-      queryId: 1
-    };
+  //STATE: Checking Credential - END
 
-    await queryHandler({
-      query: fetchObjects,
-      payload: payload,
-      successCb: async (data) => {
-        const results = data?.resultData ?? {};
-        const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
+  // STATE: Discover State - BEGIN
+  useEffect(() => {
+    // This object is set on completion of check Query
+    if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
+      // if config exists in connectionDataFlow then run discover call -- but do it only once.
+      discoverState().run();
+    }
+  }, [connectionDataFlow.entities[getCredentialObjKey(type)]?.config]);
 
-        let streams = [];
+  const discoverState = () => {
+    //
+    // listen to entities on redux
+    // and do discover query  and set response in redux
+    // discovering integration objects
+    return {
+      run: async () => {
+        const { formValues = {} } = oAuthConfigData ?? {};
+        const payload = {
+          config: formValues,
+          workspaceId: wid,
+          connectorType: type,
+          queryId: 1
+        };
 
-        for (let i = 0; i < filteredStreams.length; i++) {
-          streams.push(generateStreamObj(filteredStreams[i], 'stream'));
-        }
+        await queryHandler({
+          query: fetchObjects,
+          payload: payload,
+          successCb: async (data) => {
+            const results = data?.resultData ?? {};
+            const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
 
-        await handleConnectionOnCreate(streams);
-      },
-      errorCb: (err) => {
-        setStatus('error');
+            let streams = [];
 
-        handleAlertOpen({ message: err, alertType: 'error' });
+            for (let i = 0; i < filteredStreams.length; i++) {
+              streams.push(generateStreamObj(filteredStreams[i], 'stream'));
+            }
+
+            await createConnectionState().run(streams);
+          },
+          errorCb: (err) => {
+            setStatus('error');
+
+            handleAlertOpen({ message: err, alertType: 'error' });
+          }
+        });
       }
-    });
+    };
   };
 
-  const handleConnectionOnCreate = async (streams: any) => {
-    const schedulePayload = {
-      name: type?.toLocaleLowerCase(),
-      run_interval: 'Every 1 hour'
-    };
+  // STATE: Discover State - END
 
-    const { formValues: sourceCredentials = {} } = oAuthConfigData ?? {};
+  // STATE: Create Connection State - BEGIN
+  const createConnectionState = () => {
+    return {
+      run: async (streams: any) => {
+        const schedulePayload = {
+          name: type?.toLocaleLowerCase(),
+          run_interval: 'Every 1 hour'
+        };
 
-    const payload = generateConnectionPayload({
-      sourceCredentials: sourceCredentials,
-      extras: connectionDataFlow?.entities[getExtrasObjKey()] ?? {},
-      streams: streams,
-      isEditableFlow: isEditableFlow,
-      schedulePayload: schedulePayload,
-      type: type,
-      user: session?.user ?? {},
-      workspaceId: wid
-    });
+        const payload = generateConnectionPayload({
+          sourceCredentials: connectionDataFlow?.entities[getCredentialObjKey(type)].config,
+          extras: connectionDataFlow?.entities[getExtrasObjKey()] ?? {},
+          streams: streams,
+          isEditableFlow: isEditableFlow,
+          schedulePayload: schedulePayload,
+          type: type,
+          user: session?.user ?? {},
+          workspaceId: wid
+        });
 
-    const query = getConnectionQuery({ type: type, isEditableFlow: isEditableFlow });
+        const query = getConnectionQuery({ type: type, isEditableFlow: isEditableFlow });
 
-    await queryHandler({
-      query: query,
-      payload: payload,
-      successCb: (data: any) => {
-        setStatus('success');
-        handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
-        // dispatch(clearConnectionFlowState());
-        router.push(`/spaces/${wid}/connections`);
-      },
-      errorCb: (err) => {
-        setStatus('error');
+        await queryHandler({
+          query: query,
+          payload: payload,
+          successCb: (data: any) => {
+            setStatus('success');
+            handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
+            router.push(`/spaces/${wid}/connections`);
+          },
+          errorCb: (err) => {
+            setStatus('error');
 
-        handleAlertOpen({ message: err, alertType: 'error' });
+            handleAlertOpen({ message: err, alertType: 'error' });
+          }
+        });
       }
-    });
+    };
   };
 
+  // STATE: Create Connection State - END
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
     if (type === getShopifyIntegrationType()) {
       // TODO: handle update default warehouse connection

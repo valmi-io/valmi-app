@@ -16,7 +16,13 @@ import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmD
 import { isObjectEmpty } from '@/utils/lib';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import {
+  getCredentialObjKey,
+  getSelectedConnectorKey,
+  isIntegrationAuthorized,
+  isIntegrationConfigured,
+  isOAuthConfigurationRequired
+} from '@/utils/connectionFlowUtils';
 import { AppDispatch } from '@/store/store';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 
@@ -60,7 +66,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const entitiesInStore = connectionDataFlow?.entities ?? {};
 
-  const { type = '', oauth_keys: oauthKeys = '' } = selectedConnector;
+  const { type = '', oauth_keys: oauthKeys = '', oauth_error = '', oauth_params = null } = selectedConnector;
 
   const { oauthCredentials = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
@@ -88,6 +94,12 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (oauthCredentials) {
+      console.log('form one of control Oauth credentials', oauthCredentials);
+    }
+  }, [oauthCredentials]);
 
   // console.log('Form one of control Oauth credentials:_', oauthCredentials);
 
@@ -146,15 +158,21 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   );
 
   const renderOAuthButton = () => {
+    console.log('renderOAuthButton', {
+      isConfigurationRequired: isOAuthConfigurationRequired(oauthKeys),
+      isConnectorConfigured: isIntegrationConfigured(oauthCredentials, type),
+      hasOAuthAuthorized: isIntegrationAuthorized(oauth_params, false)
+    });
+
     return (
       <FormFieldAuth
         onClick={handleOAuthButtonClick}
-        isConfigurationRequired={oAuthConfigData?.requireConfiguration}
-        isConnectorConfigured={oAuthConfigData?.isconfigured}
+        isConfigurationRequired={isOAuthConfigurationRequired(oauthKeys)}
+        isConnectorConfigured={isIntegrationConfigured(oauthCredentials, type)}
         handleOnConfigureButtonClick={handleOnConfigureButtonClick}
         oAuthProvider={getOAuthProviderName(selectedConnector)}
-        oauth_error={selectedConnector?.oauth_error}
-        hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
+        oauth_error={oauth_error}
+        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, false)}
         sx={{ mt: 2 }}
       />
     );
@@ -199,7 +217,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                   )
               )}
 
-            {hasOneOfArr && isOAuthSelected(selectedIndex) && (
+            {/* {hasOneOfArr && isOAuthSelected(selectedIndex) && (
               <FormFieldAuth
                 onClick={handleOAuthButtonClick}
                 isConfigurationRequired={oAuthConfigData?.requireConfiguration}
@@ -210,9 +228,10 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                 hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
                 sx={{ mt: 2 }}
               />
-            )}
+            )} */}
+            {hasOneOfArr && isOAuthSelected(selectedIndex) && renderOAuthButton()}
 
-            {!hasOneOfArr && (
+            {/* {!hasOneOfArr && (
               <FormFieldAuth
                 onClick={handleOAuthButtonClick}
                 isConfigurationRequired={oAuthConfigData?.requireConfiguration}
@@ -223,7 +242,9 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
                 hasOAuthAuthorized={oAuthConfigData?.isAuthorized}
                 sx={{ mt: 2 }}
               />
-            )}
+            )} */}
+
+            {!hasOneOfArr && renderOAuthButton()}
 
             <TabSwitchConfirmDialog
               cancel={cancel}
