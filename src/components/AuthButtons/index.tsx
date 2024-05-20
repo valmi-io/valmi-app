@@ -4,7 +4,7 @@ import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import {
   getOauthColorCode,
   getOauthImage,
-  getOauthLoginText
+  getOauthLoginText 
 } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
 import styled from '@emotion/styled';
 import { setCookie } from '@/lib/cookies';

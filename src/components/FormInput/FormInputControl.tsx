@@ -12,6 +12,10 @@ import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
 import moment from 'moment';
 
 const isDateFormat = (schema: any) => {
+  return !!(schema?.format === 'date');
+};
+
+const isDateTimeFormat = (schema: any) => {
   return !!(schema?.format === 'date-time');
 };
 
@@ -52,7 +56,7 @@ export const FormInputControl = (props: ControlProps) => {
 
     if (!val) return undefined;
 
-    if (isDateFormat(schema)) return new Date(val).toISOString();
+    if (isDateTimeFormat(schema)) return new Date(val).toISOString();
     return val;
   };
 
@@ -63,7 +67,7 @@ export const FormInputControl = (props: ControlProps) => {
 
   let val = inputText;
 
-  if (isDateFormat(schema)) {
+  if (isDateTimeFormat(schema)) {
     const date = moment(val);
 
     const formattedDate = date.format('YYYY-MM-DD');
@@ -84,7 +88,7 @@ export const FormInputControl = (props: ControlProps) => {
           >
             <TextField
               label={label}
-              type={schema?.format === 'date-time' ? 'date' : ''}
+              type={isDateFormat(schema) || isDateTimeFormat(schema) ? 'date' : ''}
               required={required}
               value={val}
               disabled={!enabled}

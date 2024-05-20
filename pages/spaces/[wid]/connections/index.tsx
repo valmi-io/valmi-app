@@ -7,16 +7,13 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { initialiseFlowState } from '@content/SyncFlow/stateManagement';
-
-import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
 import ContentLayout from '@/layouts/ContentLayout';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
@@ -24,13 +21,11 @@ import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-
-  /** Redux store */
-  const flowState = useSelector((state: RootState) => state.syncFlow.flowState);
 
   const { workspaceId = null } = useWorkspaceId();
 
@@ -49,7 +44,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     // initialising sync flow state
-    initialiseFlowState(dispatch, flowState, false);
+    dispatch(clearConnectionFlowState());
   }, []);
 
   const PageContent = () => {

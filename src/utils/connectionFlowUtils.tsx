@@ -1,7 +1,11 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
 import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { setEntities } from '@/store/reducers/connectionDataFlow';
+import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
+import { isObjectEmpty } from '@/utils/lib';
+import { TData } from '@/utils/typings.d';
 
 export type TStream = {
   name: string;
@@ -51,11 +55,12 @@ export const connectionScheduleSchema = {
 };
 
 export const getSelectedConnectorObj = (item: ConnectorType, key: string) => {
-  const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string } = {
+  const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string; mode: string } = {
     type: item.type ?? item.connector_type ?? {},
     display_name: item.display_name,
     oauth: !!item.oauth,
-    oauth_keys: item.oauth_keys ?? ''
+    oauth_keys: item.oauth_keys ?? '',
+    mode: item.mode ? item.mode[0] : ''
   };
 
   return obj;
@@ -73,32 +78,77 @@ export const generateCredentialPayload = (credentialConfig: any, type: string, u
   return payload;
 };
 
-export const generateConnectionPayload = (
-  streams: any[],
-  state: any,
-  wid: string,
-  isEditableFlow: boolean = false,
-  extras: any
-) => {
-  let connectionPayload: any = {};
+export const generateConnectionPayload = ({
+  sourceCredentials,
+  streams,
+  extras,
+  user,
+  isEditableFlow,
+  schedulePayload,
+  type,
+  workspaceId
+}: {
+  sourceCredentials: any;
+  extras: any;
+  streams: any;
+  user: any;
+  type: string;
+  schedulePayload: { name: string; run_interval: string };
+  workspaceId: string;
+  isEditableFlow: boolean;
+}) => {
+  let payload: Record<string, any> = {};
 
-  const { name = '', run_interval = '' } = state ?? {};
-  connectionPayload['src'] = generateSourcePayload(streams, isEditableFlow, extras);
-  connectionPayload['dest'] = generateDestinationPayload(streams, isEditableFlow, extras);
-  connectionPayload['schedule'] = { run_interval: getRunInterval(run_interval) };
-  connectionPayload['uiState'] = {};
-  connectionPayload['connectionName'] = name;
+  const { name = '', run_interval = '' } = schedulePayload ?? {};
 
-  connectionPayload['workspaceId'] = wid;
-
-  if (isEditableFlow) {
-    connectionPayload['connId'] = extras?.connId ?? '';
+  if (type === getShopifyIntegrationType()) {
+    // TODO: handle for isEditableFlow=true
+    const { name, ...config } = sourceCredentials;
+    payload = {
+      workspaceId: workspaceId,
+      connectionPayload: {
+        account: generateAccountPayload(user),
+        source_connector_type: type,
+        source_connector_config: config,
+        name: config?.shop ?? name,
+        source_catalog: generateSourcePayload(streams, isEditableFlow, extras),
+        destination_catalog: generateDestinationPayload(streams, isEditableFlow, extras),
+        schedule: { run_interval: getRunInterval(run_interval) }
+      }
+    };
+    return payload;
   }
 
-  return connectionPayload;
+  //TODO: handle payload for regular connections.
+  let credentialPayload = null;
+  let destCredentialPayload = null;
+
+  payload = {
+    workspaceId: workspaceId,
+    connectionPayload: {
+      src: generateSourcePayload(streams, isEditableFlow, extras),
+      dest: generateDestinationPayload(streams, isEditableFlow, extras),
+      schedule: { run_interval: getRunInterval(run_interval) },
+      uiState: {},
+      connectionName: name
+    }
+  };
+
+  if (isEditableFlow) {
+    payload.connectionPayload.connId = extras?.connId ?? '';
+  }
+
+  if (!isEditableFlow) {
+    credentialPayload = generateCredentialPayload(sourceCredentials, type, user);
+    destCredentialPayload = generateCredentialPayload(sourceCredentials, 'DEST_POSTGRES-DEST', user);
+    payload.credentialPayload = credentialPayload;
+    payload.destCredentialPayload = destCredentialPayload;
+  }
+
+  return payload;
 };
 
-const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: any) => {
+export const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: any) => {
   const sourcePayload: any = {
     catalog: {
       streams: streams
@@ -113,7 +163,7 @@ const generateSourcePayload = (streams: any[], isEditableFlow: boolean, extras: 
   return sourcePayload;
 };
 
-const generateDestinationPayload = (streams: TConfiguredStream[], isEditableFlow: boolean, extras: any) => {
+export const generateDestinationPayload = (streams: TConfiguredStream[], isEditableFlow: boolean, extras: any) => {
   const newStreams = streams.map((stream) => {
     let obj = { ...stream };
     if (!obj['primary_key']) {
@@ -236,7 +286,7 @@ export const getConnectionFlowSteps = (mode: string, isEditableFlow: boolean) =>
   ];
 
   //@ts-ignore
-  const { create = [], edit = [] } = steps.find((step) => mode === step.type);
+  const { create = [], edit = [] } = steps?.find((step) => mode === step.type) ?? {};
 
   return isEditableFlow ? edit : create;
 };
@@ -285,4 +335,114 @@ export const getFreePackageId = () => {
 
 export const getPremiuimPackageIds = () => {
   return ['p0', 'p1'];
+};
+
+export const getShopifyIntegrationType = () => {
+  return 'SRC_SHOPIFY';
+};
+
+export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
+  return !!(mode === 'etl' && type === getShopifyIntegrationType());
+};
+
+// filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
+export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
+  const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+
+  const rows = results?.catalog?.streams ?? [];
+
+  const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
+
+  const streams = rows.filter(({ name }: { name: string }) => {
+    if (namesInScopes.includes(name)) return true;
+  });
+
+  return streams;
+};
+
+export const initializeConnectionFlowState = ({
+  connectionDataFlow,
+  dispatch,
+  spec,
+  package: scopes,
+  oauthCredentials,
+  type
+}: {
+  connectionDataFlow: any;
+  dispatch: AppDispatch;
+  spec: any;
+  package: any;
+  oauthCredentials: any;
+  type: string;
+}) => {
+  const obj = {
+    ...connectionDataFlow.entities,
+    [getCredentialObjKey(type)]: {
+      ...connectionDataFlow.entities[getCredentialObjKey(type)],
+      spec: spec,
+      package: scopes,
+      oauthCredentials: oauthCredentials
+    }
+  };
+  dispatch(setEntities(obj));
+};
+
+export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
+
+export const isIntegrationConfigured = (data: TData, type: string) => {
+  return !!data?.entities[type];
+};
+
+export const isIntegrationAuthorized = (oAuthParams: any, isEditableFlow: boolean) => {
+  return !!((oAuthParams && !isObjectEmpty(oAuthParams)) || isEditableFlow);
+};
+
+export const generateConfigFromSpec = (spec: any, values: any) => {
+  return createJsonObject(
+    spec.spec.connectionSpecification.required,
+    spec.spec.connectionSpecification.properties,
+    values
+  );
+};
+
+const createJsonObject = (required: any, properties_def: any, values: any) => {
+  let obj: any = {};
+
+  if (required) {
+    for (const field of required) {
+      if (properties_def[field].oneOf) {
+        // Determine which oneOf schema to use based on the auth_method value
+        const method = values?.credentials?.auth_method ?? '';
+        const selectedSchema = properties_def[field].oneOf.find(
+          (schema: any) => schema.properties.auth_method.const === method
+        );
+
+        // Merge nested credentials from top-level values
+        const nestedValues = { ...values.credentials, ...extractNestedCredentials(values) };
+        obj[field] = createJsonObject(selectedSchema?.required, selectedSchema?.properties, nestedValues);
+      } else if (properties_def[field].type === 'object') {
+        if (properties_def[field].required) {
+          obj[field] = createJsonObject(
+            properties_def[field].required,
+            properties_def[field].properties,
+            values[field]
+          );
+        } else {
+          obj[field] = values[field];
+        }
+      } else {
+        obj[field] = values[field];
+      }
+    }
+  }
+
+  return obj;
+};
+
+const extractNestedCredentials = (values: any) => {
+  return {
+    client_id: values.client_id,
+    client_secret: values.client_secret,
+    access_token: values.access_token
+  };
 };

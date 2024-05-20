@@ -15,16 +15,12 @@ import { useWizard } from 'react-use-wizard';
 import { WizardFooter } from '@/components/Wizard/Footer';
 import { RootState } from '@/store/reducers';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
-import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/apiSlice';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import {
   connectionScheduleSchema,
   generateConnectionPayload,
-  generateCredentialPayload,
   getCatalogObjKey,
-  getCredentialObjKey,
-  getExtrasObjKey,
   getScheduleObjKey,
   getSelectedConnectorKey
 } from '@/utils/connectionFlowUtils';
@@ -32,12 +28,16 @@ import { useRouter } from 'next/router';
 import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import Spinner from '@/components/Spinner';
+import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/connectionApiSlice';
+import { useSession } from 'next-auth/react';
 
-const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) => {
+const ConnectionSchedule = ({ params, isEditableFlow = false }: TConnectionUpsertProps) => {
   const router = useRouter();
   const { wid = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
+
+  const { data: session } = useSession();
   let initialData = {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
@@ -58,10 +58,6 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
       run_interval: 'Every 1 hour'
     };
   }
-
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-
-  const { user } = appState ?? {};
 
   // create connection query
   const [createConnection] = useLazyCreateConnectionQuery();
@@ -119,27 +115,14 @@ const ConnectionSchedule = ({ params, isEditableFlow }: TConnectionUpsertProps) 
   const handleOnClick = () => {
     setStatus('submitting');
 
-    let credentialObj = connectionDataFlow?.entities[getCredentialObjKey(type)]?.config ?? {};
-    const streams = connectionDataFlow?.entities[getCatalogObjKey(type)]?.streams ?? {};
-
-    const extras = connectionDataFlow?.entities[getExtrasObjKey()] ?? {};
-
-    let credentialPayload = null;
-    let destCredentialPayload = null;
-
-    const connectionPayload = generateConnectionPayload(streams, data, wid, isEditableFlow, extras);
-
-    const payload: any = {
-      workspaceId: wid,
-      connectionPayload
-    };
-
-    if (!isEditableFlow) {
-      credentialPayload = generateCredentialPayload(credentialObj, type, user);
-      destCredentialPayload = generateCredentialPayload(credentialObj, 'DEST_POSTGRES-DEST', user);
-      payload['credentialPayload'] = credentialPayload;
-      payload['destCredentialPayload'] = destCredentialPayload;
-    }
+    const payload = generateConnectionPayload({
+      connectionDataFlow: connectionDataFlow,
+      isEditableFlow: isEditableFlow,
+      schedulePayload: data,
+      type: type,
+      user: session?.user ?? {},
+      workspaceId: wid
+    });
 
     const query = isEditableFlow ? updateConnection : createConnection;
 

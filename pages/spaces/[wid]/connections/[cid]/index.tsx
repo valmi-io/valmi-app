@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 
-import ConnectionFormComponent from '@/content/ConnectionFlow/ConnectionFormComponent';
+import ConnectionFormComponent from '@/content/ConnectionFlow/ConnectionFlowComponent';
 
 type TConnectionUpsertParams = {
   type: string;

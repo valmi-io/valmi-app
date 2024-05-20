@@ -1,28 +1,22 @@
 // @ts-nocheck
 import { useRouter } from 'next/router';
 import { ReactNode, createContext, useState } from 'react';
-import { FormObject } from '@/utils/form-utils';
-import { TData } from '@/utils/typings.d';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getCredentialObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
-import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
+import { getSelectedConnectorKey, getShopifyIntegrationType } from '@/utils/connectionFlowUtils';
+import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
-import { getOauthRoute } from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import { getOauthRoute } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 
 type OAuthContextType = {
   handleOAuthButtonClick: () => void;
   handleOnConfigureButtonClick: () => void;
-  isConnectorConfigured: any;
-  isConfigurationRequired: any;
   oAuthProvider: string;
   selectedConnector: object;
-  oAuthConfigData: any;
-  setOAuthConfigData: any;
-  isoAuthStepDone: boolean;
-  setIsOAuthStepDone: any;
+  formState: any;
+  setFormState: any;
 };
 
 const OAuthContext = createContext<OAuthContextType>({} as OAuthContextType);
@@ -44,16 +38,20 @@ function OAuthContextProvider({ children }: Props) {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  let { oauth_keys = 'private', type = '', oauth_params = {} } = selectedConnector;
+  let { oauth_keys = 'private', type = '' } = selectedConnector;
 
-  const { wid = '', mode = 'etl' } = params ?? {};
+  const { wid = '' } = params ?? {};
 
-  const [oAuthConfigData, setOAuthConfigData] = useState({
-    isconfigured: false,
-    requireConfiguration: true,
-    isAuthorized: false,
-    formValues: {}
-  });
+  let initialData = {};
+  if (type === getShopifyIntegrationType()) {
+    initialData = {
+      credentials: {
+        auth_method: 'api_password'
+      }
+    };
+  }
+
+  const [formState, setFormState] = useState(initialData);
 
   const [isoAuthStepDone, setIsOAuthStepDone] = useState(false);
 
@@ -79,7 +77,7 @@ function OAuthContextProvider({ children }: Props) {
       if (type === 'SRC_SHOPIFY') {
         meta = {
           ...meta,
-          shop: oAuthConfigData?.formValues?.shop || '',
+          shop: formState?.shop || '',
           scope: ['read_orders', 'read_products', 'write_products']
         };
       }
@@ -98,7 +96,7 @@ function OAuthContextProvider({ children }: Props) {
         [getSelectedConnectorKey()]: {
           ...connectionDataFlow.entities[getSelectedConnectorKey()],
           formValues: {
-            ...oAuthConfigData?.formValues
+            ...formState
           }
         }
       };
@@ -113,11 +111,8 @@ function OAuthContextProvider({ children }: Props) {
       value={{
         handleOAuthButtonClick,
         handleOnConfigureButtonClick,
-        selectedConnector,
-        oAuthConfigData,
-        setOAuthConfigData,
-        isoAuthStepDone,
-        setIsOAuthStepDone
+        formState,
+        setFormState
       }}
     >
       {children}

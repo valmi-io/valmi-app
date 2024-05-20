@@ -16,11 +16,11 @@ type TExtendedObjType = {
 
 type TIncomingObjType = 'stream' | 'sink';
 
-const hasSourceDefinedCursor = (obj: any) => {
+export const hasSourceDefinedCursor = (obj: any) => {
   return !!(checkIfPropExistsInObject(obj, 'source_defined_cursor') && !!obj.source_defined_cursor);
 };
 
-const generateObj = (obj: any, type: TIncomingObjType) => {
+export const generateStreamObj = (obj: any, type: TIncomingObjType) => {
   let extendedObj: TExtendedObjType = {
     sync_mode: obj.supported_sync_modes ? obj.supported_sync_modes[obj.supported_sync_modes.length > 1 ? 1 : 0] : '',
     destination_sync_mode: 'append'
@@ -55,7 +55,7 @@ export default function streamsReducer(state: any, action: TActionPayload) {
 
       if (selectedIndex === -1) {
         ids = [...ids, id];
-        entities[id] = generateObj(obj, 'stream');
+        entities[id] = generateStreamObj(obj, 'stream');
       } else {
         ids = ids.filter((i) => i !== id);
 
@@ -82,7 +82,7 @@ export default function streamsReducer(state: any, action: TActionPayload) {
       if (checked) {
         objs.forEach((obj: any) => {
           ids.push(obj.name);
-          entities[obj.name] = generateObj(obj, 'stream');
+          entities[obj.name] = generateStreamObj(obj, 'stream');
         });
       }
 

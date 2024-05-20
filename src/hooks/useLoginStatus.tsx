@@ -17,11 +17,7 @@ export const useLoginStatus = () => {
       try {
         const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (accessToken && session) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
+        setIsLoggedIn(!!(accessToken && session));
       } catch (error) {
         // Handle any errors here
         setIsLoggedIn(false);
@@ -32,7 +28,7 @@ export const useLoginStatus = () => {
   }, [getCookie, session]);
 
   //@ts-ignore
-  const workspaceId = session?.workspaceId ?? '';
+  const workspaceId = isLoggedIn ? session?.workspaceId ?? '' : '';
 
   return { isLoggedIn, workspaceId };
 };
