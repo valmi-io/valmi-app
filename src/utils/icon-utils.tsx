@@ -7,8 +7,11 @@
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 import LanguageIcon from '@mui/icons-material/Language';
-import AppsIcon from '@mui/icons-material/Apps';
 
+import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import PeopleIcon from '@mui/icons-material/People';
+import MonitorIcon from '@mui/icons-material/Monitor';
 import {
   faArrowRight,
   faCalendar,
@@ -66,6 +69,9 @@ export interface IAppIcons {
   BROWSER: React.ReactElement;
   APPS: React.ReactElement;
   CIRCLE_PLUS_OUTLINED: IconDefinition;
+  EXPLORES: React.ReactElement;
+  CATALOG: React.ReactElement;
+  DATA_FLOWS: React.ReactElement;
 }
 
 const appIcons: IAppIcons = {
@@ -96,8 +102,11 @@ const appIcons: IAppIcons = {
   SOURCE_ICON: { ...faCircleArrowRight },
   DESTINATION_ICON: { ...faArrowsToDot },
   BROWSER: <LanguageIcon />,
-  APPS: <AppsIcon />,
-  CIRCLE_PLUS_OUTLINED: { ...faCirclePlus }
+  APPS: <MonitorIcon />,
+  CIRCLE_PLUS_OUTLINED: { ...faCirclePlus },
+  EXPLORES: <SpaceDashboardIcon />,
+  CATALOG: <ViewColumnIcon />,
+  DATA_FLOWS: <PeopleIcon />
 };
 
 export default appIcons;
