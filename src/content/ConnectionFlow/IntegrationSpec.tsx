@@ -13,8 +13,6 @@ import { Stack } from '@mui/material';
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
 
-import spec from './spec.json';
-
 const IntegrationSpec = ({
   error,
   traceError,
@@ -28,7 +26,6 @@ const IntegrationSpec = ({
   isLoading: boolean;
   specData: any;
   status: string;
-
   handleSubmit: (payload: any) => void;
 }) => {
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
@@ -64,10 +61,7 @@ const IntegrationSpec = ({
     }
 
     if (specData) {
-      // const schema: any = specData?.spec?.connectionSpecification ?? {};
-
-      // TODO: replace spec with specData
-      const schema: any = spec?.spec?.connectionSpecification ?? {};
+      const schema: any = specData?.spec?.connectionSpecification ?? {};
 
       const { valid, errors } = jsonFormValidator(schema, formState);
 
