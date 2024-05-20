@@ -140,13 +140,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const handleTabChange = useCallback(
     (_event: any, newOneOfIndex: number) => {
-      console.log('new one of index:_', newOneOfIndex);
       setNewSelectedIndex(newOneOfIndex);
-      // if (isEmpty(data)) {
-      //   openNewTab(newOneOfIndex);
-      // } else {
-      //   setConfirmDialogOpen(true);
-      // }
 
       setConfirmDialogOpen(true);
     },
