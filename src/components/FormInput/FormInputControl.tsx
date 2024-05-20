@@ -80,12 +80,9 @@ export const FormInputControl = (props: ControlProps) => {
   }
 
   const getInputType = (schema: JsonSchema) => {
-    console.log('Schema.format', schema);
     if (isDateFormat(schema) || isDateTimeFormat(schema)) {
       return 'date';
     }
-
-    console.log('ispassword format:_', isPasswordFormat(schema));
 
     if (isPasswordFormat(schema)) return 'password';
     return '';

@@ -78,8 +78,6 @@ const Sidebar = () => {
 
   const theme = useTheme();
 
-  console.log(sidebarToggle);
-
   return (
     <>
       {SidebarPaperComponent(workspaceId, false)}

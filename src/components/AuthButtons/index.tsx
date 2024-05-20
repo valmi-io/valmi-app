@@ -1,12 +1,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box, Paper, Typography, styled } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import {
-  getOauthColorCode,
-  getOauthImage,
-  getOauthLoginText 
-} from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
-import styled from '@emotion/styled';
+import { getOauthImage, getOauthLoginText } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
