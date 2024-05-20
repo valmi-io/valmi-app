@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { ControlProps, isDescriptionHidden } from '@jsonforms/core';
+import { ControlProps, JsonSchema, isDescriptionHidden } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Card, FormControl, FormHelperText, Hidden, TextField } from '@mui/material';
 import { merge } from 'lodash';
@@ -17,6 +17,10 @@ const isDateFormat = (schema: any) => {
 
 const isDateTimeFormat = (schema: any) => {
   return !!(schema?.format === 'date-time');
+};
+
+const isPasswordFormat = (schema: any) => {
+  return !!(schema?.format === 'password');
 };
 
 export const FormInputControl = (props: ControlProps) => {
@@ -75,6 +79,18 @@ export const FormInputControl = (props: ControlProps) => {
     val = formattedDate.toString();
   }
 
+  const getInputType = (schema: JsonSchema) => {
+    console.log('Schema.format', schema);
+    if (isDateFormat(schema) || isDateTimeFormat(schema)) {
+      return 'date';
+    }
+
+    console.log('ispassword format:_', isPasswordFormat(schema));
+
+    if (isPasswordFormat(schema)) return 'password';
+    return '';
+  };
+
   return (
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
@@ -88,7 +104,8 @@ export const FormInputControl = (props: ControlProps) => {
           >
             <TextField
               label={label}
-              type={isDateFormat(schema) || isDateTimeFormat(schema) ? 'date' : ''}
+              // type={isDateFormat(schema) || isDateTimeFormat(schema) ? 'date' : ''}
+              type={getInputType(schema)}
               required={required}
               value={val}
               disabled={!enabled}

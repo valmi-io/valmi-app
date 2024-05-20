@@ -37,7 +37,8 @@
                   "title": "API Password",
                   "description": "The API Password for your private application in the `Shopify` store.",
                   "airbyte_secret": true,
-                  "order": 1
+                  "order": 1,
+                  "format": "password"
                 }
               }
             },
