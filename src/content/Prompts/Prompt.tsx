@@ -24,7 +24,7 @@ export type TPrompt = {
 export const PromptFilterChip = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100],
   borderRadius: 4,
-  backgroundColor: '#B497FF'
+  backgroundColor: '#E55837'
 }));
 
 type TPromptProps = {

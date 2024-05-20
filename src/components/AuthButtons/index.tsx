@@ -1,11 +1,27 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { Box, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import {
   getOauthColorCode,
   getOauthImage,
-  getOauthLoginText
-} from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
+  getOauthLoginText 
+} from '@/content/ConnectionFlow/ConnectorConfig/ConnectorConfigUtils';
+import styled from '@emotion/styled';
+
+const PaperWrapper = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  width: '100%',
+  height: '41px',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '1px 10px 1px 1px',
+  gap: '10px',
+  border: '1px solid rgba(0, 0, 0, 0.5)',
+  boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.084), 0px 1px 1px rgba(0, 0, 0, 0.168)',
+  cursor: 'pointer',
+  borderRadius: theme.spacing(0.4)
+}));
 
 export function GoogleSignInButton() {
   const { data: session } = useSession();
@@ -18,22 +34,7 @@ export function GoogleSignInButton() {
     }
   };
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: 60,
-        padding: 1,
-        backgroundColor: '#fff',
-        cursor: 'pointer',
-        boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px;',
-        borderRadius: 1
-      }}
-      onClick={handleClick}
-    >
+    <PaperWrapper onClick={handleClick}>
       <Box
         sx={{
           display: 'flex',
@@ -72,6 +73,6 @@ export function GoogleSignInButton() {
               })}
         </Typography>
       </Box>
-    </Box>
+    </PaperWrapper>
   );
 }

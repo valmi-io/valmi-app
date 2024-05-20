@@ -6,7 +6,7 @@
 
 import { memo } from 'react';
 
-import { Icon, ListItemButton, Stack, Typography, styled } from '@mui/material';
+import { Button, Icon, ListItemButton, Stack, Typography, styled } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
@@ -31,7 +31,7 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
     >
       <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }} gap={2}>
         {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
-        <Label variant="h5">{displayText}</Label>
+        <Button size="medium">{displayText}</Button>
       </Stack>
     </ListItemButton>
   );

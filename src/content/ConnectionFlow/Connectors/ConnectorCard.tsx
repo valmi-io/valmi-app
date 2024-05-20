@@ -6,15 +6,16 @@
 
 import React from 'react';
 
-import { styled, darken, Chip, Stack, Box, Button } from '@mui/material';
+import { styled, darken, Chip, Stack, IconButton } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 
 import { ConnectorModel } from '@content/Connections/ConnectionModel';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import { EventSourceType } from '@/constants/extDestinations';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
 
 interface ConnectorCardProps {
   item: ConnectorModel | EventSourceType;
@@ -58,16 +59,13 @@ const ConnectorCard = ({
             color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary)
           }}
         >
-          <Button
-            type="button"
-            sx={{
-              color: (theme) => (selected ? theme.palette.success.contrastText : theme.palette.text.secondary),
-              alignSelf: 'flex-end'
-            }}
+          <IconButton
+            sx={{ ml: 2, alignSelf: 'flex-end' }}
+            color="primary"
             onClick={() => handleConnectorOnClick(item)}
           >
-            <AddCircleOutlinedIcon fill={'white'} />
-          </Button>
+            <CustomIcon style={{ fontSize: ImageSize.small }} icon={appIcons.CIRCLE_PLUS_OUTLINED} />
+          </IconButton>
           <ImageComponent src={src} alt="connector" size={ImageSize.large} style={{ marginBottom: '14px' }} />
           {displayName}
           <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, justifyContent: 'center', mt: 1 }}>

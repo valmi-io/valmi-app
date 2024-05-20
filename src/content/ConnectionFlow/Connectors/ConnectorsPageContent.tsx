@@ -21,7 +21,6 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
 
   const handleItemOnClick = (item: ConnectorType) => {
     const pathname = `${getBaseRoute(workspaceId as string)}/connections/create`;
-
     const key = getSelectedConnectorKey();
 
     const objToDispatch = {

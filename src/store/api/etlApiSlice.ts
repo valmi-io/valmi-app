@@ -112,6 +112,15 @@ export const etlApiSlice = apiSlice.injectEndpoints({
       }
     }),
 
+    getExploreStatusById: builder.query({
+      query: (arg) => {
+        const { workspaceId, exploreId } = arg;
+        return {
+          url: `/explores/workspaces/${workspaceId}/${exploreId}/status`
+        };
+      }
+    }),
+
     getPackageById: builder.query({
       query: ({ packageId }) => `/packages/${packageId}`,
 
@@ -139,6 +148,8 @@ export const {
   useGetExploresQuery,
   useCreateExploreMutation,
   useGetExploreByIdQuery,
+  useGetExploreStatusByIdQuery,
   useGetPackageByIdQuery,
   useGetPromptPreviewMutation
+
 } = etlApiSlice;

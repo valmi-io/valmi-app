@@ -12,9 +12,10 @@ type TExploreProps = {
   handleOnClick: (item: any) => void;
   handlePreviewOnClick: (item: any) => void;
   src: string;
+  exploreReadyStatus: any;
 };
 
-const Explore = ({ item, handleOnClick, handlePreviewOnClick, src }: TExploreProps) => {
+const Explore = ({ item, handleOnClick, handlePreviewOnClick, src, exploreReadyStatus }: TExploreProps) => {
   const {
     name = '',
     account: { external_id = '' },
@@ -32,11 +33,16 @@ const Explore = ({ item, handleOnClick, handlePreviewOnClick, src }: TExplorePro
                 <DownloadIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="preview sheet">
-              <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handlePreviewOnClick(item)}>
-                <VisibilityIcon />
-              </IconButton>
-            </Tooltip>
+            {/* <Tooltip title="preview sheet"> */}
+            <IconButton
+              sx={{ ml: 2 }}
+              color="primary"
+              disabled={exploreReadyStatus(item) === 'running'}
+              onClick={() => handlePreviewOnClick(item)}
+            >
+              <VisibilityIcon />
+            </IconButton>
+            {/* </Tooltip> */}
           </>
         }
         title={name}
