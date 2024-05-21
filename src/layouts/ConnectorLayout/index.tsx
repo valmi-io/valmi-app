@@ -16,7 +16,7 @@ interface layoutProps {
 const ConnectorLayout = ({ title = '', children, layoutStyles }: layoutProps) => {
   return (
     <Box sx={{ width: '100%' }}>
-      {title ? <CardHeader title={title} /> : null}
+      {title ? <CardHeader title={title} sx={{ padding: 1 }} /> : null}
       {/* <Divider /> */}
       <Box sx={{ m: 1 }} style={layoutStyles}>
         {/* Content */}

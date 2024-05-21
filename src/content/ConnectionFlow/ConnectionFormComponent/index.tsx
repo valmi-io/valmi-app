@@ -82,7 +82,7 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
         {/** Stepper */}
 
         {/* <Wizard header={<HorizontalLinearStepper steps={connectionSteps} />} wrapper={<Paper variant="outlined" />}> */}
-        <Wizard wrapper={<Paper variant="outlined" />}>{getWizardStepContent()}</Wizard>
+        <Wizard wrapper={<Paper variant="elevation" />}>{getWizardStepContent()}</Wizard>
       </PageLayout>
     </OAuthContextProvider>
   );

@@ -9,7 +9,7 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, Icon, styled } from '@mui/material';
+import { Box, Typography, Icon, styled, Button } from '@mui/material';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -31,7 +31,13 @@ const HeaderTitle = () => {
   // query object
   const query = router.query;
 
-  const valuesAfterWid = url.split('/').slice(3);
+  const getQueryValue = (route: string) => {
+    if (route.startsWith('[') && route.endsWith(']')) {
+      if (query?.route) return query.route;
+      else return route;
+    }
+  };
+  let valuesAfterWid = url.split('/').slice(3);
 
   /**
    *
@@ -68,9 +74,16 @@ const HeaderTitle = () => {
           {valuesAfterWid.length > 0 &&
             valuesAfterWid.map((route, index) => {
               return (
-                <Typography key={`breadcrumb-${index}`} variant="body2">
-                  {filterRoute(route)}
-                </Typography>
+                <Button
+                  key={`breadcrumb-${index}`}
+                  href={
+                    valuesAfterWid.length > 1
+                      ? `/spaces/${query?.wid}/` + `${valuesAfterWid.join('/')}`
+                      : `/spaces/${query?.wid}/${getQueryValue(route)}`
+                  }
+                >
+                  <Typography variant="body2">{filterRoute(route)}</Typography>
+                </Button>
               );
             })}
         </Breadcrumbs>

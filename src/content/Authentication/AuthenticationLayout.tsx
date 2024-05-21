@@ -102,7 +102,7 @@ const AuthenticationLayout = () => {
         </Stack>
         <TextLayout variant="body1">
           {isNewUser
-            ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets,analyze and engage with your customers.'
+            ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'
             : 'Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'}
         </TextLayout>
         {isNewUser && (
