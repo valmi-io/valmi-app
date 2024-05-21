@@ -33,7 +33,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getPromptById: builder.query({
-      query: ({ workspaceId, promptId }) => `/prompts/workspaces/${workspaceId}/prompts/${promptId}`,
+      query: ({ workspaceId, promptId }) => `/workspaces/${workspaceId}/prompts/${promptId}`,
       transformResponse: (responseData) => {
         return promptsAdapter.setOne(initialPromptsState, responseData);
       },
@@ -47,7 +47,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getPreviewData: builder.query({
-      query: ({ workspaceId, promptId }) => `/prompts/workspaces/${workspaceId}/prompts/${promptId}/preview`,
+      query: ({ workspaceId, promptId }) => `/workspaces/${workspaceId}/prompts/${promptId}/preview`,
       transformResponse: (responseData) => {
         return previewAdapter.setAll(initialPreviewState, responseData);
       },
@@ -65,7 +65,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
 
     getPromptPreview: builder.mutation({
       query: ({ workspaceId, promptId, prompt }) => ({
-        url: `/prompts/workspaces/${workspaceId}/prompts/${promptId}/preview`,
+        url: `/workspaces/${workspaceId}/prompts/${promptId}/preview`,
         method: 'POST',
         body: prompt
       }),
@@ -75,7 +75,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getExplores: builder.query({
-      query: ({ workspaceId }) => `/explores/workspaces/${workspaceId}`,
+      query: ({ workspaceId }) => `/workspaces/${workspaceId}/explores`,
 
       transformResponse: (responseData) => {
         return exploresAdapter.setAll(initialExploresState, responseData);
@@ -91,7 +91,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
 
     createExplore: builder.mutation({
       query: ({ workspaceId, explore }) => ({
-        url: `/explores/workspaces/${workspaceId}/create`,
+        url: `/workspaces/${workspaceId}/explores/create`,
         method: 'POST',
         body: explore
       }),
@@ -99,7 +99,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
     }),
 
     getExploreById: builder.query({
-      query: ({ workspaceId, exploreId }) => `/explores/workspaces/${workspaceId}/${exploreId}`,
+      query: ({ workspaceId, exploreId }) => `/workspaces/${workspaceId}/explores/${exploreId}`,
       transformResponse: (responseData) => {
         return exploresAdapter.setOne(initialExploresState, responseData);
       },
@@ -116,7 +116,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
       query: (arg) => {
         const { workspaceId, exploreId } = arg;
         return {
-          url: `/explores/workspaces/${workspaceId}/${exploreId}/status`
+          url: `/workspaces/${workspaceId}/${exploreId}/explores/status`
         };
       }
     }),
@@ -151,5 +151,4 @@ export const {
   useGetExploreStatusByIdQuery,
   useGetPackageByIdQuery,
   useGetPromptPreviewMutation
-
 } = etlApiSlice;
