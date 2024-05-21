@@ -40,8 +40,8 @@ const ExploresPage: NextPageWithLayout = () => {
     <PageLayout
       pageHeadTitle="Explores"
       title="Explores"
-      buttonTitleInHeader={'Explore'}
-      handleButtonInHeaderOnClick={handleButtonOnClick}
+      buttonTitle={'Explore'}
+      handleButtonOnClick={handleButtonOnClick}
     >
       <ContentLayout
         key={`explores-page`}

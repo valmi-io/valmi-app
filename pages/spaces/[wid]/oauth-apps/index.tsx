@@ -93,7 +93,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
   const notConfigured = getConnectors({ connectors: notConfiguredConnectors });
 
   return (
-    <PageLayout pageHeadTitle="OAuth" title="" displayButtonInHeader={false}>
+    <PageLayout pageHeadTitle="OAuth" title="" displayButton={false}>
       {configured.length > 0 && (
         <Grid item xs={12}>
           <OAuthApps

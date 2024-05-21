@@ -205,7 +205,7 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
     <PageLayout
       pageHeadTitle={connection_type === 'src' ? 'Source Log History' : 'Destination Log History'}
       title={connection_type === 'src' ? 'Source Log History' : 'Destination Log History'}
-      displayButtonInHeader={false}
+      displayButton={false}
     >
       <ContentLayout
         key={`syncsLogsPage`}

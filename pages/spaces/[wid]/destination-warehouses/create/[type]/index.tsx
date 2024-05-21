@@ -212,7 +212,7 @@ const CreateDestination = ({ type }: any) => {
     <PageLayout
       pageHeadTitle={editing ? 'Edit Destination' : 'Create Destination'}
       title={editing ? 'Edit destination' : 'Create a new destination'}
-      displayButtonInHeader={false}
+      displayButton={false}
     >
       <AlertComponent
         open={alertState.show}

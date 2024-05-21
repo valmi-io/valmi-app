@@ -83,8 +83,8 @@ const Connections = (props: ConnectionLayoutProps) => {
     <PageLayout
       pageHeadTitle={pageHeadTitle}
       title={title}
-      buttonTitleInHeader={buttonTitle}
-      handleButtonInHeaderOnClick={navigateToCreateConnectionsPage}
+      buttonTitle={buttonTitle}
+      handleButtonOnClick={navigateToCreateConnectionsPage}
     >
       <Paper>
         <ContentLayout

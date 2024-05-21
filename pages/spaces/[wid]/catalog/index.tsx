@@ -28,11 +28,7 @@ const CatalogPage = () => {
   }, []);
 
   return (
-    <PageLayout
-      pageHeadTitle="Integrations"
-      title={constants.catalog.CREATE_CONNECTION_TITLE}
-      displayButtonInHeader={false}
-    >
+    <PageLayout pageHeadTitle="Integrations" title={constants.catalog.CREATE_CONNECTION_TITLE} displayButton={false}>
       <Paper variant="elevation">
         {/** Display error */}
         {error && <ErrorComponent error={error} />}

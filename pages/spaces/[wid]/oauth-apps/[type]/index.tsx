@@ -195,11 +195,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
   };
 
   return (
-    <PageLayout
-      pageHeadTitle={'Create OAuth Configuration'}
-      title={'Create OAuth Configuration'}
-      displayButtonInHeader={false}
-    >
+    <PageLayout pageHeadTitle={'Create OAuth Configuration'} title={'Create OAuth Configuration'} displayButton={false}>
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}

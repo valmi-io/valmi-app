@@ -76,7 +76,7 @@ const ConnectionFormComponent = ({ params }: { params: any }) => {
       <PageLayout
         pageHeadTitle={constants.connections.CREATE_CONNECTION_TITLE}
         title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
-        displayButtonInHeader={false}
+        displayButton={false}
       >
         <AlertComponent open={alertDialog} onClose={handleClose} message={alertMessage} isError={isErrorAlert} />
         {/** Stepper */}

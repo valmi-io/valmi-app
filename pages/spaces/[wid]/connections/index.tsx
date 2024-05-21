@@ -66,8 +66,8 @@ const ConnectionsPage: NextPageWithLayout = () => {
     <PageLayout
       pageHeadTitle="Connections"
       title="Connections"
-      buttonTitleInHeader="Connection"
-      handleButtonInHeaderOnClick={handleCreateConnectionOnClick}
+      buttonTitle="Connection"
+      handleButtonOnClick={handleCreateConnectionOnClick}
     >
       <ContentLayout
         key={`connectionsPage`}

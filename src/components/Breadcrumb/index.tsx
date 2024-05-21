@@ -33,16 +33,19 @@ const HeaderTitle = () => {
 
   let valuesAfterWid = url.split('/').slice(3);
   const getQueryValue = (route: string) => {
+    console.log('route:', route);
     let values = valuesAfterWid.map((item) => {
       if (item === route && item.startsWith('[') && item.endsWith(']')) {
-        let path = item.split('');
+        let path: any = item.split('');
         path.shift();
         path.pop();
         path = path.join('');
         if (query[path]) return query[path];
       } else return item;
     });
-    return values.join('/');
+    console.log('values:', values);
+    if (values.indexOf(route) !== 0) return values.join('/');
+    else return route;
   };
 
   /**
@@ -76,12 +79,13 @@ const HeaderTitle = () => {
         <CustomIcon icon={appIcons.ARROW_LEFT} />
       </BackIcon>
       <Box>
-        <Breadcrumbs separator={'/'} aria-label="breadcrumb">
+        <Breadcrumbs separator={'>'} aria-label="breadcrumb">
           {valuesAfterWid.length > 0 &&
             valuesAfterWid.map((route, index) => {
               return (
                 <Button
                   key={`breadcrumb-${index}`}
+                  sx={{ padding: 0 }}
                   href={
                     valuesAfterWid.length > 1
                       ? `/spaces/${query?.wid}/${getQueryValue(route)}`

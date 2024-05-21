@@ -67,7 +67,7 @@ const CreateWarehousePage = () => {
   });
 
   return (
-    <PageLayout pageHeadTitle={'Select Destination'} title={'Select Destination'} displayButtonInHeader={false}>
+    <PageLayout pageHeadTitle={'Select Destination'} title={'Select Destination'} displayButton={false}>
       <Paper variant="outlined">
         <ConnectorLayout title={''} layoutStyles={{ margin: theme.spacing(3) }}>
           {/** Display page content */}

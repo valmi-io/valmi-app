@@ -386,7 +386,7 @@ const EventsPage: NextPageWithLayout = () => {
   };
 
   return (
-    <PageLayout pageHeadTitle="Events" title="Events" buttonTitleInHeader="Connection" displayButtonInHeader={false}>
+    <PageLayout pageHeadTitle="Events" title="Events" buttonTitle="Connection" displayButton={false}>
       <ContentLayout
         key={`eventsPage`}
         error={streamsError ?? destinationsError ?? linksError}

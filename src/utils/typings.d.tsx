@@ -9,3 +9,9 @@ export interface IParams {
   cid?: string;
   eid?: string;
 }
+
+export interface IButton {
+  title: string;
+  onClick: any;
+  disabled: boolean;
+}

@@ -6,22 +6,18 @@
 
 import { ReactNode } from 'react';
 
-import { Container, Grid, Paper, styled } from '@mui/material';
+import { Container, Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';
 import PageTitleWrapper from '@components/PageTitleWrapper';
-import PageFooter from '@/components/PageFooter';
 
 interface PageLayoutProps {
   pageHeadTitle: string;
   title: string;
-  buttonTitleInHeader?: string;
-  buttonTitleInFooter?: string;
-  handleButtonInHeaderOnClick?: () => void;
-  handleButtonInFooterOnClick?: () => void;
-  displayButtonInHeader?: boolean;
-  displayButtonInFooter?: boolean;
+  buttonTitle?: string;
+  handleButtonOnClick?: () => void;
+  displayButton?: boolean;
   children: ReactNode;
 }
 
@@ -32,21 +28,11 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const PageLayout = (props: PageLayoutProps) => {
-  const {
-    pageHeadTitle,
-    title,
-    displayButtonInHeader,
-    displayButtonInFooter,
-    buttonTitleInHeader,
-    buttonTitleInFooter,
-    handleButtonInHeaderOnClick,
-    handleButtonInFooterOnClick,
-    children
-  } = props;
+  const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
     <Paper sx={{ height: '100%', paddingX: (theme) => theme.spacing(8) }}>
       <Paper sx={{ height: '100%', border: '1px solid black', position: 'relative' }}>
-        <Grid
+        {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}
           sx={{ width: '100%', height: '100%', position: 'absolute', top: 10 }}
@@ -56,25 +42,17 @@ const PageLayout = (props: PageLayoutProps) => {
               <Item sx={{ height: '100%', bgcolor: 'transparent', border: '0.5px solid grey' }}>{index}</Item>
             </Grid>
           ))}
-        </Grid>
+        </Grid> */}
         <PageHead title={pageHeadTitle} />
         <PageTitleWrapper>
           <PageTitle
             title={title}
-            displayButton={displayButtonInHeader}
-            buttonTitle={buttonTitleInHeader?.toUpperCase()}
-            onClick={handleButtonInHeaderOnClick}
+            displayButton={displayButton}
+            buttonTitle={buttonTitle?.toUpperCase()}
+            onClick={handleButtonOnClick}
           />
         </PageTitleWrapper>
         <Container maxWidth="lg">{children}</Container>
-        {/* </Paper>
-      <Paper sx={{ paddingX: '16px' }}> */}
-        <PageFooter
-          displayFooterButton={displayButtonInFooter}
-          displayStartIcon={false}
-          footerButtonTitle={buttonTitleInFooter}
-          onClick={handleButtonInFooterOnClick}
-        />
       </Paper>
     </Paper>
   );

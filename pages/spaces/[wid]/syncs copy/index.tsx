@@ -79,12 +79,7 @@ const SyncsPage: NextPageWithLayout = () => {
   };
 
   return (
-    <PageLayout
-      pageHeadTitle="Syncs"
-      title="Syncs"
-      buttonTitleInHeader="Sync"
-      handleButtonInHeaderOnClick={handleCreateSyncOnClick}
-    >
+    <PageLayout pageHeadTitle="Syncs" title="Syncs" buttonTitle="Sync" handleButtonOnClick={handleCreateSyncOnClick}>
       <ContentLayout
         key={`syncsPage`}
         error={error}
