@@ -31,13 +31,19 @@ const HeaderTitle = () => {
   // query object
   const query = router.query;
 
-  const getQueryValue = (route: string) => {
-    if (route.startsWith('[') && route.endsWith(']')) {
-      if (query?.route) return query.route;
-      else return route;
-    }
-  };
   let valuesAfterWid = url.split('/').slice(3);
+  const getQueryValue = (route: string) => {
+    let values = valuesAfterWid.map((item) => {
+      if (item === route && item.startsWith('[') && item.endsWith(']')) {
+        let path = item.split('');
+        path.shift();
+        path.pop();
+        path = path.join('');
+        if (query[path]) return query[path];
+      } else return item;
+    });
+    return values.join('/');
+  };
 
   /**
    *
@@ -78,8 +84,8 @@ const HeaderTitle = () => {
                   key={`breadcrumb-${index}`}
                   href={
                     valuesAfterWid.length > 1
-                      ? `/spaces/${query?.wid}/` + `${valuesAfterWid.join('/')}`
-                      : `/spaces/${query?.wid}/${getQueryValue(route)}`
+                      ? `/spaces/${query?.wid}/${getQueryValue(route)}`
+                      : `/spaces/${query?.wid}/${route}`
                   }
                 >
                   <Typography variant="body2">{filterRoute(route)}</Typography>
