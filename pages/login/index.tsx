@@ -48,7 +48,7 @@ const ImageBoxContainer = styled(Box)(({ theme }) => ({
   width: '100%',
   height: '100%',
   minWidth: '440px',
-  maxWidth: '648px',
+   maxWidth: '648px',
   padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
@@ -86,7 +86,9 @@ const Login: NextPageWithLayout = () => {
         >
           <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
         </ImageBoxContainer>
+ 
         <AuthenticationLayout />
+
       </ContainerWrapper>
       {/* </GridLayout> */}
     </>

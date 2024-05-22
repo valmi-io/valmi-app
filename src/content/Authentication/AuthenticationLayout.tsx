@@ -4,10 +4,9 @@
  * Created Date: Monday, May 22nd 2023, 2:52:54 pm
  * Author: Nagendra S @ valmi.io
  */
-
-import React, { useState } from 'react';
-
-import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
+ 
+import React, {  useState } from 'react';
+ import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
@@ -15,7 +14,7 @@ import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFor
 import { GoogleSignInButton } from '@/components/AuthButtons';
 import { JsonForms } from '@jsonforms/react';
 import { materialCells } from '@jsonforms/material-renderers';
-import { jsonFormValidator } from '@/utils/form-utils';
+import { jsonFormValidator } from '@/utils/form-utils'; 
 
 const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -51,7 +50,7 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   border: '1px solid rgba(0, 0, 0, 0.25)',
   flexGrow: 1
 }));
-
+ 
 const DetailBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -82,6 +81,7 @@ const AuthenticationLayout = () => {
   const initialData = {};
   const [data, setData] = useState<any>(initialData);
   const [isNewUser, setIsNewUser] = useState<boolean>(true);
+ 
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
   const { valid, errors } = jsonFormValidator(schema, data);
 
@@ -90,7 +90,8 @@ const AuthenticationLayout = () => {
   };
   return (
     <ContainerLayout>
-      <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
+        <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
+
         {/** valmi - logo */}
         <Stack alignItems="center">
           <ImageComponent
@@ -102,12 +103,14 @@ const AuthenticationLayout = () => {
         </Stack>
         <TextLayout variant="body1">
           {isNewUser
+ 
             ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'
+
             : 'Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'}
         </TextLayout>
         {isNewUser && (
           <FormLayout>
-            <JsonForms
+             <JsonForms
               schema={schema}
               data={data}
               renderers={customRenderers}
@@ -129,6 +132,7 @@ const AuthenticationLayout = () => {
             />
           </Button>
           <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
+ 
             <AuthenticationFormFooter
               footerText={isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             />

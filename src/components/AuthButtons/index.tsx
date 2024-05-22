@@ -4,6 +4,7 @@ import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { getOauthImage, getOauthLoginText } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { setCookie } from '@/lib/cookies';
 
+
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
   width: '100%',
