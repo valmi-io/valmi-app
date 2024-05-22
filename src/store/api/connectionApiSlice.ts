@@ -8,7 +8,7 @@ export const connectionApiSlice = apiSlice.injectEndpoints({
         const { connectionPayload, workspaceId } = arg;
 
         const result = await baseQuery({
-          url: `workspaces/${workspaceId}/connection/DefaultWarehouse`,
+          url: `workspaces/${workspaceId}/syncs/create_with_defaults`,
           method: 'POST',
           body: connectionPayload
         });

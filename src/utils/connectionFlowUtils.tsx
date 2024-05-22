@@ -108,12 +108,11 @@ export const generateConnectionPayload = ({
       workspaceId: workspaceId,
       connectionPayload: {
         account: generateAccountPayload(user),
-        source_connector_type: type,
-        source_connector_config: config,
-        name: config?.shop ?? name,
-        source_catalog: generateSourcePayload(streams, isEditableFlow, extras),
-        destination_catalog: generateDestinationPayload(streams, isEditableFlow, extras),
-        schedule: { run_interval: getRunInterval(run_interval) }
+        source: {
+          config: config,
+          catalog: generateSourcePayload(streams, isEditableFlow, extras)?.catalog
+        },
+        name: config?.shop ?? name
       }
     };
     return payload;
