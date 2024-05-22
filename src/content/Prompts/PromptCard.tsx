@@ -3,6 +3,7 @@ import CustomIcon from '@/components/Icon/CustomIcon';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import appIcons from '@/utils/icon-utils';
 import { Chip, Grid, IconButton, Tooltip, styled } from '@mui/material';
+import { useMemo } from 'react';
 
 export type TPromptSource = { id: string; name: string };
 
@@ -30,16 +31,21 @@ export const PromptFilterChip = styled(Chip)(({ theme }) => ({
 type TPromptProps = {
   item: TPrompt;
   handleOnClick: (item: TPrompt) => void;
-  src: string;
 };
 
-const Prompt = ({ item, handleOnClick, src }: TPromptProps) => {
+const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
   const { description, name } = item ?? {};
+
+  const icon = useMemo(() => {
+    const integrationType: string = item?.type?.split('_').slice(1).join('_') ?? '';
+
+    return `/connectors/${integrationType.toLowerCase()}.svg`;
+  }, [item.type]);
 
   return (
     <Grid item xs={'auto'}>
       <CustomCard
-        startIcon={<ImageComponent src={src} alt="connector" size={ImageSize.medium} />}
+        startIcon={<ImageComponent src={icon} alt="connector" size={ImageSize.medium} />}
         endIcon={
           <Tooltip title="">
             <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handleOnClick(item)}>
@@ -54,4 +60,4 @@ const Prompt = ({ item, handleOnClick, src }: TPromptProps) => {
   );
 };
 
-export default Prompt;
+export default PromptCard;

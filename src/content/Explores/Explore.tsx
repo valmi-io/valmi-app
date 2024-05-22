@@ -5,7 +5,7 @@ import { Grid, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import { PromptFilterChip } from '@/content/Prompts/Prompt';
+import { PromptFilterChip } from '@/content/Prompts/PromptCard';
 
 type TExploreProps = {
   item: any;

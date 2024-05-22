@@ -1,4 +1,4 @@
-import { TPromptSource } from '@/content/Prompts/Prompt';
+import { TPromptSource } from '@/content/Prompts/PromptCard';
 
 interface JsonSchema {
   $schema: string;
@@ -89,14 +89,13 @@ export const schema = {
       items: {
         type: 'object',
         properties: {
- 
           label: { type: 'string' },
           name: { type: 'string', enum: ['title'] },
           // type: { type: 'string' },
           operator: { type: 'string', enum: ['=', '!='] },
           value: { type: 'string' }
         },
- 
+
         required: ['label', 'name', 'value', 'operator']
       }
     }
@@ -112,13 +111,11 @@ type TPayloadIn = {
 };
 
 export type TPayloadOut = {
- 
   schema_id: string;
   filters: {}[];
   time_window: TimeWindowType;
 };
 
- 
 export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
   const payload: TPayloadOut = {
     schema_id: schema.length ? schema[0].id : '',

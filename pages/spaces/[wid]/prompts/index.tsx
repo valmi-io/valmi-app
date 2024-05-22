@@ -9,8 +9,9 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
 import { useGetPromptsQuery } from '@/store/api/etlApiSlice';
-import Prompts from '@/content/Prompts';
+import PromptsList from '@/content/Prompts/PromptsList';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { TData } from '@/utils/typings.d';
 
 const PromptsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
@@ -19,21 +20,12 @@ const PromptsPage: NextPageWithLayout = () => {
     query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
-  console.log('data:', data);
-
-  const PageContent = () => {
-    if (isDataEmpty(data)) {
-      return <ListEmptyComponent description={'No prompts found in this workspace'} />;
-    }
-    return <Prompts data={data} />;
-  };
-
   return (
     <PageLayout pageHeadTitle="Prompts" title="Prompts" displayButton={false}>
       <ContentLayout
         key={`prompts-page`}
         error={error}
-        PageContent={<PageContent />}
+        PageContent={<PageContent data={data} />}
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -47,3 +39,10 @@ PromptsPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default PromptsPage;
+
+const PageContent = ({ data }: { data: TData }) => {
+  if (isDataEmpty(data)) {
+    return <ListEmptyComponent description={'No prompts found in this workspace'} />;
+  }
+  return <PromptsList data={data} />;
+};
