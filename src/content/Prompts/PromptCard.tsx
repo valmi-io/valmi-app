@@ -1,31 +1,60 @@
-import CustomCard from '@/components/CustomCard';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import SubmitButton from '@/components/SubmitButton';
 import appIcons from '@/utils/icon-utils';
-import { Chip, Grid, IconButton, Tooltip, styled } from '@mui/material';
-import { useMemo } from 'react';
+import { TPrompt } from '@/utils/typings.d';
+import { Grid, Paper, Stack, Typography, styled } from '@mui/material';
+import { useCallback, useMemo } from 'react';
 
-export type TPromptSource = { id: string; name: string };
+const Card = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: theme.spacing(1),
+  padding: theme.spacing(2),
+  isolation: 'isolate',
+  width: '360px',
+  maxHeight: '360px',
+  backgroundColor: 'rgba(42, 157, 144, 0.12)',
+  border: '1px solid #E0E0E0',
+  overflow: 'hidden',
+  position: 'relative'
+}));
 
-export type TPromptSchema = { id: string; name: string; sources: TPromptSource[] };
+const PromptIconContainer = styled(Paper)(({ theme }) => ({
+  position: 'absolute',
+  width: '67.88px',
+  height: '67.88px',
+  right: '-43.88px',
+  top: theme.spacing(1),
+  backgroundColor: 'transparent'
+}));
 
-export type TPrompt = {
-  id: string;
-  name: string;
-  gated: boolean;
-  package_id: string;
-  query: string;
-  schemas: TPromptSchema[];
-  spec: any;
-  table: string;
-  type: string;
-  description: string;
-};
+const Rectangle = styled(Paper)(({}) => ({
+  position: 'absolute',
+  width: '48px',
+  height: '48px',
+  left: '0',
+  top: '-33.94px',
+  backgroundColor: 'rgba(42, 157, 144, 0.3)',
+  transform: 'rotate(-45deg)'
+}));
 
-export const PromptFilterChip = styled(Chip)(({ theme }) => ({
-  color: theme.colors.alpha.white[100],
-  borderRadius: 4,
-  backgroundColor: '#E55837'
+const PromptHeaderContainer = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: theme.spacing(1)
+}));
+
+const PromptFooterContainer = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: theme.spacing(2),
+  width: '100%',
+  justifyContent: 'flex-end'
 }));
 
 type TPromptProps = {
@@ -33,29 +62,62 @@ type TPromptProps = {
   handleOnClick: (item: TPrompt) => void;
 };
 
-const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
-  const { description, name } = item ?? {};
+const PromptHeader = ({ icon, title }: { icon: any; title: string }) => {
+  return (
+    <PromptHeaderContainer>
+      {icon && <ImageComponent src={icon} alt="connector" size={ImageSize.medium} />}
+      <PromptTitle title={title} />
+    </PromptHeaderContainer>
+  );
+};
 
+const PromptTitle = ({ title }: { title: string }) => {
+  return (
+    <Typography variant="h6" color="text.primary">
+      {title}
+    </Typography>
+  );
+};
+
+const PromptFooter = ({ disabled, onClick }: { disabled: boolean; onClick: () => void }) => {
+  return (
+    <PromptFooterContainer>
+      <SubmitButton buttonText={'PREVIEW'} data={null} isFetching={false} disabled={disabled} onClick={onClick} />
+    </PromptFooterContainer>
+  );
+};
+
+const PromptDescription = ({ description }: { description: string }) => {
+  return (
+    <Typography sx={{ color: (theme) => theme.colors.alpha.black[50] }} variant="body1" noWrap={false}>
+      {description}
+    </Typography>
+  );
+};
+
+const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
   const icon = useMemo(() => {
     const integrationType: string = item?.type?.split('_').slice(1).join('_') ?? '';
 
     return `/connectors/${integrationType.toLowerCase()}.svg`;
   }, [item.type]);
 
+  const onClick = useCallback(() => {
+    handleOnClick(item);
+  }, [item]);
+
   return (
     <Grid item xs={'auto'}>
-      <CustomCard
-        startIcon={<ImageComponent src={icon} alt="connector" size={ImageSize.medium} />}
-        endIcon={
-          <Tooltip title="">
-            <IconButton sx={{ ml: 2 }} color="primary" onClick={() => handleOnClick(item)}>
-              <CustomIcon style={{ fontSize: ImageSize.medium }} icon={appIcons.CIRCLE_PLUS_OUTLINED} />
-            </IconButton>
-          </Tooltip>
-        }
-        title={name}
-        desc={description}
-      />
+      <Card variant="outlined">
+        <PromptIconContainer>
+          <Rectangle>
+            <CustomIcon style={{ fontSize: 14, position: 'absolute', top: 16 }} icon={appIcons.CIRCLE_DOT} />
+          </Rectangle>
+        </PromptIconContainer>
+        <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
+        <PromptDescription key={'PromptDescription'} description={item.description} />
+        <PromptFooter key={'PromptFooter'} disabled={item?.enabled} onClick={onClick} />
+      </Card>
     </Grid>
   );
 };

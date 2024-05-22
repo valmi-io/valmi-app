@@ -21,7 +21,7 @@ const PromptsPage: NextPageWithLayout = () => {
   });
 
   return (
-    <PageLayout pageHeadTitle="Prompts" title="Prompts" displayButton={false}>
+    <PageLayout pageHeadTitle="Prompts" title="PRESET PROMPTS" displayButton={false}>
       <ContentLayout
         key={`prompts-page`}
         error={error}

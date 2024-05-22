@@ -52,7 +52,6 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       color={color}
       size={size}
       endIcon={endIcon}
-      sx={{ mt: 2 }}
       onClick={onClick && onClick}
       style={styles}
     >

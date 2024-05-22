@@ -1,7 +1,7 @@
-import { TData } from '@/utils/typings.d';
+import { TData, TPrompt } from '@/utils/typings.d';
 import { Grid, styled } from '@mui/material';
 
-import PromptCard, { TPrompt } from '@/content/Prompts/PromptCard';
+import PromptCard from '@/content/Prompts/PromptCard';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
