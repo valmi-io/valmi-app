@@ -37,7 +37,7 @@ const Prompt = ({ item, handleOnClick, src }: TPromptProps) => {
   const { description, name } = item ?? {};
 
   return (
-    <Grid item xs={'auto'} sm={4} md={4}>
+    <Grid item xs={'auto'}>
       <CustomCard
         startIcon={<ImageComponent src={src} alt="connector" size={ImageSize.medium} />}
         endIcon={

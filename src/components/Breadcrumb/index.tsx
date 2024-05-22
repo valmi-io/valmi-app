@@ -33,7 +33,6 @@ const HeaderTitle = () => {
 
   let valuesAfterWid = url.split('/').slice(3);
   const getQueryValue = (route: string) => {
-    console.log('route:', route);
     let values = valuesAfterWid.map((item) => {
       if (item === route && item.startsWith('[') && item.endsWith(']')) {
         let path: any = item.split('');
@@ -43,7 +42,6 @@ const HeaderTitle = () => {
         if (query[path]) return query[path];
       } else return item;
     });
-    console.log('values:', values);
     if (values.indexOf(route) !== 0) return values.join('/');
     else return route;
   };

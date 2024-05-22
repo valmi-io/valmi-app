@@ -10,11 +10,16 @@ import { isDataEmpty } from '@/utils/lib';
 import ContentLayout from '@/layouts/ContentLayout';
 import { useGetPromptsQuery } from '@/store/api/etlApiSlice';
 import Prompts from '@/content/Prompts';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const PromptsPage: NextPageWithLayout = () => {
+  const { workspaceId = '' } = useWorkspaceId();
+
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetPromptsQuery({}, { refetchOnMountOrArgChange: true })
+    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
+
+  console.log('data:', data);
 
   const PageContent = () => {
     if (isDataEmpty(data)) {

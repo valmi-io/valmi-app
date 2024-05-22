@@ -6,7 +6,7 @@
 
 import { ReactNode } from 'react';
 
-import { Container, Paper, styled } from '@mui/material';
+import { Container, Grid, Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';

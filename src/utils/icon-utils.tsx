@@ -35,7 +35,8 @@ import {
   faCircleArrowRight,
   faArrowsToDot,
   faWaveSquare,
-  faCirclePlus
+  faCirclePlus,
+  faCircleDot
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -72,6 +73,7 @@ export interface IAppIcons {
   EXPLORES: React.ReactElement;
   CATALOG: React.ReactElement;
   DATA_FLOWS: React.ReactElement;
+  CIRCLE_DOT: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -106,7 +108,8 @@ const appIcons: IAppIcons = {
   CIRCLE_PLUS_OUTLINED: { ...faCirclePlus },
   EXPLORES: <SpaceDashboardIcon />,
   CATALOG: <ViewColumnIcon />,
-  DATA_FLOWS: <PeopleIcon />
+  DATA_FLOWS: <PeopleIcon />,
+  CIRCLE_DOT: { ...faCircleDot }
 };
 
 export default appIcons;
