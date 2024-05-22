@@ -109,6 +109,7 @@ export const generateConnectionPayload = ({
       connectionPayload: {
         account: generateAccountPayload(user),
         source: {
+          type: type,
           config: config,
           catalog: generateSourcePayload(streams, isEditableFlow, extras)?.catalog
         },
