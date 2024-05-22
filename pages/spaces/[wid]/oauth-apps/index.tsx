@@ -112,7 +112,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
       )}
 
       {notConfigured.length > 0 && (
-        <Grid item xs={12} sx={{ mt: 3 }}>
+        <Grid item xs={12} sx={{ mt: configured.length === 0 ? -1 : 3 }}>
           <OAuthApps
             key={`notConfiguredApps`}
             handleItemOnClick={handleItemOnClick}

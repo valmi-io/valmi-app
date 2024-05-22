@@ -35,6 +35,7 @@ const SidebarLayout: FC<SidebarLayoutProps> = ({ children }) => {
           sx={{
             position: 'relative',
             display: 'block',
+            height: '100%',
             flex: 1,
             pt: `${theme.header.height}`,
             [theme.breakpoints.up('lg')]: {

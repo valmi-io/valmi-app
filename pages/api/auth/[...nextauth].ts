@@ -94,6 +94,7 @@ export const nextAuthOptions = (req, res) => {
     callbacks: {
       async jwt({ token, trigger, account, profile, user, session }) {
         // Initial sign in
+        let additionalAuthParams = JSON.parse(req.cookies.additionalAuthParams);
 
         if (account && user) {
           if (account.provider === 'google') {
@@ -113,7 +114,10 @@ export const nextAuthOptions = (req, res) => {
               },
               user: {
                 name: name,
-                email: email
+                email: email,
+                meta: {
+                  ...additionalAuthParams.meta
+                }
               }
             };
 

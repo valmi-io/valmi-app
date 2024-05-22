@@ -9,7 +9,7 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, Icon, styled } from '@mui/material';
+import { Box, Typography, Icon, styled, Button } from '@mui/material';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -31,7 +31,22 @@ const HeaderTitle = () => {
   // query object
   const query = router.query;
 
-  const valuesAfterWid = url.split('/').slice(3);
+  let valuesAfterWid = url.split('/').slice(3);
+  const getQueryValue = (route: string) => {
+    console.log('route:', route);
+    let values = valuesAfterWid.map((item) => {
+      if (item === route && item.startsWith('[') && item.endsWith(']')) {
+        let path: any = item.split('');
+        path.shift();
+        path.pop();
+        path = path.join('');
+        if (query[path]) return query[path];
+      } else return item;
+    });
+    console.log('values:', values);
+    if (values.indexOf(route) !== 0) return values.join('/');
+    else return route;
+  };
 
   /**
    *
@@ -64,13 +79,21 @@ const HeaderTitle = () => {
         <CustomIcon icon={appIcons.ARROW_LEFT} />
       </BackIcon>
       <Box>
-        <Breadcrumbs separator={'/'} aria-label="breadcrumb">
+        <Breadcrumbs separator={'>'} aria-label="breadcrumb">
           {valuesAfterWid.length > 0 &&
             valuesAfterWid.map((route, index) => {
               return (
-                <Typography key={`breadcrumb-${index}`} variant="body2">
-                  {filterRoute(route)}
-                </Typography>
+                <Button
+                  key={`breadcrumb-${index}`}
+                  sx={{ padding: 0 }}
+                  href={
+                    valuesAfterWid.length > 1
+                      ? `/spaces/${query?.wid}/${getQueryValue(route)}`
+                      : `/spaces/${query?.wid}/${route}`
+                  }
+                >
+                  <Typography variant="body2">{filterRoute(route)}</Typography>
+                </Button>
               );
             })}
         </Breadcrumbs>

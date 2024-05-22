@@ -75,8 +75,8 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
     return (
       <Wizard
         header={!isAutomationFlow && <HorizontalLinearStepper steps={connectionSteps} />}
-        wrapper={<Paper variant="outlined" />}
-      >
+        wrapper={<Paper variant="elevation" />}
+        >
         {getWizardStepContent({ isAutomationFlow })}
       </Wizard>
     );

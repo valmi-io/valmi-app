@@ -57,6 +57,7 @@ export const FormSelectControl = (props: ControlProps) => {
             variant={'standard'}
           >
             <TextField
+              size="small"
               label={label}
               select={true}
               required={required}
