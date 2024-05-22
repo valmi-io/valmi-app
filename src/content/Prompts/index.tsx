@@ -20,7 +20,19 @@ const Prompts = ({ data }: { data: TData }) => {
   };
 
   return (
-    <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} sx={{ padding: 2 }}>
+    <Grid
+      container
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        alignContent: 'flex-start',
+        gap: '16px',
+        isolation: 'isolate'
+      }}
+    >
       {data.ids.map((id: string) => (
         <Prompt key={id} item={data.entities[id]} handleOnClick={handleOnClick} src={src} />
       ))}

@@ -19,7 +19,7 @@ const initialpackageState = packageAdapter.getInitialState();
 export const etlApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPrompts: builder.query({
-      query: (arg) => `/prompts/`,
+      query: ({ workspaceId }) => `/workspaces/${workspaceId}/prompts`,
       transformResponse: (responseData) => {
         return promptsAdapter.setAll(initialPromptsState, responseData);
       },

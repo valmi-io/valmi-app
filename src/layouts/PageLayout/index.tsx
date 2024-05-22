@@ -6,7 +6,7 @@
 
 import { ReactNode } from 'react';
 
-import { Container, Paper, styled } from '@mui/material';
+import { Container, Grid, Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';
@@ -30,7 +30,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
-    <Paper sx={{ height: '100%', paddingX: (theme) => theme.spacing(8) }}>
+    <Paper sx={{ height: '100%', px: 8 }}>
       <Paper sx={{ height: '100%', border: '1px solid black', position: 'relative' }}>
         {/* <Grid
           container
