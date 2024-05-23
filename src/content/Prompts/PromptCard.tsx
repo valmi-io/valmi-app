@@ -27,7 +27,7 @@ const PromptIconContainer = styled(Paper)(({ theme }) => ({
   width: '67.88px',
   height: '67.88px',
   right: '-43.88px',
-  top: theme.spacing(1),
+  top: theme.spacing(2),
   backgroundColor: 'transparent'
 }));
 
@@ -36,7 +36,7 @@ const Rectangle = styled(Paper)(({}) => ({
   width: '48px',
   height: '48px',
   left: '0',
-  top: '-33.94px',
+  top: '-39.94px',
   backgroundColor: 'rgba(42, 157, 144, 0.3)',
   transform: 'rotate(-45deg)'
 }));
@@ -120,10 +120,13 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
 
   return (
     <Grid item xs={'auto'}>
-      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.5 }}>
+      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
         <PromptIconContainer>
           <Rectangle>
-            <CustomIcon style={{ fontSize: 14, position: 'absolute', top: 16 }} icon={appIcons.CIRCLE_DOT} />
+            <CustomIcon
+              style={{ fontSize: 14, position: 'absolute', top: 16.8, left: 2.5 }}
+              icon={appIcons.CIRCLE_DOT}
+            />
           </Rectangle>
         </PromptIconContainer>
         <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
