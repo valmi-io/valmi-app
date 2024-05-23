@@ -142,7 +142,7 @@ const EventsPage: NextPageWithLayout = () => {
 
   const theme = useTheme();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   // getStreams
   const {

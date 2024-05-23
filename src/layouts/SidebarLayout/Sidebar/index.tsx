@@ -12,7 +12,7 @@ import SidebarMenu from '@layouts/SidebarLayout/Sidebar/V2SidebarMenu';
 
 import { SidebarContext } from '@contexts/SidebarContext';
 
-import Logo, { SidebarLogo } from '@components/LogoSign';
+import { SidebarLogo } from '@components/LogoSign';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const SidebarPaper = styled(Paper)(
@@ -74,7 +74,7 @@ const SidebarPaperComponent = (workspaceId: any, sidebarToggle: boolean) => {
 const Sidebar = () => {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const theme = useTheme();
 

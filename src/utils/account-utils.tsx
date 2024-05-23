@@ -1,4 +1,6 @@
-export const generateAccountPayload = (user: any) => {
+import { AppFlowUserState } from '@/store/reducers/appFlow';
+
+export const generateAccountPayload = (user: AppFlowUserState) => {
   //@ts-ignore
   const { email = '', name = '', image = '' } = user || {};
 

@@ -21,7 +21,7 @@ const ExploresPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
+    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
   const handleButtonOnClick = () => {
