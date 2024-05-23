@@ -11,8 +11,6 @@ import { FormStatus } from '@/utils/form-utils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
-import { useWizard } from 'react-use-wizard';
-import { WizardFooter } from '@/components/Wizard/Footer';
 import { RootState } from '@/store/reducers';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
@@ -21,6 +19,8 @@ import {
   connectionScheduleSchema,
   generateConnectionPayload,
   getCatalogObjKey,
+  getCredentialObjKey,
+  getExtrasObjKey,
   getScheduleObjKey,
   getSelectedConnectorKey
 } from '@/utils/connectionFlowUtils';
@@ -29,7 +29,8 @@ import { AppDispatch } from '@/store/store';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import Spinner from '@/components/Spinner';
 import { useLazyCreateConnectionQuery, useLazyUpdateConnectionQuery } from '@/store/api/connectionApiSlice';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@/hooks/useUser';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ConnectionSchedule = ({ params, isEditableFlow = false }: TConnectionUpsertProps) => {
   const router = useRouter();
@@ -37,7 +38,8 @@ const ConnectionSchedule = ({ params, isEditableFlow = false }: TConnectionUpser
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { data: session } = useSession();
+  const { user } = useUser();
+  const { workspaceId = '' } = useWorkspaceId();
   let initialData = {};
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
@@ -116,12 +118,14 @@ const ConnectionSchedule = ({ params, isEditableFlow = false }: TConnectionUpser
     setStatus('submitting');
 
     const payload = generateConnectionPayload({
-      connectionDataFlow: connectionDataFlow,
+      sourceCredentials: connectionDataFlow?.entities[getCredentialObjKey(type)].config,
+      extras: connectionDataFlow?.entities[getExtrasObjKey()] ?? {},
+      streams: streams,
       isEditableFlow: isEditableFlow,
       schedulePayload: data,
       type: type,
-      user: session?.user ?? {},
-      workspaceId: wid
+      user: user ?? {},
+      workspaceId: workspaceId
     });
 
     const query = isEditableFlow ? updateConnection : createConnection;

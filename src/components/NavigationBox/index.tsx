@@ -15,7 +15,7 @@ const Label = styled(InputLabel)(({ theme }) => ({
 const NavigationBox = ({ label, redirectRoute }: NavigationBox) => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
   const handleClick = () => {
     router.push(`/spaces/${workspaceId}/${redirectRoute}`);
   };

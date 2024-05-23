@@ -1,9 +1,8 @@
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { Box, Paper, Typography, styled } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { getOauthImage, getOauthLoginText } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { setCookie } from '@/lib/cookies';
-
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -23,21 +22,19 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
 export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDisabled: boolean }) {
   const { data: session } = useSession();
 
-  const handleClick = () => {
-    if (session) {
-      signOut();
-    } else {
-      setCookie(
-        'additionalAuthParams',
-        JSON.stringify({
-          meta: meta
-        })
-      );
-      signIn('google', {
-        callbackUrl: '/'
-      });
-    }
+  const handleClick = async () => {
+    setCookie(
+      'additionalAuthParams',
+      JSON.stringify({
+        meta: meta
+      })
+    );
+    signIn('google', {
+      // callbackUrl: '/'
+      redirect: false
+    });
   };
+
   return (
     <PaperWrapper
       onClick={handleClick}

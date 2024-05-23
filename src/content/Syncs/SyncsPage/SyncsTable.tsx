@@ -30,7 +30,7 @@ export interface SyncOnClickProps {
 const SyncsTable = ({ syncs }) => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const handleOnClick = ({ syncId }: SyncOnClickProps) => {
     // navigate to sync runs

@@ -34,18 +34,18 @@ export const getErrorsInErrorObject = (error: any) => {
   } else if (error && checkIfPropExistsInObject(error, 'data')) {
     let errorMessage = extractErrorFromDataObject(error.data);
     return {
-      status: error.status ? error.status : 'unknown status code',
+      status: error.status ? error.status : '',
       message: errorMessage
     };
   } else if (error && checkIfPropExistsInObject(error, 'error')) {
     return {
-      status: error.status ? error.status : 'uknown status code',
+      status: error.status ? error.status : '',
       message: error.error
     };
   }
   return {
-    status: 'unknown status code',
-    message: 'Unknown error'
+    status: '',
+    message: ''
   };
 };
 

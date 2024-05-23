@@ -20,7 +20,7 @@ export const useIntegrationQuery = ({
     isFetching: isSpecLoading,
     traceError: specTraceError
   } = useFetch({
-    query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true, skip: false })
+    query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
   const {

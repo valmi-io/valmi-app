@@ -4,11 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Box, Container, Paper, styled } from '@mui/material';
+import { Box, Paper, styled } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
@@ -18,25 +18,25 @@ import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 
 import Head from '@components/PageHead';
 
-import { GoogleSignInButton } from '@/components/AuthButtons';
-
 import { useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import GridLayout from '@/components/grid';
-import { useLoginStatus } from '@/hooks/useLoginStatus';
-import { signOutUser } from '@/utils/lib';
+import { isObjectEmpty, signOutUser } from '@/utils/lib';
 import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
+import { useSearchParams } from 'next/navigation';
+import { getSearchParams } from '@/utils/router-utils';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { initialiseAppState } from '@/utils/login-utils';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 
-const ContainerWrapper = styled(Paper)(({ theme }) => ({
+const ContainerWrapper = styled(Paper)(({}) => ({
   boxSizing: 'border-box',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'flex-start',
-  // gap: theme.spacing(2),
   width: '100%',
   minHeight: '364.25px'
-  // border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
 
 const ImageBoxContainer = styled(Box)(({ theme }) => ({
@@ -48,7 +48,7 @@ const ImageBoxContainer = styled(Box)(({ theme }) => ({
   width: '100%',
   height: '100%',
   minWidth: '440px',
-   maxWidth: '648px',
+  maxWidth: '648px',
   padding: '1px 0px',
   border: '1px solid rgba(0, 0, 0, 0.25)'
 }));
@@ -57,23 +57,136 @@ const Login: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const searchParams = useSearchParams();
+
+  const params = getSearchParams(searchParams);
+
+  const { data: session } = useSession();
+
+  const { workspaceId = '' } = useWorkspaceId();
+
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
 
-  const { isLoggedIn, workspaceId } = useLoginStatus();
+  // alert state
+  const [alertState, setAlertState] = useState<AlertType>({
+    message: '',
+    show: false,
+    type: 'empty'
+  });
+
+  const [oauthError, setOauthError] = useState('');
+
+  // If workspaceId exists, navigate to connections
+  useEffect(() => {
+    if (workspaceId) {
+      saveAuthTokenInCookie().run();
+      router.push(`/spaces/${workspaceId}/connections`);
+    }
+  }, [workspaceId]);
+
+  // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
+  const saveAuthTokenInCookie = () => {
+    return {
+      run: async () => {
+        const cookieObj = {
+          accessToken: session?.authToken ?? ''
+        };
+
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+        if (!accessToken) {
+          setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
+        }
+      }
+    };
+  };
+  // This function checks if session exists. If exists, saves session to redux store.
+  useEffect(() => {
+    if (session) {
+      if (session?.user && !workspaceId) {
+        const data = {
+          ...session.user,
+          workspaceId: session.workspaceId
+        };
+
+        // save session to redux store.
+        saveUserStateInStore(data).run();
+      }
+    }
+  }, [session, workspaceId]);
+
+  // This function handles both google oauth errors (next-auth errors)
+  // & api backend error caused while social user logging in.
+  useEffect(() => {
+    if (!isObjectEmpty(params) || session?.error) {
+      if (!oauthError) {
+        setOauthError(params?.error ?? session?.error ?? '');
+      }
+    }
+  }, [params, session]);
 
   useEffect(() => {
-    if (isLoggedIn && workspaceId) {
-      //@ts-ignore
-      router.push(`/spaces/${workspaceId}/connections`);
-    } else {
-      signOutUser(router, dispatch, logoutUser);
+    if (oauthError) {
+      oAuthErrorState({ error: oauthError }).run();
     }
-  }, [isLoggedIn]);
+  }, [oauthError]);
+
+  const oAuthErrorState = ({ error }: { error: string }) => {
+    return {
+      run: () => {
+        // display error if not already shown.
+        if (!alertState.show) {
+          handleAlertOpen({ message: error, alertType: 'error' });
+          // clear session & access_token cookies if exists.
+          signOutUser(router, dispatch, logoutUser);
+        }
+      }
+    };
+  };
+
+  // stores user information in redux store
+  const saveUserStateInStore = (data: any) => {
+    return {
+      run: () => {
+        initialiseAppState(dispatch, data);
+      }
+    };
+  };
+
+  /**
+   * Responsible for opening alert dialog.
+   */
+  const handleAlertOpen = ({ message = '', alertType }: { message: string | any; alertType: AlertStatus }) => {
+    setAlertState({
+      message: message,
+      show: true,
+      type: alertType
+    });
+  };
+
+  /**
+   * Responsible for closing alert dialog.
+   */
+  const handleAlertClose = () => {
+    setAlertState({
+      message: '',
+      show: false,
+      type: 'empty'
+    });
+  };
 
   return (
     <>
       <Head title="Login" />
+      <AlertComponent
+        open={alertState.show}
+        onClose={handleAlertClose}
+        message={alertState.message}
+        displayButton={false}
+        isError={alertState.type === 'error'}
+      />
+
       {/* <GridLayout> */}
       <ContainerWrapper>
         <ImageBoxContainer
@@ -86,9 +199,8 @@ const Login: NextPageWithLayout = () => {
         >
           <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
         </ImageBoxContainer>
- 
-        <AuthenticationLayout />
 
+        <AuthenticationLayout />
       </ContainerWrapper>
       {/* </GridLayout> */}
     </>

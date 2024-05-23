@@ -41,7 +41,7 @@ const ConnectionTest = ({ handleFormStatus }: ConnectionTestProps) => {
 
   const dispatch = useDispatch();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const [connectionTestState, setConnectionTestState] = useState<ConnectionTestState>({
     error: '',

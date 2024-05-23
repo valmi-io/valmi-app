@@ -39,6 +39,7 @@ import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import { getOAuthParams } from '@/pagesauth/callback';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { FormStatus } from '@/utils/form-utils';
+import { useUser } from '@/hooks/useUser';
 
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -47,6 +48,8 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const router = useRouter();
 
   const { data: session } = useSession();
+
+  const { user } = useUser();
 
   const { nextStep } = useWizard();
 
@@ -258,7 +261,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           isEditableFlow: isEditableFlow,
           schedulePayload: schedulePayload,
           type: type,
-          user: session?.user ?? {},
+          user: user ?? {},
           workspaceId: wid
         });
 
