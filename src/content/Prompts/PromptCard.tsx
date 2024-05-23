@@ -82,7 +82,14 @@ const PromptTitle = ({ title }: { title: string }) => {
 const PromptFooter = ({ disabled, onClick }: { disabled: boolean; onClick: () => void }) => {
   return (
     <PromptFooterContainer>
-      <SubmitButton buttonText={'PREVIEW'} data={null} isFetching={false} disabled={disabled} onClick={onClick} />
+      <SubmitButton
+        buttonText={'PREVIEW'}
+        data={null}
+        isFetching={false}
+        size="small"
+        disabled={disabled}
+        onClick={onClick}
+      />
     </PromptFooterContainer>
   );
 };

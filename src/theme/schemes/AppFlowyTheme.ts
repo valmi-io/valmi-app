@@ -401,71 +401,17 @@ export const AppFlowyTheme = createTheme({
       },
       styleOverrides: {
         root: {
-          fontSize: 16,
-          fontWeight: '400',
-          textTransform: 'none',
-          paddingLeft: 16,
-          paddingRight: 16,
-          borderRadius: 5,
-          '.MuiSvgIcon-root': {
-            transition: 'all .2s'
-          }
+          textTransform: 'none'
         },
-        endIcon: {
-          marginRight: -8
-        },
-        containedSecondary: {
-          backgroundColor: colors.secondary.main,
-          color: colors.alpha.white[100]
 
-          // border: '1px solid ' + colors.alpha.black[30]
-        },
-        containedPrimary: {
-          backgroundColor: colors.primary.main,
-          color: colors.alpha.white[100]
-
-          // border: '1px solid ' + colors.alpha.black[30]
-        },
-        outlinedSecondary: {
-          backgroundColor: colors.alpha.white[100],
-
-          '&:hover, &.MuiSelected': {
-            backgroundColor: colors.alpha.black[5],
-            color: colors.alpha.black[100]
-          }
-        },
         sizeSmall: {
-          padding: '6px 16px',
-          lineHeight: 1.5
-        },
-        sizeMedium: {
-          padding: '8px 20px'
-        },
-        sizeLarge: {
-          padding: '11px 24px'
-        },
-        textSizeSmall: {
-          padding: '7px 12px'
-        },
-        textSizeMedium: {
-          padding: '9px 16px'
-        },
-        textSizeLarge: {
-          padding: '12px 16px'
+          fontWeight: 500,
+          lineHeight: 1.7,
+          borderRadius: 0
         }
       }
     },
-    //modifies sidebar button border-radius
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: false
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 6
-        }
-      }
-    },
+
     // modifies hover and transition behaviour, without this when hovered table cell highlights in black color
     MuiTableRow: {
       styleOverrides: {
