@@ -81,10 +81,6 @@ export const getConnectorImage = (connectorType) => {
 };
 
 export const signOutUser = async (router, dispatch, query) => {
-  // clear redux store
-  dispatch({ type: 'RESET_STORE' });
-  // clear auth cookie
-
   // Get access_token from cookie
   const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
@@ -94,18 +90,28 @@ export const signOutUser = async (router, dispatch, query) => {
       query,
       payload: {},
       successCb: async () => {
-        await clearCookie();
-        router.push('/login');
+        removeAppState(router, dispatch).run();
       },
       errorCb: async () => {
-        await clearCookie();
-        router.push('/login');
+        removeAppState(router, dispatch).run();
       }
     });
   } else {
+    // clear redux store
+    removeReduxStore(dispatch);
     // If no access_token, redirect to login
     router.push('/login');
   }
+};
+
+const removeAppState = (router: any, dispatch: any) => {
+  return {
+    run: async () => {
+      await clearCookie();
+      removeReduxStore(dispatch);
+      router.push('/login');
+    }
+  };
 };
 
 const clearCookie = async () => {
@@ -115,6 +121,10 @@ const clearCookie = async () => {
   });
   // clear nextauth session
   await signOut({ redirect: false, callbackUrl: '/login' });
+};
+
+const removeReduxStore = (dispatch) => {
+  dispatch({ type: 'RESET_STORE' });
 };
 
 export const splitNumberByCommas = (number) => {
