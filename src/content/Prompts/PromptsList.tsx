@@ -12,9 +12,8 @@ const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'wrap',
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between',
   alignItems: 'center',
-  alignContent: 'flex-start',
   gap: theme.spacing(2),
   isolation: 'isolate'
 }));
