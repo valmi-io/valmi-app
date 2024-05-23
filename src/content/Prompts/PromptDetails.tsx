@@ -1,6 +1,6 @@
 //@S-Nagendra
 import { StackLayout } from '@/components/Layouts/Layouts';
-import { TPrompt } from '@/content/Prompts/Prompt';
+import { TPrompt } from '@/content/Prompts/PromptCard';
 import appIcons from '@/utils/icon-utils';
 import { Card, Stack, Typography } from '@mui/material';
 

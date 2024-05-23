@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Paper } from '@mui/material';
 import moment from 'moment';
-import { TPrompt, TPromptSource } from '@/content/Prompts/Prompt';
+import { TPrompt, TPromptSource } from '@/content/Prompts/PromptCard';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 

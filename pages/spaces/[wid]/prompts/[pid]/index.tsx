@@ -17,7 +17,7 @@ import { isDataEmpty } from '@/utils/lib';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { getLastNthDate } from '@/utils/date-utils';
 import { getPromptFilter } from '@/utils/explore-utils';
-import { PromptFilterChip, TPrompt } from '@/content/Prompts/Prompt';
+import { PromptFilterChip, TPrompt } from '@/content/Prompts/PromptCard';
 import { StackLayout } from '@/components/Layouts/Layouts';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -40,6 +40,8 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
   const { pid = '', filter = '', wid = '' } = params;
+
+  console.log('params:', params);
 
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetPromptByIdQuery({ promptId: pid, workspaceId: wid })

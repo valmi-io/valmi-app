@@ -42,6 +42,7 @@ import { PostHogProvider } from 'posthog-js/react';
 import { SessionProvider } from 'next-auth/react';
 
 import { initializeBugsnag, isBugsnagClientInitialized } from '@lib/bugsnag';
+import { Box, styled } from '@mui/material';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -71,6 +72,14 @@ type AppPropsWithLayout = AppProps & {
 if (!isBugsnagClientInitialized()) {
   initializeBugsnag();
 }
+
+const ContainerWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%'
+}));
 
 const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmotionCache, pageProps }) => {
   const store = useStore();
@@ -113,17 +122,19 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
           <Head>
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
           </Head>
-          <SidebarProvider>
-            <ThemeProviderWrapper>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <CssBaseline />
+          <ContainerWrapper>
+            <SidebarProvider>
+              <ThemeProviderWrapper>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <CssBaseline />
 
-                {/* <PostHogProvider client={posthog}> */}
-                {getLayout(<Component {...pageProps} />)}
-                {/* </PostHogProvider> */}
-              </LocalizationProvider>
-            </ThemeProviderWrapper>
-          </SidebarProvider>
+                  {/* <PostHogProvider client={posthog}> */}
+                  {getLayout(<Component {...pageProps} />)}
+                  {/* </PostHogProvider> */}
+                </LocalizationProvider>
+              </ThemeProviderWrapper>
+            </SidebarProvider>
+          </ContainerWrapper>
         </CacheProvider>
       </PersistGate>
     </SessionProvider>

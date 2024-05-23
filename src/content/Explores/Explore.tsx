@@ -1,11 +1,9 @@
 import CustomCard from '@/components/CustomCard';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import { Grid, IconButton, Tooltip } from '@mui/material';
+import { Chip, Grid, IconButton, Tooltip, styled } from '@mui/material';
 
 import DownloadIcon from '@mui/icons-material/Download';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
-import { PromptFilterChip } from '@/content/Prompts/Prompt';
 
 type TExploreProps = {
   item: any;
@@ -15,10 +13,16 @@ type TExploreProps = {
   exploreReadyStatus: any;
 };
 
+const PromptFilterChip = styled(Chip)(({ theme }) => ({
+  color: theme.colors.alpha.white[100],
+  borderRadius: 4,
+  backgroundColor: '#E55837'
+}));
+
 const Explore = ({ item, handleOnClick, handlePreviewOnClick, src, exploreReadyStatus }: TExploreProps) => {
   const {
     name = '',
-    account: { external_id = '' },
+    account: { external_id = '' } = {},
     prompt: { description = '', parameters = {} } = ({} = {})
   } = item ?? {};
 

@@ -16,8 +16,10 @@ const successColor = '#2E7D32';
 const warningColor = '#EF6C00';
 const errorColor = '#D32F2F';
 const infoColor = '#0288D1';
-export const blackColor = '#202020';
+export const blackColor = '#000000';
 const whiteColor = '#FFFFFF';
+
+const elevationOutlinedColor = '#E0E0E0';
 
 const _lightBg1 = whiteColor; //'#f7f8fc';
 const _lightBg2 = '#edeef2';
@@ -32,7 +34,8 @@ const themeColors = {
   info: _lightBg2,
   black: blackColor,
   white: whiteColor,
-  primaryAlt: '#000C57'
+  primaryAlt: '#000C57',
+  elevation: elevationOutlinedColor
 };
 
 /**
@@ -305,7 +308,7 @@ export const AppFlowyTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         '.black-bg': {
-          color: colors.alpha.black[100]
+          // color: colors.alpha.black[100]
         },
         '.custom-class': {
           backgroundColor: 'orange'
@@ -380,7 +383,9 @@ export const AppFlowyTheme = createTheme({
         elevation24: {
           // boxShadow: colors.shadows.cardLg
         },
-        outlined: {}
+        outlined: {
+          border: `1px solid ${themeColors.elevation}`
+        }
       }
     },
     MuiContainer: {
@@ -401,71 +406,17 @@ export const AppFlowyTheme = createTheme({
       },
       styleOverrides: {
         root: {
-          fontSize: 16,
-          fontWeight: '400',
-          textTransform: 'none',
-          paddingLeft: 16,
-          paddingRight: 16,
-          borderRadius: 5,
-          '.MuiSvgIcon-root': {
-            transition: 'all .2s'
-          }
+          textTransform: 'none'
         },
-        endIcon: {
-          marginRight: -8
-        },
-        containedSecondary: {
-          backgroundColor: colors.secondary.main,
-          color: colors.alpha.white[100]
 
-          // border: '1px solid ' + colors.alpha.black[30]
-        },
-        containedPrimary: {
-          backgroundColor: colors.primary.main,
-          color: colors.alpha.white[100]
-
-          // border: '1px solid ' + colors.alpha.black[30]
-        },
-        outlinedSecondary: {
-          backgroundColor: colors.alpha.white[100],
-
-          '&:hover, &.MuiSelected': {
-            backgroundColor: colors.alpha.black[5],
-            color: colors.alpha.black[100]
-          }
-        },
         sizeSmall: {
-          padding: '6px 16px',
-          lineHeight: 1.5
-        },
-        sizeMedium: {
-          padding: '8px 20px'
-        },
-        sizeLarge: {
-          padding: '11px 24px'
-        },
-        textSizeSmall: {
-          padding: '7px 12px'
-        },
-        textSizeMedium: {
-          padding: '9px 16px'
-        },
-        textSizeLarge: {
-          padding: '12px 16px'
+          fontWeight: 500,
+          lineHeight: 1.7,
+          borderRadius: 0
         }
       }
     },
-    //modifies sidebar button border-radius
-    MuiButtonBase: {
-      defaultProps: {
-        disableRipple: false
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 6
-        }
-      }
-    },
+
     // modifies hover and transition behaviour, without this when hovered table cell highlights in black color
     MuiTableRow: {
       styleOverrides: {
@@ -555,12 +506,15 @@ export const AppFlowyTheme = createTheme({
     h6: {
       fontSize: 20,
       lineHeight: 1.6,
-      fontWeight: 500
+      fontWeight: 500,
+      letterSpacing: 0.15,
+      color: colors.alpha.black[100]
     },
     body1: {
       fontSize: 16,
       lineHeight: 1.5,
-      fontWeight: 500
+      fontWeight: 400,
+      letterSpacing: 0.15
     },
     body2: {
       fontSize: 14,

@@ -1,16 +1,9 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Thursday, May 4th 2023, 1:49:00 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { ReactNode } from 'react';
 
 import { Container, Grid, Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';
-import PageTitleWrapper from '@components/PageTitleWrapper';
 
 interface PageLayoutProps {
   pageHeadTitle: string;
@@ -31,7 +24,7 @@ const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
     <Paper sx={{ height: '100%', px: 8 }}>
-      <Paper sx={{ height: '100%', border: '1px solid black', position: 'relative' }}>
+      <Paper sx={{ height: '100%', border: '1px solid black', position: 'relative', p: 2 }}>
         {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}
@@ -44,14 +37,14 @@ const PageLayout = (props: PageLayoutProps) => {
           ))}
         </Grid> */}
         <PageHead title={pageHeadTitle} />
-        <PageTitleWrapper>
-          <PageTitle
-            title={title}
-            displayButton={displayButton}
-            buttonTitle={buttonTitle?.toUpperCase()}
-            onClick={handleButtonOnClick}
-          />
-        </PageTitleWrapper>
+
+        <PageTitle
+          title={title}
+          displayButton={displayButton}
+          buttonTitle={buttonTitle?.toUpperCase()}
+          onClick={handleButtonOnClick}
+        />
+
         <Container maxWidth="lg">{children}</Container>
       </Paper>
     </Paper>

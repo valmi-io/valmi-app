@@ -7,7 +7,8 @@
 import React from 'react';
 
 import { CheckOutlined } from '@mui/icons-material';
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, SxProps } from '@mui/material';
+import { Theme } from '@mui/material/styles';
 
 interface SubmitButtonProps {
   buttonText: string;
@@ -19,7 +20,7 @@ interface SubmitButtonProps {
   buttonType?: 'submit' | 'button' | 'reset';
   fullWidth?: boolean;
   color?: 'primary' | 'secondary' | 'error' | 'success';
-  styles?: React.CSSProperties;
+  styles?: SxProps<Theme> | undefined;
   size?: 'small' | 'medium' | 'large';
 }
 
@@ -52,9 +53,9 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       color={color}
       size={size}
       endIcon={endIcon}
-      sx={{ mt: 2 }}
       onClick={onClick && onClick}
-      style={styles}
+      // style={styles}
+      sx={styles}
     >
       {buttonText}
     </Button>
