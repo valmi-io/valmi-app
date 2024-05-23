@@ -14,10 +14,10 @@ const Card = styled(Paper)(({ theme }) => ({
   gap: theme.spacing(1),
   padding: theme.spacing(2),
   isolation: 'isolate',
-  width: '360px',
-  maxHeight: '360px',
+  width: 360,
+  height: 198,
   backgroundColor: 'rgba(42, 157, 144, 0.12)',
-  border: '1px solid #E0E0E0',
+  // border: '1px solid #E0E0E0',
   overflow: 'hidden',
   position: 'relative'
 }));
@@ -49,11 +49,20 @@ const PromptHeaderContainer = styled(Stack)(({ theme }) => ({
   gap: theme.spacing(1)
 }));
 
+const PromptDescriptionContainer = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  width: '100%',
+  height: 72,
+  overflow: 'hidden'
+}));
+
 const PromptFooterContainer = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: theme.spacing(2),
   width: '100%',
+  height: 46,
+  padding: theme.spacing(1, 0),
+  alignItems: 'center',
   justifyContent: 'flex-end'
 }));
 
@@ -72,11 +81,7 @@ const PromptHeader = ({ icon, title }: { icon: any; title: string }) => {
 };
 
 const PromptTitle = ({ title }: { title: string }) => {
-  return (
-    <Typography variant="h6" color="text.primary">
-      {title}
-    </Typography>
-  );
+  return <Typography variant="h6">{title}</Typography>;
 };
 
 const PromptFooter = ({ disabled, onClick }: { disabled: boolean; onClick: () => void }) => {
@@ -96,9 +101,9 @@ const PromptFooter = ({ disabled, onClick }: { disabled: boolean; onClick: () =>
 
 const PromptDescription = ({ description }: { description: string }) => {
   return (
-    <Typography sx={{ color: (theme) => theme.colors.alpha.black[50] }} variant="body1" noWrap={false}>
-      {description}
-    </Typography>
+    <PromptDescriptionContainer>
+      <Typography variant="body1">{description} </Typography>
+    </PromptDescriptionContainer>
   );
 };
 
@@ -115,7 +120,7 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
 
   return (
     <Grid item xs={'auto'}>
-      <Card variant="outlined">
+      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.5 }}>
         <PromptIconContainer>
           <Rectangle>
             <CustomIcon style={{ fontSize: 14, position: 'absolute', top: 16 }} icon={appIcons.CIRCLE_DOT} />
@@ -123,7 +128,7 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
         </PromptIconContainer>
         <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
         <PromptDescription key={'PromptDescription'} description={item.description} />
-        <PromptFooter key={'PromptFooter'} disabled={item?.enabled} onClick={onClick} />
+        <PromptFooter key={'PromptFooter'} disabled={!item?.enabled} onClick={onClick} />
       </Card>
     </Grid>
   );
