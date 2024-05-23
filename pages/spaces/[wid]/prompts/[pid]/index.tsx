@@ -41,6 +41,8 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
   const { pid = '', filter = '', wid = '' } = params;
 
+  console.log('params:', params);
+
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetPromptByIdQuery({ promptId: pid, workspaceId: wid })
   });
