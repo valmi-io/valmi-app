@@ -12,7 +12,7 @@ const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'wrap',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'center',
   alignContent: 'flex-start',
   gap: theme.spacing(2),
