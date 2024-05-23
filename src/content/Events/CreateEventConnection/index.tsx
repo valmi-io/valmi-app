@@ -46,7 +46,7 @@ const CreateTrack = ({ linkState }: CreateTrackProps) => {
 
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   // Getting from redux to decide creating/editing
   const { editing, id: linkId } = useSelector((state: RootState) => state.trackFlow);

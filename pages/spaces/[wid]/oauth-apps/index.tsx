@@ -47,7 +47,7 @@ export type OnConnectorClickProps = {
 const OAuthAppsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const {
     data: configuredConnectors,

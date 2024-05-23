@@ -17,7 +17,7 @@ const Explores = ({ data }: { data: TData }) => {
   const params = getSearchParams(searchParams);
   const { wid = '' } = params;
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
   const src = `/connectors/google-sheets.svg`;
 
   const exploreReadyStatus = (item: any) => {

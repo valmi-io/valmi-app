@@ -10,11 +10,14 @@ import { useRouter } from 'next/router';
 
 import Head from '@components/PageHead';
 import { useLoginStatus } from '@/hooks/useLoginStatus';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const HomePage = () => {
   const router = useRouter();
 
-  const { isLoggedIn, workspaceId } = useLoginStatus();
+  const { isLoggedIn } = useLoginStatus();
+
+  const { workspaceId = '' } = useWorkspaceId();
 
   useEffect(() => {
     if (isLoggedIn && workspaceId) {

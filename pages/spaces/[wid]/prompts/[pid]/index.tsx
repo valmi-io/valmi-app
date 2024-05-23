@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
-import { IParams, TData } from '@/utils/typings.d';
+import { IParams, TData, TPrompt } from '@/utils/typings.d';
 import PageLayout from '@/layouts/PageLayout';
 import { Stack, Typography } from '@mui/material';
 import { useFetch } from '@/hooks/useFetch';
@@ -15,9 +15,6 @@ import { useGetPromptByIdQuery } from '@/store/api/etlApiSlice';
 import ContentLayout from '@/layouts/ContentLayout';
 import { isDataEmpty } from '@/utils/lib';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import { getLastNthDate } from '@/utils/date-utils';
-import { getPromptFilter } from '@/utils/explore-utils';
-import { PromptFilterChip, TPrompt } from '@/content/Prompts/PromptCard';
 import { StackLayout } from '@/components/Layouts/Layouts';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -40,8 +37,6 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
   const { pid = '', filter = '', wid = '' } = params;
-
-  console.log('params:', params);
 
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetPromptByIdQuery({ promptId: pid, workspaceId: wid })

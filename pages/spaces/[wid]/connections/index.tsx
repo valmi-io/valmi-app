@@ -20,14 +20,14 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
 import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const {
     data: syncs,
@@ -35,7 +35,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
     isFetching,
     traceError
   } = useFetch({
-    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: workspaceId ? false : true })
+    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
   const handleCreateConnectionOnClick = () => {

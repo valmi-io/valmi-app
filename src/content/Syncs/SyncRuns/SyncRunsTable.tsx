@@ -28,7 +28,7 @@ type SyncRunsTableProps = {
 const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');

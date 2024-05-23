@@ -35,7 +35,7 @@ const StreamsPage: NextPageWithLayout = () => {
 
   const dispatch = useDispatch();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const { data, isLoading, traceError, error } = useFetch({ query: useGetStreamsQuery(workspaceId) });
 

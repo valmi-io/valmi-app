@@ -39,7 +39,7 @@ const LiveEventsPage = ({
 }) => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const handleOnChange = (event: SyntheticEvent, newValue: number) => {
     const type = eventTypes[newValue];

@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getAuthTokenCookie, setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { queryHandler } from '@/services';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 import { signOut } from 'next-auth/react';
@@ -81,24 +81,31 @@ export const getConnectorImage = (connectorType) => {
 };
 
 export const signOutUser = async (router, dispatch, query) => {
- 
   // clear redux store
   dispatch({ type: 'RESET_STORE' });
   // clear auth cookie
 
-  // destroy token in the api backend
-   await queryHandler({
-    query,
-    payload: {},
-    successCb: async () => {
-      await clearCookie();
-      router.push('/login');
-    },
-    errorCb: async () => {
-      await clearCookie();
-      router.push('/login');
-    }
-  });
+  // Get access_token from cookie
+  const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+  // if access_token is in cookie, destroy token in the api backend
+  if (accessToken) {
+    await queryHandler({
+      query,
+      payload: {},
+      successCb: async () => {
+        await clearCookie();
+        router.push('/login');
+      },
+      errorCb: async () => {
+        await clearCookie();
+        router.push('/login');
+      }
+    });
+  } else {
+    // If no access_token, redirect to login
+    router.push('/login');
+  }
 };
 
 const clearCookie = async () => {

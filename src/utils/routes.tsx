@@ -6,14 +6,7 @@
 
 import { isTrue } from './lib';
 
-export const publicRoutes = [
-  '/login',
-  '/signup',
-  '/activate',
-  '/activate/[uid]/[tid]',
-  '/reset_password',
-  '/reset_password/[uid]/[tid]'
-];
+export const publicRoutes = ['/login'];
 
 export const isPublicSync = (pathname: string): boolean => {
   const publicSyncRun = `/spaces/${process.env.PUBLIC_WORKSPACE}/syncs/${process.env.PUBLIC_SYNC}/runs`;
