@@ -106,7 +106,7 @@ const MetaInfo = ({ item }: { item: any }) => {
         <Typography variant="caption" sx={{ color: (theme) => theme.colors.secondary.main }}>
           LAST SYNCED
         </Typography>
-        <Typography variant="caption">{getTimeAgo(item?.last_sync_created_at)}</Typography>
+        <Typography variant="caption">{getTimeAgo(item?.last_sync_succeeded_at)}</Typography>
       </MetaInfoChip>
       <MetaInfoChip>
         <Typography variant="caption" sx={{ color: (theme) => theme.colors.secondary.main }}>

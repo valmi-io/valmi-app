@@ -8,15 +8,19 @@ export const getTimeAt = (date: Date) => {
   return moment(date).format('YYYY-MM-DD');
 };
 
-export const getTimeAgo = (date: Date) => {
+export const getTimeAgo = (date: Date | '') => {
   const now = moment();
-  const diff = now.diff(date, 'days');
-
-  if (diff === 0) {
-    return 'Today';
-  } else if (diff === 1) {
-    return '1 day ago';
+  if (date === '') {
+    return '--';
   } else {
-    return diff + ' days ago';
+    const diff = now.diff(date, 'days');
+
+    if (diff === 0) {
+      return 'Today';
+    } else if (diff === 1) {
+      return '1 day ago';
+    } else {
+      return diff + ' days ago';
+    }
   }
 };
