@@ -1,8 +1,9 @@
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import { CircularProgress, Grid, IconButton, Paper, Stack, Tooltip, Typography, styled } from '@mui/material';
+import { CircularProgress, Grid, IconButton, Paper, Stack, Tooltip, Typography, styled, useTheme } from '@mui/material';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import appIcons from '@/utils/icon-utils';
 import SubmitButton from '@/components/SubmitButton';
+import { getTimeAt, getTimeAgo } from '@/utils/date-utils';
 
 type TExploreProps = {
   item: any;
@@ -94,25 +95,24 @@ const MetaInfoChip = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  // height: '100%',
   alignItems: 'center',
   justifyContent: 'center'
 }));
 
-const MetaInfo = ({ last_sync_created_at }: { last_sync_created_at: string }) => {
+const MetaInfo = ({ item }: { item: any }) => {
   return (
     <MetaInfoContainer>
       <MetaInfoChip>
         <Typography variant="caption" sx={{ color: (theme) => theme.colors.secondary.main }}>
           LAST SYNCED
         </Typography>
-        <Typography variant="caption">{'3 DAYS AGO'}</Typography>
+        <Typography variant="caption">{getTimeAgo(item?.last_sync_created_at)}</Typography>
       </MetaInfoChip>
       <MetaInfoChip>
         <Typography variant="caption" sx={{ color: (theme) => theme.colors.secondary.main }}>
           CREATED AT
         </Typography>
-        <Typography variant="caption">{'3 DAYS AGO'}</Typography>
+        <Typography variant="caption">{getTimeAt(item?.last_sync_created_at)}</Typography>
       </MetaInfoChip>
     </MetaInfoContainer>
   );
@@ -130,33 +130,25 @@ const ExploreTitle = ({ title }: { title: string }) => {
   return <Typography variant="h6">{title}</Typography>;
 };
 
-const ExploreFooter = ({
-  disabled,
-  onClick,
-  last_sync_created_at,
-  sync_state,
-  last_sync_result,
-  last_sync_succeeded_at
-}: {
-  disabled: boolean;
-  onClick: () => void;
-  last_sync_created_at: string;
-  sync_state: string;
-  last_sync_result: string;
-  last_sync_succeeded_at: string;
-}) => {
+const StatusIcon = ({ status }: { status: string }) => {};
+
+const ExploreFooter = ({ disabled, onClick, item }: { disabled: boolean; onClick: () => void; item: any }) => {
+  const theme = useTheme();
   return (
     <ExploreFooterContainer>
-      <MetaInfo last_sync_created_at={last_sync_created_at} />
+      <MetaInfo item={item} />
       <StatusChip>
-        <CircularProgress size={16} />
+        {item?.sync_state === 'RUNNING' && <CircularProgress size={16} />}
+        {item?.sync_state === 'RUNNING' && item?.last_sync_result === 'FAILED' && (
+          <CustomIcon style={{ fontSize: 16, color: theme.colors.primary.main }} icon={appIcons.WARNING} />
+        )}
       </StatusChip>
       <SubmitButton
         buttonText={'EXPLORE'}
         data={null}
         isFetching={false}
         size="small"
-        disabled={disabled}
+        disabled={item?.last_sync_succeeded_at === ''}
         onClick={onClick}
       />
     </ExploreFooterContainer>
@@ -165,27 +157,17 @@ const ExploreFooter = ({
 
 const ExploreDescription = ({ description }: { description: string }) => {
   return (
-    <ExploreDescriptionContainer>
-      <CustomIcon style={{ fontSize: 14 }} icon={appIcons.CIRCLE_DOT} />
-      <Typography variant="body1">
-        {description ||
-          'Get a snapshot of your active inventory quantity, cost, and total value. Results are grouped by product- and variant'}
-      </Typography>
-    </ExploreDescriptionContainer>
+    <>
+      <ExploreDescriptionContainer>
+        <CustomIcon style={{ fontSize: 14 }} icon={appIcons.CIRCLE_DOT} />
+        <Typography variant="body1">{description}</Typography>
+      </ExploreDescriptionContainer>
+    </>
   );
 };
 
 const ExploreCard = ({ item, handleOnClick, handlePreviewOnClick, src }: TExploreProps) => {
   console.log('exploreitem:', item);
-
-  const {
-    name = '',
-    enabled,
-    last_sync_created_at = '',
-    sync_state = '',
-    last_sync_result = '',
-    last_sync_succeeded_at = ''
-  } = item ?? {};
 
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
@@ -206,10 +188,7 @@ const ExploreCard = ({ item, handleOnClick, handlePreviewOnClick, src }: TExplor
           key={'ExploreFooter'}
           disabled={!item?.enabled}
           onClick={() => handleOnClick(item)}
-          last_sync_created_at={last_sync_created_at}
-          sync_state={sync_state}
-          last_sync_result={last_sync_result}
-          last_sync_succeeded_at={last_sync_succeeded_at}
+          item={item}
         />
       </Card>
     </Grid>
