@@ -18,15 +18,18 @@ import {
   Paper,
   ListItem,
   ListItemText,
+  ListItemIcon,
+
 } from "@mui/material";
 import CustomIcon from "@components/Icon/CustomIcon";
 import { TSidebarRoute } from "@utils/sidebar-utils";
+import { size } from 'lodash';
 
 const Label = styled(Typography)(({ theme }) => ({
   color: theme.colors.alpha.white[70],
 }));
 
-const ItemContainer = styled(Container)(({ theme }) => ({
+const ItemContainer = styled(ListItemButton)(({ theme }) => ({
   display: "flex",
   flexDirection: 'row',
   alignItems: "center",
@@ -35,7 +38,7 @@ const ItemContainer = styled(Container)(({ theme }) => ({
   height: 48,
 }));
 
-const IconContainer = styled(Paper)(({ theme }) => ({
+const IconContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-start",
@@ -50,13 +53,12 @@ const InnerIconBox = styled(Icon)(({ theme }) => ({
   flexDirection: "row",
   alignItems: "center",
   justifyContent:'center',
-  paddingBottom: "3px",
   width: 24,
   height: 24,
   backgroundColor: 'transparent'
 }));
 
-const TextBox = styled(ListItemButton)(({ theme }) => ({
+const TextBox = styled(ListItemText)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-start",
@@ -77,18 +79,18 @@ const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   } = item;
 
   return (
-    <ItemContainer>
+    <ItemContainer
+      onClick={() => onClick(path)}
+      className={currentRoute === id ? "active" : ""}
+      >
       <IconContainer>
         <InnerIconBox>
-          {icon && (muiIcon ? <Icon>{icon}</Icon> : <CustomIcon icon={icon} />)}
+          {icon && (muiIcon ? <Icon sx={{display:"flex"}} >{icon}</Icon> : <CustomIcon icon={icon} />)}
         </InnerIconBox>
       </IconContainer>
 
-      <TextBox
-        onClick={() => onClick(path)}
-        className={currentRoute === id ? "active" : ""}
-      >
-        <Typography>{displayText}</Typography>
+      <TextBox>
+          <Typography variant='button'>{displayText}</Typography>
       </TextBox>
     </ItemContainer>
   );

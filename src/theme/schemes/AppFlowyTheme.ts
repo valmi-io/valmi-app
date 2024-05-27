@@ -568,8 +568,8 @@ export const AppFlowyTheme = createTheme({
       fontWeight: 500
     },
     button: {
-      fontWeight: 600,
-      lineHeight: 1.4
+      fontWeight: 500,
+      lineHeight: 1.75
     },
     caption: {
       fontSize: 12,
