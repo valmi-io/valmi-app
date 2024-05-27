@@ -12,8 +12,9 @@ import ContentLayout from '@/layouts/ContentLayout';
 import { useGetExploresQuery } from '@/store/api/etlApiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import Explores from '@/content/Explores';
+import ExploresList from '@/content/Explores/ExploresList';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { TData } from '@/utils/typings.d';
 
 const ExploresPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -23,17 +24,8 @@ const ExploresPage: NextPageWithLayout = () => {
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
-
   const handleButtonOnClick = () => {
     router.push(`${getBaseRoute(workspaceId!)}/prompts`);
-  };
-
-  const PageContent = () => {
-    if (isDataEmpty(data)) {
-      return <ListEmptyComponent description={'No explores found in this workspace'} />;
-    }
-
-    return <Explores data={data} />;
   };
 
   return (
@@ -46,7 +38,7 @@ const ExploresPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`explores-page`}
         error={error}
-        PageContent={<PageContent />}
+        PageContent={<PageContent data={data} />}
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -60,3 +52,11 @@ ExploresPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default ExploresPage;
+
+const PageContent = ({ data }: { data: TData }) => {
+  if (isDataEmpty(data)) {
+    return <ListEmptyComponent description={'No explores found in this workspace'} />;
+  }
+
+  return <ExploresList data={data} />;
+};

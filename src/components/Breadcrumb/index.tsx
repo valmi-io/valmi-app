@@ -34,7 +34,7 @@ const HeaderTitle = () => {
   let valuesAfterWid = url.split('/').slice(3);
   const getQueryValue = (route: string) => {
     let values = valuesAfterWid.map((item) => {
-      if (item === route && item.startsWith('[') && item.endsWith(']')) {
+      if (item.startsWith('[') && item.endsWith(']')) {
         let path: any = item.split('');
         path.shift();
         path.pop();
