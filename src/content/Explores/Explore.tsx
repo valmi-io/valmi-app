@@ -22,7 +22,7 @@ const PromptFilterChip = styled(Chip)(({ theme }) => ({
 const Explore = ({ item, handleOnClick, handlePreviewOnClick, src, exploreReadyStatus }: TExploreProps) => {
   const {
     name = '',
-    account: { external_id = '' },
+    account: { external_id = '' } = {},
     prompt: { description = '', parameters = {} } = ({} = {})
   } = item ?? {};
 
