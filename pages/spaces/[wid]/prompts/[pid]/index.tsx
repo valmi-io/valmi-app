@@ -15,6 +15,8 @@ import { useGetPromptByIdQuery } from '@/store/api/etlApiSlice';
 import ContentLayout from '@/layouts/ContentLayout';
 import { isDataEmpty } from '@/utils/lib';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
+import { StackLayout } from '@/components/Layouts/Layouts';
+import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import PromptDetails from '@/content/Prompts/PromptDetails';
 import PreviewTable from '@/content/Prompts/PreviewTable';

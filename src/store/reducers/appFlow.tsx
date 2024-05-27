@@ -8,13 +8,16 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 
+export type AppFlowUserState = {
+  email: string;
+  name: string;
+  image: string;
+};
+
 type AppState = {
   workspaceId: string;
   loginFlowState?: any;
-  user?: {
-    email: string;
-    username: string;
-  };
+  user?: AppFlowUserState;
 };
 
 export type AppFlowState = {
@@ -24,10 +27,10 @@ export type AppFlowState = {
 const initialState: AppFlowState = {
   appState: {
     workspaceId: '',
-    loginFlowState: {},
     user: {
-      username: '',
-      email: ''
+      name: '',
+      email: '',
+      image: ''
     }
   }
 };

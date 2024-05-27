@@ -17,7 +17,7 @@ const PromptsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
   });
 
   return (

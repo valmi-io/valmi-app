@@ -5,19 +5,17 @@
  */
 
 import { getAuthTokenCookie, getCookie } from '@/lib/cookies';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 export const useLoginStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { data: session } = useSession();
 
   useEffect(() => {
     const getLoginStatus = async () => {
       try {
         const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        setIsLoggedIn(!!(accessToken && session));
+        setIsLoggedIn(!!accessToken);
       } catch (error) {
         // Handle any errors here
         setIsLoggedIn(false);
@@ -25,10 +23,7 @@ export const useLoginStatus = () => {
     };
 
     getLoginStatus();
-  }, [getCookie, session]);
+  }, [getCookie]);
 
-  //@ts-ignore
-  const workspaceId = isLoggedIn ? session?.workspaceId ?? '' : '';
-
-  return { isLoggedIn, workspaceId };
+  return { isLoggedIn };
 };

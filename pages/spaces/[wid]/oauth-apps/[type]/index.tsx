@@ -56,7 +56,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
 
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   // Getting schema for the object
   const {

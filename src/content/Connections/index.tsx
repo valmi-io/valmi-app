@@ -41,7 +41,7 @@ const Connections = (props: ConnectionLayoutProps) => {
   /** Redux store */
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const { connectionsError, filteredConnectionsData, isFetching, traceError } = useFilteredConnectionsData(
     workspaceId,

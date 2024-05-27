@@ -5,9 +5,6 @@ import GoogleProviders from 'next-auth/providers/google';
 
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 
-import Cookies from 'cookies';
-import { getAuthTokenCookie } from '@/lib/cookies';
-
 const GOOGLE_AUTHORIZATION_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
   new URLSearchParams({
@@ -89,9 +86,17 @@ export const nextAuthOptions = (req, res) => {
     session: { strategy: 'jwt', maxAge: 7 * 24 * 60 * 60 }, // this session lasts 7 days
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
-      signIn: '/login'
+      signIn: '/login',
+      error: '/login'
     },
     callbacks: {
+      async signIn({ user, account, profile, email, credentials }) {
+        // we are currently not allowing sign-ins from google accounts that have not been verified google.
+        if (account && account.provider === 'google' && profile && 'email_verified' in profile) {
+          if (!profile.email_verified) return false;
+        }
+        return true;
+      },
       async jwt({ token, trigger, account, profile, user, session }) {
         // Initial sign in
         let additionalAuthParams = JSON.parse(req.cookies.additionalAuthParams);
@@ -128,35 +133,22 @@ export const nextAuthOptions = (req, res) => {
                 const workspaceId =
                   organizations.length > 0 ? organizations[0]?.organizations[0]?.workspaces[0]?.id : '';
                 if (workspaceId) {
-                  const cookieObj = {
-                    accessToken: auth_token
-                  };
-
-                  const cookies = new Cookies(req, res);
-
-                  const auth = cookies.get(getAuthTokenCookie());
-
-                  if (!auth) {
-                    cookies.set(getAuthTokenCookie(), JSON.stringify(cookieObj), {
-                      path: '/',
-                      httpOnly: false
-                    });
-                  }
                 }
+                token.authToken = auth_token;
                 token.workspaceId = workspaceId;
               },
               (error) => {
                 token.error = error;
               }
             );
-          }
 
-          return {
-            ...token,
-            accessToken: account.accessToken,
-            accessTokenExpires: Date.now() + account.expires_in * 1000,
-            refreshToken: account.refresh_token
-          };
+            return {
+              ...token,
+              accessToken: access_token,
+              accessTokenExpires: Date.now() + expires_at * 1000,
+              refreshToken: refresh_token
+            };
+          }
         }
 
         // Return previous token if the access token has not expired yet
@@ -169,8 +161,9 @@ export const nextAuthOptions = (req, res) => {
       },
 
       async session({ token, session }) {
-        session.error = token.error;
-        if (!token?.workspaceId) return {};
+        if (token?.error) {
+          return { error: token.error };
+        }
 
         return {
           ...session,
@@ -196,9 +189,17 @@ const handleSocialLogin = async (payload, successCb, errorCb) => {
     } else {
       successCb(result);
     }
-  } catch (err) {
-    const errors = getErrorsInErrorObject(err);
-    const { message = '' } = errors || {};
-    errorCb(message);
+  } catch (error) {
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+
+      const errors = getErrorsInErrorObject(error.response);
+      const { message = '' } = errors || {};
+      errorCb(message);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      errorCb(error?.message ?? '');
+    }
   }
 };

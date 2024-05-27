@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
- 
+
 import { useDispatch } from 'react-redux';
 
 import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
@@ -22,7 +22,8 @@ import { AppDispatch } from '@/store/store';
 import { useSession, signIn } from 'next-auth/react';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useRouter } from 'next/router';
- 
+import { useUser } from '@/hooks/useUser';
+
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
         padding-left: ${theme.spacing(1)};
@@ -52,13 +53,15 @@ const UserBoxLabel = styled(Typography)(
 );
 
 const HeaderUserbox = () => {
-   const router = useRouter();
-    const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
 
   const { data: session } = useSession();
+
+  const { user } = useUser();
 
   const ref = useRef<any>(null);
   // Popover states
@@ -66,6 +69,7 @@ const HeaderUserbox = () => {
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
+      console.error('[userbox.tsx]: refresh access token error');
       signIn('google', { callbackUrl: '/' }); // Force sign in to hopefully resolve error
     }
   }, [session]);
@@ -79,18 +83,17 @@ const HeaderUserbox = () => {
   };
 
   const handleSignoutClick = async (): void => {
-     signOutUser(router, dispatch, logoutUser);
- 
-   };
+    signOutUser(router, dispatch, logoutUser);
+  };
 
   const userAvatar = () => {
-    return <Avatar sx={{ width: 30, height: 30 }} src={session?.user?.image ?? ''} />;
+    return <Avatar sx={{ width: 30, height: 30 }} src={user.image ?? ''} />;
   };
 
   const userTitle = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">{session?.user?.name ?? 'valmi'}</UserBoxLabel>
+        <UserBoxLabel variant="body2">{user?.name ?? 'valmi'}</UserBoxLabel>
       </UserBoxText>
     );
   };
@@ -98,7 +101,7 @@ const HeaderUserbox = () => {
   const userEmail = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">{session?.user?.email ?? 'valmi.io'}</UserBoxLabel>
+        <UserBoxLabel variant="body2">{user?.email ?? '@valmi.io'}</UserBoxLabel>
       </UserBoxText>
     );
   };

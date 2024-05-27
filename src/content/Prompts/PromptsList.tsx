@@ -5,8 +5,6 @@ import PromptCard from '@/content/Prompts/PromptCard';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { useParams, useSearchParams } from 'next/navigation';
-import { getSearchParams } from '@/utils/router-utils';
 
 const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
@@ -21,14 +19,11 @@ const Container = styled(Grid)(({ theme }) => ({
 const PromptsList = ({ data }: { data: TData }) => {
   const router = useRouter();
 
-  const searchParams = useSearchParams();
-
-  const params = getSearchParams(searchParams);
-  // const { workspaceId = '' } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const handleOnClick = (prompt: TPrompt) => {
     // redirect to preview page
-    router.push(`${getBaseRoute(params.wid!)}/prompts/${prompt.id}?filter=Last 7 days`);
+    router.push(`${getBaseRoute(workspaceId)}/prompts/${prompt.id}?filter=Last 7 days`);
   };
 
   return (

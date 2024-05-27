@@ -60,7 +60,7 @@ const ConnectionsTable = ({ connections = [], connectionType = '' }: Connections
   const connection_flow = useSelector((state: RootState) => state.connectionFlow);
   const { flowState: {} = {} } = connection_flow;
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const handleEditConnectionClick = (connection) => {
     // setconnectionflow

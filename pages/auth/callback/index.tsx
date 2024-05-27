@@ -29,7 +29,7 @@ const OAuthRedirectPage = () => {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   useEffect(() => {
     if (router?.query) {
