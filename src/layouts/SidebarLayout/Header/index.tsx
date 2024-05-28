@@ -25,14 +25,17 @@ import { useLoginStatus } from '@/hooks/useLoginStatus';
 
 const HeaderWrapper = styled(Box)(
   ({ theme }) => `
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: ${theme.spacing(0, 2)};
+        gap: ${theme.spacing(2)};
         height: ${theme.header.height};
-        color: ${theme.header.textColor};
-
         right: 0;
         z-index: 6;
         background-color: ${alpha(theme.header.background, 0.95)};
         position: fixed;
-        justify-content: space-between;
         width: 100%;
         @media (min-width: ${theme.breakpoints.values.lg}px) {
             left: ${theme.sidebar.width};
@@ -51,17 +54,8 @@ function Header() {
   const { isLoggedIn } = useLoginStatus();
 
   return (
-    <HeaderWrapper
-      display="flex"
-      alignItems="center"
-      sx={{
-        paddingLeft: (theme) => theme.spacing(3),
-        paddingRight: (theme) => theme.spacing(3)
-      }}
-    >
-      <Box sx={{ display: 'flex' }}>
-        <Breadcrumb />
-      </Box>
+    <HeaderWrapper>
+      <Breadcrumb />
       <Box display="flex" alignItems="center">
         {isPublicSync(getRouterPathname(query, url)) ? (
           <Box
