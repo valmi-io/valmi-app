@@ -285,18 +285,18 @@ export const AppFlowyTheme = createTheme({
       default: colors.layout.general.bodyBg
     },
     action: {
-      active: '#8c8c8c',
-      hover: '#0d0d0d',
-      selected: '#1a1a1a',
-      focus: '#262626',
-      disabled: '#666666',
-      disabledBackground: '#cccccc'
+      active: 'rgba(0, 0, 0, 0.56)',
+      hover: 'rgba(0, 0, 0, 0.04)',
+      selected: 'rgba(0, 0, 0, 0.08)',
+      focus: 'rgba(0, 0, 0, 0.12)',
+      disabled: 'rgba(0, 0, 0, 0.38)',
+      disabledBackground: 'rgba(0, 0, 0, 0.12)'
     },
     tonalOffset: 0.5
   },
   breakpoints: {
     values: {
-      xs: 0,
+      xs: 444,
       sm: 600,
       md: 900,
       lg: 1200,
@@ -473,7 +473,7 @@ export const AppFlowyTheme = createTheme({
     }
   },
   shape: {
-    borderRadius: 10
+    borderRadius: 4
   },
   typography: {
     fontFamily: poppins.style.fontFamily,
