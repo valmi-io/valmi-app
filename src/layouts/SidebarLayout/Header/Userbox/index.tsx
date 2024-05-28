@@ -23,6 +23,8 @@ import { useSession, signIn } from 'next-auth/react';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useRouter } from 'next/router';
 import { useUser } from '@/hooks/useUser';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -93,7 +95,7 @@ const HeaderUserbox = () => {
   const userTitle = () => {
     return (
       <UserBoxText>
-        <UserBoxLabel variant="body2">{user?.name ?? 'valmi'}</UserBoxLabel>
+        <UserBoxLabel variant="body1">{user?.name ?? 'valmi'}</UserBoxLabel>
       </UserBoxText>
     );
   };
@@ -113,7 +115,7 @@ const HeaderUserbox = () => {
 
         <Hidden mdDown>{userTitle()}</Hidden>
         <Hidden smDown>
-          <ExpandMoreTwoToneIcon className="black-bg" sx={{ ml: 1 }} />
+          <CustomIcon style={{ fontSize: 16, color: 'black', marginLeft: 16 }} icon={appIcons.CARET_DOWN} />
         </Hidden>
       </UserBoxButton>
 

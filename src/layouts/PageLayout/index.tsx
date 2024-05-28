@@ -24,7 +24,7 @@ const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
     <Paper sx={{ height: '100%', px: 2 }}>
-      <Paper sx={{ height: '100%', border: '1px solid black', position: 'relative', p: 2 }}>
+      <Paper variant="outlined" sx={{ height: '100%', position: 'relative', p: 2 }}>
         {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}

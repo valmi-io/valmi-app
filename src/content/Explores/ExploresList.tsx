@@ -19,8 +19,8 @@ const ExploresList = ({ data }: { data: TData }) => {
   const { workspaceId = '' } = useWorkspaceId();
   const src = `/connectors/google-sheets.svg`;
 
-  const handleOnClick = (item: any) => {
-    // handle explore download
+  const handleIconOnClick = (item: any) => {
+    router.push(`${getBaseRoute(workspaceId!)}/connections/${item.sync_id}/runs`);
   };
 
   const handlePreviewOnClick = (item: any) => {
@@ -33,7 +33,7 @@ const ExploresList = ({ data }: { data: TData }) => {
         <ExploreCard
           key={id}
           item={data.entities[id]}
-          handleOnClick={handleOnClick}
+          handleIconOnClick={handleIconOnClick}
           handlePreviewOnClick={handlePreviewOnClick}
           src={src}
         />
