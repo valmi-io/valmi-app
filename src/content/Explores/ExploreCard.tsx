@@ -174,7 +174,7 @@ const ExploreFooter = ({ disabled, onClick, item, handleIconOnClick }: TExploreF
         data={null}
         isFetching={false}
         size="small"
-        disabled={disabled && item?.last_sync_succeeded_at === ''}
+        disabled={!item?.enabled || item?.last_sync_succeeded_at === ''}
         onClick={onClick}
       />
     </ExploreFooterContainer>
