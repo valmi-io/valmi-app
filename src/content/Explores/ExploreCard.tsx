@@ -149,7 +149,7 @@ const StatusIcon = ({
   const theme = useTheme();
   if (sync_state === 'RUNNING') {
     return <CircularProgress size={16} />;
-  } else if (sync_state === 'RUNNING' && last_sync_result === 'FAILED') {
+  } else if (sync_state === 'IDLE' && last_sync_result === 'FAILED') {
     return (
       <Paper onClick={onClick}>
         <CustomIcon style={{ fontSize: 16, color: theme.colors.primary.main }} icon={appIcons.WARNING} />
