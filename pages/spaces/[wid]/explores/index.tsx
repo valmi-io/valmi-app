@@ -31,7 +31,7 @@ const ExploresPage: NextPageWithLayout = () => {
   return (
     <PageLayout
       pageHeadTitle="Explores"
-      title="Explores"
+      title="EXPLORES"
       buttonTitle={'Explore'}
       handleButtonOnClick={handleButtonOnClick}
     >

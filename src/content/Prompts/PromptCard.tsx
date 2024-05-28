@@ -119,21 +119,18 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
   }, [item]);
 
   return (
-    <Grid item xs={'auto'}>
-      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
-        <PromptIconContainer>
-          <Rectangle>
-            <CustomIcon
-              style={{ fontSize: 14, position: 'absolute', top: 16.8, left: 2.5 }}
-              icon={appIcons.CIRCLE_DOT}
-            />
-          </Rectangle>
-        </PromptIconContainer>
-        <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
-        <PromptDescription key={'PromptDescription'} description={item.description} />
-        <PromptFooter key={'PromptFooter'} disabled={!item?.enabled} onClick={onClick} />
-      </Card>
-    </Grid>
+    // <Grid item xs={'auto'}>
+    <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
+      <PromptIconContainer>
+        <Rectangle>
+          <CustomIcon style={{ fontSize: 14, position: 'absolute', top: 16.8, left: 2.5 }} icon={appIcons.CIRCLE_DOT} />
+        </Rectangle>
+      </PromptIconContainer>
+      <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
+      <PromptDescription key={'PromptDescription'} description={item.description} />
+      <PromptFooter key={'PromptFooter'} disabled={!item?.enabled} onClick={onClick} />
+    </Card>
+    // </Grid>
   );
 };
 

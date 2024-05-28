@@ -36,7 +36,7 @@ const PreviewPage = ({ params }: { params: IParams }) => {
   });
 
   return (
-    <Stack sx={{ flexGrow: 1 }}>
+    <Stack sx={{ display: 'flex', width: '100%', flexGrow: 1 }}>
       <Box sx={{ display: 'flex', p: 2 }}>
         <Breadcrumb />
       </Box>

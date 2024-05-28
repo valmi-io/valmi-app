@@ -24,7 +24,7 @@ const Card = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  gap: theme.spacing(1),
+  gap: theme.spacing(2),
   padding: theme.spacing(2),
   isolation: 'isolate',
   width: 360,
@@ -67,7 +67,6 @@ const ExploreDescriptionContainer = styled(Stack)(({ theme }) => ({
   justifyContent: 'center',
   gap: theme.spacing(1),
   width: '100%',
-  height: 72,
   overflow: 'hidden'
 }));
 
@@ -183,18 +182,16 @@ const ExploreFooter = ({ disabled, onClick, item, handleIconOnClick }: TExploreF
 
 const ExploreDescription = ({ description }: { description: string }) => {
   return (
-    <>
-      <ExploreDescriptionContainer>
-        <CustomIcon style={{ fontSize: 14 }} icon={appIcons.CIRCLE_DOT} />
-        <Typography variant="body1">{description}</Typography>
-      </ExploreDescriptionContainer>
-    </>
+    <ExploreDescriptionContainer>
+      <CustomIcon style={{ fontSize: 14 }} icon={appIcons.CIRCLE_DOT} />
+      <Typography variant="body1">{description}</Typography>
+    </ExploreDescriptionContainer>
   );
 };
 
 const ExploreCard = ({ item, handlePreviewOnClick, src, handleIconOnClick }: TExploreProps) => {
   return (
-    <Grid item xs={'auto'} sm={4} md={4}>
+    <Grid item xs={'auto'}>
       <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
         <ExploreIconContainer>
           <Rectangle>

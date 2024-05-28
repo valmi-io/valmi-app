@@ -10,7 +10,7 @@ const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'wrap',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   alignItems: 'center',
   gap: theme.spacing(2),
   isolation: 'isolate'
