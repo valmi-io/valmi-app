@@ -26,9 +26,7 @@ import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
-import { initialiseAppState } from '@/utils/login-utils';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 
 const ContainerWrapper = styled(Paper)(({}) => ({
   boxSizing: 'border-box',
@@ -63,8 +61,6 @@ const Login: NextPageWithLayout = () => {
 
   const { data: session } = useSession();
 
-  const { workspaceId = '' } = useWorkspaceId();
-
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
 
@@ -76,45 +72,6 @@ const Login: NextPageWithLayout = () => {
   });
 
   const [oauthError, setOauthError] = useState('');
-
-  // If workspaceId exists, navigate to connections
-  useEffect(() => {
-    if (workspaceId) {
-      saveAuthTokenInCookie().run();
-      router.push(`/spaces/${workspaceId}/connections`);
-    }
-  }, [workspaceId]);
-
-  // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
-  const saveAuthTokenInCookie = () => {
-    return {
-      run: async () => {
-        const cookieObj = {
-          accessToken: session?.authToken ?? ''
-        };
-
-        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
-
-        if (!accessToken) {
-          setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
-        }
-      }
-    };
-  };
-  // This function checks if session exists. If exists, saves session to redux store.
-  useEffect(() => {
-    if (session) {
-      if (session?.user && !workspaceId) {
-        const data = {
-          ...session.user,
-          workspaceId: session.workspaceId
-        };
-
-        // save session to redux store.
-        saveUserStateInStore(data).run();
-      }
-    }
-  }, [session, workspaceId]);
 
   // This function handles both google oauth errors (next-auth errors)
   // & api backend error caused while social user logging in.
@@ -141,15 +98,6 @@ const Login: NextPageWithLayout = () => {
           // clear session & access_token cookies if exists.
           signOutUser(router, dispatch, logoutUser);
         }
-      }
-    };
-  };
-
-  // stores user information in redux store
-  const saveUserStateInStore = (data: any) => {
-    return {
-      run: () => {
-        initialiseAppState(dispatch, data);
       }
     };
   };

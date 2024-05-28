@@ -9,22 +9,70 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import Head from '@components/PageHead';
-import { useLoginStatus } from '@/hooks/useLoginStatus';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { useSession } from 'next-auth/react';
+import { initialiseAppState } from '@/utils/login-utils';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 
 const HomePage = () => {
   const router = useRouter();
 
-  const { isLoggedIn } = useLoginStatus();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
+  const { data: session } = useSession();
+
+  // If workspaceId exists, navigate to connections
   useEffect(() => {
-    if (isLoggedIn && workspaceId) {
-      //@ts-ignore
+    if (workspaceId) {
+      saveAuthTokenInCookie().run();
       router.push(`/spaces/${workspaceId}/connections`);
     }
-  }, [isLoggedIn, workspaceId]);
+  }, [workspaceId]);
+
+  // This function checks if session exists. If exists, saves session to redux store.
+  useEffect(() => {
+    if (session) {
+      if (session?.user && !workspaceId) {
+        const data = {
+          ...session.user,
+          workspaceId: session.workspaceId
+        };
+
+        // save session to redux store.
+        saveUserStateInStore(data).run();
+      }
+    }
+  }, [session, workspaceId]);
+
+  // stores user information in redux store
+  const saveUserStateInStore = (data: any) => {
+    return {
+      run: () => {
+        initialiseAppState(dispatch, data);
+      }
+    };
+  };
+
+  // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
+  const saveAuthTokenInCookie = () => {
+    return {
+      run: async () => {
+        const cookieObj = {
+          accessToken: session?.authToken ?? ''
+        };
+
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+        if (!accessToken) {
+          setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
+        }
+      }
+    };
+  };
 
   return (
     <>

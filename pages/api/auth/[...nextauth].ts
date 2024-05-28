@@ -19,6 +19,7 @@ const GOOGLE_AUTHORIZATION_URL =
  * returns the old token and an error property
  */
 async function refreshAccessToken(token) {
+  console.log('refreshing access token:_');
   try {
     const url =
       'https://oauth2.googleapis.com/token?' +
@@ -151,10 +152,15 @@ export const nextAuthOptions = (req, res) => {
           }
         }
 
+        console.log('TOKEN:_', token.accessTokenExpires);
+
         // Return previous token if the access token has not expired yet
         if (Date.now() < token.accessTokenExpires) {
+          console.log('TOKEN IS NOT EXPIRED:_');
           return token;
         }
+
+        console.log('trying to refresh token:_');
 
         // Access token has expired, try to update it
         return await refreshAccessToken(token);
