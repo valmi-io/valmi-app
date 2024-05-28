@@ -5,19 +5,22 @@ export const getLastNthDate = (n: number) => {
 };
 
 export const getTimeAt = (date: Date) => {
-  if (date === null || '') {
+  //@ts-ignore
+  if (date === null || date === '') {
     return '--';
   } else return moment(date).format('YYYY-MM-DD');
 };
 
 export const getTimeAgo = (date: Date | '') => {
   const now = moment();
-  if (date === null || '') {
+  if (date === null || date === '') {
     return '--';
   } else {
     const diff = now.diff(date, 'days');
 
-    if (diff === 0) {
+    if (isNaN(diff)) {
+      return '--';
+    } else if (diff === 0) {
       return 'Today';
     } else if (diff === 1) {
       return '1 day ago';
