@@ -227,7 +227,7 @@ export const AppFlowyTheme = createTheme({
     width: '248px'
   },
   header: {
-    height: '60px',
+    height: '64px',
     background: colors.alpha.white[100],
     textColor: colors.secondary.main
   },
@@ -546,13 +546,14 @@ export const AppFlowyTheme = createTheme({
       fontWeight: 500,
       fontSize: '14px',
       lineHeight: 1.75,
+      letterSpacing: '0.4px',
       textTransform: 'uppercase'
     },
     caption: {
       fontWeight: 400,
       fontSize: '12px',
-      lineHeight: 1.66,
-      letterSpacing: '1px',
+      lineHeight: 1.67,
+      letterSpacing: '0.4px',
       color: colors.alpha.black[100]
     },
     overline: {

@@ -1,5 +1,5 @@
 import { TData } from '@/utils/typings.d';
-import { Grid } from '@mui/material';
+import { Grid, styled } from '@mui/material';
 
 import ExploreCard from '@/content/Explores/ExploreCard';
 import { useRouter } from 'next/router';
@@ -8,6 +8,16 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useFetch } from '@/hooks/useFetch';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
+
+const Container = styled(Grid)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  gap: theme.spacing(2),
+  isolation: 'isolate'
+}));
 
 const ExploresList = ({ data }: { data: TData }) => {
   const router = useRouter();
@@ -28,7 +38,7 @@ const ExploresList = ({ data }: { data: TData }) => {
   };
 
   return (
-    <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} sx={{ padding: 2 }}>
+    <Container container>
       {data.ids.map((id: string) => (
         <ExploreCard
           key={id}
@@ -38,7 +48,7 @@ const ExploresList = ({ data }: { data: TData }) => {
           src={src}
         />
       ))}
-    </Grid>
+    </Container>
   );
 };
 

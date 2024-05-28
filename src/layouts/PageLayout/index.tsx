@@ -20,15 +20,33 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center'
 }));
 
+const ContainerWrapper = styled(Container)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  padding: theme.spacing(0, 2),
+  height: '100%'
+}));
+
+const InnerContainer = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  padding: theme.spacing(2),
+  height: '100%',
+  minWidth: '1024px',
+  position: 'relative'
+}));
+
 const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
-    <Paper sx={{ height: '100%', px: 2 }}>
-      <Paper variant="outlined" sx={{ height: '100%', position: 'relative', p: 2 }}>
+    <ContainerWrapper maxWidth="lg">
+      <InnerContainer variant="outlined">
         {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}
-          sx={{ width: '100%', height: '100%', position: 'absolute', top: 10 }}
+          sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
         >
           {Array.from(Array(12)).map((_, index) => (
             <Grid item xs={1} key={index} height="100%">
@@ -44,10 +62,9 @@ const PageLayout = (props: PageLayoutProps) => {
           buttonTitle={buttonTitle?.toUpperCase()}
           onClick={handleButtonOnClick}
         />
-
-        <Container maxWidth="lg">{children}</Container>
-      </Paper>
-    </Paper>
+        {children}
+      </InnerContainer>
+    </ContainerWrapper>
   );
 };
 
