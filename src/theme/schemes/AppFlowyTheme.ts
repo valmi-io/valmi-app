@@ -527,73 +527,88 @@ export const AppFlowyTheme = createTheme({
   typography: {
     fontFamily: poppins.style.fontFamily,
     h1: {
-      fontWeight: 700,
-      lineHeight: 1.16,
-      fontSize: 96
+      fontWeight: 300,
+      fontSize: '96px',
+      lineHeight: 1.167,
+      letterSpacing: '-1px'
     },
     h2: {
-      fontWeight: 600,
+      fontWeight: 300,
+      fontSize: '60px',
       lineHeight: 1.2,
-      fontSize: 60
+      letterSpacing: '-0.5px'
     },
     h3: {
-      fontWeight: 600,
-      fontSize: 48,
-      lineHeight: 1.16,
+      fontWeight: 400,
+      fontSize: '48px',
+      lineHeight: 1.167,
+      letterSpacing: '0',
       color: colors.alpha.black[100]
     },
     h4: {
-      fontWeight: 600,
-      lineHeight: 1.23,
-      fontSize: 34
+      fontWeight: 400,
+      fontSize: '34px',
+      lineHeight: 1.235,
+      letterSpacing: '0.5px'
     },
     h5: {
-      fontWeight: 600,
-      lineHeight: 1.33,
-      fontSize: 24
+      fontWeight: 400,
+      fontSize: '24px',
+      lineHeight: 1.334,
+      letterSpacing: '0'
     },
     h6: {
-      fontSize: 20,
+      fontWeight: 500,
+      fontSize: '20px',
       lineHeight: 1.6,
-      fontWeight: 500
+      letterSpacing: '0.5px',
+      color: colors.alpha.black[100]
+    },
+    subtitle1: {
+      fontWeight: 400,
+      fontSize: '16px',
+      lineHeight: 1.75,
+      letterSpacing: '0.5px',
+      color: colors.alpha.black[100]
+    },
+    subtitle2: {
+      fontWeight: 500,
+      fontSize: '14px',
+      lineHeight: 1.57,
+      letterSpacing: '0.25px',
+      color: colors.alpha.black[100]
     },
     body1: {
-      fontSize: 16,
+      fontWeight: 400,
+      fontSize: '16px',
       lineHeight: 1.5,
-      fontWeight: 500
+      letterSpacing: '0.15px'
+      // color: colors.alpha.black[100]
     },
     body2: {
-      fontSize: 14,
+      fontWeight: 400,
+      fontSize: '14px',
       lineHeight: 1.43,
-      fontWeight: 500
+      letterSpacing: '0.75px'
     },
     button: {
       fontWeight: 500,
-      lineHeight: 1.75
+      fontSize: '14px',
+      lineHeight: 1.75,
+      textTransform: 'uppercase'
     },
     caption: {
-      fontSize: 12,
       fontWeight: 400,
-      textTransform: 'uppercase',
+      fontSize: '12px',
       lineHeight: 1.66,
-      color: colors.alpha.black[50]
-    },
-    subtitle1: {
-      fontSize: 16,
-      fontWeight: 600,
-      lineHeight: 1.75,
-      color: colors.alpha.black[70]
-    },
-    subtitle2: {
-      fontWeight: 600,
-      fontSize: 14,
-      lineHeight: 1.57,
-      color: colors.alpha.black[70]
+      letterSpacing: '1px',
+      color: colors.alpha.black[100]
     },
     overline: {
-      fontSize: 12,
-      fontWeight: 700,
+      fontWeight: 400,
+      fontSize: '10px',
       lineHeight: 2.66,
+      letterSpacing: '2px',
       textTransform: 'uppercase'
     }
   }
