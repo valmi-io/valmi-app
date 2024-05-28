@@ -7,9 +7,16 @@ import { getTimeAt, getTimeAgo } from '@/utils/date-utils';
 
 type TExploreProps = {
   item: any;
-  handleOnClick: (item: any) => void;
+  handleIconOnClick: (item: any) => void;
   handlePreviewOnClick: (item: any) => void;
   src: string;
+};
+
+type TExploreFooterProps = {
+  disabled: boolean;
+  onClick: () => void;
+  item: any;
+  handleIconOnClick: () => void;
 };
 
 const Card = styled(Paper)(({ theme }) => ({
@@ -130,25 +137,44 @@ const ExploreTitle = ({ title }: { title: string }) => {
   return <Typography variant="h6">{title}</Typography>;
 };
 
-const StatusIcon = ({ status }: { status: string }) => {};
-
-const ExploreFooter = ({ disabled, onClick, item }: { disabled: boolean; onClick: () => void; item: any }) => {
+const StatusIcon = ({
+  sync_state,
+  last_sync_result,
+  onClick
+}: {
+  sync_state: string;
+  last_sync_result: string;
+  onClick: () => void;
+}) => {
   const theme = useTheme();
+  if (sync_state === 'RUNNING') {
+    return <CircularProgress size={16} />;
+  } else if (sync_state === 'RUNNING' && last_sync_result === 'FAILED') {
+    return (
+      <Paper onClick={onClick}>
+        <CustomIcon style={{ fontSize: 16, color: theme.colors.primary.main }} icon={appIcons.WARNING} />
+      </Paper>
+    );
+  }
+};
+
+const ExploreFooter = ({ disabled, onClick, item, handleIconOnClick }: TExploreFooterProps) => {
   return (
     <ExploreFooterContainer>
       <MetaInfo item={item} />
       <StatusChip>
-        {item?.sync_state === 'RUNNING' && <CircularProgress size={16} />}
-        {item?.sync_state === 'RUNNING' && item?.last_sync_result === 'FAILED' && (
-          <CustomIcon style={{ fontSize: 16, color: theme.colors.primary.main }} icon={appIcons.WARNING} />
-        )}
+        <StatusIcon
+          sync_state={item?.sync_state}
+          last_sync_result={item?.last_sync_result}
+          onClick={handleIconOnClick}
+        />
       </StatusChip>
       <SubmitButton
         buttonText={'EXPLORE'}
         data={null}
         isFetching={false}
         size="small"
-        disabled={item?.last_sync_succeeded_at === ''}
+        disabled={disabled && item?.last_sync_succeeded_at === ''}
         onClick={onClick}
       />
     </ExploreFooterContainer>
@@ -166,9 +192,7 @@ const ExploreDescription = ({ description }: { description: string }) => {
   );
 };
 
-const ExploreCard = ({ item, handleOnClick, handlePreviewOnClick, src }: TExploreProps) => {
-  console.log('exploreitem:', item);
-
+const ExploreCard = ({ item, handlePreviewOnClick, src, handleIconOnClick }: TExploreProps) => {
   return (
     <Grid item xs={'auto'} sm={4} md={4}>
       <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
@@ -186,8 +210,9 @@ const ExploreCard = ({ item, handleOnClick, handlePreviewOnClick, src }: TExplor
         <ExploreDescription key={'ExploreDescription'} description={item.description} />
         <ExploreFooter
           key={'ExploreFooter'}
-          disabled={!item?.enabled}
-          onClick={() => handleOnClick(item)}
+          disabled={item?.enabled}
+          onClick={() => handlePreviewOnClick(item)}
+          handleIconOnClick={() => handleIconOnClick(item)}
           item={item}
         />
       </Card>

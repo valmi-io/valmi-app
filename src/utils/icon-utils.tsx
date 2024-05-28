@@ -37,7 +37,8 @@ import {
   faWaveSquare,
   faCirclePlus,
   faCircleDot,
-  faTriangleExclamation
+  faTriangleExclamation,
+  faCaretDown
 } from '@fortawesome/free-solid-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -76,6 +77,7 @@ export interface IAppIcons {
   DATA_FLOWS: React.ReactElement;
   CIRCLE_DOT: IconDefinition;
   WARNING: IconDefinition;
+  CARET_DOWN: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -112,7 +114,8 @@ const appIcons: IAppIcons = {
   CATALOG: <ViewColumnIcon />,
   DATA_FLOWS: <PeopleIcon />,
   CIRCLE_DOT: { ...faCircleDot },
-  WARNING: { ...faTriangleExclamation }
+  WARNING: { ...faTriangleExclamation },
+  CARET_DOWN: { ...faCaretDown }
 };
 
 export default appIcons;
