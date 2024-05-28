@@ -31,7 +31,6 @@ const InnerContainer = styled(Paper)(({ theme }) => ({
   boxSizing: 'border-box',
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-end',
   padding: theme.spacing(2),
   height: '100%',
   minWidth: '1024px',
