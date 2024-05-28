@@ -61,6 +61,8 @@ const Login: NextPageWithLayout = () => {
 
   const { data: session } = useSession();
 
+  const { workspaceId = '' } = useWorkspaceId();
+
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
 

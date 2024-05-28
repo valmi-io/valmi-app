@@ -6,26 +6,23 @@ import { getAuthTokenCookie } from '@/lib/cookies';
 
 export async function middleware(request: NextRequest, response: NextResponse) {
   let cookie = request.cookies.get(getAuthTokenCookie())?.value;
-
   let accessToken = '';
   if (cookie) {
     cookie = JSON.parse(cookie);
     accessToken = (cookie as { accessToken?: string })?.accessToken || '';
   }
-
   const route = request.nextUrl.pathname;
 
   const isLoggedIn = !!accessToken;
-
   if (isLoggedIn) {
     // user is authenticated.
-    if (publicRoutes.includes(route)) {
+    if (publicRoutes.includes(route) || route === '/spaces') {
       return NextResponse.redirect(new URL('/', request.url));
     }
   } else {
     // user is not authenticated
     // checking if route is a protected route.
-    if (!publicRoutes.includes(route)) {
+    if (!publicRoutes.includes(route) && route !== '/') {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
