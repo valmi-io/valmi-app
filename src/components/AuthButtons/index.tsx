@@ -30,7 +30,7 @@ export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDis
       })
     );
     signIn('google', {
-      // callbackUrl: '/'
+      callbackUrl: '/',
       redirect: false
     });
   };
@@ -77,11 +77,9 @@ export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDis
             opacity: isDisabled ? 0.5 : 0.6
           }}
         >
-          {session
-            ? 'Logout'
-            : getOauthLoginText({
-                oAuth: 'google'
-              })}
+          {getOauthLoginText({
+            oAuth: 'google'
+          })}
         </Typography>
       </Box>
     </PaperWrapper>
