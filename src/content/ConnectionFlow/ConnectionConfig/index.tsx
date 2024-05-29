@@ -36,10 +36,10 @@ import {
 import { useSession } from 'next-auth/react';
 import { useIntegrationQuery } from '@/content/ConnectionFlow/useIntegrationQuery';
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
-import { getOAuthParams } from '@/pagesauth/callback';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { FormStatus } from '@/utils/form-utils';
 import { useUser } from '@/hooks/useUser';
+import { getOAuthParams } from '@/utils/oauth-utils';
 
 const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const { wid = '', connectionId = '' } = params ?? {};
@@ -155,42 +155,46 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
   const checkConnection = async (url: string, payload: any) => {
     await httpPostRequestHandler({
-      route: apiRoutes['check'],
+      route: apiRoutes['checkURL'],
       url,
       payload,
-      errorCb: (err) => {
-        setStatus('error');
+      errorCb: handleConnectionError,
+      successCb: (res) => handleConnectionSuccess(res, payload)
+    });
+  };
 
-        handleAlertOpen({ message: err, alertType: 'error' });
-      },
-      successCb: async (res) => {
-        const { connectionStatus: { status = '', message = '' } = {} } = res ?? {};
-        if (status === 'FAILED') {
-          setStatus('error');
+  const handleConnectionSuccess = async (res: any, payload: any) => {
+    const { connectionStatus: { status = '', message = '' } = {} } = res ?? {};
+    if (status === 'FAILED') {
+      setStatus('error');
 
-          handleAlertOpen({ message: message, alertType: 'error' });
-        } else {
-          const entities = {
-            ...connectionDataFlow.entities,
-            [getCredentialObjKey(type)]: {
-              ...connectionDataFlow.entities[getCredentialObjKey(type)],
-              //TODO : after check, get the name from the response and send it here instead displayName
-              config: {
-                ...payload.config,
-                name: displayName
-              }
-            }
-          };
-
-          dispatch(setEntities(entities));
-
-          if (!isConnectionAutomationFlow({ mode, type })) {
-            setStatus('success');
-            nextStep();
+      handleAlertOpen({ message: message, alertType: 'error' });
+    } else {
+      const entities = {
+        ...connectionDataFlow.entities,
+        [getCredentialObjKey(type)]: {
+          ...connectionDataFlow.entities[getCredentialObjKey(type)],
+          //TODO : after check, get the name from the response and send it here instead displayName
+          config: {
+            ...payload.config,
+            name: displayName
           }
         }
+      };
+
+      dispatch(setEntities(entities));
+
+      if (!isConnectionAutomationFlow({ mode, type })) {
+        setStatus('success');
+        nextStep();
       }
-    });
+    }
+  };
+
+  const handleConnectionError = async (err: any) => {
+    setStatus('error');
+
+    handleAlertOpen({ message: err, alertType: 'error' });
   };
 
   //STATE: Checking Credential - END

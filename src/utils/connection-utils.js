@@ -4,12 +4,11 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getOAuthParams } from 'pages/auth/callback';
-
 import { isConnectorRequiresOAuth } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 import { ConnectionType } from '@content/Connections/ConnectionModel';
 
 import { setConnectionFlow } from '@store/reducers/connectionFlow';
+import { getOAuthParams } from './oauth-utils';
 
 export const getInitialConnectionFlowState = (connection_flow, isInitialState) => {
   const { flowState: { connection_type = ConnectionType.SRC, steps = 0, currentStep = 0 } = {} } = connection_flow;
