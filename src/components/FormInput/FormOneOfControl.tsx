@@ -212,7 +212,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
               open={confirmDialogOpen}
               handleClose={handleClose}
             />
-            <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
+            {/* <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText> */}
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>
         )}

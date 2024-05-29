@@ -25,7 +25,7 @@ const SyncRunsPage: NextPageWithLayout = () => {
 
   const { cid = '1' } = router.query;
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   return (
     <PageLayout pageHeadTitle="Sync Runs" title={'Sync Details'} displayButton={false}>

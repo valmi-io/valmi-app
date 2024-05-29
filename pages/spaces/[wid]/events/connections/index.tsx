@@ -34,7 +34,7 @@ const EventConnectionsPage: NextPageWithLayout = () => {
 
   const dispatch = useDispatch();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   // getStreams
   const {

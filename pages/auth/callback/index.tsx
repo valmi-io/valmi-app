@@ -1,25 +1,39 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
- * Author: Nagendra S @ valmi.io
- */
 import { useEffect } from 'react';
 
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import axios from 'axios';
 
-import { hasErrorsInData } from '@components/Error/ErrorUtils';
+import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { isObjectEmpty } from '@/utils/lib';
+import { apiRoutes, redirectToCreateConnection, redirectToHomePage } from '@/utils/router-utils';
+import { updateOAuthStateInRedux } from '@/utils/oauth-utils';
 
-const OAuthRedirectPage = () => {
+const handleFacebookLogin = async (queryParams: any, successCb: (res: any) => void, errorCb: (err: any) => void) => {
+  const URL = apiRoutes['fbTokenURL'];
+  try {
+    const response = await axios.get(URL, { params: { state: queryParams } });
+
+    const result = response?.data ?? {};
+    if (hasErrorsInData(result)) {
+      const traceError = getErrorsInData(result);
+      errorCb(traceError);
+    } else {
+      successCb(result);
+    }
+  } catch (error) {
+    errorCb(error);
+  }
+};
+
+const OAuthCallbackPage = () => {
   const router = useRouter();
 
   const dispatchToStore = useDispatch<AppDispatch>();
@@ -29,163 +43,93 @@ const OAuthRedirectPage = () => {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { oauth_params: oAuthParams = {}, oauth_error: oAuthError = '' } = selectedConnector;
+
+  const { workspaceId = '' } = useWorkspaceId();
 
   useEffect(() => {
-    if (router?.query) {
-      const { provider = '', access_token = '' } = router.query;
-      if (provider && workspaceId) {
-        if (provider === 'facebook') {
-          const data = {
-            config: {
-              credentials: {
-                access_token: access_token,
-                client_id: 'AUTH_FACEBOOK_CLIENT_ID',
-                client_secret: 'AUTH_FACEBOOK_CLIENT_SECRET'
-              }
-            }
-          };
-          getFbLongLivedToken(``, 'POST', data);
-        } else {
-          redirectToCreateConnection({
-            oAuthParams: router.query
-          });
-        }
+    if (router.isReady) {
+      if (router?.query && !isObjectEmpty(router.query)) {
+        handleQueryParams(router, dispatchToStore, router.query, workspaceId, selectedConnector, connectionDataFlow);
+      } else {
+        redirectToHomePage(workspaceId, router);
       }
     }
-  }, [router, workspaceId]);
+  }, [router.isReady]);
 
-  const getFbLongLivedToken = async (url: any, method: any, data: any) => {
+  useEffect(() => {
+    if ((oAuthParams && !isObjectEmpty(oAuthParams)) || oAuthError) {
+      redirectToCreateConnection({
+        router: router,
+        wid: workspaceId
+      });
+    }
+  }, [oAuthParams, oAuthError]);
+
+  const handleQueryParams = (
+    router: NextRouter,
+    dispatch: AppDispatch,
+    params: any,
+    wid: string,
+    selectedConnector: any,
+    connectionDataFlow: any
+  ) => {
+    const { provider = '', access_token = '' } = params ?? {};
+    if (provider && wid) {
+      if (provider === 'facebook') {
+        getFbLongLivedToken(router, wid, access_token, selectedConnector);
+      } else {
+        updateOAuthStateInRedux({
+          oAuthParams: router.query,
+          oAuthError: '',
+          connectionDataFlow: connectionDataFlow,
+          dispatch: dispatch
+        });
+      }
+    } else {
+      redirectToHomePage(workspaceId, router);
+    }
+  };
+
+  const getFbLongLivedToken = async (router: NextRouter, wid: string, access_token: string, selectedConnector: any) => {
     const { oauth_keys = 'private', type = '' } = selectedConnector ?? {};
 
     let obj = {
-      workspace: workspaceId,
+      workspace: wid,
       connector: type,
       oauth_keys: oauth_keys,
-      accessToken: data?.config?.credentials?.access_token ?? ''
+      accessToken: access_token ?? ''
     };
 
     let state = encodeURIComponent(JSON.stringify(obj));
 
-    const entitiesInStore = connectionDataFlow?.entities ?? {};
-    try {
-      const response = await axios.get('/api/getFbLongLivedToken', { params: { state: state } });
-
-      const result = response.data;
-
-      if (hasErrorsInData(result)) {
-        // TODO: Handle this error if needed.
-        const obj = {
-          ...entitiesInStore,
-          [getSelectedConnectorKey()]: {
-            ...connectionDataFlow.entities[getSelectedConnectorKey()],
-            oauth_params: result
-          }
-        };
-
-        dispatchToStore(setEntities(obj));
-        redirectToCreateConnection({ oAuthParams: {} });
-      } else {
-        const oAuthParams = {
-          ...router.query,
-          long_term_acccess_token: result.access_token
-        };
-        redirectToCreateConnection({ oAuthParams });
-      }
-    } catch (error) {
-      // Handle any errors that occur during the API request
-      // store error in redux store
-      const obj = {
-        ...entitiesInStore,
-        [getSelectedConnectorKey()]: {
-          ...connectionDataFlow.entities[getSelectedConnectorKey()],
-          oauth_error: error
-        }
-      };
-
-      dispatchToStore(setEntities(obj));
-      redirectToCreateConnection({ oAuthParams: {} });
-    }
+    await handleFacebookLogin(state, (res) => handleFacebookLoginSuccess(router, res), handleFacebookLoginError);
   };
 
-  const redirectToCreateConnection = ({ oAuthParams }: any) => {
-    const entitiesInStore = connectionDataFlow?.entities ?? {};
-
-    // store oAuthparams in redux store
-    const obj = {
-      ...entitiesInStore,
-      [getSelectedConnectorKey()]: {
-        ...connectionDataFlow.entities[getSelectedConnectorKey()],
-        oauth_params: oAuthParams,
-        oauth_error: ''
-      }
+  const handleFacebookLoginSuccess = (router: NextRouter, res: any) => {
+    const oAuthParams = {
+      ...router.query,
+      long_term_acccess_token: res.access_token
     };
 
-    dispatchToStore(setEntities(obj));
-
-    router.push(`/spaces/${workspaceId}/connections/create`);
+    updateOAuthStateInRedux({
+      oAuthParams: oAuthParams,
+      oAuthError: '',
+      connectionDataFlow: connectionDataFlow,
+      dispatch: dispatchToStore
+    });
   };
-};
 
-export const getOAuthParams = (params: any) => {
-  const oAuthParams = params || {};
-
-  const { provider = '' } = oAuthParams;
-  switch (provider) {
-    case 'facebook':
-      return getFacebookOAuthParams(oAuthParams);
-    case 'google':
-      return getGoogleOAuthParams(oAuthParams);
-    case 'hubspot':
-      return getHubspotOAuthParams(oAuthParams);
-    case 'slack':
-      return getSlackOAuthParams(oAuthParams);
-    case 'shopify':
-      return getShopifyOAuthParams(oAuthParams);
-    default:
-      return { ...oAuthParams };
-  }
-};
-
-const getFacebookOAuthParams = (oAuthParams: any) => {
-  return {
-    ...oAuthParams,
-    app_id: 'AUTH_FACEBOOK_CLIENT_ID',
-    app_secret: 'AUTH_FACEBOOK_CLIENT_SECRET'
+  const handleFacebookLoginError = (err: any) => {
+    updateOAuthStateInRedux({
+      oAuthParams: {},
+      oAuthError: err,
+      connectionDataFlow: connectionDataFlow,
+      dispatch: dispatchToStore
+    });
   };
+
+  return <></>;
 };
 
-const getSlackOAuthParams = (oAuthParams: any) => {
-  return {
-    ...oAuthParams,
-    client_id: 'AUTH_SLACK_CLIENT_ID',
-    client_secret: 'AUTH_SLACK_CLIENT_SECRET'
-  };
-};
-
-const getGoogleOAuthParams = (oAuthParams: any) => {
-  return {
-    ...oAuthParams,
-    client_id: 'AUTH_GOOGLE_CLIENT_ID',
-    client_secret: 'AUTH_GOOGLE_CLIENT_SECRET',
-    developer_token: 'AUTH_GOOGLE_DEVELOPER_TOKEN'
-  };
-};
-
-const getHubspotOAuthParams = (oAuthParams: any) => {
-  return {
-    ...oAuthParams,
-    client_id: 'AUTH_HUBSPOT_CLIENT_ID',
-    client_secret: 'AUTH_HUBSPOT_CLIENT_SECRET'
-  };
-};
-
-const getShopifyOAuthParams = (oAuthParams: any) => {
-  return {
-    ...oAuthParams,
-    client_id: 'AUTH_SHOPIFY_CLIENT_ID',
-    client_secret: 'AUTH_SHOPIFY_CLIENT_SECRET'
-  };
-};
-
-export default OAuthRedirectPage;
+export default OAuthCallbackPage;

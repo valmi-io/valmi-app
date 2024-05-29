@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getAuthTokenCookie, setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { queryHandler } from '@/services';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 import { signOut } from 'next-auth/react';
@@ -81,33 +81,52 @@ export const getConnectorImage = (connectorType) => {
 };
 
 export const signOutUser = async (router, dispatch, query) => {
- 
-  // clear redux store
-  dispatch({ type: 'RESET_STORE' });
-  // clear auth cookie
+  // Get access_token from cookie
+  const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-  // destroy token in the api backend
-   await queryHandler({
-    query,
-    payload: {},
-    successCb: async () => {
+  // if access_token is in cookie, destroy token in the api backend
+  if (accessToken) {
+    await queryHandler({
+      query,
+      payload: {},
+      successCb: async () => {
+        removeAppState(router, dispatch).run();
+      },
+      errorCb: async () => {
+        removeAppState(router, dispatch).run();
+      }
+    });
+  } else {
+    // clear redux store
+    removeReduxStore(dispatch);
+    // If no access_token, redirect to login
+    router.push('/login');
+  }
+};
+
+const removeAppState = (router: any, dispatch: any) => {
+  return {
+    run: async () => {
       await clearCookie();
-      router.push('/login');
-    },
-    errorCb: async () => {
-      await clearCookie();
+      removeReduxStore(dispatch);
       router.push('/login');
     }
-  });
+  };
 };
 
 const clearCookie = async () => {
+  // clear auth token
   await setCookie(getAuthTokenCookie(), '', {
     expires: new Date(0),
     path: '/'
   });
+
   // clear nextauth session
   await signOut({ redirect: false, callbackUrl: '/login' });
+};
+
+const removeReduxStore = (dispatch) => {
+  dispatch({ type: 'RESET_STORE' });
 };
 
 export const splitNumberByCommas = (number) => {

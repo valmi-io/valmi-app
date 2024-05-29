@@ -9,7 +9,7 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, Icon, styled, Button } from '@mui/material';
+import { Box, Typography, Icon, styled, Button, Link } from '@mui/material';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -34,7 +34,7 @@ const HeaderTitle = () => {
   let valuesAfterWid = url.split('/').slice(3);
   const getQueryValue = (route: string) => {
     let values = valuesAfterWid.map((item) => {
-      if (item === route && item.startsWith('[') && item.endsWith(']')) {
+      if (item.startsWith('[') && item.endsWith(']')) {
         let path: any = item.split('');
         path.shift();
         path.pop();
@@ -81,17 +81,24 @@ const HeaderTitle = () => {
           {valuesAfterWid.length > 0 &&
             valuesAfterWid.map((route, index) => {
               return (
-                <Button
+                <Link
                   key={`breadcrumb-${index}`}
-                  sx={{ padding: 0 }}
+                  sx={{
+                    padding: 0,
+                    textDecoration: 'none',
+                    color:
+                      index !== valuesAfterWid.length - 1
+                        ? (theme) => theme.colors.alpha.black[50]
+                        : (theme) => theme.colors.alpha.black[100]
+                  }}
                   href={
                     valuesAfterWid.length > 1
                       ? `/spaces/${query?.wid}/${getQueryValue(route)}`
                       : `/spaces/${query?.wid}/${route}`
                   }
                 >
-                  <Typography variant="body2">{filterRoute(route)}</Typography>
-                </Button>
+                  <Typography variant="body1">{filterRoute(route)}</Typography>
+                </Link>
               );
             })}
         </Breadcrumbs>

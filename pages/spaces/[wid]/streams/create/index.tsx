@@ -37,7 +37,7 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 const CreateStream = () => {
   const router = useRouter();
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   // Getting schema for the object
   const { data: schema, isLoading, traceError, error } = useFetch({ query: useStreamSchemaQuery(workspaceId) });

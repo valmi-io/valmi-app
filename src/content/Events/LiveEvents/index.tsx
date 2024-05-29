@@ -44,7 +44,7 @@ const LiveEvents = ({
 
   const { query } = router.query;
 
-  const { workspaceId = null } = useWorkspaceId();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const [
     getStreamLogs,

@@ -1,9 +1,12 @@
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import { Box, Paper, Typography, styled } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { getOauthImage, getOauthLoginText } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
-import { setCookie } from '@/lib/cookies';
-
+import { getAuthMetaCookie, getCookie, setCookie } from '@/lib/cookies';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
+import { RootState } from '@/store/reducers';
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -23,21 +26,30 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
 export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDisabled: boolean }) {
   const { data: session } = useSession();
 
-  const handleClick = () => {
-    if (session) {
-      signOut();
-    } else {
-      setCookie(
-        'additionalAuthParams',
-        JSON.stringify({
-          meta: meta
-        })
-      );
-      signIn('google', {
-        callbackUrl: '/'
-      });
+  const dispatch = useDispatch<AppDispatch>();
+
+  const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
+
+  const handleClick = async () => {
+    const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
+
+    if (!meta) {
+      setCookie(getAuthMetaCookie(), JSON.stringify({ meta: meta }));
     }
+
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: 'INITIALIZED'
+      })
+    );
+
+    signIn('google', {
+      callbackUrl: '/'
+      // redirect: false
+    });
   };
+
   return (
     <PaperWrapper
       onClick={handleClick}
@@ -80,11 +92,9 @@ export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDis
             opacity: isDisabled ? 0.5 : 0.6
           }}
         >
-          {session
-            ? 'Logout'
-            : getOauthLoginText({
-                oAuth: 'google'
-              })}
+          {getOauthLoginText({
+            oAuth: 'google'
+          })}
         </Typography>
       </Box>
     </PaperWrapper>

@@ -4,6 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { ConnectionSelectionState } from '@/content/SyncFlow/Warehouse/ConnectionSelectionState';
 import { checkIfPropExistsInObject, isObjectEmpty } from '@utils/lib';
 
 export const hasErrorsInData = (data: any) => {
@@ -34,18 +35,18 @@ export const getErrorsInErrorObject = (error: any) => {
   } else if (error && checkIfPropExistsInObject(error, 'data')) {
     let errorMessage = extractErrorFromDataObject(error.data);
     return {
-      status: error.status ? error.status : 'unknown status code',
+      status: error.status ? error.status : '',
       message: errorMessage
     };
   } else if (error && checkIfPropExistsInObject(error, 'error')) {
     return {
-      status: error.status ? error.status : 'uknown status code',
+      status: error.status ? error.status : '',
       message: error.error
     };
   }
   return {
-    status: 'unknown status code',
-    message: 'Unknown error'
+    status: '',
+    message: ''
   };
 };
 
@@ -71,4 +72,47 @@ const extractErrorFromDataObject = (data: any): any => {
   }
 
   return 'unknown error'; // If no string value is found
+};
+
+export const handleAxiosError = (error: any, errorCb: (err: string) => void) => {
+  if (error.response) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+
+    const errors = getErrorsInErrorObject(error.response);
+    const { message = '' } = errors || {};
+    errorCb(message);
+  } else if (error.request) {
+    // The request was made but no response was received
+    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+    // http.ClientRequest in node.js
+
+    if (error.code === 'ECONNREFUSED') {
+      errorCb('Connection refused by the server');
+    } else {
+      errorCb(error.toJSON().message ?? '');
+    }
+  } else {
+    // Something happened in setting up the request that triggered an Error
+    errorCb(error?.message ?? '');
+  }
+};
+
+export enum Error {
+  Configuration = 'Configuration',
+  AccessDenied = 'AccessDenied',
+  Verification = 'Verification',
+  Default = 'Default',
+  Callback = 'Callback'
+}
+
+export const errorMap = {
+  [Error.Configuration]:
+    'There was a problem when trying to authenticate. Please contact us if this error persists. Unique error code: Configuration',
+  [Error.AccessDenied]:
+    'You do not have permission to sign in. Please contact us if this error persists. Unique error code: AccessDenied',
+  [Error.Verification]:
+    'The token has expired or has already been used. Please contact us if this error persists. Unique error code: Verification',
+  [Error.Default]: 'Please contact us if this error persists. Unique error code: Verification',
+  [Error.Callback]: 'ECON REFUSED. Please contact us if this error persists. Unique error code: Callback'
 };
