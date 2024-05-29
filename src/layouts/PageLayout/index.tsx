@@ -42,7 +42,7 @@ const PageLayout = (props: PageLayoutProps) => {
   return (
     <ContainerWrapper maxWidth="lg">
       <InnerContainer variant="outlined">
-        {/* <Grid
+         {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}
           sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}

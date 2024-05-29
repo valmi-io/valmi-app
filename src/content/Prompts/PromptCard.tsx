@@ -119,6 +119,7 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
   }, [item]);
 
   return (
+ 
     // <Grid item xs={'auto'}>
     <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
       <PromptIconContainer>
