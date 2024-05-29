@@ -20,13 +20,12 @@ import Head from '@components/PageHead';
 
 import { useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
-import { isObjectEmpty, signOutUser } from '@/utils/lib';
+import { signOutUser } from '@/utils/lib';
 import { useDispatch } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useSearchParams } from 'next/navigation';
-import { getSearchParams } from '@/utils/router-utils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
-import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { Error, errorMap } from '@/components/Error/ErrorUtils';
 
 const ContainerWrapper = styled(Paper)(({}) => ({
   boxSizing: 'border-box',
@@ -55,13 +54,11 @@ const Login: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const searchParams = useSearchParams();
+  const search = useSearchParams();
 
-  const params = getSearchParams(searchParams);
+  const error = search.get('error') as Error;
 
   const { data: session } = useSession();
-
-  const { workspaceId = '' } = useWorkspaceId();
 
   // logout user query
   const [logoutUser] = useLazyLogoutUserQuery();
@@ -77,13 +74,14 @@ const Login: NextPageWithLayout = () => {
 
   // This function handles both google oauth errors (next-auth errors)
   // & api backend error caused while social user logging in.
+
   useEffect(() => {
-    if (!isObjectEmpty(params) || session?.error) {
+    if (error) {
       if (!oauthError) {
-        setOauthError(params?.error ?? session?.error ?? '');
+        setOauthError(session?.error ?? errorMap[error] ?? errorMap['Default']);
       }
     }
-  }, [params, session]);
+  }, [error]);
 
   useEffect(() => {
     if (oauthError) {

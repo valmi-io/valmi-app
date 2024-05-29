@@ -6,10 +6,11 @@ export const useUser = () => {
   const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
 
   const {
-    appState: { user }
+    appState: { user, loginFlowState }
   } = appState;
 
   return {
-    user
+    user,
+    loginFlowState
   };
 };

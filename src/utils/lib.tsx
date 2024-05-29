@@ -115,10 +115,12 @@ const removeAppState = (router: any, dispatch: any) => {
 };
 
 const clearCookie = async () => {
+  // clear auth token
   await setCookie(getAuthTokenCookie(), '', {
     expires: new Date(0),
     path: '/'
   });
+
   // clear nextauth session
   await signOut({ redirect: false, callbackUrl: '/login' });
 };
