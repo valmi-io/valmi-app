@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 
 import { useDispatch } from 'react-redux';
 
-import { Box, List, styled } from '@mui/material';
+import { Box, List, Stack, styled } from '@mui/material';
 
 import SidebarItemCollapse from '@layouts/SidebarLayout/Sidebar/SidebarItemCollapse';
 import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
@@ -22,7 +22,7 @@ import { isJitsuEnabled } from '@utils/routes';
 import { getBrowserRoute, getRoute } from '@/utils/lib';
 import SidebarNestedItem from '@/layouts/SidebarLayout/Sidebar/SidebarNestedItem';
 
-const MenuWrapper = styled(Box)(
+const MenuWrapper = styled(Stack)(
   ({ theme }) => `
   .MuiList-root {
     padding: ${theme.spacing(0.5)};
