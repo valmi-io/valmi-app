@@ -14,10 +14,10 @@ const Card = styled(Paper)(({ theme }) => ({
   gap: theme.spacing(1),
   padding: theme.spacing(2),
   isolation: 'isolate',
-  width: '360px',
-  maxHeight: '360px',
+  width: 360,
+  height: 198,
   backgroundColor: 'rgba(42, 157, 144, 0.12)',
-  border: '1px solid #E0E0E0',
+  // border: '1px solid #E0E0E0',
   overflow: 'hidden',
   position: 'relative'
 }));
@@ -27,7 +27,7 @@ const PromptIconContainer = styled(Paper)(({ theme }) => ({
   width: '67.88px',
   height: '67.88px',
   right: '-43.88px',
-  top: theme.spacing(1),
+  top: theme.spacing(2),
   backgroundColor: 'transparent'
 }));
 
@@ -36,7 +36,7 @@ const Rectangle = styled(Paper)(({}) => ({
   width: '48px',
   height: '48px',
   left: '0',
-  top: '-33.94px',
+  top: '-39.94px',
   backgroundColor: 'rgba(42, 157, 144, 0.3)',
   transform: 'rotate(-45deg)'
 }));
@@ -49,11 +49,20 @@ const PromptHeaderContainer = styled(Stack)(({ theme }) => ({
   gap: theme.spacing(1)
 }));
 
+const PromptDescriptionContainer = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  width: '100%',
+  height: 72,
+  overflow: 'hidden'
+}));
+
 const PromptFooterContainer = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginTop: theme.spacing(2),
   width: '100%',
+  height: 46,
+  padding: theme.spacing(1, 0),
+  alignItems: 'center',
   justifyContent: 'flex-end'
 }));
 
@@ -72,26 +81,29 @@ const PromptHeader = ({ icon, title }: { icon: any; title: string }) => {
 };
 
 const PromptTitle = ({ title }: { title: string }) => {
-  return (
-    <Typography variant="h6" color="text.primary">
-      {title}
-    </Typography>
-  );
+  return <Typography variant="h6">{title}</Typography>;
 };
 
 const PromptFooter = ({ disabled, onClick }: { disabled: boolean; onClick: () => void }) => {
   return (
     <PromptFooterContainer>
-      <SubmitButton buttonText={'PREVIEW'} data={null} isFetching={false} disabled={disabled} onClick={onClick} />
+      <SubmitButton
+        buttonText={'PREVIEW'}
+        data={null}
+        isFetching={false}
+        size="small"
+        disabled={disabled}
+        onClick={onClick}
+      />
     </PromptFooterContainer>
   );
 };
 
 const PromptDescription = ({ description }: { description: string }) => {
   return (
-    <Typography sx={{ color: (theme) => theme.colors.alpha.black[50] }} variant="body1" noWrap={false}>
-      {description}
-    </Typography>
+    <PromptDescriptionContainer>
+      <Typography variant="body1">{description} </Typography>
+    </PromptDescriptionContainer>
   );
 };
 
@@ -108,15 +120,18 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
 
   return (
     <Grid item xs={'auto'}>
-      <Card variant="outlined">
+      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
         <PromptIconContainer>
           <Rectangle>
-            <CustomIcon style={{ fontSize: 14, position: 'absolute', top: 16 }} icon={appIcons.CIRCLE_DOT} />
+            <CustomIcon
+              style={{ fontSize: 14, position: 'absolute', top: 16.8, left: 2.5 }}
+              icon={appIcons.CIRCLE_DOT}
+            />
           </Rectangle>
         </PromptIconContainer>
         <PromptHeader key={'PromptHeader'} icon={icon} title={item.name} />
         <PromptDescription key={'PromptDescription'} description={item.description} />
-        <PromptFooter key={'PromptFooter'} disabled={item?.enabled} onClick={onClick} />
+        <PromptFooter key={'PromptFooter'} disabled={!item?.enabled} onClick={onClick} />
       </Card>
     </Grid>
   );

@@ -17,7 +17,7 @@ const PromptsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useGetPromptsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   return (
@@ -27,7 +27,7 @@ const PromptsPage: NextPageWithLayout = () => {
         error={error}
         PageContent={<PageContent data={data} />}
         displayComponent={!!(!error && !isLoading && data)}
-        isLoading={isLoading}
+        isLoading={isLoading || !workspaceId}
         traceError={traceError}
       />
     </PageLayout>
