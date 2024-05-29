@@ -15,7 +15,8 @@ export const initialiseAppState = (dispatch, data) => {
         email: email,
         name: name,
         image: image
-      }
+      },
+      loginFlowState: 'SUCCESS'
     })
   );
 };

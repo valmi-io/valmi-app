@@ -13,6 +13,8 @@ type CookieOptions = {
 
 const AUTH_TOKEN_COOKIE = 'auth';
 
+const AUTH_META_COOKIE = 'additionalAuthParams';
+
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
   try {
@@ -39,4 +41,8 @@ export function clearCookie(name: string, options: CookieOptions = {}): void {
 
 export function getAuthTokenCookie() {
   return AUTH_TOKEN_COOKIE;
+}
+
+export function getAuthMetaCookie() {
+  return AUTH_META_COOKIE;
 }

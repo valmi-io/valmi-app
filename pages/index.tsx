@@ -14,7 +14,8 @@ import { useSession } from 'next-auth/react';
 import { initialiseAppState } from '@/utils/login-utils';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
+import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
+import { useUser } from '@/hooks/useUser';
 
 const HomePage = () => {
   const router = useRouter();
@@ -23,11 +24,22 @@ const HomePage = () => {
 
   const { workspaceId = '' } = useWorkspaceId();
 
+  const { loginFlowState } = useUser();
+
   const { data: session } = useSession();
+
+  // This effect checks if the user has initiated a login flow
+  // "DEFAULT" means not initiated.
+  useEffect(() => {
+    if (loginFlowState === 'DEFAULT') {
+      router.push('/login');
+    }
+  }, [loginFlowState]);
 
   // If workspaceId exists, navigate to connections
   useEffect(() => {
     if (workspaceId) {
+      removeAuthMetaCookie().run();
       saveAuthTokenInCookie().run();
       router.push(`/spaces/${workspaceId}/connections`);
     }
@@ -47,6 +59,21 @@ const HomePage = () => {
       }
     }
   }, [session, workspaceId]);
+
+  // remove additional params cookie
+  const removeAuthMetaCookie = () => {
+    return {
+      run: async () => {
+        const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
+        if (meta) {
+          await setCookie(getAuthMetaCookie(), '', {
+            expires: new Date(0),
+            path: '/'
+          });
+        }
+      }
+    };
+  };
 
   // stores user information in redux store
   const saveUserStateInStore = (data: any) => {

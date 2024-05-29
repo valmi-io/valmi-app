@@ -3,7 +3,7 @@ import axios from 'axios';
 import NextAuth from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
 
-import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
+import { getErrorsInData, handleAxiosError, hasErrorsInData } from '@/components/Error/ErrorUtils';
 
 const GOOGLE_AUTHORIZATION_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
@@ -140,6 +140,7 @@ export const nextAuthOptions = (req, res) => {
               },
               (error) => {
                 token.error = error;
+                throw new Error(error);
               }
             );
 
@@ -152,15 +153,10 @@ export const nextAuthOptions = (req, res) => {
           }
         }
 
-        console.log('TOKEN:_', token.accessTokenExpires);
-
         // Return previous token if the access token has not expired yet
         if (Date.now() < token.accessTokenExpires) {
-          console.log('TOKEN IS NOT EXPIRED:_');
           return token;
         }
-
-        console.log('trying to refresh token:_');
 
         // Access token has expired, try to update it
         return await refreshAccessToken(token);
@@ -196,16 +192,6 @@ const handleSocialLogin = async (payload, successCb, errorCb) => {
       successCb(result);
     }
   } catch (error) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-
-      const errors = getErrorsInErrorObject(error.response);
-      const { message = '' } = errors || {};
-      errorCb(message);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      errorCb(error?.message ?? '');
-    }
+    handleAxiosError(error, (err) => errorCb(err));
   }
 };

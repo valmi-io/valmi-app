@@ -16,7 +16,7 @@ export type AppFlowUserState = {
 
 type AppState = {
   workspaceId: string;
-  loginFlowState?: any;
+  loginFlowState?: 'DEFAULT' | 'INITIALIZED' | 'SUCCESS';
   user?: AppFlowUserState;
 };
 
@@ -31,7 +31,8 @@ const initialState: AppFlowState = {
       name: '',
       email: '',
       image: ''
-    }
+    },
+    loginFlowState: 'DEFAULT'
   }
 };
 
