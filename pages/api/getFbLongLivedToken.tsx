@@ -12,6 +12,7 @@ import { createRouter } from 'next-connect';
 
 import { sendErrorToBugsnag } from '@lib/bugsnag';
 import { oauthKeys } from '@/lib/oauth_middleware';
+import { handleAxiosError } from '@/components/Error/ErrorUtils';
 
 const router = createRouter();
 
@@ -40,10 +41,12 @@ router
       // Handle the response data as needed
       return res.status(200).json(data);
     } catch (error: any) {
-      // send error to bugsnag
-      sendErrorToBugsnag(error.message);
-      // Handle any error that occurred during the request
-      return res.status(500).json({ error: error.message });
+      handleAxiosError(error, (err) => {
+        // send error to bugsnag
+        sendErrorToBugsnag(err);
+        // Handle any error that occurred during the request
+        return res.status(500).json({ error: err });
+      });
     }
   });
 

@@ -95,6 +95,8 @@ function OAuthContextProvider({ children }: Props) {
         ...entitiesInStore,
         [getSelectedConnectorKey()]: {
           ...connectionDataFlow.entities[getSelectedConnectorKey()],
+          oauth_params: {},
+          oauth_error: '',
           formValues: {
             ...formState
           }
