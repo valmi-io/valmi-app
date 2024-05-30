@@ -19,7 +19,6 @@ const BackIcon = styled(Icon)(({ theme }) => ({
   display: 'flex',
   marginRight: theme.spacing(1),
   color: blackColor,
-  cursor: 'pointer',
   justifyContent: 'center',
   alignItems: 'center'
 }));
@@ -49,6 +48,22 @@ const HeaderTitle = () => {
     } else return route;
   };
 
+  const getIconName = (name: string) => {
+    const routeName = name.replace(/-/g, '').toUpperCase();
+
+    switch (routeName) {
+      case 'CONNECTIONS':
+        return appIcons.DATA_FLOWS;
+      case 'OAUTHAPPS':
+        return appIcons.APPS;
+      case 'PROMPTS':
+        return appIcons.EXPLORES;
+      default:
+        //@ts-ignore
+        return appIcons[routeName] || null;
+    }
+  };
+
   /**
    *
    * @param route
@@ -70,14 +85,11 @@ const HeaderTitle = () => {
    * Executes window.history.back()
    * @returns {Function}
    */
-  const handleBack = () => {
-    router.back();
-  };
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <BackIcon onClick={handleBack}>
-        <CustomIcon icon={appIcons.ARROW_LEFT} />
+      <BackIcon>
+        <CustomIcon icon={getIconName(valuesAfterWid[0])} />
       </BackIcon>
       <Box>
         <Breadcrumbs separator={'>'} aria-label="breadcrumb">

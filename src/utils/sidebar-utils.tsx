@@ -45,7 +45,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'DATA FLOWS',
         icon: appIcons.DATA_FLOWS,
-        muiIcon: true
+        muiIcon: false
       }
     },
 
@@ -55,7 +55,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'CATALOG',
         icon: appIcons.CATALOG,
-        muiIcon: true
+        muiIcon: false
       }
     },
 
@@ -65,7 +65,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'CONFIGURE APPS',
         icon: appIcons.APPS,
-        muiIcon: true
+        muiIcon: false
       }
     }
   ].filter(Boolean) as TSidebarRoute[];

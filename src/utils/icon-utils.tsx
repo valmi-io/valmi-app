@@ -36,7 +36,10 @@ import {
   faCirclePlus,
   faCircleDot,
   faTriangleExclamation,
-  faCaretDown
+  faCaretDown,
+  faTimeline,
+  faSliders,
+  faPlug
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faWpexplorer } from '@fortawesome/free-brands-svg-icons';
@@ -71,11 +74,11 @@ export interface IAppIcons {
   SOURCE_ICON: IconDefinition;
   DESTINATION_ICON: IconDefinition;
   BROWSER: React.ReactElement;
-  APPS: React.ReactElement;
+  APPS: IconDefinition;
   CIRCLE_PLUS_OUTLINED: IconDefinition;
   EXPLORES: IconDefinition;
-  CATALOG: React.ReactElement;
-  DATA_FLOWS: React.ReactElement;
+  CATALOG: IconDefinition;
+  DATA_FLOWS: IconDefinition;
   CIRCLE_DOT: IconDefinition;
   WARNING: IconDefinition;
   CARET_DOWN: IconDefinition;
@@ -109,11 +112,11 @@ const appIcons: IAppIcons = {
   SOURCE_ICON: { ...faCircleArrowRight },
   DESTINATION_ICON: { ...faArrowsToDot },
   BROWSER: <LanguageIcon />,
-  APPS: <MonitorIcon />,
+  APPS: { ...faPlug },
   CIRCLE_PLUS_OUTLINED: { ...faCirclePlus },
   EXPLORES: { ...faWpexplorer },
-  CATALOG: <ViewColumnIcon />,
-  DATA_FLOWS: <PeopleIcon />,
+  CATALOG: { ...faTimeline },
+  DATA_FLOWS: { ...faSliders },
   CIRCLE_DOT: { ...faCircleDot },
   WARNING: { ...faTriangleExclamation },
   CARET_DOWN: { ...faCaretDown }
