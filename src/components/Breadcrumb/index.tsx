@@ -42,8 +42,11 @@ const HeaderTitle = () => {
         if (query[path]) return query[path];
       } else return item;
     });
-    if (values.indexOf(route) !== 0) return values.join('/');
-    else return route;
+    if ('connector' in query && 'type' in query) {
+      return `${values.join('/')}?connector=${query?.connector}`;
+    } else if (values.indexOf(route) !== 0) {
+      return values.join('/');
+    } else return route;
   };
 
   /**

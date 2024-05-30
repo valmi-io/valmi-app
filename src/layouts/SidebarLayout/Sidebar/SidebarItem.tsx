@@ -4,65 +4,46 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { memo } from "react";
+import { memo } from 'react';
 
-import {
-  Button,
-  Container,
-  Icon,
-  ListItemButton,
-  Stack,
-  Typography,
-  styled,
-  Box,
-  Paper,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-
-} from "@mui/material";
-import CustomIcon from "@components/Icon/CustomIcon";
-import { TSidebarRoute } from "@utils/sidebar-utils";
-import { size } from 'lodash';
-
-const Label = styled(Typography)(({ theme }) => ({
-  color: theme.colors.alpha.white[70],
-}));
+import { Icon, ListItemButton, Typography, styled, Box, ListItemText } from '@mui/material';
+import CustomIcon from '@components/Icon/CustomIcon';
+import { TSidebarRoute } from '@utils/sidebar-utils';
 
 const ItemContainer = styled(ListItemButton)(({ theme }) => ({
-  display: "flex",
+  display: 'flex',
   flexDirection: 'row',
-  alignItems: "center",
+  alignItems: 'center',
   padding: theme.spacing(1, 2),
   width: theme.sidebar.width,
   height: 48,
+  flexGrow: 0
 }));
 
 const IconContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "0px",
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '0px',
   minWidth: 56,
-  height: 24,
   backgroundColor: 'transparent'
 }));
 
 const InnerIconBox = styled(Icon)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent:'center',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
   width: 24,
   height: 24,
   backgroundColor: 'transparent'
 }));
 
 const TextBox = styled(ListItemText)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  padding: "4px 0px",
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '4px 0px'
 }));
 
 export type TSidebarItemProps = {
@@ -72,25 +53,18 @@ export type TSidebarItemProps = {
 };
 
 const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
-  const {
-    id = "",
-    path = "",
-    sidebarProps: { icon = null, displayText = "", muiIcon = false } = {},
-  } = item;
+  const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <ItemContainer
-      onClick={() => onClick(path)}
-      className={currentRoute === id ? "active" : ""}
-      >
+    <ItemContainer onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
       <IconContainer>
         <InnerIconBox>
-          {icon && (muiIcon ? <Icon sx={{display:"flex"}} >{icon}</Icon> : <CustomIcon icon={icon} />)}
+          {icon && (muiIcon ? <Icon sx={{ display: 'flex' }}>{icon}</Icon> : <CustomIcon icon={icon} />)}
         </InnerIconBox>
       </IconContainer>
 
       <TextBox>
-          <Typography variant='button'>{displayText}</Typography>
+        <Typography variant="button">{displayText}</Typography>
       </TextBox>
     </ItemContainer>
   );

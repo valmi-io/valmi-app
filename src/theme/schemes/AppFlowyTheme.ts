@@ -279,7 +279,7 @@ export const AppFlowyTheme = createTheme({
       secondary: '#999999',
       disabled: '#e6e6e6'
     },
-    divider: '#1a1a1a',
+    divider: '#616161',
     background: {
       paper: colors.alpha.white[100],
       default: colors.layout.general.bodyBg

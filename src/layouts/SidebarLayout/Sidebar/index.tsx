@@ -8,7 +8,7 @@ import { useContext } from 'react';
 
 import { Box, Drawer, styled, Divider, useTheme, Paper, Stack } from '@mui/material';
 
-import SidebarMenu from '@layouts/SidebarLayout/Sidebar/SidebarMenu';
+import SidebarMenu from '@layouts/SidebarLayout/Sidebar/V2SidebarMenu';
 
 import { SidebarContext } from '@contexts/SidebarContext';
 
@@ -36,19 +36,18 @@ const ImageBox = styled(Box)(({ theme }) => ({
 }));
 
 const SidebarDivider = styled(Divider)(({ theme }) => ({
-  width: theme.sidebar.width,
-  border: '1px solid rgba(97, 97, 97, 0.9)',
-  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)'
+  display: 'flex',
+  width: theme.sidebar.width
 }));
 
 const SidebarPaperComponent = (workspaceId: any, sidebarToggle: boolean) => {
   let displayProps: any = {
-    lg: 'inline-block'
+    lg: 'flex'
   };
   if (!sidebarToggle) {
     displayProps = {
       xs: 'none',
-      lg: 'inline-block'
+      lg: 'flex'
     };
   }
   return (

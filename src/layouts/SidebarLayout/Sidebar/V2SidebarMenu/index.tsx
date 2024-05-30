@@ -10,9 +10,8 @@ import { useRouter } from 'next/router';
 
 import { useDispatch } from 'react-redux';
 
-import { Box, List, styled, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 
-import SidebarItemCollapse from '@layouts/SidebarLayout/Sidebar/SidebarItemCollapse';
 import SidebarItem from '@layouts/SidebarLayout/Sidebar/SidebarItem';
 
 import { SidebarContext } from '@contexts/SidebarContext';
@@ -20,46 +19,6 @@ import { SidebarContext } from '@contexts/SidebarContext';
 import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
 import { getBrowserRoute, getRoute } from '@/utils/lib';
-import SidebarNestedItem from '@/layouts/SidebarLayout/Sidebar/SidebarNestedItem';
-
-const MenuWrapper = styled(Box)(
-  ({ theme }) => `
-  .MuiList-root {
-    padding: ${theme.spacing(0.5)};
-
-    & > .MuiList-root {
-      padding: 0 ${theme.spacing(0)} ${theme.spacing(0)};
-    }
-  }
-
-    .MuiListSubheader-root {
-      text-transform: uppercase;
-      font-weight: bold;
-      color: ${theme.colors.alpha.black[70]};
-      padding: ${theme.spacing(0, 2.5)};
-      line-height: 1.4;
-    }
-`
-);
-
-const SubMenuWrapper = styled(Box)(
-  ({ theme }) => `
-    .MuiList-root {
-
-      .MuiListItem-root {
-        padding: 0px 0;
-
-        .MuiListItemButton-root {
-
-          &.active {
-            color: ${theme.colors.alpha.white[100]};
-            font-weight:500;
-          }
-        }
-      }
-    }
-`
-);
 
 type TSidebarMenuProps = {
   workspaceId: any;
