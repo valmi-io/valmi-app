@@ -1,12 +1,6 @@
-import { signIn, useSession } from 'next-auth/react';
 import { Box, Paper, Typography, styled } from '@mui/material';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { getOauthImage, getOauthLoginText } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
-import { getAuthMetaCookie, getCookie, setCookie } from '@/lib/cookies';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '@/store/store';
-import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
-import { RootState } from '@/store/reducers';
 
 const PaperWrapper = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -17,42 +11,14 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
   padding: '1px 10px 1px 1px',
   gap: '10px',
-  // border: '1px solid rgba(0, 0, 0, 0.5)',
   boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.084), 0px 1px 1px rgba(0, 0, 0, 0.168)',
-  // cursor: 'pointer',
   borderRadius: theme.spacing(0.4)
 }));
 
-export function GoogleSignInButton({ isDisabled, meta = {} }: { meta: any; isDisabled: boolean }) {
-  const { data: session } = useSession();
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
-
-  const handleClick = async () => {
-    const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
-
-    if (!meta) {
-      setCookie(getAuthMetaCookie(), JSON.stringify({ meta: meta }));
-    }
-
-    dispatch(
-      setAppState({
-        ...appState,
-        loginFlowState: 'INITIALIZED'
-      })
-    );
-
-    signIn('google', {
-      callbackUrl: '/'
-      // redirect: false
-    });
-  };
-
+export function GoogleSignInButton({ isDisabled, onClick }: { meta: any; isDisabled: boolean; onClick: () => void }) {
   return (
     <PaperWrapper
-      onClick={handleClick}
+      onClick={onClick}
       sx={{
         cursor: isDisabled ? 'not-allowed' : 'pointer',
         border: isDisabled ? '1px solid rgba(0, 0, 0, 0.2)' : '1px solid rgba(0, 0, 0, 0.5)'

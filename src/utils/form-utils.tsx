@@ -7,7 +7,7 @@
 
 import FormFieldPassword from '@components/FormInput/FormFieldPasword';
 import FormFieldText from '@components/FormInput/FormFieldText';
-import { createAjv } from '@jsonforms/core';
+import { Translator, UISchemaElement, createAjv } from '@jsonforms/core';
 import Ajv from 'ajv';
 
 export type FormObject = {
@@ -241,3 +241,20 @@ export const jsonFormRemoveAdditionalFields = (schema: any, data: any) => {
 };
 
 export type FormStatus = 'submitting' | 'success' | 'error' | 'empty';
+
+export type formValidationMode = 'ValidateAndShow' | 'ValidateAndHide' | 'NoValidation';
+
+export const translateFormError = (error: any, translate: Translator, uischema?: UISchemaElement) => {
+  const { keyword = '', message = '' } = error;
+
+  if (keyword && formErrors[keyword]) {
+    return formErrors[keyword];
+  }
+
+  return message;
+};
+
+const formErrors = {
+  const: 'field is required',
+  required: 'field is required'
+};

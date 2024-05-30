@@ -6,7 +6,7 @@
 
 import { createWrapper } from 'next-redux-wrapper';
 
-import { configureStore, ThunkAction, Action, AnyAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action, AnyAction } from '@reduxjs/toolkit';
 
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 
@@ -23,7 +23,7 @@ const makeConfiguredStore = () =>
 
 const reducerProxy = (state: any, action: AnyAction) => {
   if (action.type === 'RESET_STORE') {
-    return rootReducer(undefined, action);
+    state = undefined;
   }
   return rootReducer(state, action);
 };
@@ -39,14 +39,7 @@ export const makeStore = () => {
     const persistConfig = {
       key: 'app',
       blacklist: [apiSlice.reducerPath],
-      whitelist: [
-        'appFlow',
-        'user',
-        'connectionFlow',
-        'connectionDataFlow'
-        // 'syncFlow'
-      ], // make sure it does not clash with server keys,
-
+      whitelist: ['appFlow', 'user', 'connectionFlow', 'connectionDataFlow'], // make sure it does not clash with server keys,
       storage
     };
 

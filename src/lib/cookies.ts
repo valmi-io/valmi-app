@@ -1,3 +1,4 @@
+import { Session } from 'next-auth/core/types';
 import Cookies from 'react-cookies';
 
 // Type for the options object used in cookie operations
@@ -45,4 +46,32 @@ export function getAuthTokenCookie() {
 
 export function getAuthMetaCookie() {
   return AUTH_META_COOKIE;
+}
+
+export async function setAuthTokenCookie(session: Session) {
+  const cookieObj = {
+    accessToken: session?.authToken ?? ''
+  };
+
+  const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+  if (!accessToken) {
+    setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
+  }
+}
+export async function setAuthMetaCookie(data: any) {
+  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
+  if (!meta) {
+    setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));
+  }
+}
+
+export async function clearAuthMetaCookie() {
+  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
+  if (meta) {
+    await setCookie(getAuthMetaCookie(), '', {
+      expires: new Date(0),
+      path: '/'
+    });
+  }
 }

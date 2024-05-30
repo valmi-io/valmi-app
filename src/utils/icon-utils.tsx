@@ -8,7 +8,6 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 import LanguageIcon from '@mui/icons-material/Language';
 
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import PeopleIcon from '@mui/icons-material/People';
 import MonitorIcon from '@mui/icons-material/Monitor';
@@ -30,7 +29,6 @@ import {
   faWater,
   faBolt,
   faArrowLeft,
-  faBasketball,
   faScrewdriver,
   faCircleArrowRight,
   faArrowsToDot,

@@ -80,7 +80,7 @@ const Login: NextPageWithLayout = () => {
   }, [session]);
 
   // This function handles both google oauth errors (next-auth errors)
-  // & api backend error caused while social user logging in.
+  // & api backend error caused while user logging in.
   useEffect(() => {
     if (error) {
       if (!oauthError) {

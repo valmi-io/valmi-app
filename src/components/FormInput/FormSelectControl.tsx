@@ -6,7 +6,7 @@
 
 import { ControlProps, isDescriptionHidden } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Card, FormControl, FormHelperText, Hidden, MenuItem, TextField } from '@mui/material';
+import { Card, FormControl, FormHelperText, Hidden, MenuItem, TextField, Tooltip } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
 
@@ -49,37 +49,39 @@ export const FormSelectControl = (props: ControlProps) => {
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
         {visible && (
-          <FormControl
-            fullWidth={!appliedUiSchemaOptions.trim}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            id={id}
-            variant={'standard'}
-          >
-            <TextField
-              size="small"
-              label={label}
-              select={true}
-              required={required}
-              disabled={!enabled}
-              value={inputText}
-              onChange={onChange}
-              InputLabelProps={{
-                shrink: true
-              }}
+          <Tooltip title={description ? description : ''} placement="top-start">
+            <FormControl
+              fullWidth={!appliedUiSchemaOptions.trim}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              id={id}
+              variant={'standard'}
             >
-              {schema.enum?.map((item: string) => {
-                return (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                );
-              })}
-            </TextField>
+              <TextField
+                size="small"
+                label={label}
+                select={true}
+                required={required}
+                disabled={!enabled}
+                value={inputText}
+                onChange={onChange}
+                InputLabelProps={{
+                  shrink: true
+                }}
+              >
+                {schema.enum?.map((item: string) => {
+                  return (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  );
+                })}
+              </TextField>
 
-            <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
-            <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
-          </FormControl>
+              <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
+              <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
+            </FormControl>
+          </Tooltip>
         )}
       </Card>
     </Hidden>

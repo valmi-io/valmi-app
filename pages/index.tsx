@@ -14,7 +14,7 @@ import { useSession } from 'next-auth/react';
 import { initialiseAppState } from '@/utils/login-utils';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
+import { clearAuthMetaCookie, setAuthTokenCookie } from '@/lib/cookies';
 import { useUser } from '@/hooks/useUser';
 
 const HomePage = () => {
@@ -39,8 +39,12 @@ const HomePage = () => {
   // If workspaceId exists, navigate to connections
   useEffect(() => {
     if (workspaceId) {
-      removeAuthMetaCookie().run();
-      saveAuthTokenInCookie().run();
+      // This will clear authmeta cookie set when login flow is initiated.
+      clearAuthMetaCookie();
+
+      // This will save the authToken returned from the api backend to make api calls if not found in cookie.
+      setAuthTokenCookie(session!);
+
       router.push(`/spaces/${workspaceId}/connections`);
     }
   }, [workspaceId]);
@@ -60,43 +64,11 @@ const HomePage = () => {
     }
   }, [session, workspaceId]);
 
-  // remove additional params cookie
-  const removeAuthMetaCookie = () => {
-    return {
-      run: async () => {
-        const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
-        if (meta) {
-          await setCookie(getAuthMetaCookie(), '', {
-            expires: new Date(0),
-            path: '/'
-          });
-        }
-      }
-    };
-  };
-
   // stores user information in redux store
   const saveUserStateInStore = (data: any) => {
     return {
       run: () => {
         initialiseAppState(dispatch, data);
-      }
-    };
-  };
-
-  // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
-  const saveAuthTokenInCookie = () => {
-    return {
-      run: async () => {
-        const cookieObj = {
-          accessToken: session?.authToken ?? ''
-        };
-
-        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
-
-        if (!accessToken) {
-          setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
-        }
       }
     };
   };

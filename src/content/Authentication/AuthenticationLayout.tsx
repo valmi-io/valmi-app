@@ -4,17 +4,22 @@
  * Created Date: Monday, May 22nd 2023, 2:52:54 pm
  * Author: Nagendra S @ valmi.io
  */
- 
-import React, {  useState } from 'react';
- import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
+
+import React, { useState } from 'react';
+import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
 import { GoogleSignInButton } from '@/components/AuthButtons';
-import { JsonForms } from '@jsonforms/react';
-import { materialCells } from '@jsonforms/material-renderers';
-import { jsonFormValidator } from '@/utils/form-utils'; 
+import { formValidationMode, jsonFormValidator } from '@/utils/form-utils';
+import { setAuthMetaCookie } from '@/lib/cookies';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
+import { RootState } from '@/store/reducers';
+import { signIn } from 'next-auth/react';
+import { JsonFormsWrapper } from '@/components/JsonFormsWrapper';
 
 const schema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
@@ -22,13 +27,15 @@ const schema = {
   properties: {
     promotion: {
       type: 'boolean',
-      title: 'Check to receive latest product updates over email'
+      title: 'Check to receive latest product updates over email',
+      const: true,
+      description: 'Select this checkbox to receive emails about new product features and announcements'
     },
     role: {
       type: 'string',
       title: 'You are part of',
       enum: ['Engineering', 'Marketing', 'Other'],
-      enumNames: ['Engineering', 'Marketing', 'Other']
+      description: "Select your role from the dropdown menu. If your role isn't listed, choose 'Other'"
     }
   },
   required: ['promotion', 'role']
@@ -50,12 +57,11 @@ const ContainerLayout = styled(Box)(({ theme }) => ({
   border: '1px solid rgba(0, 0, 0, 0.25)',
   flexGrow: 1
 }));
- 
+
 const DetailBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  // justifyContent: 'center',
   Width: '100%',
   height: '100%',
   padding: theme.spacing(2, 8),
@@ -78,20 +84,100 @@ const FormLayout = styled(Paper)(({ theme }) => ({
 }));
 
 const AuthenticationLayout = () => {
-  const initialData = {};
-  const [data, setData] = useState<any>(initialData);
-  const [isNewUser, setIsNewUser] = useState<boolean>(true);
- 
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
-  const { valid, errors } = jsonFormValidator(schema, data);
+  const dispatch = useDispatch<AppDispatch>();
+  const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
 
-  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
+  const initialData = {};
+  const [formData, setFormData] = useState<any>(initialData);
+  const [isUserNew, setIsUserNew] = useState<boolean>(true);
+
+  const [formValidationState, setFormValidationState] = useState<formValidationMode>('ValidateAndHide');
+
+  /**
+   * Retrieves custom renderers for the JSONForms component based on the provided configuration
+   * (e.g., hiding specific fields).
+   */
+  const handleFormRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+
+  /**
+   * Validates the user-submitted data (`formData`) against the defined schema (`schema`)
+   * and returns an object containing a `valid` flag and any encountered `errors`.
+   */
+  const { valid, errors } = jsonFormValidator(schema, formData);
+
+  /**
+   * Updates the `formData` state with the new data received from the JSONForms component
+   * when the user interacts with the form.
+   */
+  const handleFormDataChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setFormData(data);
   };
+
+  /**
+   * Handles the click event on the login button. It checks user type, form validation,
+   * and promotion selection (for new users) before triggering the login flow (`handleLogin`).
+   */
+  const handleLoginClick = () => {
+    if (!isUserNew) {
+      handleLogin();
+      return;
+    }
+    if (!valid) {
+      setFormValidationState('ValidateAndShow');
+      return;
+    }
+
+    if (!formData.promotion) {
+      setFormValidationState('ValidateAndShow');
+      return;
+    }
+    handleLogin();
+  };
+
+  /**
+   * Performs the actual login process. It includes setting the authentication meta cookie,
+   * updating the login flow state in Redux, and calling the `signIn` function from
+   * `next-auth/react` to initiate user sign-in.
+   */
+  const handleLogin = async () => {
+    try {
+      await setAuthMetaCookie(formData);
+      updateLoginFlowState();
+
+      signIn('google', {
+        callbackUrl: '/'
+      });
+    } catch (error) {
+      // console.error('Error during login:', error);
+    }
+  };
+
+  /**
+   * Dispatches a Redux action to update the `loginFlowState` in the app state
+   * with the value `'INITIALIZED'`.
+   */
+  const updateLoginFlowState = () => {
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: 'INITIALIZED'
+      })
+    );
+  };
+
+  /**
+   * Toggles the user mode between "Sign Up" and "Sign In".
+   * This function updates the `isUserNew` state & resets formData state, which controls the displayed form
+   * and button options based on whether the user is a new user or an existing user.
+   */
+  const handleLoginModes = () => {
+    setFormData({});
+    setIsUserNew(!isUserNew);
+  };
+
   return (
     <ContainerLayout>
-        <DetailBox sx={isNewUser ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
-
+      <DetailBox sx={isUserNew ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
         {/** valmi - logo */}
         <Stack alignItems="center">
           <ImageComponent
@@ -102,39 +188,32 @@ const AuthenticationLayout = () => {
           />
         </Stack>
         <TextLayout variant="body1">
-          {isNewUser
- 
+          {isUserNew
             ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'
-
             : 'Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'}
         </TextLayout>
-        {isNewUser && (
-          <FormLayout>
-             <JsonForms
+
+        {isUserNew ? (
+          <FormLayout key={`${isUserNew ? 'Login' : 'Signup'}Form`}>
+            <JsonFormsWrapper
+              formValidationState={formValidationState}
+              onChange={handleFormDataChange}
+              renderers={handleFormRenderers}
               schema={schema}
-              data={data}
-              renderers={customRenderers}
-              cells={materialCells}
-              onChange={handleFormChange}
+              data={formData}
             />
           </FormLayout>
-        )}
+        ) : null}
         <Stack
           sx={{
-            width: '100%',
-            cursor: isNewUser ? (!(valid && data.promotion === true) ? 'not-allowed' : 'pointer') : 'not-allowed'
+            width: '100%'
+            // cursor: isUserNew ? (!(valid && formData?.promotion === true) ? 'not-allowed' : 'pointer') : 'not-allowed'
           }}
         >
-          <Button disabled={isNewUser ? !(valid && data.promotion === true) : false} fullWidth sx={{ padding: 0 }}>
-            <GoogleSignInButton
-              meta={{ ...data }}
-              isDisabled={isNewUser ? !(valid && data.promotion === true) : false}
-            />
-          </Button>
-          <Button onClick={() => setIsNewUser(!isNewUser)} sx={{ alignSelf: 'flex-end', padding: 1 }}>
- 
+          <GoogleSignInButton onClick={handleLoginClick} />
+          <Button onClick={handleLoginModes} sx={{ alignSelf: 'flex-end', padding: 1 }}>
             <AuthenticationFormFooter
-              footerText={isNewUser ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              footerText={isUserNew ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             />
           </Button>
         </Stack>
