@@ -21,11 +21,13 @@ import Head from '@components/PageHead';
 import { signIn, useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { signOutUser } from '@/utils/lib';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
 import { useSearchParams } from 'next/navigation';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { Error, errorMap } from '@/components/Error/ErrorUtils';
+import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
+import { RootState } from '@/store/reducers';
 
 const ContainerWrapper = styled(Paper)(({}) => ({
   boxSizing: 'border-box',
@@ -54,6 +56,8 @@ const Login: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
+  const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
+
   const search = useSearchParams();
 
   const error = search.get('error') as Error;
@@ -71,6 +75,13 @@ const Login: NextPageWithLayout = () => {
   });
 
   const [oauthError, setOauthError] = useState('');
+
+  /**
+   * Resets loginFlowState
+   */
+  useEffect(() => {
+    updateLoginFlowState();
+  }, []);
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
@@ -94,6 +105,19 @@ const Login: NextPageWithLayout = () => {
       oAuthErrorState({ error: oauthError }).run();
     }
   }, [oauthError]);
+
+  /**
+   * Dispatches a Redux action to update the `loginFlowState` in the app state
+   * with the value `'DEFAULT'`.
+   */
+  const updateLoginFlowState = () => {
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: 'DEFAULT'
+      })
+    );
+  };
 
   const oAuthErrorState = ({ error }: { error: string }) => {
     return {
