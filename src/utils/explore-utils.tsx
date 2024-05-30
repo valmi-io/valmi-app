@@ -1,13 +1,30 @@
 import { generateAccountPayload } from '@/utils/account-utils';
+import moment from 'moment';
 
-export const generateExplorePayload = (wid: string, pid: string, user: any) => {
+export const generateExplorePayload = (
+  wid: string,
+  pid: string,
+  user: any,
+  schemaID: string,
+  exploreName: string,
+  filters: []
+) => {
   return {
     workspaceId: wid,
     explore: {
-      name: '',
+      name: exploreName,
       prompt_id: pid,
-      ready: false,
-      account: generateAccountPayload(user)
+      account: generateAccountPayload(user),
+      schema_id: schemaID,
+      time_window: {
+        label: 'custom',
+        range: {
+          // 1 month range
+          start: moment().subtract(1, 'months').toISOString(),
+          end: moment().toISOString()
+        }
+      },
+      filters: filters || []
     }
   };
 };

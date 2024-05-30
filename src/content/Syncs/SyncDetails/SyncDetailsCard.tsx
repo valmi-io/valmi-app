@@ -104,10 +104,10 @@ const SyncDetailsCard = ({
               <CustomIcon icon={appIcons.EDIT} />
 
               <Typography
-                onClick={() => handleEditSync(syncData)}
+                // onClick={() => handleEditSync(syncData)}
                 variant="body2"
                 sx={{
-                  cursor: 'pointer'
+                  cursor: 'not-allowed'
                 }}
               >
                 {'Edit'}

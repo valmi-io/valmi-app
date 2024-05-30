@@ -54,15 +54,19 @@ const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick }: Co
         <Typography variant="body2">{capitalizeFirstLetter(connectionStatus)}</Typography>
 
         {/** Display error icon if connection status is failed */}
-        {connectionStatus === 'failed' && <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={handleStatusOnClick} />}
+        {connectionStatus === 'failed' && (
+          <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={handleStatusOnClick} />
+        )}
 
         {/** Display success icon if connection status is success */}
-        {connectionStatus === 'success' && <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={() => {}} />}
+        {connectionStatus === 'success' && (
+          <RunStatusIcon status={connectionStatus} tooltipTitle={''} onClick={() => {}} />
+        )}
         {/** Display Log button */}
 
         <Button
           sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
-          variant='text'
+          variant="text"
           size="small"
           onClick={() => onLogClick(syncRun, connection)}
         >

@@ -16,16 +16,17 @@ export const getTimeAgo = (date: Date | '') => {
   if (date === null || date === '') {
     return '--';
   } else {
-    const diff = now.diff(date, 'days');
+    const diffDays = now.diff(date, 'days');
+    const diffHours = now.diff(date, 'hours');
 
-    if (isNaN(diff)) {
+    if (isNaN(diffDays)) {
       return '--';
-    } else if (diff === 0) {
-      return 'Today';
-    } else if (diff === 1) {
+    } else if (diffDays === 0) {
+      return diffHours + ' hr ago';
+    } else if (diffDays === 1) {
       return '1 day ago';
     } else {
-      return diff + ' days ago';
+      return diffDays + ' days ago';
     }
   }
 };

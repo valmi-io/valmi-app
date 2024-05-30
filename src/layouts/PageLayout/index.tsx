@@ -23,6 +23,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const ContainerWrapper = styled(Container)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
+  width: '100%',
   padding: theme.spacing(0, 2),
   height: '100%'
 }));
@@ -33,16 +34,15 @@ const InnerContainer = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   padding: theme.spacing(2),
   height: '100%',
-  minWidth: '1024px',
   position: 'relative'
 }));
 
 const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
   return (
-    <ContainerWrapper maxWidth="lg">
+    <ContainerWrapper>
       <InnerContainer variant="outlined">
-         {/* <Grid
+        {/* <Grid
           container
           spacing={{ md: 2, xs: 2 }}
           sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
@@ -61,7 +61,7 @@ const PageLayout = (props: PageLayoutProps) => {
           buttonTitle={buttonTitle?.toUpperCase()}
           onClick={handleButtonOnClick}
         />
-        {children}
+        <Paper sx={{ marginTop: 2 }}>{children}</Paper>
       </InnerContainer>
     </ContainerWrapper>
   );

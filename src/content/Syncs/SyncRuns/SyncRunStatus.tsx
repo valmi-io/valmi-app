@@ -29,21 +29,11 @@ const SyncRunStatus = ({ syncRun, displayError }: SyncRunStatusProps) => {
     <Stack spacing={0.5} direction="row" alignItems="center">
       <ChipComponent
         label={runStatus}
-        color={
-          runStatus === 'failed'
-            ? 'error'
-            : runStatus === 'success'
-            ? 'primary'
-            : 'secondary'
-        }
+        color={runStatus === 'failed' ? 'error' : runStatus === 'success' ? 'success' : 'secondary'}
       />
 
       {runStatus === 'failed' && (
-        <RunStatusIcon
-          onClick={handleStatusOnClick}
-          status={runStatus}
-          tooltipTitle={'Show Error'}
-        />
+        <RunStatusIcon onClick={handleStatusOnClick} status={runStatus} tooltipTitle={'Show Error'} />
       )}
     </Stack>
   );

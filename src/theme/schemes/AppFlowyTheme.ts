@@ -296,7 +296,7 @@ export const AppFlowyTheme = createTheme({
   },
   breakpoints: {
     values: {
-      xs: 444,
+      xs: 0,
       sm: 600,
       md: 900,
       lg: 1200,
@@ -533,8 +533,8 @@ export const AppFlowyTheme = createTheme({
       fontWeight: 400,
       fontSize: '16px',
       lineHeight: 1.5,
-      letterSpacing: '0.15px'
-      // color: colors.alpha.black[100]
+      letterSpacing: '0.15px',
+      color: colors.alpha.black[100]
     },
     body2: {
       fontWeight: 400,

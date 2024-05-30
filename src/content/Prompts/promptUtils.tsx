@@ -105,7 +105,7 @@ export const schema = {
 type TimeWindowType = { label: string; range: { start: string; end: string } };
 
 type TPayloadIn = {
-  schema: TPromptSource[];
+  schema: TPromptSource[] | any;
   filters: {}[];
   time_window: TimeWindowType;
 };
@@ -118,7 +118,8 @@ export type TPayloadOut = {
 
 export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
   const payload: TPayloadOut = {
-    schema_id: schema.length ? schema[0].id : '',
+    // schema_id: schema.length ? schema[0].id : '',
+    schema_id: schema,
 
     filters: filters,
     time_window: time_window

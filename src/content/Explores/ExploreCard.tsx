@@ -151,7 +151,10 @@ const StatusIcon = ({
   } else if (sync_state === 'IDLE' && last_sync_result === 'FAILED') {
     return (
       <Paper onClick={onClick}>
-        <CustomIcon style={{ fontSize: 16, color: theme.colors.primary.main }} icon={appIcons.WARNING} />
+        <CustomIcon
+          style={{ fontSize: 16, color: theme.colors.primary.main, cursor: 'pointer' }}
+          icon={appIcons.WARNING}
+        />
       </Paper>
     );
   }
@@ -173,8 +176,9 @@ const ExploreFooter = ({ disabled, onClick, item, handleIconOnClick }: TExploreF
         data={null}
         isFetching={false}
         size="small"
-        disabled={!item?.enabled || item?.last_sync_succeeded_at === ''}
+        disabled={!item?.enabled || item?.last_sync_succeeded_at === null}
         onClick={onClick}
+        styles={{ minWidth: '77px' }}
       />
     </ExploreFooterContainer>
   );

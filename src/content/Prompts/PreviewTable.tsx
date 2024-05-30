@@ -15,11 +15,12 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
-import { Paper } from '@mui/material';
+import { Container, MenuItem, Paper, TextField } from '@mui/material';
 import moment from 'moment';
 import { TPrompt, TPromptSource } from '@/content/Prompts/PromptCard';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
+import SaveModal from '@/content/Prompts/SaveModal';
 
 const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
   const { pid = '', wid = '', filter = '' } = params;
@@ -36,6 +37,9 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
+  const [schemaID, setSchemaID] = useState<string>('');
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [exploreName, setExploreName] = useState<string>('');
 
   // alert state
   const [alertState, setAlertState] = useState<AlertType>({
@@ -49,7 +53,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       const { schemas = [] } = prompt;
 
       const payload: TPayloadOut = generatePreviewPayload({
-        schema: schemas,
+        schema: schemaID,
         filters: [],
         time_window: {
           label: 'custom',
@@ -63,7 +67,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
       previewPrompt(payload);
     }
-  }, [pid]);
+  }, [pid, schemaID]);
 
   // useEffect(() => {
   //   if (filter) {
@@ -80,8 +84,13 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   const handleSaveAsExplore = () => {
+    setOpenModal(true);
+  };
+
+  const handleSave = () => {
+    setOpenModal(false);
+    const payload = generateExplorePayload(wid, pid, user, schemaID, exploreName, []);
     setStatus('submitting');
-    const payload = generateExplorePayload(wid, pid, user);
 
     createExploreHandler({ query: createObject, payload: payload });
   };
@@ -134,27 +143,58 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   return (
-    <Paper variant="outlined">
+    <Paper variant="elevation">
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}
         message={alertState.message}
         isError={alertState.type === 'error'}
       />
-
-      <PromptFilter spec={''} applyFilters={applyFilters} />
-
-      <ContentLayout
-        key={`PreviewPage`}
-        error={error}
-        PageContent={
-          <PageContent
-            prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
+      <TextField
+        size="small"
+        label="Select the connection to apply this prompt on"
+        select={true}
+        required={true}
+        value={schemaID}
+        onChange={(event) => setSchemaID(event.target.value)}
+        InputLabelProps={{
+          shrink: true
+        }}
+        sx={{ width: '50%' }}
+      >
+        {prompt?.schemas.map(({ id, sources }: { id: string; sources: any }) => {
+          return (
+            <MenuItem key={id} value={id}>
+              {sources[0]?.name}
+            </MenuItem>
+          );
+        })}
+      </TextField>
+      {schemaID && (
+        <Container>
+          <PromptFilter spec={''} applyFilters={applyFilters} />
+          <ContentLayout
+            key={`PreviewPage`}
+            error={error}
+            PageContent={
+              <PageContent
+                prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
+              />
+            }
+            displayComponent={!error && !isLoading && data}
+            isLoading={isLoading}
+            traceError={false}
           />
-        }
-        displayComponent={!error && !isLoading && data}
-        isLoading={isLoading}
-        traceError={false}
+        </Container>
+      )}
+      <SaveModal
+        Title={'Save Explore as'}
+        Description="test description"
+        exploreName={exploreName}
+        setExploreName={setExploreName}
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+        handleSaveExplore={handleSave}
       />
     </Paper>
   );
