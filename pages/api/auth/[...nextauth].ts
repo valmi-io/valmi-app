@@ -1,6 +1,6 @@
 // @ts-nocheck
 import axios from 'axios';
-import NextAuth from 'next-auth';
+import NextAuth, { User } from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
 
 import { getErrorsInData, handleAxiosError, hasErrorsInData } from '@/components/Error/ErrorUtils';
@@ -19,7 +19,8 @@ const GOOGLE_AUTHORIZATION_URL =
  * returns the old token and an error property
  */
 async function refreshAccessToken(token) {
-  console.log('refreshing access token:_');
+  console.log('refreshing access token:.........');
+  console.log('[refreshAccessToken]: old token: ', token.access_token);
   try {
     const url =
       'https://oauth2.googleapis.com/token?' +
@@ -37,22 +38,28 @@ async function refreshAccessToken(token) {
       method: 'POST'
     });
 
-    const refreshedTokens = await response.json();
+    const responseTokens = await response.json();
 
     if (!response.ok) {
-      throw refreshedTokens;
+      throw responseTokens;
     }
 
+    console.log('[refreshAccessToken]: new token: ', responseTokens.access_token);
+
     return {
+      // Keep the previous token properties
       ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken // Fall back to old refresh token
+      access_token: responseTokens.access_token,
+      expires_at: Math.floor(Date.now() / 1000 + (responseTokens.expires_in as number)),
+      // Fall back to old refresh token, but note that
+      // many providers may only allow using a refresh token once.
+      refresh_token: responseTokens.refresh_token ?? token.refresh_token
     };
   } catch (error) {
+    console.error('Error refreshing access token', error);
     return {
       ...token,
-      error: 'RefreshAccessTokenError'
+      error: 'RefreshAccessTokenError' as const
     };
   }
 }
@@ -104,6 +111,16 @@ export const nextAuthOptions = (req, res) => {
 
         if (account && user) {
           if (account.provider === 'google') {
+            // First login, save the `access_token`, `refresh_token`, and other
+            // details into the JWT
+
+            const userProfile: User = {
+              id: token.sub,
+              name: profile?.name,
+              email: profile?.email,
+              image: token?.picture
+            };
+
             const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
             const { name, email } = token;
 
@@ -147,18 +164,16 @@ export const nextAuthOptions = (req, res) => {
             return {
               ...token,
               accessToken: access_token,
-              accessTokenExpires: Date.now() + expires_at * 1000,
-              refreshToken: refresh_token
+              expires_at: account.expires_at,
+              refreshToken: refresh_token,
+              user: userProfile
             };
           }
-        }
-
-        // Return previous token if the access token has not expired yet
-        if (Date.now() < token.accessTokenExpires) {
+        } else if (Date.now() < token.expires_at * 1000) {
+          // Subsequent logins, if the `access_token` is still valid, return the JWT
           return token;
         }
 
-        // Access token has expired, try to update it
         return await refreshAccessToken(token);
       },
 

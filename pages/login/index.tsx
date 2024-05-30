@@ -18,7 +18,7 @@ import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
 
 import Head from '@components/PageHead';
 
-import { useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 import { signOutUser } from '@/utils/lib';
 import { useDispatch } from 'react-redux';
@@ -72,9 +72,15 @@ const Login: NextPageWithLayout = () => {
 
   const [oauthError, setOauthError] = useState('');
 
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      console.error('[login.tsx]: refresh access token error');
+      signIn('google', { callbackUrl: '/' }); // Force sign in to hopefully resolve error
+    }
+  }, [session]);
+
   // This function handles both google oauth errors (next-auth errors)
   // & api backend error caused while social user logging in.
-
   useEffect(() => {
     if (error) {
       if (!oauthError) {

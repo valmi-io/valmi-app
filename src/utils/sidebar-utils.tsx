@@ -36,7 +36,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       sidebarProps: {
         displayText: 'EXPLORES',
         icon: appIcons.EXPLORES,
-        muiIcon: true
+        muiIcon: false
       }
     },
     {

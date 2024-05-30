@@ -40,6 +40,9 @@ import {
   faTriangleExclamation,
   faCaretDown
 } from '@fortawesome/free-solid-svg-icons';
+
+import { faWpexplorer } from '@fortawesome/free-brands-svg-icons';
+
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export interface IAppIcons {
@@ -72,7 +75,7 @@ export interface IAppIcons {
   BROWSER: React.ReactElement;
   APPS: React.ReactElement;
   CIRCLE_PLUS_OUTLINED: IconDefinition;
-  EXPLORES: React.ReactElement;
+  EXPLORES: IconDefinition;
   CATALOG: React.ReactElement;
   DATA_FLOWS: React.ReactElement;
   CIRCLE_DOT: IconDefinition;
@@ -110,7 +113,7 @@ const appIcons: IAppIcons = {
   BROWSER: <LanguageIcon />,
   APPS: <MonitorIcon />,
   CIRCLE_PLUS_OUTLINED: { ...faCirclePlus },
-  EXPLORES: <SpaceDashboardIcon />,
+  EXPLORES: { ...faWpexplorer },
   CATALOG: <ViewColumnIcon />,
   DATA_FLOWS: <PeopleIcon />,
   CIRCLE_DOT: { ...faCircleDot },
