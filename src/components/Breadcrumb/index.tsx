@@ -17,9 +17,7 @@ import appIcons from '@/utils/icon-utils';
 
 const BackIcon = styled(Icon)(({ theme }) => ({
   display: 'flex',
-  marginRight: theme.spacing(1),
   color: blackColor,
-  justifyContent: 'center',
   alignItems: 'center'
 }));
 
