@@ -29,13 +29,15 @@ import { Error, errorMap } from '@/components/Error/ErrorUtils';
 import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
 import { RootState } from '@/store/reducers';
 
-const ContainerWrapper = styled(Paper)(({}) => ({
+const ContainerWrapper = styled(Paper)(({ theme }) => ({
   boxSizing: 'border-box',
   display: 'flex',
-  justifyContent: 'center',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
   alignItems: 'flex-start',
   width: '100%',
-  minHeight: '364.25px'
+  minHeight: '364.25px',
+  gap: theme.spacing(2)
 }));
 
 const ImageBoxContainer = styled(Box)(({ theme }) => ({
@@ -48,8 +50,7 @@ const ImageBoxContainer = styled(Box)(({ theme }) => ({
   height: '100%',
   minWidth: '440px',
   maxWidth: '648px',
-  padding: '1px 0px',
-  border: '1px solid rgba(0, 0, 0, 0.25)'
+  padding: '1px 0px'
 }));
 
 const Login: NextPageWithLayout = () => {
@@ -165,7 +166,7 @@ const Login: NextPageWithLayout = () => {
       />
 
       {/* <GridLayout> */}
-      <ContainerWrapper>
+      <ContainerWrapper variant="outlined">
         <ImageBoxContainer
           sx={{
             display: {

@@ -65,11 +65,10 @@ const DetailBox = styled(Box)(({ theme }) => ({
   Width: '100%',
   height: '100%',
   padding: theme.spacing(2, 8),
-  gap: theme.spacing
+  gap: theme.spacing(1)
 }));
 
 const TextLayout = styled(Typography)(({ theme }) => ({
-  color: theme.colors.primary.dark,
   maxWidth: '520px'
 }));
 
@@ -207,7 +206,6 @@ const AuthenticationLayout = () => {
         <Stack
           sx={{
             width: '100%'
-            // cursor: isUserNew ? (!(valid && formData?.promotion === true) ? 'not-allowed' : 'pointer') : 'not-allowed'
           }}
         >
           <GoogleSignInButton onClick={handleLoginClick} />

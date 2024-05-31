@@ -9,7 +9,7 @@ const PaperWrapper = styled(Paper)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: '1px 10px 1px 1px',
+  padding: '1px',
   gap: '10px',
   boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.084), 0px 1px 1px rgba(0, 0, 0, 0.168)',
   borderRadius: theme.spacing(0.4)
