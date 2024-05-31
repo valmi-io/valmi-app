@@ -165,7 +165,6 @@ const ConnectionSchedule = ({ params, isEditableFlow = false }: TConnectionUpser
         open={alertState.show}
         onClose={handleAlertClose}
         message={alertState.message}
-        displayButton={false}
         isError={alertState.type === 'error'}
       />
       <ConnectorLayout title={''}>

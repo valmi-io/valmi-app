@@ -23,6 +23,16 @@ import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
+const PageContent = (data: any) => {
+  if (data.length > 0) {
+    // Display syncs when syncs data length > 0
+    return <SyncsTable syncs={data} />;
+  }
+
+  // Display empty component
+  return <ListEmptyComponent description={'No connections found in this workspace'} />;
+};
+
 const ConnectionsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -47,16 +57,6 @@ const ConnectionsPage: NextPageWithLayout = () => {
     dispatch(clearConnectionFlowState());
   }, []);
 
-  const PageContent = () => {
-    if (syncs.length > 0) {
-      // Display syncs when syncs data length > 0
-      return <SyncsTable syncs={syncs} />;
-    }
-
-    // Display empty component
-    return <ListEmptyComponent description={'No connections found in this workspace'} />;
-  };
-
   return (
     <PageLayout
       pageHeadTitle="Connections"
@@ -67,7 +67,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`connectionsPage`}
         error={error}
-        PageContent={<PageContent />}
+        PageContent={<PageContent data={syncs} />}
         displayComponent={!error && !isFetching && syncs}
         isLoading={isFetching}
         traceError={traceError}

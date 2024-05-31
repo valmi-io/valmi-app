@@ -327,7 +327,6 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         open={alertState.show}
         onClose={handleAlertClose}
         message={alertState.message}
-        displayButton={false}
         isError={alertState.type === 'error'}
       />
       <IntegrationSpec

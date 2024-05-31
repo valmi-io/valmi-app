@@ -1,81 +1,50 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Thursday, May 18th 2023, 9:42:45 pm
- * Author: Nagendra S @ valmi.io
- */
-
-import { Alert, Snackbar, Stack, Typography } from '@mui/material';
+import { Alert, Snackbar, styled } from '@mui/material';
 
 export interface AlertComponentProps {
   open: boolean;
   onClose: () => void;
   message: string;
-  displayButton?: boolean;
-  onButtonClick?: () => void;
-  isError?: boolean;
+  isError?: boolean; // Optional prop to indicate if the alert is an error
 }
 
+// Possible statuses for the alert
 export type AlertStatus = 'empty' | 'success' | 'error';
 
+// Structure of the alert type
 export type AlertType = {
   message: string;
   show: boolean;
   type: AlertStatus;
 };
 
-const AlertComponent = ({
-  open,
-  onClose,
-  message,
-  displayButton = false,
-  onButtonClick,
-  isError
-}: AlertComponentProps) => {
-  const displayAlertMessage = () => {
-    return (
-      <>
-        {message}
-        {displayButton && (
-          <Stack>
-            <Typography variant="body2" color="text.error">
-              If user is not activated,{' '}
-              <span onClick={onButtonClick} style={{ textDecoration: 'underline', cursor: 'pointer' }}>
-                resend activation link
-              </span>
-              <span>{'.'}</span>
-            </Typography>
-          </Stack>
-        )}
-      </>
-    );
-  };
+// Styled component for the AlertContainer
+const AlertContainer = styled(Alert)(({}) => ({
+  display: 'flex',
+  width: '100%',
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  justifyContent: 'center'
+}));
 
+// Styled component for the SnackbarContainer
+const SnackbarContainer = styled(Snackbar)(({}) => ({
+  alignItems: 'center'
+}));
+
+const AlertComponent = ({ open, onClose, message, isError }: AlertComponentProps) => {
   return (
-    <Snackbar
+    <SnackbarContainer
       anchorOrigin={{
         vertical: 'top',
         horizontal: 'center'
       }}
       open={open}
-      autoHideDuration={null}
       onClose={onClose}
-      sx={{
-        alignItems: 'center'
-      }}
     >
-      <Alert
-        onClose={onClose}
-        severity={isError ? 'error' : 'success'}
-        sx={{
-          display: 'flex',
-          width: '100%',
-          flexDirection: 'row',
-          alignItems: 'center'
-        }}
-      >
-        {displayAlertMessage()}
-      </Alert>
-    </Snackbar>
+      <AlertContainer onClose={onClose} severity={isError ? 'error' : 'success'}>
+        {message}
+      </AlertContainer>
+    </SnackbarContainer>
   );
 };
 

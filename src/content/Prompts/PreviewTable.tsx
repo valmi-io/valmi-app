@@ -9,7 +9,7 @@ import { useCreateExploreMutation, useGetPromptPreviewMutation } from '@/store/a
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
-import { TData } from '@/utils/typings.d';
+import { TData, TPrompt } from '@/utils/typings.d';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react';
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Container, MenuItem, Paper, TextField } from '@mui/material';
 import moment from 'moment';
-import { TPrompt, TPromptSource } from '@/content/Prompts/PromptCard';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';

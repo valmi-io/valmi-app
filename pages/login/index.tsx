@@ -161,7 +161,6 @@ const Login: NextPageWithLayout = () => {
         open={alertState.show}
         onClose={handleAlertClose}
         message={alertState.message}
-        displayButton={false}
         isError={alertState.type === 'error'}
       />
 
