@@ -30,8 +30,8 @@ const MainContainer = styled(Stack)(({ theme }) => ({
 const ContentWrapper = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flex: 1,
-  marginLeft: theme.spacing(8),
-  marginRight: theme.spacing(8)
+  marginLeft: theme.spacing(2),
+  marginRight: theme.spacing(2)
 }));
 
 // Wrapper for the header to style it properly
