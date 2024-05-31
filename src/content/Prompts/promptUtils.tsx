@@ -1,4 +1,4 @@
-import { TPromptSource } from '@/content/Prompts/PromptCard';
+import { TPromptSource } from '@/utils/typings.d';
 
 interface JsonSchema {
   $schema: string;
