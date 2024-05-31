@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { Box, styled, Stack, Typography, Paper, Button } from '@mui/material';
+import { Box, styled, Stack, Typography, Paper, Button, Link } from '@mui/material';
 
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
@@ -214,6 +214,15 @@ const AuthenticationLayout = () => {
               footerText={isUserNew ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             />
           </Button>
+        </Stack>
+        <Stack sx={{ alignSelf: 'start' }}>
+          <Typography variant="body1">
+            By signing {isUserNew ? 'up' : 'in'}, you agree to Valmi.io's
+            <Link sx={{ ml: 1 }} href="https://www.valmi.io/privacy-policy">
+              Privacy Policy
+            </Link>{' '}
+            .
+          </Typography>
         </Stack>
       </DetailBox>
     </ContainerLayout>
