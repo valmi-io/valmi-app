@@ -7,6 +7,7 @@
 import { memo } from 'react';
 
 import {
+  Chip,
   Table,
   TableBody,
   TableCell,
@@ -27,7 +28,7 @@ import {
 
 import { TABLE_COLUMN_SIZES } from '@utils/table-utils';
 import TableHeader from '@components/Table/TableHeader';
-import { StyledChip } from '@/content/Events/LiveEvents/IncomingEventsTable';
+// import { StyledChip } from '@/content/Events/LiveEvents/IncomingEventsTable';
 
 export const CustomizedTableRow = styled(TableRow)<TableRowProps>(({}) => ({
   '& > *': {
@@ -45,6 +46,12 @@ export const LogMessage = styled(Typography)(({}) => ({
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis'
+}));
+
+const StyledChip = styled(Chip)(({ theme }) => ({
+  color: theme.colors.alpha.white[100],
+  borderRadius: 4,
+  backgroundColor: '#B497FF'
 }));
 
 const SyncRunLogsTable = ({ data, onRowClick }: SyncRunLogsTableProps) => {
