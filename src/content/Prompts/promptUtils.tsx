@@ -1,4 +1,5 @@
 import { TPromptSource } from '@/content/Prompts/PromptCard';
+import moment from 'moment';
 
 interface JsonSchema {
   $schema: string;
@@ -116,14 +117,15 @@ export type TPayloadOut = {
   time_window: TimeWindowType;
 };
 
-export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
-  const payload: TPayloadOut = {
-    // schema_id: schema.length ? schema[0].id : '',
-    schema_id: schema,
-
-    filters: filters,
-    time_window: time_window
-  };
-
-  return payload;
+export const generateOnMountPreviewPayload = ({ schemaID }:{schemaID:string}) => {
+  return {
+    schema: schemaID,
+    filters: [
+      {
+        "tag": "updated_up",
+        "operator": "BETWEEN",
+        "value": `${moment().subtract(1, 'months').toISOString()} AND ${moment().toISOString()}`
+      }
+    ]
+  }
 };

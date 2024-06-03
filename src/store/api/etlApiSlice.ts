@@ -63,7 +63,7 @@ export const etlApiSlice = apiSlice.injectEndpoints({
       }
     }),
 
-    getPromptPreview: builder.mutation({
+    getPromptPreviewData: builder.mutation({
       query: ({ workspaceId, promptId, prompt }) => ({
         url: `/workspaces/${workspaceId}/prompts/${promptId}/preview`,
         method: 'POST',
@@ -140,5 +140,5 @@ export const {
   useCreateExploreMutation,
   useGetExploreByIdQuery,
   useGetPackageByIdQuery,
-  useGetPromptPreviewMutation
+  useGetPromptPreviewDataMutation
 } = etlApiSlice;

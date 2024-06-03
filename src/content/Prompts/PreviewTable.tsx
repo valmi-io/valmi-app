@@ -5,7 +5,7 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import ContentLayout from '@/layouts/ContentLayout';
 import { IPreviewPage } from '@/pagesspaces/[wid]/prompts/[pid]';
 import { queryHandler } from '@/services';
-import { useCreateExploreMutation, useGetPromptPreviewMutation } from '@/store/api/etlApiSlice';
+import { useCreateExploreMutation, useGetPromptPreviewDataMutation } from '@/store/api/etlApiSlice';
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
 import { getBaseRoute, isDataEmpty } from '@/utils/lib';
@@ -16,8 +16,7 @@ import { useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Container, MenuItem, Paper, TextField } from '@mui/material';
-import moment from 'moment';
-import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
+import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 
@@ -27,7 +26,15 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   const router = useRouter();
 
   // Mutation for creating stream
-  const [preview, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewMutation();
+  const [getPromptPreviewData, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewDataMutation();
+
+  const fetchPromptPreview = (payload: TPayloadOut) => {
+    getPromptPreviewData({
+      workspaceId: wid,
+      promptId: pid,
+      prompt: payload
+    });
+  };
 
   const [createObject] = useCreateExploreMutation();
 
@@ -51,36 +58,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     if (pid) {
       const { schemas = [] } = prompt;
 
-      const payload: TPayloadOut = generatePreviewPayload({
-        schema: schemaID,
-        filters: [],
-        time_window: {
-          label: 'custom',
-          range: {
-            // 1 month range
-            start: moment().subtract(1, 'months').toISOString(),
-            end: moment().toISOString()
-          }
-        }
-      });
+      const onMountPayload: any = generateOnMountPreviewPayload({ schemaID });
 
-      previewPrompt(payload);
+      fetchPromptPreview(onMountPayload);
     }
   }, [pid, schemaID]);
 
-  // useEffect(() => {
-  //   if (filter) {
-  //     getData();
-  //   }
-  // }, [filter]);
-
-  const previewPrompt = (payload: TPayloadOut) => {
-    preview({
-      workspaceId: wid,
-      promptId: pid,
-      prompt: payload
-    });
-  };
 
   const handleSaveAsExplore = () => {
     setOpenModal(true);
@@ -138,7 +121,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     const { schemas = [] } = prompt;
     payload.schema_id = schemas.length ? schemas[0].id : '';
 
-    previewPrompt(payload);
+    fetchPromptPreview(payload);
   };
 
   return (
@@ -171,7 +154,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       </TextField>
       {schemaID && (
         <Container>
-          <PromptFilter spec={''} applyFilters={applyFilters} />
+          <PromptFilter spec={prompt.spec} applyFilters={applyFilters} />
           <ContentLayout
             key={`PreviewPage`}
             error={error}

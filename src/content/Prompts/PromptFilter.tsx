@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { schema } from '@content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
+import transformFilters from '@utils/filter-util'
 
 const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: any) => void }) => {
   let initialData = {};
@@ -15,33 +16,30 @@ const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: 
   // customJsonRenderers
   const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
 
-  const { valid, errors } = jsonFormValidator(schema, data);
+  const { valid, errors } = jsonFormValidator(spec, data);
 
   const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
     setData(data);
   };
 
   const customUISchema = useMemo(() => {
-    const uischema = Generate.uiSchema(schema);
+    const uischema = Generate.uiSchema(spec);
     uischema['type'] = 'HorizontalLayout';
     return uischema;
-  }, [schema]);
+  }, [spec]);
 
   const handleOnClick = () => {
-    let obj = data;
-    if (!data?.filters) {
-      obj.filters = [];
-    }
+    let obj = transformFilters(data);
     applyFilters(obj);
   };
 
   return (
     <Paper variant="outlined">
       <JsonForms
-        schema={schema}
+        schema={spec}
         uischema={customUISchema}
         data={data}
-        renderers={customRenderers}
+        renderers={materialRenderers}
         cells={materialCells}
         onChange={handleFormChange}
       />
