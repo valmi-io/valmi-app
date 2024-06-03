@@ -122,7 +122,7 @@ export const generateOnMountPreviewPayload = ({ schemaID }:{schemaID:string}) =>
     schema: schemaID,
     filters: [
       {
-        "tag": "updated_up",
+        "tag": "updated_at",
         "operator": "BETWEEN",
         "value": `${moment().subtract(1, 'months').toISOString()} AND ${moment().toISOString()}`
       }
