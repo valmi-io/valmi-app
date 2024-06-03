@@ -16,7 +16,7 @@ const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
       baseUrl: constants.urls.API_URL,
-      timeout: 60000, // 60 seconds,
+      timeout: 120000, // 120 seconds,
       prepareHeaders: async (headers, { getState }) => {
         const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 

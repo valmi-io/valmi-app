@@ -20,6 +20,7 @@ import moment from 'moment';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
+import { useUser } from '@/hooks/useUser';
 
 const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
   const { pid = '', wid = '', filter = '' } = params;
@@ -32,7 +33,8 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   const [createObject] = useCreateExploreMutation();
 
   const { data: session } = useSession();
-  const { user = {} } = session ?? {};
+  // const { user = {} } = session ?? {};
+  const { user } = useUser();
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
