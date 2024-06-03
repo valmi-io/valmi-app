@@ -16,5 +16,8 @@
 
   "psi-header.changes-tracking": {},
   "psi-header.templates": [],
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }
