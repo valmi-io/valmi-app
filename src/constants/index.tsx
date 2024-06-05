@@ -30,7 +30,7 @@ const constants = {
     SELECT_CONNECTOR_LAYOUT_TITLE: 'Select connector'
   },
   catalog: {
-    CREATE_CONNECTION_TITLE: 'Integrations'
+    CREATE_CONNECTION_TITLE: 'CATALOG'
   },
   docs: {
     syncs: 'https://www.valmi.io/docs/concepts/syncs',
