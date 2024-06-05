@@ -41,7 +41,7 @@ export const ConnectorItem = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: 0,
+  padding: '0 0 8px',
   gap: theme.spacing(1),
   position: 'absolute',
   left: 0,

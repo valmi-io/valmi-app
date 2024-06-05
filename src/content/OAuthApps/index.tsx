@@ -10,6 +10,8 @@ import ConnectorLayout from '@/layouts/ConnectorLayout';
 import PageTitle from '@/components/PageTitle';
 import { OAuthConnectorsState, OnConnectorClickProps } from '@/pagesspaces/[wid]/oauth-apps';
 import ConnectorsList from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
+import { getCombinedConnectors } from '@/utils/lib';
 
 type LayoutState = {
   isLoading: boolean;
@@ -33,19 +35,19 @@ const OAuthApps = ({ state, handleItemOnClick, connectorState }: OAuthAppProps) 
 
     return (
       <>
-        <ConnectorLayout title="">
-          {/** Display page content */}
+        {/* <ConnectorLayout title=""> */}
+        {/** Display page content */}
 
-          <Stack sx={{ display: 'flex' }} spacing={3}>
-            {/** connectors */}
-            <ConnectorsList
-              key={`oauthconnectorsList-${state.title}`}
-              data={data}
-              handleItemOnClick={(item) => handleItemOnClick({ item, configured: false })}
-              selectedType={type}
-            />
-          </Stack>
-        </ConnectorLayout>
+        <Stack sx={{ display: 'flex' }} spacing={3}>
+          {/** connectors */}
+          <ConnectorsList
+            key={`oauthconnectorsList-${state.title}`}
+            data={data}
+            handleItemOnClick={(item) => handleItemOnClick({ item, configured: false })}
+            selectedType={type}
+          />
+        </Stack>
+        {/* </ConnectorLayout> */}
       </>
     );
   };
