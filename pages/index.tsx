@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { useUser } from '@/hooks/useUser';
+import { isObjectEmpty } from '@/utils/lib';
 
 const HomePage = () => {
   const router = useRouter();
@@ -31,7 +32,8 @@ const HomePage = () => {
   // This effect checks if the user has initiated a login flow
   // "DEFAULT" means not initiated.
   useEffect(() => {
-    if (loginFlowState === 'DEFAULT') {
+    //@ts-ignore
+    if (isObjectEmpty(loginFlowState) || !loginFlowState || loginFlowState === 'DEFAULT') {
       router.push('/login');
     }
   }, [loginFlowState]);
