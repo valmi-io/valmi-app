@@ -10,17 +10,25 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 interface ConnectorListProps {
   data: any;
+  credentialsData: any;
 }
 
-const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
+const ConnectorsPageContent = ({ data, credentialsData }: ConnectorListProps) => {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
+  const isNewConnection = (connection: any) => {
+    const arr = credentialsData.filter((item: any) => item?.connector_type === connection?.type);
+    return arr.length === 0 ? true : false;
+  };
+
   const handleItemOnClick = (item: ConnectorType) => {
-    const pathname = `${getBaseRoute(workspaceId as string)}/connections/create`;
+    const pathname = isNewConnection(item)
+      ? `${getBaseRoute(workspaceId as string)}/connections/create`
+      : `${getBaseRoute(workspaceId as string)}/catalog/credentials?type=${item?.display_name.toLowerCase()}`;
     const key = getSelectedConnectorKey();
 
     const objToDispatch = {
@@ -35,7 +43,15 @@ const ConnectorsPageContent = ({ data }: ConnectorListProps) => {
     router.push(pathname);
   };
 
-  return <ConnectorsList key={`connectorsList`} data={data} handleItemOnClick={handleItemOnClick} selectedType={''} />;
+  return (
+    <ConnectorsList
+      key={`connectorsList`}
+      data={data}
+      handleItemOnClick={handleItemOnClick}
+      selectedType={''}
+      credentialsData={credentialsData}
+    />
+  );
 };
 
 export default ConnectorsPageContent;
