@@ -22,7 +22,7 @@ import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
 
-const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
+const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any }) => {
   const { pid = '', wid = '', filter = '' } = params;
 
   const router = useRouter();
@@ -78,10 +78,19 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
+
+      let xyz = {
+        workspaceId: wid,
+        promptId: pid,
+        filters: payload
+      };
+
+      console.log("sending to backend: ", xyz);
+
       preview({
         workspaceId: wid,
         promptId: pid,
-        prompt: payload
+        filters: payload
       });
     },
     [schemaID]
@@ -175,7 +184,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       </TextField>
       {schemaID && (
         <Container>
-          <PromptFilter spec={''} applyFilters={applyFilters} />
+          <PromptFilter filters={prompt.filters} typedefs={prompt.typedefs} applyFilters={applyFilters} />
           <ContentLayout
             key={`PreviewPage`}
             error={error}
