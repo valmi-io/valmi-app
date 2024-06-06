@@ -56,7 +56,7 @@ export const TableCellComponent = ({ text }: TableCellProps) => {
 
 export const TableCellWithImage = ({ size, src, alt, title }: TableCellWithImageProps) => {
   return (
-    <TableCell style={{ display: 'flex' }}>
+    <TableCell>
       <ImageComponent size={size} src={src} alt={alt ? alt : 'icon'} style={{ marginRight: '10px' }} title={title} />
     </TableCell>
   );

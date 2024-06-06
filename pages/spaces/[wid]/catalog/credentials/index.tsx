@@ -17,7 +17,6 @@ import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
 import { getBaseRoute, getCombinedConnectors } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
-import { useFilteredConnectionsData } from '@/content/Connections/useFilteredConnectionsData';
 
 const PageContent = ({ data }: { data: any }) => {
   if (data.length > 0) {
@@ -40,7 +39,6 @@ const CredentialsPage: NextPageWithLayout = () => {
     fetchCredentials,
     { data: data, isError: isError, error: error, isLoading: isLoading, isFetching: isFetching }
   ] = useLazyFetchCredentialsQuery();
-  const { connectionsError, filteredConnectionsData, traceError } = useFilteredConnectionsData(workspaceId, type);
 
   const filteredData = (type: any) => {
     const arr = data?.resultData?.filter((item: any) => item?.display_name.toLowerCase() === type);

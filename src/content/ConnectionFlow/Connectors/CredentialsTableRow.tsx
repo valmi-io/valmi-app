@@ -53,7 +53,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
       <TableCellWithImage
         title={credential?.display_name}
         src={`/connectors/${credential?.connector_type?.split('_')[1].toLowerCase()}.svg`}
-        size={ImageSize.medium}
+        size={ImageSize.small}
       />
       <TableCellWithActionButton
         tooltip={'Edit connection'}
