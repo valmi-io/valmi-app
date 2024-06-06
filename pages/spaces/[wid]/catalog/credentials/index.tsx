@@ -14,9 +14,10 @@ import ContentLayout from '@/layouts/ContentLayout';
 import CredentialsTable from '@/content/ConnectionFlow/Connectors/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
-import { getCombinedConnectors } from '@/utils/lib';
+import { getBaseRoute, getCombinedConnectors } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
+import { useFilteredConnectionsData } from '@/content/Connections/useFilteredConnectionsData';
 
 const PageContent = ({ data }: { data: any }) => {
   if (data.length > 0) {
@@ -39,6 +40,7 @@ const CredentialsPage: NextPageWithLayout = () => {
     fetchCredentials,
     { data: data, isError: isError, error: error, isLoading: isLoading, isFetching: isFetching }
   ] = useLazyFetchCredentialsQuery();
+  const { connectionsError, filteredConnectionsData, traceError } = useFilteredConnectionsData(workspaceId, type);
 
   const filteredData = (type: any) => {
     const arr = data?.resultData?.filter((item: any) => item?.display_name.toLowerCase() === type);
@@ -50,13 +52,13 @@ const CredentialsPage: NextPageWithLayout = () => {
   }, [workspaceId, fetchCredentials]);
 
   const handleCreateConnectionOnClick = () => {
-    router.push(`/spaces/${workspaceId}/connections/create`);
+    router.push(`${getBaseRoute(workspaceId as string)}/connections/create`);
   };
 
   return (
     <PageLayout
       pageHeadTitle="Credentials"
-      title="Credentials"
+      title="CREDENTIALS"
       buttonTitle="Credential"
       handleButtonOnClick={handleCreateConnectionOnClick}
     >

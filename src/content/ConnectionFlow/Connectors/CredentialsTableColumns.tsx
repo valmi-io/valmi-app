@@ -10,31 +10,23 @@ import appIcons from '@utils/icon-utils';
 export const CredentialsColumns: TableColumnProps[] = [
   {
     id: '1',
-    label: 'CONNECTION',
+    label: 'NAME',
     minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.NAME,
-    muiIcon: true
+    icon: appIcons.TITLE,
+    muiIcon: false
   },
   {
     id: '2',
-    label: 'SHOP',
+    label: 'ACCOUNT',
+    minWidth: TABLE_COLUMN_SIZES[2],
+    icon: appIcons.ACCOUNT
+  },
+  {
+    id: '4',
+    label: 'CONNECTOR',
     minWidth: TABLE_COLUMN_SIZES[2],
     icon: appIcons.SRC
   },
-  { id: '3', label: '', minWidth: TABLE_COLUMN_SIZES[0] },
-  {
-    id: '4',
-    label: 'TYPE',
-    minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.DEST
-  },
 
-  {
-    id: '5',
-    label: 'Status',
-    minWidth: TABLE_COLUMN_SIZES[0],
-    icon: appIcons.STATUS,
-    muiIcon: true
-  },
-  { id: '6', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
+  { id: '5', label: '', action: true, minWidth: TABLE_COLUMN_SIZES[0] }
 ];

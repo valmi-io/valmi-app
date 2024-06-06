@@ -11,15 +11,13 @@ export interface SyncOnClickProps {
   syncId: string;
 }
 
-//@ts-ignore
-const CredentialsTable = ({ credentials }) => {
+const CredentialsTable = ({ credentials }: { credentials: any }) => {
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
 
-  const handleOnClick = ({ syncId }: SyncOnClickProps) => {
-    // navigate to sync runs
-    router.push(`/spaces/${workspaceId}/connections/${syncId}/runs`);
+  const handleOnClick = ({ credentialId }: { credentialId: string }) => {
+    router.push(`/spaces/${workspaceId}/connections/create`);
   };
 
   return (
