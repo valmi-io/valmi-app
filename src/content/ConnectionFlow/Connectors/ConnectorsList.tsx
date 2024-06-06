@@ -30,12 +30,18 @@ export type NewConnectorType = {
 const ConnectorsList = ({
   data,
   handleItemOnClick,
-  selectedType
+  selectedType,
+  credentialsData
 }: {
   data: ConnectorType[];
   handleItemOnClick: (item: ConnectorType) => void;
   selectedType: string;
+  credentialsData: any;
 }) => {
+  const isNewConnection = (connection: any) => {
+    const arr = credentialsData?.filter((item: any) => item?.connector_type === connection?.type);
+    return arr?.length === 0 ? 0 : arr?.length;
+  };
   return (
     <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
       {data.map((item: ConnectorType) => {
@@ -56,6 +62,7 @@ const ConnectorsList = ({
             displayName={displayName}
             type={item.type.split('_')[0]}
             mode={item.mode}
+            connections={isNewConnection(item)}
           />
         );
       })}
