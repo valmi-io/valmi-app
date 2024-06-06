@@ -1,60 +1,42 @@
-// @ts-nocheck
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Wednesday, October 18th 2023, 6:09:30 pm
- * Author: Nagendra S @ valmi.io
- */
+import { JsonFormsWrapper } from '@/components/JsonFormsWrapper';
+import { getCustomRenderers } from '@/utils/form-customRenderers';
+import { formValidationMode } from '@/utils/form-utils';
+import { Paper, styled } from '@mui/material';
+import React from 'react';
 
-import { Box } from '@mui/material';
+const FormLayout = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  padding: theme.spacing(1, 0),
+  maxWidth: '520px'
+}));
 
-import { Controller } from 'react-hook-form';
+interface IAuthenticationForm {
+  formValidationState: formValidationMode;
+  handleFormDataChange: (data: any) => void;
+  formData: any;
+  schema: any;
+}
 
-import { FormObject, getInputField } from '@/utils/form-utils';
-import SubmitButton from '@components/SubmitButton';
-
-const AuthenticationForm = ({ fields, control, handleSubmit, onSubmit, isFetching, data, buttonText }) => {
+const AuthenticationForm = ({ formValidationState, handleFormDataChange, formData, schema }: IAuthenticationForm) => {
+  /**
+   * Retrieves custom renderers for the JSONForms component based on the provided configuration
+   * (e.g., hiding specific fields).
+   */
+  const handleFormRenderers = getCustomRenderers({ invisibleFields: ['invisible_fields'] });
   return (
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': {
-          mt: 1,
-          mb: 1,
-          width: '100%'
-        }
-      }}
-      noValidate
-      onSubmit={handleSubmit(onSubmit)}
-      autoComplete="off"
-    >
-      {fields.map((inputField: FormObject) => (
-        <Controller
-          key={inputField.name}
-          name={inputField.name}
-          control={control}
-          defaultValue=""
-          rules={{ required: inputField.required }}
-          render={({ field, fieldState: { error } }) => {
-            return getInputField(
-              field,
-              inputField.description,
-              error ? true : false,
-              inputField.label,
-              inputField.enumValue,
-              inputField.required,
-              inputField.disabled,
-              !field.value ? '' : field.value,
-              inputField.fieldType,
-              null,
-              null,
-              null
-            );
-          }}
-        />
-      ))}
-      {/** Display submit button  */}
-      <SubmitButton buttonType="submit" fullWidth={true} ariaLabel="form-submit" isFetching={isFetching} data={data} buttonText={buttonText} />
-    </Box>
+    <FormLayout>
+      <JsonFormsWrapper
+        formValidationState={formValidationState}
+        onChange={handleFormDataChange}
+        renderers={handleFormRenderers}
+        schema={schema}
+        data={formData}
+      />
+    </FormLayout>
   );
 };
 
