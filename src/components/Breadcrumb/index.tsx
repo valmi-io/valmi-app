@@ -28,8 +28,22 @@ const HeaderTitle = () => {
   // query object
   const query = router.query;
 
+  const createQueryString = (queryParams: any) => {
+    let queryStringArray = [];
+
+    for (let key in queryParams) {
+      if (queryParams.hasOwnProperty(key) && key !== 'wid') {
+        queryStringArray.push(`${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`);
+      }
+    }
+
+    return queryStringArray.join('&');
+  };
+
+  console.log('createQueryString:', createQueryString(query));
+
   let valuesAfterWid = url.split('/').slice(3);
-  const getQueryValue = (route: string) => {
+  const getQueryValue = (route: string, index: number) => {
     let values = valuesAfterWid.map((item) => {
       if (item.startsWith('[') && item.endsWith(']')) {
         let path: any = item.split('');
@@ -39,8 +53,8 @@ const HeaderTitle = () => {
         if (query[path]) return query[path];
       } else return item;
     });
-    if ('connector' in query && 'type' in query) {
-      return `${values.join('/')}?connector=${query?.connector}`;
+    if (!!query && index === valuesAfterWid.length - 1) {
+      return `${values.join('/')}?${createQueryString(query)}`;
     } else if (values.indexOf(route) !== 0) {
       return values.join('/');
     } else return route;
@@ -98,19 +112,25 @@ const HeaderTitle = () => {
                   key={`breadcrumb-${index}`}
                   sx={{
                     padding: 0,
-                    textDecoration: 'none',
-                    color:
-                      index !== valuesAfterWid.length - 1
-                        ? (theme) => theme.colors.alpha.black[50]
-                        : (theme) => theme.colors.alpha.black[100]
+                    textDecoration: 'none'
                   }}
                   href={
                     valuesAfterWid.length > 1
-                      ? `/spaces/${query?.wid}/${getQueryValue(route)}`
+                      ? `/spaces/${query?.wid}/${getQueryValue(route, index)}`
                       : `/spaces/${query?.wid}/${route}`
                   }
                 >
-                  <Typography variant="body1">{filterRoute(route)}</Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color:
+                        index !== valuesAfterWid.length - 1
+                          ? (theme) => theme.colors.alpha.black[50]
+                          : (theme) => theme.colors.alpha.black[100]
+                    }}
+                  >
+                    {filterRoute(route)}
+                  </Typography>
                 </Link>
               );
             })}
