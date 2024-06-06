@@ -1,22 +1,18 @@
-import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { jsonFormValidator } from '@/utils/form-utils';
-import { Generate, JsonFormsCore } from '@jsonforms/core';
-import { JsonForms } from '@jsonforms/react';
-import { Card, Paper, Stack, Select, MenuItem, TextField, Button } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { schema } from '@content/Prompts/promptUtils';
-import SubmitButton from '@/components/SubmitButton';
-import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
+import React, { useState } from 'react';
+import { Select, MenuItem, TextField, Button, Stack } from '@mui/material';
 
-
-const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: { filters: any; operators: any ; applyFilters: (data: any) => void }) => {
-  const [appliedFilters, setAppliedFilters] = useState<Array<{ column: string; operator: string; value: string }>>([]);
+const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: { filters: any; operators: any; applyFilters: (data: any) => void }) => {
+  const [appliedFilters, setAppliedFilters] = useState<Array<{ column: string; operator: string; value: string }>>([
+    { column: 'ORDER_VALUE', operator: '>=', value: '100' },
+  ]);
 
   const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>({
     timeRange: 'last30days',
     start_date: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
     end_date: new Date(),
   });
+
+  const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | null>(null);
 
   const handleDateRangeChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const selectedRange = e.target.value as string;
@@ -60,6 +56,11 @@ const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: {
     setAppliedFilters(newAppliedFilters);
   };
 
+  const handleColumnChange = (index: number, value: string) => {
+    setSelectedColumnIndex(index);
+    handleFilterChange(index, 'column', value);
+  };
+
   const handleSubmit = () => {
     const combinedFilters = [...appliedFilters,
       { column: 'updated_at', operator: '>=', value: dateRange.start_date.toISOString() },
@@ -96,29 +97,35 @@ const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: {
         <Stack direction="row" spacing={2} key={index}>
           <Select
             value={appliedFilter.column}
-            onChange={(e) => handleFilterChange(index, 'column', e.target.value as string)}
+            onChange={(e) => handleColumnChange(index, e.target.value as string)}
           >
+            <MenuItem value="">Select Column</MenuItem>
             {filters.map((filter: any) => (
               <MenuItem key={filter.column} value={filter.column}>
                 {filter.column}
               </MenuItem>
             ))}
           </Select>
-          <Select
-            value={appliedFilter.operator}
-            onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
-          >
-            {standardOperators["STRING"]?.map((op: string) => (
-              <MenuItem key={op} value={op}>
-                {op}
-              </MenuItem>
-            ))}
-          </Select>
-          <TextField
-            value={appliedFilter.value}
-            onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
-            placeholder="Enter value"
-          />
+          {selectedColumnIndex === index && (
+            <>
+              <Select
+                value={appliedFilter.operator}
+                onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
+              >
+                <MenuItem value="">Select Operator</MenuItem>
+                {standardOperators[filters.find((filter: any) => filter.column === appliedFilter.column)?.column_type]?.map((op: string) => (
+                  <MenuItem key={op} value={op}>
+                    {op}
+                  </MenuItem>
+                ))}
+              </Select>
+              <TextField
+                value={appliedFilter.value}
+                onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
+                placeholder="Enter value"
+              />
+            </>
+          )}
           <Button onClick={() => handleRemoveFilter(index)}>Remove</Button>
         </Stack>
       ))}
@@ -127,6 +134,5 @@ const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: {
     </Stack>
   );
 };
-
 
 export default PromptFilter;
