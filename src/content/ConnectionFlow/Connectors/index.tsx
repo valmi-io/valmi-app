@@ -20,14 +20,17 @@ import { useFetchConnectorsQuery } from '@store/api/apiSlice';
 
 import constants from '@constants/index';
 import { useFetch } from '@/hooks/useFetch';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const Connectors = () => {
   const flowState = useSelector((state: RootState) => state.connectionFlow.flowState);
   const { connection_type = '' } = flowState;
+
+  const { workspaceId = '' } = useWorkspaceId();
   // connectors query
 
   const { data, isLoading, error, traceError } = useFetch({
-    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
+    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   const [filteredData, setFilteredData] = useState<any>([]);

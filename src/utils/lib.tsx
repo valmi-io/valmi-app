@@ -5,7 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
+import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { queryHandler } from '@/services';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
 import { signOut } from 'next-auth/react';
@@ -117,6 +117,12 @@ const removeAppState = (router: any, dispatch: any) => {
 const clearCookie = async () => {
   // clear auth token
   await setCookie(getAuthTokenCookie(), '', {
+    expires: new Date(0),
+    path: '/'
+  });
+
+  // clear auth meta cookie
+  await setCookie(getAuthMetaCookie(), '', {
     expires: new Date(0),
     path: '/'
   });

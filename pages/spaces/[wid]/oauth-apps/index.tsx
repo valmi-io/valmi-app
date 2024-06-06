@@ -16,7 +16,6 @@ import SidebarLayout from '@layouts/SidebarLayout';
 import { useFetch } from '@/hooks/useFetch';
 import { flattenObjectValuesToArray, getBaseRoute } from '@/utils/lib';
 import { Box, Grid } from '@mui/material';
-import SubmitButton from '@/components/SubmitButton';
 import { useGetConfiguredConnectorsQuery, useGetNotConfiguredConnectorsQuery } from '@/store/api/oauthApiSlice';
 
 import OAuthApps from '@/content/OAuthApps';
@@ -54,14 +53,18 @@ const OAuthAppsPage: NextPageWithLayout = () => {
     isLoading: isConfiguredConnectorsLoading,
     traceError: configuredConnectorsTraceError,
     error: configuredConnectorsError
-  } = useFetch({ query: useGetConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
+  } = useFetch({
+    query: useGetConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+  });
 
   const {
     data: notConfiguredConnectors,
     isLoading: isNotConfiguredConnectorsLoading,
     traceError: notConfiguredConnectorsTraceError,
     error: notConfiguredConnectorsError
-  } = useFetch({ query: useGetNotConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
+  } = useFetch({
+    query: useGetNotConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+  });
 
   const [connectorState, setConnectorState] = useState<OAuthConnectorsState>({
     type: '',
@@ -75,10 +78,11 @@ const OAuthAppsPage: NextPageWithLayout = () => {
       type: type,
       configured: configured
     }));
+    onSubmitClick({ type });
   };
 
-  const onSubmitClick = () => {
-    let { type = '' } = connectorState;
+  const onSubmitClick = ({ type }: { type: any }) => {
+    // let { type = '' } = connectorState;
 
     const connector = type.split('_')[0] ?? '';
 
@@ -134,15 +138,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
           flexDirection: 'row',
           justifyContent: 'flex-end'
         }}
-      >
-        <SubmitButton
-          buttonText={'Next'}
-          data={null}
-          isFetching={false}
-          disabled={!connectorState.type}
-          onClick={onSubmitClick}
-        />
-      </Box>
+      ></Box>
     </PageLayout>
   );
 };

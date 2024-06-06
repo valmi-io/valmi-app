@@ -26,21 +26,7 @@ export default function SaveModal({
 
   return (
     <>
-      <Dialog
-        open={openModal}
-        onClose={handleClose}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries((formData as any).entries());
-            const email = formJson.email;
-            console.log(email);
-            handleClose();
-          }
-        }}
-      >
+      <Dialog open={openModal} onClose={handleClose}>
         <Paper sx={{ minWidth: '400px' }}>
           <DialogTitle>{Title}</DialogTitle>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

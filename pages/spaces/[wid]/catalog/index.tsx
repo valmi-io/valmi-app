@@ -13,12 +13,15 @@ import constants from '@constants/index';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CatalogPage = () => {
   const router = useRouter();
 
+  const { workspaceId = '' } = useWorkspaceId();
+
   const { data, isLoading, error, traceError } = useFetch({
-    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
+    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   useEffect(() => {

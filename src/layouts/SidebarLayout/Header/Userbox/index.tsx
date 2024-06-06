@@ -11,7 +11,6 @@ import { useDispatch } from 'react-redux';
 
 import { Avatar, Box, Button, Divider, Hidden, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -54,6 +53,15 @@ const UserBoxLabel = styled(Typography)(
 `
 );
 
+const UserAvatar = styled(Avatar)(({ theme }) => ({
+  display: 'flex',
+  width: 32,
+  height: 32,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: theme.colors.alpha.black[100]
+}));
+
 const HeaderUserbox = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -89,7 +97,13 @@ const HeaderUserbox = () => {
   };
 
   const userAvatar = () => {
-    return <Avatar sx={{ width: 30, height: 30 }} src={user.image ?? ''} />;
+    return (
+      <UserAvatar src={user?.image}>
+        <Typography variant="h6" sx={{ color: (theme) => theme.colors.alpha.white[100] }}>
+          {user?.name[0]?.toLowerCase()}
+        </Typography>
+      </UserAvatar>
+    );
   };
 
   const userTitle = () => {

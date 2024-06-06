@@ -21,8 +21,8 @@ import { useSyncRunLogs } from '@/content/Syncs/SyncRunLogs/useSyncRunLogs';
 import { copy, isDataEmpty } from '@/utils/lib';
 import { generateLogsObject } from '@/content/Syncs/SyncRunLogs/SyncRunLogsUtils';
 import Modal from '@/components/Modal';
-import EventsFooter from '@/content/Events/LiveEvents/EventsFooter';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import EventsFooter from '@/content/Syncs/EventsFooter';
 
 /**
  * Responsible for rendering the logs page and its components.

@@ -22,7 +22,7 @@ const ExploresPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const { data, error, isLoading, traceError } = useFetch({
-    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
   const handleButtonOnClick = () => {
     router.push(`${getBaseRoute(workspaceId!)}/prompts`);

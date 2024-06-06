@@ -12,7 +12,7 @@ import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import { TData, TPrompt } from '@/utils/typings.d';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Container, MenuItem, Paper, TextField } from '@mui/material';
@@ -20,6 +20,7 @@ import moment from 'moment';
 import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
+import { useUser } from '@/hooks/useUser';
 
 const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
   const { pid = '', wid = '', filter = '' } = params;
@@ -32,7 +33,8 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   const [createObject] = useCreateExploreMutation();
 
   const { data: session } = useSession();
-  const { user = {} } = session ?? {};
+  // const { user = {} } = session ?? {};
+  const { user } = useUser();
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
@@ -74,13 +76,16 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   //   }
   // }, [filter]);
 
-  const previewPrompt = (payload: TPayloadOut) => {
-    preview({
-      workspaceId: wid,
-      promptId: pid,
-      prompt: payload
-    });
-  };
+  const previewPrompt = useCallback(
+    (payload: TPayloadOut) => {
+      preview({
+        workspaceId: wid,
+        promptId: pid,
+        prompt: payload
+      });
+    },
+    [schemaID]
+  );
 
   const handleSaveAsExplore = () => {
     setOpenModal(true);
@@ -90,7 +95,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     setOpenModal(false);
     const payload = generateExplorePayload(wid, pid, user, schemaID, exploreName, []);
     setStatus('submitting');
-
     createExploreHandler({ query: createObject, payload: payload });
   };
 

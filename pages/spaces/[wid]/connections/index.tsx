@@ -22,8 +22,9 @@ import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { useSession } from 'next-auth/react';
 
-const PageContent = (data: any) => {
+const PageContent = ({ data }: { data: any }) => {
   if (data.length > 0) {
     // Display syncs when syncs data length > 0
     return <SyncsTable syncs={data} />;
@@ -45,7 +46,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
     isFetching,
     traceError
   } = useFetch({
-    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   const handleCreateConnectionOnClick = () => {

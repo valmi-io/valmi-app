@@ -64,7 +64,7 @@ const ExploreDescriptionContainer = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'baseline',
-  justifyContent: 'center',
+  justifyContent: 'start',
   gap: theme.spacing(1),
   width: '100%',
   overflow: 'hidden'
