@@ -91,7 +91,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
           }
         }
       };
-      console.lof(response);
+      console.log(response);
       preview(response);
     },
     [schemaID]
