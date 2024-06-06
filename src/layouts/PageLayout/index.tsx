@@ -18,7 +18,9 @@ const LayoutRoot = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2)
 }));
 
-const ContentWrapper = styled(Paper)(({ theme }) => ({}));
+const ContentWrapper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(1)
+}));
 
 const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
