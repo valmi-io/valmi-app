@@ -24,6 +24,41 @@ import { useUser } from '@/hooks/useUser';
 
 const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any }) => {
   const { pid = '', wid = '', filter = '' } = params;
+  prompt =   {
+    "id": "578de8fd-bfa7-4b90-bcd1-af36c7c4132b",
+    "name": "Inventory snapshot KATAKAM 002",
+    "description": "Get a snapshot of your active inventory quantity, cost, and total value. Results are grouped by product- and variant-title, archived and draft product variants are ignored.",
+    "type": "SRC_SHOPIFY",
+    "spec": {},
+    "package_id": "P0",
+    "gated": true,
+    "query": "",
+    "schemas": [
+        {
+            "id": "2dec5258-a772-4a2a-b609-1c15dbda8635",
+            "name": "iuewgeeppmndfaaga",
+            "sources": [
+                {
+                    "name": "shopify$2024-05-29 07:32:14.056548+00:00",
+                    "id": "aea64ec4-4f07-429f-b1d8-60e2a61b1b7f"
+                }
+            ]
+        }
+    ],
+    "filters": [
+      {"column": "ORDER_VALUE", "column_type": "INTEGER"},
+      {"column": "ADDRESS", "column_type": "STRING"},
+      {"column": "isPaidCustomer", "column_type": "BOOLEAN"},
+      {"column": "status", "column_type": "string"}
+    ],
+
+    "operators": {
+      "INTEGER": ["=", "!=", ">=", "<="],
+      "STRING":  ["=", "!=", "LIKE", "IN", "NOT IN"],
+      "BOOLEAN": ["true", "false"],
+      "DATE": []
+    }
+};
 
   const router = useRouter();
 
