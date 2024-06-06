@@ -81,7 +81,11 @@ const ContainerWrapper = styled(Box)(({ theme }) => ({
   height: '100%'
 }));
 
-const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmotionCache, pageProps }) => {
+const MyApp: FC<AppPropsWithLayout> = ({
+  Component,
+  emotionCache = clientSideEmotionCache,
+  pageProps: { session, ...pageProps }
+}) => {
   const store = useStore();
 
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -116,7 +120,7 @@ const MyApp: FC<AppPropsWithLayout> = ({ Component, emotionCache = clientSideEmo
   }, []);
 
   return (
-    <SessionProvider session={pageProps.session}>
+    <SessionProvider session={session}>
       <PersistGate persistor={store.__persistor}>
         <CacheProvider value={emotionCache}>
           <Head>

@@ -78,7 +78,7 @@ const Login: NextPageWithLayout = () => {
   const [oauthError, setOauthError] = useState('');
 
   /**
-   * Resets loginFlowState
+   * Updates loginFlowState
    */
   useEffect(() => {
     updateLoginFlowState();

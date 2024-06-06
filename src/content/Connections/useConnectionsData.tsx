@@ -22,7 +22,7 @@ export const useConnectionsData = (workspaceId: string) => {
       workspaceId,
       queryId: 0
     },
-    { refetchOnMountOrArgChange: true }
+    { refetchOnMountOrArgChange: true, skip: !workspaceId }
   );
 
   // Use the custom hook to check for trace errors in the data

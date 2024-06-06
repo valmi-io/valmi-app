@@ -53,14 +53,18 @@ const OAuthAppsPage: NextPageWithLayout = () => {
     isLoading: isConfiguredConnectorsLoading,
     traceError: configuredConnectorsTraceError,
     error: configuredConnectorsError
-  } = useFetch({ query: useGetConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
+  } = useFetch({
+    query: useGetConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+  });
 
   const {
     data: notConfiguredConnectors,
     isLoading: isNotConfiguredConnectorsLoading,
     traceError: notConfiguredConnectorsTraceError,
     error: notConfiguredConnectorsError
-  } = useFetch({ query: useGetNotConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true }) });
+  } = useFetch({
+    query: useGetNotConfiguredConnectorsQuery(workspaceId, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+  });
 
   const [connectorState, setConnectorState] = useState<OAuthConnectorsState>({
     type: '',

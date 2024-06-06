@@ -20,8 +20,10 @@ const CatalogPage = () => {
   const router = useRouter();
   const { workspaceId = '' } = useWorkspaceId();
 
+  const { workspaceId = '' } = useWorkspaceId();
+
   const { data, isLoading, error, traceError } = useFetch({
-    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true })
+    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   const [fetchCredentials, { data: credentialsData }] = useLazyFetchCredentialsQuery();
