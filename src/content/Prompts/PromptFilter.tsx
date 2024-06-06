@@ -9,11 +9,8 @@ import SubmitButton from '@/components/SubmitButton';
 import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
 
 
-const PromptFilter = ({ filters, typedefs, applyFilters }: { filters: any; typedefs: any ; applyFilters: (data: any) => void }) => {
-  const [appliedFilters, setAppliedFilters] = useState<Array<{ column: string; operator: string; value: string }>>([
-    { column: 'ORDER_VALUE', operator: '>=', value: '1000' },
-    { column: 'ADDRESS',   operator: '!=', value: 'hyd' },
-  ]);
+const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: { filters: any; operators: any ; applyFilters: (data: any) => void }) => {
+  const [appliedFilters, setAppliedFilters] = useState<Array<{ column: string; operator: string; value: string }>>([]);
 
   const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>({
     timeRange: 'last30days',
@@ -111,7 +108,7 @@ const PromptFilter = ({ filters, typedefs, applyFilters }: { filters: any; typed
             value={appliedFilter.operator}
             onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
           >
-            {typedefs["INTEGER"]?.map((op: string) => (
+            {standardOperators["STRING"]?.map((op: string) => (
               <MenuItem key={op} value={op}>
                 {op}
               </MenuItem>

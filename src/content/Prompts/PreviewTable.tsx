@@ -184,7 +184,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
       </TextField>
       {schemaID && (
         <Container>
-          <PromptFilter filters={prompt.filters} typedefs={prompt.typedefs} applyFilters={applyFilters} />
+          <PromptFilter filters={prompt.filters} operators={prompt.operators} applyFilters={applyFilters} />
           <ContentLayout
             key={`PreviewPage`}
             error={error}
