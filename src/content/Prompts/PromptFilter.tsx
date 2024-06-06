@@ -119,11 +119,20 @@ const PromptFilter = ({ filters, operators: standardOperators, applyFilters }: {
                   </MenuItem>
                 ))}
               </Select>
-              <TextField
-                value={appliedFilter.value}
-                onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
-                placeholder="Enter value"
-              />
+              {filters.find((filter: any) => filter.column === appliedFilter.column)?.column_type === 'STRING' ? (
+                <TextField
+                  value={appliedFilter.value}
+                  onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
+                  placeholder="Enter value"
+                />
+              ) : (
+                <TextField
+                  type={filters.find((filter: any) => filter.column === appliedFilter.column)?.column_type.toLowerCase()}
+                  value={appliedFilter.value}
+                  onChange={(e) => handleFilterChange(index, 'value', e.target.value)}
+                  placeholder={`Enter ${filters.find((filter: any) => filter.column === appliedFilter.column)?.column_type.toLowerCase()}`}
+                />
+              )}
             </>
           )}
           <Button onClick={() => handleRemoveFilter(index)}>Remove</Button>
