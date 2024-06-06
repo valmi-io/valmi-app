@@ -107,7 +107,6 @@ export const nextAuthOptions = (req, res) => {
       },
       async jwt({ token, trigger, account, profile, user, session }) {
         // Initial sign in
-        let additionalAuthParams = JSON.parse(req.cookies.additionalAuthParams);
 
         if (account && user) {
           if (account.provider === 'google') {
@@ -124,6 +123,10 @@ export const nextAuthOptions = (req, res) => {
             const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
             const { name, email } = token;
 
+            let authMeta = JSON.parse(req.cookies.authMeta);
+
+            console.log('[next-auth] authMeta', authMeta);
+
             let payload = {
               account: {
                 provider: provider,
@@ -139,7 +142,7 @@ export const nextAuthOptions = (req, res) => {
                 name: name,
                 email: email,
                 meta: {
-                  ...additionalAuthParams.meta
+                  ...authMeta.meta
                 }
               }
             };
@@ -156,10 +159,13 @@ export const nextAuthOptions = (req, res) => {
                 token.workspaceId = workspaceId;
               },
               (error) => {
+                console.log('[nextauth api backend error]', error);
                 token.error = error;
                 throw new Error(error);
               }
             );
+
+            console.log('[VALID] - returning token');
 
             return {
               ...token,
@@ -170,6 +176,8 @@ export const nextAuthOptions = (req, res) => {
             };
           }
         } else if (Date.now() < token.expires_at * 1000) {
+          console.log('[next-auth] - validating token.expired_at with current Date');
+          console.log('[VALID TOKEN]');
           // Subsequent logins, if the `access_token` is still valid, return the JWT
           return token;
         }

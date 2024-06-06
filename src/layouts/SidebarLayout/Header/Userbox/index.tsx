@@ -100,7 +100,7 @@ const HeaderUserbox = () => {
     return (
       <UserAvatar src={user?.image}>
         <Typography variant="h6" sx={{ color: (theme) => theme.colors.alpha.white[100] }}>
-          {user?.name[0].toLowerCase()}
+          {user?.name[0]?.toLowerCase()}
         </Typography>
       </UserAvatar>
     );

@@ -20,7 +20,7 @@ export const useIntegrationQuery = ({
     isFetching: isSpecLoading,
     traceError: specTraceError
   } = useFetch({
-    query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true })
+    query: useFetchIntegrationSpecQuery({ type, workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
   const {
@@ -47,7 +47,8 @@ export const useIntegrationQuery = ({
     query: useGetPackageByIdQuery(
       { packageId: getFreePackageId() },
       {
-        refetchOnMountOrArgChange: true
+        refetchOnMountOrArgChange: true,
+        skip: !workspaceId
       }
     )
   });

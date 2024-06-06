@@ -14,7 +14,7 @@ type CookieOptions = {
 
 const AUTH_TOKEN_COOKIE = 'auth';
 
-const AUTH_META_COOKIE = 'additionalAuthParams';
+const AUTH_META_COOKIE = 'authMeta';
 
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
@@ -48,30 +48,21 @@ export function getAuthMetaCookie() {
   return AUTH_META_COOKIE;
 }
 
-export async function setAuthTokenCookie(session: Session) {
-  const cookieObj = {
-    accessToken: session?.authToken ?? ''
+export async function setAuthTokenCookie(authToken: string) {
+  console.log('[cookies.ts] storing auth token:_', authToken);
+  const data = {
+    accessToken: authToken ?? ''
   };
-
   const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
   if (!accessToken) {
-    setCookie(getAuthTokenCookie(), JSON.stringify(cookieObj));
+    setCookie(getAuthTokenCookie(), JSON.stringify(data));
   }
 }
+
 export async function setAuthMetaCookie(data: any) {
   const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
   if (!meta) {
     setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));
-  }
-}
-
-export async function clearAuthMetaCookie() {
-  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
-  if (meta) {
-    await setCookie(getAuthMetaCookie(), '', {
-      expires: new Date(0),
-      path: '/'
-    });
   }
 }
