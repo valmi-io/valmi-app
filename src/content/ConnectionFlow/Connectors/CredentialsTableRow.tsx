@@ -46,9 +46,18 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
       </BoxLayout>
     );
   };
+
+  const getNameCellValue = (connector: any) => {
+    let type = connector?.display_name?.toLowerCase();
+    if (type === 'shopify') {
+      return connector?.connector_config?.shop;
+    } else if (type === 'postgres' || type === 'dest postgres') {
+      return connector?.connector_config?.database;
+    } else return connector?.connector_type;
+  };
   return (
     <TableRow hover key={credential?.id}>
-      <TableCellComponent text={credential?.connector_config?.shop} />
+      <TableCellComponent text={getNameCellValue(credential)} />
       <TableCell>{userAccountTableCell(credential?.account)}</TableCell>
       <TableCellWithImage
         title={credential?.display_name}
