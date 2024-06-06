@@ -10,7 +10,7 @@ import appIcons from '@utils/icon-utils';
 export const CredentialsColumns: TableColumnProps[] = [
   {
     id: '1',
-    label: 'Name',
+    label: 'CONNECTION',
     minWidth: TABLE_COLUMN_SIZES[2],
     icon: appIcons.NAME,
     muiIcon: true

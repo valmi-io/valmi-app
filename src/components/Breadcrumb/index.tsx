@@ -40,8 +40,6 @@ const HeaderTitle = () => {
     return queryStringArray.join('&');
   };
 
-  console.log('createQueryString:', createQueryString(query));
-
   let valuesAfterWid = url.split('/').slice(3);
   const getQueryValue = (route: string, index: number) => {
     let values = valuesAfterWid.map((item) => {

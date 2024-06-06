@@ -50,7 +50,7 @@ const CredentialsPage: NextPageWithLayout = () => {
   }, [workspaceId, fetchCredentials]);
 
   const handleCreateConnectionOnClick = () => {
-    router.push(`/spaces/${workspaceId}/catalog`);
+    router.push(`/spaces/${workspaceId}/connections/create`);
   };
 
   return (
