@@ -11,6 +11,7 @@ export enum ImageSize {
   small = '20',
   medium = '32',
   large = '48',
+  connectorCard = '64',
   logo = '200',
   extralarge = '320'
 }

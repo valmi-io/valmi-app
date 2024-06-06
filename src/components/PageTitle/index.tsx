@@ -74,10 +74,10 @@ const PageTitle: FC<PageTitleProps> = ({
                 </Link>
               ) : (
                 <Button
+                  size="small"
                   endIcon={endIcon}
                   startIcon={startIcon}
                   disabled={disabled}
-                  sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
                   variant="contained"
                   onClick={onClick}
                 >

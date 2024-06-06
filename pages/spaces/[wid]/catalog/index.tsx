@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -13,10 +13,12 @@ import constants from '@constants/index';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
+import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CatalogPage = () => {
   const router = useRouter();
+  const { workspaceId = '' } = useWorkspaceId();
 
   const { workspaceId = '' } = useWorkspaceId();
 
@@ -24,10 +26,13 @@ const CatalogPage = () => {
     query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
 
+  const [fetchCredentials, { data: credentialsData }] = useLazyFetchCredentialsQuery();
+
   useEffect(() => {
     const url = new URL(window.location.href);
     url.searchParams.set('mode', 'all');
     router.push(url);
+    fetchCredentials({ workspaceId });
   }, []);
 
   return (
@@ -44,7 +49,12 @@ const CatalogPage = () => {
 
         {/** Display page content */}
         <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          {!error && !isLoading && data && <ConnectorsPageContent data={data && getCombinedConnectors(data)} />}
+          {!error && !isLoading && data && (
+            <ConnectorsPageContent
+              data={data && getCombinedConnectors(data)}
+              credentialsData={credentialsData?.resultData}
+            />
+          )}
         </Stack>
       </Paper>
     </PageLayout>

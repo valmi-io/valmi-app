@@ -6,17 +6,15 @@
 
 import React from 'react';
 
-import { Chip, TableCell, TableRow, styled } from '@mui/material';
+import { Avatar, Chip, TableCell, TableRow, Typography, styled } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
-import {
-  TableCellComponent,
-  TableCellWithImage
-} from '@components/Table/TableCellComponent';
+import { TableCellComponent, TableCellWithImage } from '@components/Table/TableCellComponent';
 import { ImageSize } from '@components/ImageComponent';
-import { convertDurationToMinutesOrHours } from '@utils/lib';
+import { convertDurationToMinutesOrHours, stringAvatar } from '@utils/lib';
 import { SyncOnClickProps } from './SyncsTable';
+import { BoxLayout } from '@/components/Layouts/Layouts';
 
 const ChipComponent = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]
@@ -42,41 +40,23 @@ const SyncTableRow = ({ sync, onClick }: SyncTableRowProps) => {
   const getConnectorName = (sync: any, connectionType: any) => {
     return sync[connectionType].credential.connector_type.split('_')[1];
   };
+
   return (
-    <CustomizedTableRow
-      hover
-      key={sync.id}
-      onClick={() => onClick({ syncId: sync.id })}
-    >
+    <CustomizedTableRow hover key={sync.id} onClick={() => onClick({ syncId: sync.id })}>
       <TableCellComponent text={sync.name} />
-      <TableCellWithImage
-        title={sync.source.name}
-        size={ImageSize.small}
-        src={`/connectors/${getConnectorName(
-          sync,
-          'source'
-        ).toLowerCase()}.svg`}
-      />
+
       <TableCell>
         <ArrowForwardIcon style={{ fontSize: 18 }} />
       </TableCell>
       <TableCellWithImage
         size={ImageSize.small}
         title={sync.destination.name}
-        src={`/connectors/${getConnectorName(
-          sync,
-          'destination'
-        ).toLowerCase()}.svg`}
+        src={`/connectors/${getConnectorName(sync, 'destination').toLowerCase()}.svg`}
       />
-      <TableCellComponent
-        text={convertDurationToMinutesOrHours(sync.schedule.run_interval)}
-      />
+      <TableCellComponent text={convertDurationToMinutesOrHours(sync.schedule.run_interval)} />
 
       <TableCell>
-        <ChipComponent
-          color={sync.status === 'active' ? 'secondary' : 'warning'}
-          label={sync.status}
-        />
+        <ChipComponent color={sync.status === 'active' ? 'secondary' : 'warning'} label={sync.status} />
       </TableCell>
 
       <TableCell>

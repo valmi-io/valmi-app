@@ -26,6 +26,7 @@ interface ConnectorCardProps {
   displayName: string;
   type?: string;
   mode?: string[];
+  connections: number;
 }
 
 const CardWrapper = styled(Paper)(({ theme }) => ({
@@ -71,26 +72,29 @@ const ConnectorCard = ({
   src = '',
   displayName = '',
   type = 'src',
-  mode
+  mode,
+  connections
 }: ConnectorCardProps) => {
   return (
     <Grid item xs={'auto'}>
       <CardWrapper variant="outlined">
         <ConnectorItem>
-          <ImageComponent src={src} alt="connector" size={'64'} />
+          <ImageComponent src={src} alt="connector" size={ImageSize.connectorCard} />
           <Typography variant="caption" textTransform={'uppercase'}>
             {displayName}
           </Typography>
-          <CardFooter>
-            <Chip
-              label={'+10'}
-              size="small"
-              sx={{
-                bgcolor: (theme) => theme.colors.secondary.main,
-                color: 'white'
-              }}
-            />
-          </CardFooter>
+          {!!connections && (
+            <CardFooter>
+              <Chip
+                label={`+${connections}`}
+                size="small"
+                sx={{
+                  bgcolor: (theme) => theme.colors.secondary.main,
+                  color: 'white'
+                }}
+              />
+            </CardFooter>
+          )}
         </ConnectorItem>
         <Stack
           sx={{
