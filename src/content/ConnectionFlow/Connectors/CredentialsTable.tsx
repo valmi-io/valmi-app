@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 
-import { Table, TableBody, TableHead, TableContainer, TableRow, styled } from '@mui/material';
+import { Table, TableBody, TableHead, TableContainer, Paper } from '@mui/material';
 
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
@@ -21,7 +21,7 @@ const CredentialsTable = ({ credentials }: { credentials: any }) => {
   };
 
   return (
-    <TableContainer>
+    <TableContainer component={Paper} variant="outlined">
       <Table>
         <TableHead>
           <TableHeader columns={CredentialsColumns} />

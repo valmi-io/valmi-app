@@ -2,23 +2,21 @@ import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch } from 'react-redux';
-
 import { NextPageWithLayout } from '@/pages_app';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
-import { AppDispatch } from '@store/store';
 import ContentLayout from '@/layouts/ContentLayout';
 import CredentialsTable from '@/content/ConnectionFlow/Connectors/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
-import { getBaseRoute, getCombinedConnectors } from '@/utils/lib';
+import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 
 const PageContent = ({ data }: { data: any }) => {
+  console.log('page content:_', data);
   if (data.length > 0) {
     // Display credentials when credentials data length > 0
     return <CredentialsTable credentials={data} />;
@@ -27,7 +25,6 @@ const PageContent = ({ data }: { data: any }) => {
 
 const CredentialsPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
   const { workspaceId = '' } = useWorkspaceId();
   const searchParams = useSearchParams();
 

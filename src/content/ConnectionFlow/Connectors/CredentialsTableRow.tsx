@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Avatar, Chip, TableCell, TableRow, Typography, styled } from '@mui/material';
+import { Avatar, Box, Chip, TableCell, TableRow, Typography, styled } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import {
@@ -17,6 +17,11 @@ interface CredentialsTableRowProps {
   onClick: (credentialId: any) => void;
 }
 
+const UserAccountLayout = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center'
+}));
+
 const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) => {
   console.log('CREDS:', credential);
 
@@ -29,12 +34,12 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
     }
 
     return (
-      <BoxLayout display="flex">
+      <UserAccountLayout>
         <Avatar
           sx={{
             width: 25,
             height: 25,
-            marginRight: (theme) => theme.spacing(1),
+            marginRight: 1,
             backgroundColor: (theme) => theme.palette.text.disabled
           }}
           src={imageSrc || undefined}
@@ -43,7 +48,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
         <Typography variant="body2" color="text.primary" noWrap>
           {external_id}
         </Typography>
-      </BoxLayout>
+      </UserAccountLayout>
     );
   };
 
@@ -55,6 +60,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
       return connector?.connector_config?.database;
     } else return connector?.connector_type;
   };
+
   return (
     <TableRow hover key={credential?.id}>
       <TableCellComponent text={getNameCellValue(credential)} />

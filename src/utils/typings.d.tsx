@@ -33,3 +33,17 @@ export type TPrompt = {
   description: string;
   enabled: boolean;
 };
+
+export type TCatalogModes = 'etl' | 'retl';
+
+export type TOAuthKeys = 'private' | 'public';
+
+export type TCatalog = {
+  display_name: string;
+  docker_image: string;
+  docker_tag: string;
+  oauth?: boolean;
+  type: string;
+  oauth_keys?: TOAuthKeys;
+  mode?: TCatalogModes[];
+};

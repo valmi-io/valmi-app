@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Checkbox, IconButton, MenuItem, TableCell, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, IconButton, MenuItem, TableCell, Tooltip, Typography } from '@mui/material';
 
 import ImageComponent, { ImageComponentProps } from '@components/ImageComponent';
 import CustomIcon from '@/components/Icon/CustomIcon';
