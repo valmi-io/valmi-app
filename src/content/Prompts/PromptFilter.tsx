@@ -7,18 +7,18 @@ import { transformFilters } from '@/utils/filters-transform-utils';
 
 
 // Interface for filter options
-export interface Filter {
+interface Filter {
   column: string;
   column_type: string;
 }
 
 // Interface for operators
-export interface Operator {
+interface Operator {
   [key: string]: string[];
 }
 
 // Interface for applied filters
-export interface AppliedFilter {
+interface AppliedFilter {
   column: string;
   column_type: string;
   operator: string;

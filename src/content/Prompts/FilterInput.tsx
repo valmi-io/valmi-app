@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextField } from '@mui/material';
 
-export interface AppliedFilter {
+interface AppliedFilter {
     column: string;
     column_type: string;
     operator: string;

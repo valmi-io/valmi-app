@@ -1,4 +1,4 @@
-export interface AppliedFilter {
+interface AppliedFilter {
     column: string;
     column_type: string;
     operator: string;
