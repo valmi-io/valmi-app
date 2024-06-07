@@ -345,6 +345,8 @@ export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type:
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
 };
 
+const EXCLUDE_SCOPES = ['locations', 'shop'];
+
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
   const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
@@ -355,7 +357,7 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
 
   const streams = rows.filter(({ name }: { name: string }) => {
     // HACK: return true if stream and namesInScopes are the same
-    return !!(name !== 'locations');
+    if (!EXCLUDE_SCOPES.includes(name)) return true;
   });
 
   return streams;

@@ -52,6 +52,7 @@ export interface TCatalog {
 
 export interface TCredential extends TCatalog {
   id: string;
+  name: string;
   account: TAccount;
   connector_config: any;
 }
