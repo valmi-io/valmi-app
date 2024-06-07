@@ -16,8 +16,8 @@ interface FilterInputProps {
 
 const FilterInput: React.FC<FilterInputProps> = ({ appliedFilter, index, handleFilterChange }) => {
   const getInputField = () => {
-    switch (appliedFilter.column_type) {
-      case 'STRING':
+    switch (appliedFilter.column_type.toLowerCase()) {
+      case 'string':
         return (
           <TextField
             value={appliedFilter.value}
@@ -26,7 +26,7 @@ const FilterInput: React.FC<FilterInputProps> = ({ appliedFilter, index, handleF
           />
         );
 
-      case 'INTEGER':
+      case 'integer':
         return (
           <TextField
             type="number"
@@ -37,7 +37,7 @@ const FilterInput: React.FC<FilterInputProps> = ({ appliedFilter, index, handleF
           />
         );
 
-      case 'DATE':
+      case 'date':
         return (
           <TextField
             type="date"
