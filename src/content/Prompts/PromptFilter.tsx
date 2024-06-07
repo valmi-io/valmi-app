@@ -5,6 +5,7 @@ import FilterInput from './FilterInput';
 import DateRangePicker from '@components/DateRangePicker';
 import { transformFilters } from '@utils/filter-utils';
 
+
 // Interface for filter options
 export interface Filter {
   column: string;
@@ -30,18 +31,16 @@ interface PromptFilterProps {
   applyFilters: (data: AppliedFilter[]) => void;
 }
 
+
 const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standardOperators, applyFilters }) => {
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
-
   const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>(
     getDateRange('last30days')
   );
-
   const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | null>(null);
 
-  const handleDateRangeChange = (e: React.ChangeEvent<{ value: unknown }>) => {
-    const selectedRange = e.target.value as string;
-    setDateRange(getDateRange(selectedRange));
+  const handleDateRangeChange = (value: string) => {
+    setDateRange(getDateRange(value));
   };
 
   const handleAddFilter = () => {

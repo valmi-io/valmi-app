@@ -29,7 +29,7 @@ export const transformFilters = (appliedFilters: AppliedFilter[]): AppliedFilter
     if (filter.column_type === 'STRING' && filter.operator === 'IN') {
       transformedFilter.value = filter.value
         .split(',')
-        .map(item => `'${item.trim()}'`)
+        .map((item: string) => `'${item.trim()}'`)
         .join(',');
     }
 
