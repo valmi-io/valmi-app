@@ -144,7 +144,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
     });
   };
 
-  const PageContent = ({ initialData }: { initialData: any }) => {
+  const renderContent = ({ initialData }: { initialData: any }) => {
     const [data, setData] = useState(initialData);
 
     const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
@@ -205,7 +205,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
       <ContentLayout
         key={`createOAuthConfiguration${type}`}
         error={error || keysError}
-        PageContent={<PageContent initialData={processData(keys ?? initialData)} />}
+        PageContent={renderContent({ initialData: processData(keys ?? initialData) })}
         displayComponent={(!error || !keysError) && (!isLoading || !isKeysLoading) && schema && keys}
         isLoading={isLoading && isKeysLoading}
         traceError={traceError || isKeysTraceError}

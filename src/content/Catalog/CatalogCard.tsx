@@ -104,7 +104,7 @@ const CatalogCard = ({ catalog, handleCatalogOnClick }: CatalogCardProps) => {
               style={{
                 fontSize: ImageSize.large,
                 backgroundColor: 'white',
-                borderRadius: ImageSize.large
+                borderRadius: '100%'
               }}
               icon={appIcons.CIRCLE_PLUS_OUTLINED}
             />
