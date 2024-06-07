@@ -1,32 +1,17 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
- * Author: Nagendra S @ valmi.io
- */
+import React, { useCallback } from 'react';
 
-import React from 'react';
-
-import { styled, darken, Chip, Stack, IconButton, Typography } from '@mui/material';
+import { styled, Chip, Stack, IconButton, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 
-import { ConnectorModel } from '@content/Connections/ConnectionModel';
-
 import ImageComponent, { ImageSize } from '@components/ImageComponent';
-import { EventSourceType } from '@/constants/extDestinations';
 import CustomIcon from '@/components/Icon/CustomIcon';
 import appIcons from '@/utils/icon-utils';
-import SubmitButton from '@/components/SubmitButton';
+import { TCatalog } from '@/utils/typings.d';
 
-interface ConnectorCardProps {
-  item: ConnectorModel | EventSourceType;
-  handleConnectorOnClick: (data: any) => void;
-  selected?: boolean;
-  src: string;
-  displayName: string;
-  type?: string;
-  mode?: string[];
-  connections: number;
+interface CatalogCardProps {
+  catalog: TCatalog;
+  handleCatalogOnClick: (data: TCatalog) => void;
 }
 
 const CardWrapper = styled(Paper)(({ theme }) => ({
@@ -37,7 +22,7 @@ const CardWrapper = styled(Paper)(({ theme }) => ({
   position: 'relative'
 }));
 
-export const ConnectorItem = styled(Paper)(({ theme }) => ({
+export const CatalogItem = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -65,37 +50,36 @@ const CardFooter = styled(Paper)(({ theme }) => ({
   backgroundColor: 'transparent'
 }));
 
-const ConnectorCard = ({
-  item,
-  handleConnectorOnClick,
-  selected = false,
-  src = '',
-  displayName = '',
-  type = 'src',
-  mode,
-  connections
-}: ConnectorCardProps) => {
+const ConnectionCountChip = styled(Chip)(({ theme }) => ({
+  backgroundColor: theme.colors.secondary.main,
+  color: theme.colors.alpha.white[100]
+}));
+
+const CatalogCard = ({ catalog, handleCatalogOnClick }: CatalogCardProps) => {
+  const { connections = 0, display_name: displayName = '' } = catalog;
+
+  const handleOnClick = useCallback(() => {
+    handleCatalogOnClick(catalog);
+  }, [catalog]);
+
+  const catalogType: string = catalog.type.split('_').slice(1).join('_');
+
+  const catalogIconSource = `/connectors/${catalogType.toLowerCase()}.svg`;
+
   return (
     <Grid item xs={'auto'}>
       <CardWrapper variant="outlined">
-        <ConnectorItem>
-          <ImageComponent src={src} alt="connector" size={ImageSize.connectorCard} />
+        <CatalogItem>
+          <ImageComponent src={catalogIconSource} alt="connector" size={ImageSize.connectorCard} />
           <Typography variant="caption" textTransform={'uppercase'}>
             {displayName}
           </Typography>
           {!!connections && (
             <CardFooter>
-              <Chip
-                label={`+${connections}`}
-                size="small"
-                sx={{
-                  bgcolor: (theme) => theme.colors.secondary.main,
-                  color: 'white'
-                }}
-              />
+              <ConnectionCountChip label={`+${connections}`} size="small" />
             </CardFooter>
           )}
-        </ConnectorItem>
+        </CatalogItem>
         <Stack
           sx={{
             display: 'flex',
@@ -115,12 +99,12 @@ const ConnectorCard = ({
             }
           }}
         >
-          <IconButton color="primary" onClick={() => handleConnectorOnClick(item)}>
+          <IconButton color="primary" onClick={handleOnClick}>
             <CustomIcon
               style={{
                 fontSize: ImageSize.large,
                 backgroundColor: 'white',
-                borderRadius: '100%'
+                borderRadius: ImageSize.large
               }}
               icon={appIcons.CIRCLE_PLUS_OUTLINED}
             />
@@ -131,4 +115,4 @@ const ConnectorCard = ({
   );
 };
 
-export default ConnectorCard;
+export default CatalogCard;

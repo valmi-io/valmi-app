@@ -5,8 +5,6 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { FC } from 'react';
-
 import { useRouter } from 'next/router';
 
 import {

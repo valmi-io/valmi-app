@@ -193,9 +193,9 @@ export const apiSlice = createApi({
 
     fetchConnectors: builder.query({
       // The URL for the request is '/api/v1/connectors'
-      query: () => {
+      query: ({ workspaceId }) => {
         return {
-          url: `/connectors/`
+          url: `${workspaceId}/connectors`
         };
       }
     }),

@@ -29,3 +29,9 @@ export const redirectToCreateConnection = ({ router, wid }: { router: NextRouter
     router.push(`${getBaseRoute(wid)}/connections/create`);
   }
 };
+
+export const redirectToCredentials = ({ router, wid, type }: { router: NextRouter; wid: string; type: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/catalog/credentials?type=${type}`);
+  }
+};
