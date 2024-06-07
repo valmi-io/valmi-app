@@ -1,7 +1,9 @@
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import SubmitButton from '@/components/SubmitButton';
+import CatalogInstuctions from '@/content/Catalog/CatalogInstuctions';
 import { OAuthContext } from '@/contexts/OAuthContext';
+import FormLayout from '@/layouts/FormLayout';
 import { RootState } from '@/store/reducers';
 import { getSelectedConnectorKey, isConnectionAutomationFlow } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
@@ -66,34 +68,37 @@ const IntegrationSpec = ({
       const { valid, errors } = jsonFormValidator(schema, formState);
 
       return (
-        <>
-          <JsonForms
-            readonly={status === 'submitting'}
-            schema={schema}
-            data={formState}
-            renderers={customRenderers}
-            cells={materialCells}
-            onChange={handleFormChange}
-          />
-          <Stack
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              alignItems: 'center'
-            }}
-          >
-            <SubmitButton
-              buttonText={getButtonTitle()}
-              data={status === 'success'}
-              isFetching={status === 'submitting'}
-              disabled={!valid || status === 'submitting'}
-              onClick={() => handleSubmit(formState)}
-            />
-          </Stack>
-
-          {/* <ConnectionCheck key={'ConnectionCheck'} state={state} isDiscovering={isDiscovering} /> */}
-        </>
+        <FormLayout
+          formComp={
+            <>
+              <JsonForms
+                readonly={status === 'submitting'}
+                schema={schema}
+                data={formState}
+                renderers={customRenderers}
+                cells={materialCells}
+                onChange={handleFormChange}
+              />
+              <Stack
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
+                  alignItems: 'center'
+                }}
+              >
+                <SubmitButton
+                  buttonText={getButtonTitle()}
+                  data={status === 'success'}
+                  isFetching={status === 'submitting'}
+                  disabled={!valid || status === 'submitting'}
+                  onClick={() => handleSubmit(formState)}
+                />
+              </Stack>
+            </>
+          }
+          instructionsComp={<CatalogInstuctions data={specData} selected_connector={selectedConnector} />}
+        />
       );
     }
   };
