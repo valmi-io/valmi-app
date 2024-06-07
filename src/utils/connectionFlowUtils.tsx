@@ -354,7 +354,8 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
   const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
 
   const streams = rows.filter(({ name }: { name: string }) => {
-    if (namesInScopes.includes(name)) return true;
+    // HACK: return true if stream and namesInScopes are the same
+    return !!(name !== 'locations');
   });
 
   return streams;
