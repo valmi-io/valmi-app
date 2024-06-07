@@ -1,11 +1,11 @@
 import { Step } from '@/components/Stepper';
 import constants from '@/constants';
-import { ConnectorType, NewConnectorType } from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { NewConnectorType } from '@/content/Catalog/CatalogList';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
 import { isObjectEmpty } from '@/utils/lib';
-import { TData } from '@/utils/typings.d';
+import { TCatalog, TData } from '@/utils/typings.d';
 
 export type TStream = {
   name: string;
@@ -54,7 +54,7 @@ export const connectionScheduleSchema = {
   required: ['name', 'run_interval']
 };
 
-export const getSelectedConnectorObj = (item: ConnectorType, key: string) => {
+export const getSelectedConnectorObj = (item: TCatalog, key: string) => {
   const obj: { type: string; display_name: string; oauth: boolean; oauth_keys: string; mode: string } = {
     type: item.type ?? item.connector_type ?? {},
     display_name: item.display_name,

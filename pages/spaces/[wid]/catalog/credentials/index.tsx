@@ -8,19 +8,24 @@ import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 
 import ContentLayout from '@/layouts/ContentLayout';
-import CredentialsTable from '@/content/ConnectionFlow/Connectors/CredentialsTable';
+import CredentialsTable from '@/content/Credentials/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
 import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
+import ListEmptyComponent from '@/components/ListEmptyComponent';
+import { TCredential } from '@/utils/typings.d';
 
-const PageContent = ({ data }: { data: any }) => {
+const PageContent = ({ data }: { data: TCredential[] }) => {
   console.log('page content:_', data);
   if (data.length > 0) {
     // Display credentials when credentials data length > 0
     return <CredentialsTable credentials={data} />;
   }
+
+  /** Display empty component */
+  return <ListEmptyComponent description={'No credentials found for this catalog'} />;
 };
 
 const CredentialsPage: NextPageWithLayout = () => {

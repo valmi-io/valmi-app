@@ -24,12 +24,29 @@ import { setConnectionFlow } from '@store/reducers/connectionFlow';
 import { initialiseConnectionFlowState } from '@utils/connection-utils';
 import ContentLayout from '@/layouts/ContentLayout';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToCreateConnection } from '@/utils/router-utils';
 
 type ConnectionLayoutProps = {
   pageHeadTitle: string;
   title: string;
   buttonTitle: string;
   connectionType: string;
+};
+
+const PageContent = ({
+  filteredConnectionsData,
+  connectionType
+}: {
+  filteredConnectionsData: any;
+  connectionType: string;
+}) => {
+  if (filteredConnectionsData.length > 0) {
+    // Display connections when connections data length > 0
+    return <ConnectionsTable connections={filteredConnectionsData} connectionType={connectionType} />;
+  }
+
+  /** Display empty component */
+  return <ListEmptyComponent description={'No connections found in this workspace'} />;
 };
 
 const Connections = (props: ConnectionLayoutProps) => {
@@ -53,18 +70,6 @@ const Connections = (props: ConnectionLayoutProps) => {
     initialiseConnectionFlowState(dispatch, connection_flow, connectionType);
   }, []);
 
-  const PageContent = () => {
-    if (filteredConnectionsData.length > 0) {
-      // Display connections when connections data length > 0
-      return <ConnectionsTable connections={filteredConnectionsData} connectionType={connectionType} />;
-    }
-
-    {
-      /** Display empty component */
-    }
-    return <ListEmptyComponent description={'No connections found in this workspace'} />;
-  };
-
   const navigateToCreateConnectionsPage = () => {
     // update connection_type in connection_flow state.
     dispatch(
@@ -76,7 +81,7 @@ const Connections = (props: ConnectionLayoutProps) => {
       })
     );
 
-    router.push(`/spaces/${workspaceId}/connections/create`);
+    redirectToCreateConnection({ router: router, wid: workspaceId });
   };
 
   return (
@@ -90,7 +95,9 @@ const Connections = (props: ConnectionLayoutProps) => {
         <ContentLayout
           key={`connectionsPage-${connectionType}`}
           error={connectionsError}
-          PageContent={<PageContent />}
+          PageContent={
+            <PageContent connectionType={connectionType} filteredConnectionsData={filteredConnectionsData} />
+          }
           displayComponent={!connectionsError && !isFetching && filteredConnectionsData}
           isLoading={isFetching}
           traceError={traceError}

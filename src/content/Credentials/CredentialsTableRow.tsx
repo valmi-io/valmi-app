@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Avatar, Box, Chip, TableCell, TableRow, Typography, styled } from '@mui/material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Avatar, Box, TableCell, TableRow, Typography, styled } from '@mui/material';
 
 import {
   TableCellComponent,
@@ -9,7 +8,6 @@ import {
   TableCellWithImage
 } from '@components/Table/TableCellComponent';
 import { ImageSize } from '@/components/ImageComponent';
-import { BoxLayout } from '@/components/Layouts/Layouts';
 import { stringAvatar } from '@/utils/lib';
 
 interface CredentialsTableRowProps {
@@ -23,8 +21,6 @@ const UserAccountLayout = styled(Box)(({ theme }) => ({
 }));
 
 const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) => {
-  console.log('CREDS:', credential);
-
   const userAccountTableCell = (account: any) => {
     const { external_id = 'account', profile = '' } = account || {};
     let imageSrc = '';
@@ -70,10 +66,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
         src={`/connectors/${credential?.connector_type?.split('_')[1].toLowerCase()}.svg`}
         size={ImageSize.small}
       />
-      <TableCellWithActionButton
-        tooltip={'Edit connection'}
-        onClick={() => onClick({ connectionId: credential?.id })}
-      />
+      <TableCellWithActionButton tooltip={'Edit credential'} onClick={() => onClick({ credential: credential })} />
     </TableRow>
   );
 };

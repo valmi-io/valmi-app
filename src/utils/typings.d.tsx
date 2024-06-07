@@ -38,7 +38,7 @@ export type TCatalogModes = 'etl' | 'retl';
 
 export type TOAuthKeys = 'private' | 'public';
 
-export type TCatalog = {
+export interface TCatalog {
   display_name: string;
   docker_image: string;
   docker_tag: string;
@@ -46,4 +46,20 @@ export type TCatalog = {
   type: string;
   oauth_keys?: TOAuthKeys;
   mode?: TCatalogModes[];
+  connector_type?: string; // returns from credentials object.
+  connections?: number;
+}
+
+export interface TCredential extends TCatalog {
+  id: string;
+  account: TAccount;
+  connector_config: any;
+}
+
+export type TAccount = {
+  id: string;
+  name: string;
+  external_id: string;
+  meta_data: any;
+  profile: string;
 };
