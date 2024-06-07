@@ -120,29 +120,28 @@ export const nextAuthOptions = (req, res) => {
               image: token?.picture
             };
 
-            const { access_token, id_token, provider, type, expires_at, refresh_token, scope, token_type } = account;
-            const { name, email } = token;
+            console.log('[next-auth] account:_', account);
 
-            let authMeta = JSON.parse(req.cookies.authMeta);
+            console.log('[next-auth] authMeta', JSON.parse(req?.cookies?.authMeta));
 
-            console.log('[next-auth] authMeta', authMeta);
+            let authMeta = JSON.parse(req?.cookies?.authMeta);
 
             let payload = {
               account: {
-                provider: provider,
-                type: type,
-                access_token: access_token,
-                expires_at: expires_at,
-                refresh_token: refresh_token,
-                scope: scope,
-                token_type: token_type,
-                id_token: id_token
+                provider: account.provider,
+                type: account.type,
+                access_token: account.access_token,
+                expires_at: account.expires_at,
+                refresh_token: account.refresh_token,
+                scope: account.scope,
+                token_type: account.token_type,
+                id_token: account.id_token
               },
               user: {
-                name: name,
-                email: email,
+                name: token.name,
+                email: token.email,
                 meta: {
-                  ...authMeta.meta
+                  ...authMeta?.meta
                 }
               }
             };
@@ -169,9 +168,9 @@ export const nextAuthOptions = (req, res) => {
 
             return {
               ...token,
-              accessToken: access_token,
+              accessToken: account.access_token,
               expires_at: account.expires_at,
-              refreshToken: refresh_token,
+              refreshToken: account.refresh_token,
               user: userProfile
             };
           }
