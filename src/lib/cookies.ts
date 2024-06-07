@@ -1,4 +1,3 @@
-import { Session } from 'next-auth/core/types';
 import Cookies from 'react-cookies';
 
 // Type for the options object used in cookie operations
@@ -61,7 +60,8 @@ export async function setAuthTokenCookie(authToken: string) {
 }
 
 export async function setAuthMetaCookie(data: any) {
-  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? '';
+  console.log('[cookies.ts] storing auth meta:_', data);
+  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? {};
   if (!meta) {
     setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));
   }

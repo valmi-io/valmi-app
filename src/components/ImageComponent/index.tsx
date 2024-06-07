@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import Image from 'next/image';
 
 export enum ImageSize {
@@ -24,6 +24,11 @@ export interface ImageComponentProps {
   style?: React.CSSProperties;
 }
 
+const BoxLayout = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center'
+}));
+
 const ImageComponent = (props: ImageComponentProps) => {
   const { src, alt, title, style, size } = props;
 
@@ -34,7 +39,7 @@ const ImageComponent = (props: ImageComponentProps) => {
   };
 
   return (
-    <>
+    <BoxLayout>
       <Image
         priority={true}
         src={src}
@@ -48,7 +53,7 @@ const ImageComponent = (props: ImageComponentProps) => {
           {title}
         </Typography>
       )}
-    </>
+    </BoxLayout>
   );
 };
 
