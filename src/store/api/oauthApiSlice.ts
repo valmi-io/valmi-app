@@ -52,11 +52,11 @@ export const oAuthApiSlice = apiSlice.injectEndpoints({
     }),
 
     getConfiguredConnectors: builder.query({
-      query: (workspaceId) => `/connectors/${workspaceId}/configured`
+      query: (workspaceId) => `${workspaceId}/connectors/configured`
     }),
 
     getNotConfiguredConnectors: builder.query({
-      query: (workspaceId) => `/connectors/${workspaceId}/not-configured`
+      query: (workspaceId) => `${workspaceId}/connectors/not_configured`
     })
   }),
   //@ts-ignore

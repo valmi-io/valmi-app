@@ -82,8 +82,6 @@ const OAuthAppsPage: NextPageWithLayout = () => {
   };
 
   const onSubmitClick = ({ type }: { type: any }) => {
-    // let { type = '' } = connectorState;
-
     const connector = type.split('_')[0] ?? '';
 
     type = type.split('_')[1];
@@ -95,6 +93,8 @@ const OAuthAppsPage: NextPageWithLayout = () => {
 
   const configured = getConnectors({ connectors: configuredConnectors });
   const notConfigured = getConnectors({ connectors: notConfiguredConnectors });
+
+  console.log('configured connectors', { configured, notConfigured });
 
   return (
     <PageLayout pageHeadTitle="OAuth" title="" displayButton={false}>
@@ -131,14 +131,6 @@ const OAuthAppsPage: NextPageWithLayout = () => {
           />
         </Grid>
       )}
-      <Box
-        sx={{
-          margin: (theme) => theme.spacing(2),
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end'
-        }}
-      ></Box>
     </PageLayout>
   );
 };

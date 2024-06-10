@@ -12,6 +12,9 @@ import constants from '@constants/index';
 import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
 
+const credentialsAdapter: any = createEntityAdapter();
+const initialState = credentialsAdapter.getInitialState();
+
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
@@ -190,9 +193,9 @@ export const apiSlice = createApi({
 
     fetchConnectors: builder.query({
       // The URL for the request is '/api/v1/connectors'
-      query: () => {
+      query: ({ workspaceId }) => {
         return {
-          url: `/connectors/`
+          url: `${workspaceId}/connectors`
         };
       }
     }),
@@ -456,3 +459,15 @@ export const {
   useLazyGetSyncRunLogsByIdQuery,
   useLazyLogoutUserQuery
 } = apiSlice;
+
+export const fetchCredentialsSelectors = (workspaceId: string) => {
+  const fetchCredentialsResult = extendedApiSlice.endpoints.fetchCredentials.select(workspaceId);
+
+  const fetchCredentialsData = createSelector(fetchCredentialsResult, (usersResult) => usersResult.data);
+
+  const { selectAll: fetchAllCredentials, selectById: fetchAllCredentialsId } =
+    // @ts-ignore
+    credentialsAdapter.getSelectors((state) => fetchCredentialsData(state) ?? initialState);
+
+  return { fetchAllCredentials, fetchAllCredentialsId };
+};

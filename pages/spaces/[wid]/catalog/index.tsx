@@ -1,34 +1,29 @@
-import React, { ReactElement, useEffect } from 'react';
-
-import { useRouter } from 'next/router';
+import React, { ReactElement } from 'react';
 
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
-import { Paper, Stack } from '@mui/material';
+import { Paper, Stack, styled } from '@mui/material';
 
-import { getCombinedConnectors } from '@/utils/lib';
 import { useFetchConnectorsQuery } from '@store/api/apiSlice';
 import { useFetch } from '@/hooks/useFetch';
 import constants from '@constants/index';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import SkeletonLoader from '@/components/SkeletonLoader';
-import ConnectorsPageContent from '@/content/ConnectionFlow/Connectors/ConnectorsPageContent';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import CatalogList from '@/content/Catalog/CatalogList';
+
+const StackContainer = styled(Stack)(({}) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center'
+}));
 
 const CatalogPage = () => {
-  const router = useRouter();
-
   const { workspaceId = '' } = useWorkspaceId();
 
   const { data, isLoading, error, traceError } = useFetch({
-    query: useFetchConnectorsQuery({}, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+    query: useFetchConnectorsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
-
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('mode', 'all');
-    router.push(url);
-  }, []);
 
   return (
     <PageLayout pageHeadTitle="Integrations" title={constants.catalog.CREATE_CONNECTION_TITLE} displayButton={false}>
@@ -43,9 +38,7 @@ const CatalogPage = () => {
         <SkeletonLoader loading={isLoading} />
 
         {/** Display page content */}
-        <Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          {!error && !isLoading && data && <ConnectorsPageContent data={data && getCombinedConnectors(data)} />}
-        </Stack>
+        <StackContainer>{!error && !isLoading && data && <CatalogList catalogs={data?.SRC ?? []} />}</StackContainer>
       </Paper>
     </PageLayout>
   );

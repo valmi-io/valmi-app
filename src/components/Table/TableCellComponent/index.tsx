@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Checkbox, IconButton, MenuItem, TableCell, Tooltip, Typography } from '@mui/material';
+import { Box, Checkbox, IconButton, MenuItem, TableCell, Tooltip, Typography } from '@mui/material';
 
 import ImageComponent, { ImageComponentProps } from '@components/ImageComponent';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -77,14 +77,13 @@ export const TableCellWithActionButton = ({
             '&:hover': {
               background: (theme) => theme.colors.primary.lighter
             },
-            color: (theme) => theme.palette.primary.main
+            color: (theme) => theme.palette.secondary.main
           }}
           color="inherit"
           size="small"
           onClick={onClick}
         >
           <CustomIcon icon={appIcons[actionType]} />
-          {/* <EditTwoToneIcon fontSize="small" /> */}
         </IconButton>
       </Tooltip>
     </TableCell>

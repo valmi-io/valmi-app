@@ -8,9 +8,6 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 import LanguageIcon from '@mui/icons-material/Language';
 
-import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import PeopleIcon from '@mui/icons-material/People';
-import MonitorIcon from '@mui/icons-material/Monitor';
 import {
   faArrowRight,
   faCalendar,
@@ -39,7 +36,8 @@ import {
   faCaretDown,
   faTimeline,
   faSliders,
-  faPlug
+  faPlug,
+  faT
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faWpexplorer } from '@fortawesome/free-brands-svg-icons';
@@ -82,6 +80,7 @@ export interface IAppIcons {
   CIRCLE_DOT: IconDefinition;
   WARNING: IconDefinition;
   CARET_DOWN: IconDefinition;
+  TITLE: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -119,7 +118,8 @@ const appIcons: IAppIcons = {
   DATA_FLOWS: { ...faSliders },
   CIRCLE_DOT: { ...faCircleDot },
   WARNING: { ...faTriangleExclamation },
-  CARET_DOWN: { ...faCaretDown }
+  CARET_DOWN: { ...faCaretDown },
+  TITLE: { ...faT }
 };
 
 export default appIcons;

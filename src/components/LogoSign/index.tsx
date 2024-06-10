@@ -26,7 +26,16 @@ function Logo() {
 }
 
 export function SidebarLogo() {
-  return <Image priority={true} src="/images/valmi_logo_sidebar.svg" alt="Logo" width={156.8} height={32} />;
+  return (
+    <Image
+      priority={true}
+      src="/images/valmi_logo_sidebar.svg"
+      alt="Logo"
+      width="0"
+      height="0"
+      style={{ height: 32, width: 156.8 }}
+    />
+  );
 }
 
 export default Logo;

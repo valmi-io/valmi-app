@@ -6,10 +6,8 @@
  */
 
 import React, { useState } from 'react';
-import { Box, styled, Stack, Typography, Paper, Button, Link } from '@mui/material';
+import { Box, styled, Stack, Button } from '@mui/material';
 
-import ImageComponent, { ImageSize } from '@components/ImageComponent';
-import { getCustomRenderers } from '@/utils/form-customRenderers';
 import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
 import { GoogleSignInButton } from '@/components/AuthButtons';
 import { formValidationMode, jsonFormValidator } from '@/utils/form-utils';
@@ -19,27 +17,10 @@ import { AppDispatch } from '@/store/store';
 import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
 import { RootState } from '@/store/reducers';
 import { signIn } from 'next-auth/react';
-import { JsonFormsWrapper } from '@/components/JsonFormsWrapper';
-
-const schema = {
-  $schema: 'http://json-schema.org/draft-07/schema#',
-  type: 'object',
-  properties: {
-    promotion: {
-      type: 'boolean',
-      title: 'Check to receive latest product updates over email',
-      const: true,
-      description: 'Select this checkbox to receive emails about new product features and announcements'
-    },
-    role: {
-      type: 'string',
-      title: 'You are part of',
-      enum: ['Engineering', 'Marketing', 'Other'],
-      description: "Select your role from the dropdown menu. If your role isn't listed, choose 'Other'"
-    }
-  },
-  required: ['promotion', 'role']
-};
+import AuthenticationFormHeader from '@/content/Authentication/AuthenticationFormHeader';
+import AuthenticationForm from '@/content/Authentication/AuthenticationForm';
+import { loginFormSchema } from '@/utils/login-utils';
+import PrivacyPolicy from '@/content/Authentication/PrivacyPolicy';
 
 const ContainerLayout = styled(Box)(({ theme }) => ({
   boxSizing: 'border-box',
@@ -68,20 +49,6 @@ const DetailBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1)
 }));
 
-const TextLayout = styled(Typography)(({ theme }) => ({
-  maxWidth: '520px'
-}));
-
-const FormLayout = styled(Paper)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  padding: theme.spacing(1, 0),
-  maxWidth: '520px'
-}));
-
 const AuthenticationLayout = () => {
   const dispatch = useDispatch<AppDispatch>();
   const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
@@ -93,16 +60,10 @@ const AuthenticationLayout = () => {
   const [formValidationState, setFormValidationState] = useState<formValidationMode>('ValidateAndHide');
 
   /**
-   * Retrieves custom renderers for the JSONForms component based on the provided configuration
-   * (e.g., hiding specific fields).
-   */
-  const handleFormRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
-
-  /**
    * Validates the user-submitted data (`formData`) against the defined schema (`schema`)
    * and returns an object containing a `valid` flag and any encountered `errors`.
    */
-  const { valid, errors } = jsonFormValidator(schema, formData);
+  const { valid, errors } = jsonFormValidator(loginFormSchema, formData);
 
   /**
    * Updates the `formData` state with the new data received from the JSONForms component
@@ -171,38 +132,26 @@ const AuthenticationLayout = () => {
    */
   const handleLoginModes = () => {
     setFormData({});
+    setFormValidationState('ValidateAndHide');
     setIsUserNew(!isUserNew);
   };
 
   return (
     <ContainerLayout>
       <DetailBox sx={isUserNew ? { justifyContent: 'center' } : { justifyContent: 'space-evenly' }}>
-        {/** valmi - logo */}
-        <Stack alignItems="center">
-          <ImageComponent
-            src={'/images/valmi_logo_text_black.svg'}
-            alt="Logo"
-            size={ImageSize.logo}
-            style={{ height: '55px', width: '273px' }}
-          />
-        </Stack>
-        <TextLayout variant="body1">
-          {isUserNew
-            ? 'Create your free Valmi account using your Google account. Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'
-            : 'Sync your eCommerce data to Google Sheets, analyze and engage with your customers.'}
-        </TextLayout>
+        {/** Header */}
+        <AuthenticationFormHeader isUserNew={isUserNew} />
 
-        {isUserNew ? (
-          <FormLayout key={`${isUserNew ? 'Login' : 'Signup'}Form`}>
-            <JsonFormsWrapper
-              formValidationState={formValidationState}
-              onChange={handleFormDataChange}
-              renderers={handleFormRenderers}
-              schema={schema}
-              data={formData}
-            />
-          </FormLayout>
-        ) : null}
+        {isUserNew && (
+          <AuthenticationForm
+            key={`${isUserNew ? 'Login' : 'Signup'}Form`}
+            formData={formData}
+            formValidationState={formValidationState}
+            handleFormDataChange={handleFormDataChange}
+            schema={loginFormSchema}
+          />
+        )}
+
         <Stack
           sx={{
             width: '100%'
@@ -215,15 +164,8 @@ const AuthenticationLayout = () => {
             />
           </Button>
         </Stack>
-        <Stack sx={{ alignSelf: 'start' }}>
-          <Typography variant="body1">
-            By signing {isUserNew ? 'up' : 'in'}, you agree to Valmi.io's
-            <Link sx={{ ml: 1 }} href="https://www.valmi.io/privacy-policy">
-              Privacy Policy
-            </Link>{' '}
-            .
-          </Typography>
-        </Stack>
+
+        <PrivacyPolicy isUserNew={isUserNew} />
       </DetailBox>
     </ContainerLayout>
   );

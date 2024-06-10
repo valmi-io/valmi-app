@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -14,9 +14,27 @@ import { useSession } from 'next-auth/react';
 import { initialiseAppState } from '@/utils/login-utils';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setAuthTokenCookie, setCookie } from '@/lib/cookies';
+import { setAuthTokenCookie } from '@/lib/cookies';
 import { useUser } from '@/hooks/useUser';
+import { CircularProgress, Stack, Typography, styled } from '@mui/material';
+import BaseLayout from '@/layouts/BaseLayout';
 import { isObjectEmpty } from '@/utils/lib';
+
+const LoadingLayout = styled(Stack)(({}) => ({
+  width: '100%',
+  height: '100%',
+  justifyContent: 'center',
+  alignItems: 'center'
+}));
+
+const Loading = () => {
+  return (
+    <LoadingLayout spacing={2}>
+      <CircularProgress color="success" />
+      <Typography variant="body1">Loading workspaces...</Typography>
+    </LoadingLayout>
+  );
+};
 
 const HomePage = () => {
   const router = useRouter();
@@ -50,7 +68,6 @@ const HomePage = () => {
   // This function checks if session exists. If exists, saves session to redux store.
   useEffect(() => {
     if (session) {
-      console.log('Session:_', session);
       if (session?.user && !workspaceId) {
         const data = {
           ...session.user,
@@ -71,8 +88,13 @@ const HomePage = () => {
   return (
     <>
       <Head />
+      {loginFlowState !== 'DEFAULT' && <Loading />}
     </>
   );
+};
+
+HomePage.getLayout = function getLayout(page: ReactElement) {
+  return <BaseLayout>{page}</BaseLayout>;
 };
 
 export default HomePage;

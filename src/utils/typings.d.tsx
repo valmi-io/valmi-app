@@ -33,3 +33,34 @@ export type TPrompt = {
   description: string;
   enabled: boolean;
 };
+
+export type TCatalogModes = 'etl' | 'retl';
+
+export type TOAuthKeys = 'private' | 'public';
+
+export interface TCatalog {
+  display_name: string;
+  docker_image: string;
+  docker_tag: string;
+  oauth?: boolean;
+  type: string;
+  oauth_keys?: TOAuthKeys;
+  mode?: TCatalogModes[];
+  connector_type?: string; // returns from credentials object.
+  connections?: number;
+}
+
+export interface TCredential extends TCatalog {
+  id: string;
+  name: string;
+  account: TAccount;
+  connector_config: any;
+}
+
+export type TAccount = {
+  id: string;
+  name: string;
+  external_id: string;
+  meta_data: any;
+  profile: string;
+};

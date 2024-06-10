@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Container, Grid, Paper, styled } from '@mui/material';
+import { Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';
@@ -14,56 +14,29 @@ interface PageLayoutProps {
   children: ReactNode;
 }
 
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center'
+const LayoutRoot = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2)
 }));
 
-const ContainerWrapper = styled(Container)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  padding: theme.spacing(0, 2),
-  height: '100%'
-}));
-
-const InnerContainer = styled(Paper)(({ theme }) => ({
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'column',
-  padding: theme.spacing(2),
-  height: '100%',
-  position: 'relative'
+const ContentWrapper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(1)
 }));
 
 const PageLayout = (props: PageLayoutProps) => {
   const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
-  return (
-    <ContainerWrapper>
-      <InnerContainer variant="outlined">
-        {/* <Grid
-          container
-          spacing={{ md: 2, xs: 2 }}
-          sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
-        >
-          {Array.from(Array(12)).map((_, index) => (
-            <Grid item xs={1} key={index} height="100%">
-              <Item sx={{ height: '100%', bgcolor: 'transparent', border: '0.5px solid grey' }}>{index}</Item>
-            </Grid>
-          ))}
-        </Grid> */}
-        <PageHead title={pageHeadTitle} />
 
-        <PageTitle
-          title={title}
-          displayButton={displayButton}
-          buttonTitle={buttonTitle?.toUpperCase()}
-          onClick={handleButtonOnClick}
-        />
-        <Paper sx={{ marginTop: 2 }}>{children}</Paper>
-      </InnerContainer>
-    </ContainerWrapper>
+  return (
+    <LayoutRoot variant="outlined">
+      <PageHead title={pageHeadTitle} />
+
+      <PageTitle
+        title={title}
+        displayButton={displayButton}
+        buttonTitle={buttonTitle?.toUpperCase()}
+        onClick={handleButtonOnClick}
+      />
+      <ContentWrapper>{children}</ContentWrapper>
+    </LayoutRoot>
   );
 };
 
