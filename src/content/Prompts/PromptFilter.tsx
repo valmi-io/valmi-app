@@ -63,7 +63,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     handleFilterChange(index, 'column', value);
 
     const filter = filters.find((filter) => filter.column === value);
-    const columnType = filter ? filter.column_type : 'STRING';
+    const columnType = filter ? filter.column_type : 'string';
     handleFilterChange(index, 'column_type', columnType);
   };
 

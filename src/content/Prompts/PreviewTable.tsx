@@ -79,15 +79,17 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
 
-      let response = {
-        workspaceId: wid,
-        promptId: pid,
-        filters: payload,
-        time_window: {
-          label: 'custom',
-          range: {
-            start: moment().subtract(1, 'months').toISOString(),
-            end: moment().toISOString()
+      let response =
+      {
+        prompt_req: {
+          filters: payload,
+          schema_id: schemaID,
+          time_window: {
+            label: 'custom',
+            range: {
+              start: moment().subtract(1, 'months').toISOString(),
+              end: moment().toISOString()
+            }
           }
         }
       };
