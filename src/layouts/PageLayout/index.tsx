@@ -15,6 +15,7 @@ interface PageLayoutProps {
 }
 
 const LayoutRoot = styled(Paper)(({ theme }) => ({
+  width: '100%',
   padding: theme.spacing(2)
 }));
 

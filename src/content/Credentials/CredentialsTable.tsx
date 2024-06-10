@@ -18,14 +18,12 @@ export interface SyncOnClickProps {
 }
 
 const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
-  console.log('Credentials', credentials);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleCredentialEdit = ({ credential }: { credential: TCredential }) => {
-    console.log('handle on click:_', credential);
     // redirect to connections/create page.
     // router.push(`/spaces/${workspaceId}/connections/create`);
 
@@ -49,8 +47,6 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
         }
       }
     };
-
-    console.log('obj to dispatch: ', objToDispatch);
 
     dispatch(setConnectionFlowState(objToDispatch));
 

@@ -18,7 +18,6 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { TCredential } from '@/utils/typings.d';
 
 const PageContent = ({ data }: { data: TCredential[] }) => {
-  console.log('page content:_', data);
   if (data.length > 0) {
     // Display credentials when credentials data length > 0
     return <CredentialsTable credentials={data} />;

@@ -48,7 +48,7 @@ const ConnectionsPage: NextPageWithLayout = () => {
   } = useFetch({
     query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
-
+  console.log('syncs:', syncs);
   const handleCreateConnectionOnClick = () => {
     router.push(`/spaces/${workspaceId}/catalog`);
   };
@@ -60,8 +60,8 @@ const ConnectionsPage: NextPageWithLayout = () => {
 
   return (
     <PageLayout
-      pageHeadTitle="Connections"
-      title="Connections"
+      pageHeadTitle="Data Flows"
+      title="DATA FLOWS"
       buttonTitle="Connection"
       handleButtonOnClick={handleCreateConnectionOnClick}
     >
