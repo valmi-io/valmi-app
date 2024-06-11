@@ -1,68 +1,129 @@
-import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { jsonFormValidator } from '@/utils/form-utils';
-import { Generate, JsonFormsCore } from '@jsonforms/core';
-import { JsonForms } from '@jsonforms/react';
-import { Card, Paper, Stack } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { schema } from '@content/Prompts/promptUtils';
-import SubmitButton from '@/components/SubmitButton';
-import { materialCells, materialRenderers } from '@jsonforms/material-renderers';
+import React, { useState } from 'react';
+import { Select, MenuItem, Button, Stack } from '@mui/material';
+import FilterInput from './FilterInput';
+import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
+import { transformFilters } from '@/utils/filters-transform-utils';
 
-const PromptFilter = ({ spec, applyFilters }: { spec: any; applyFilters: (data: any) => void }) => {
-  let initialData = {};
 
-  const [data, setData] = useState<any>(initialData);
-  // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['bulk_window_in_days'] });
+// Interface for filter options
+interface Filter {
+  db_column: string;
+  display_column: string;
+  column_type: string;
+}
 
-  const { valid, errors } = jsonFormValidator(schema, data);
+// Interface for operators
+interface Operator {
+  [key: string]: string[];
+}
 
-  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setData(data);
+// Interface for applied filters
+interface AppliedFilter {
+  column: string;
+  column_type: string;
+  operator: string;
+  value: string;
+}
+
+interface PromptFilterProps {
+  filters: Filter[];
+  operators: Operator;
+  applyFilters: (data: AppliedFilter[]) => void;
+}
+
+
+const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standardOperators, applyFilters }) => {
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
+  const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>(
+    getDateRange('last30days')
+  );
+  const [selectedColumnIndex, setSelectedColumnIndex] = useState<number | null>(null);
+
+  const handleDateRangeChange = (value: string) => {
+    setDateRange(getDateRange(value));
   };
 
-  const customUISchema = useMemo(() => {
-    const uischema = Generate.uiSchema(schema);
-    uischema['type'] = 'HorizontalLayout';
-    return uischema;
-  }, [schema]);
+  const handleAddFilter = () => {
+    setAppliedFilters([...appliedFilters, { column: '', column_type: '', operator: '', value: '' }]);
+  };
 
-  const handleOnClick = () => {
-    let obj = data;
-    if (!data?.filters) {
-      obj.filters = [];
-    }
-    applyFilters(obj);
+  const handleRemoveFilter = (index: number) => {
+    const newAppliedFilters = [...appliedFilters];
+    newAppliedFilters.splice(index, 1);
+    setAppliedFilters(newAppliedFilters);
+  };
+
+  const handleFilterChange = (index: number, field: string, value: string) => {
+    const newAppliedFilters: any = [...appliedFilters];
+    newAppliedFilters[index][field] = value;
+    setAppliedFilters(newAppliedFilters);
+  };
+
+  const handleColumnChange = (index: number, value: string) => {
+    setSelectedColumnIndex(index);
+    handleFilterChange(index, 'column', value);
+
+    const filter = filters.find((filter) => filter.display_column === value);
+    const columnType = filter ? filter.column_type : 'string';
+    handleFilterChange(index, 'column_type', columnType);
+  };
+
+  const handleSubmit = () => {
+    const combinedFilters = appliedFilters.map((filter) => {
+      const correspondingFilter = filters.find((f) => f.display_column === filter.column);
+      return {
+        ...filter,
+        column: correspondingFilter ? correspondingFilter.db_column : filter.column
+      };
+    });
+
+    const dateRangeFilters = [
+      { column: 'updated_at', column_type: 'DATE', operator: '>=', value: dateRange.start_date.toISOString() },
+      { column: 'updated_at', column_type: 'DATE', operator: '<=', value: dateRange.end_date.toISOString() }
+    ];
+
+    applyFilters(transformFilters([...combinedFilters, ...dateRangeFilters]));
   };
 
   return (
-    <Paper variant="outlined">
-      <JsonForms
-        schema={schema}
-        uischema={customUISchema}
-        data={data}
-        renderers={customRenderers}
-        cells={materialCells}
-        onChange={handleFormChange}
-      />
+    <Stack spacing={2} p={2}>
+      <DateRangePicker dateRange={dateRange} onDateRangeChange={handleDateRangeChange} setDateRange={setDateRange} />
 
-      <Stack
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center'
-        }}
-      >
-        <SubmitButton
-          buttonText={'Apply filters'}
-          data={false}
-          isFetching={false}
-          disabled={!valid}
-          onClick={handleOnClick}
-        />
-      </Stack>
-    </Paper>
+      {appliedFilters.map((appliedFilter, index) => (
+        <Stack direction="row" spacing={2} key={index}>
+          <Select
+            value={appliedFilter.column}
+            onChange={(e) => handleColumnChange(index, e.target.value as string)}
+          >
+            <MenuItem value="">Select Column</MenuItem>
+            {filters.map((filter) => (
+              <MenuItem key={filter.display_column} value={filter.display_column}>
+                {filter.display_column}
+              </MenuItem>
+            ))}
+          </Select>
+          {selectedColumnIndex === index && (
+            <>
+              <Select
+                value={appliedFilter.operator}
+                onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
+              >
+                <MenuItem value="">Select Operator</MenuItem>
+                {standardOperators[appliedFilter.column_type]?.map((op) => (
+                  <MenuItem key={op} value={op}>
+                    {op}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FilterInput appliedFilter={appliedFilter} index={index} handleFilterChange={handleFilterChange} />
+            </>
+          )}
+          <Button onClick={() => handleRemoveFilter(index)}>Remove</Button>
+        </Stack>
+      ))}
+      <Button onClick={handleAddFilter}>Add Filter</Button>
+      <Button onClick={handleSubmit}>Apply Filters</Button>
+    </Stack>
   );
 };
 

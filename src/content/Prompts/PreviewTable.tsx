@@ -22,7 +22,7 @@ import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
 
-const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPrompt }) => {
+const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any }) => {
   const { pid = '', wid = '', filter = '' } = params;
 
   const router = useRouter();
@@ -78,8 +78,9 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
-      preview({
-        workspaceId: wid,
+
+      console.log("filters:", payload);
+      preview({workspaceId: wid,
         promptId: pid,
         prompt: payload
       });
@@ -140,9 +141,21 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const applyFilters = (payload: any) => {
     const { schemas = [] } = prompt;
-    payload.schema_id = schemas.length ? schemas[0].id : '';
 
-    previewPrompt(payload);
+    previewPrompt(
+      {
+        schema_id: schemas.length ? schemas[0].id : '',
+        time_window: {
+          label: 'custom',
+                range: {
+                  start: moment().subtract(1, 'months').toISOString(),
+                  end: moment().toISOString()
+                }
+        },
+        filters: payload
+      }
+    );
+
   };
 
   return (
@@ -175,7 +188,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       </TextField>
       {schemaID && (
         <Container>
-          <PromptFilter spec={''} applyFilters={applyFilters} />
+          <PromptFilter filters={prompt.filters} operators={prompt.operators} applyFilters={applyFilters} />
           <ContentLayout
             key={`PreviewPage`}
             error={error}
