@@ -8,11 +8,11 @@ import { useMemo } from 'react';
 export const useIntegrationQuery = ({
   type,
   workspaceId,
-  oauthKeys
+  isEditableFlow
 }: {
   type: string;
-  oauthKeys: string;
   workspaceId: string;
+  isEditableFlow: boolean;
 }) => {
   const {
     data: spec,
@@ -33,7 +33,7 @@ export const useIntegrationQuery = ({
       { type, workspaceId },
       {
         refetchOnMountOrArgChange: true,
-        skip: spec ? false : true
+        skip: !spec
       }
     )
   });
@@ -48,16 +48,19 @@ export const useIntegrationQuery = ({
       { packageId: getFreePackageId() },
       {
         refetchOnMountOrArgChange: true,
-        skip: !workspaceId
+        skip: !workspaceId || isEditableFlow
       }
     )
   });
 
   const data = useMemo(() => {
+    if (isEditableFlow && spec && oauthCredentials) {
+      return { spec, oauthCredentials, packages: [] };
+    }
     if (spec && oauthCredentials && packages) {
       return { spec, oauthCredentials, packages };
     }
-  }, [spec, oauthCredentials, packages]);
+  }, [isEditableFlow, spec, oauthCredentials, packages]);
 
   const error = specError || oauthCredentialsError || packagesError;
 

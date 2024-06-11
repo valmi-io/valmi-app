@@ -7,7 +7,7 @@ import PageTitle from '@components/PageTitle';
 
 interface PageLayoutProps {
   pageHeadTitle: string;
-  title: string;
+  title?: string;
   buttonTitle?: string;
   handleButtonOnClick?: () => void;
   displayButton?: boolean;
@@ -23,7 +23,7 @@ const ContentWrapper = styled(Paper)(({ theme }) => ({
 }));
 
 const PageLayout = (props: PageLayoutProps) => {
-  const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
+  const { pageHeadTitle, title = '', displayButton, buttonTitle, handleButtonOnClick, children } = props;
 
   return (
     <LayoutRoot variant="outlined">

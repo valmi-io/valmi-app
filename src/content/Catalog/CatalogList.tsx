@@ -30,7 +30,6 @@ export type NewConnectorType = {
 };
 
 const CatalogList = ({ catalogs }: { catalogs: TCatalog[] }) => {
-  console.log('catalogs: ', catalogs);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 

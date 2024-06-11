@@ -122,9 +122,9 @@ export const nextAuthOptions = (req, res) => {
 
             console.log('[next-auth] account:_', account);
 
-            console.log('[next-auth] authMeta', JSON.parse(req?.cookies?.authMeta));
+            console.log('[next-auth] authMeta', JSON.parse(req?.cookies?.authMeta ?? {}));
 
-            let authMeta = JSON.parse(req?.cookies?.authMeta);
+            let authMeta = JSON.parse(req?.cookies?.authMeta ?? {});
 
             let payload = {
               account: {

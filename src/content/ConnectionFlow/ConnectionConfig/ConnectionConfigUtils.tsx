@@ -55,7 +55,7 @@ export const getOauthColorCode = ({ oAuth }: any) => {
     case 'hubspot':
       return '#fff';
     case 'shopify':
-      return '#9bce39';
+      return '#fff';
     default:
       return '';
   }
@@ -72,7 +72,7 @@ export const getOauthLoginText = ({ oAuth }: any) => {
     case 'hubspot':
       return 'Sign in with Hubspot';
     case 'shopify':
-      return 'Sign in with Shopify';
+      return 'Shopify';
     default:
       return '';
   }

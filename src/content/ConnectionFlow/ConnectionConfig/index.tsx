@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@layouts/ConnectorLayout';
 
 import { AppDispatch } from '@store/store';
-import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
+import { getCredentialsSelectors, useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useWizard } from 'react-use-wizard';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
 import { httpPostRequestHandler, queryHandler } from '@/services';
-import { apiRoutes } from '@/utils/router-utils';
+import { apiRoutes, redirectToCredentials } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import {
   getCredentialObjKey,
@@ -23,7 +23,8 @@ import {
   getExtrasObjKey,
   filterStreamsBasedOnScope,
   initializeConnectionFlowState,
-  generateConfigFromSpec
+  generateConfigFromSpec,
+  generateCredentialPayload
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
@@ -33,7 +34,6 @@ import {
   useLazyCreateDefaultWarehouseConnectionQuery,
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
-import { useSession } from 'next-auth/react';
 import { useIntegrationQuery } from '@/content/ConnectionFlow/useIntegrationQuery';
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
@@ -41,29 +41,21 @@ import { FormStatus } from '@/utils/form-utils';
 import { useUser } from '@/hooks/useUser';
 import { getOAuthParams } from '@/utils/oauth-utils';
 
-const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
-  const { wid = '', connectionId = '' } = params ?? {};
+const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertProps) => {
+  const { wid = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-
-  const { data: session } = useSession();
 
   const { user } = useUser();
 
   const { nextStep } = useWizard();
 
-  let { setFormState } = useContext(OAuthContext);
-
-  let initialData = {};
+  let { formState, setFormState } = useContext(OAuthContext);
 
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
-
-  const entitiesInStore = connectionDataFlow?.entities ?? {};
-
-  const isEditableFlow = !!connectionId;
 
   const {
     type = '',
@@ -72,6 +64,16 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     mode = '',
     oauth_params: oAuthParams = {}
   } = selectedConnector;
+
+  const { config = {}, account = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
+
+  const { id: credentialId = '' } = config ?? {};
+
+  // Getting credential selectors for editing case specifically - not useful for create case
+  const { selectCredentialById } = getCredentialsSelectors(wid as string);
+  const credentialData = useSelector((state) => selectCredentialById(state, credentialId));
+
+  console.log('Credential data:_', credentialData);
 
   // discover call query
   const [fetchObjects] = useLazyDiscoverConnectorQuery();
@@ -86,9 +88,9 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   const [updateConnection] = useLazyUpdateConnectionQuery();
 
   const { data, error, isLoading, traceError } = useIntegrationQuery({
-    oauthKeys: oauthKeys,
     type: type,
-    workspaceId: wid
+    workspaceId: wid,
+    isEditableFlow: isEditableFlow
   });
 
   // form state
@@ -105,11 +107,13 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
     if (data) {
       const { spec, packages, oauthCredentials } = data ?? {};
 
+      console.log('use effect data:_', data);
+
       // initializing connection flow state.
       initializeConnectionFlowState({
         connectionDataFlow: connectionDataFlow,
         dispatch: dispatch,
-        package: packages?.entities[getFreePackageId().toLocaleUpperCase()],
+        package: isEditableFlow ? [] : packages?.entities[getFreePackageId().toLocaleUpperCase()],
         spec: spec,
         oauthCredentials: oauthCredentials,
         type: type
@@ -170,30 +174,65 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
 
       handleAlertOpen({ message: message, alertType: 'error' });
     } else {
-      const entities = {
-        ...connectionDataFlow.entities,
-        [getCredentialObjKey(type)]: {
-          ...connectionDataFlow.entities[getCredentialObjKey(type)],
-          //TODO : after check, get the name from the response and send it here instead displayName
-          config: {
-            ...payload.config,
-            name: displayName
+      if (isEditableFlow) {
+        const userAccount = { ...user, id: account.id };
+        const payload = generateCredentialPayload({
+          credentialConfig: formState,
+          type,
+          user: userAccount,
+          isEditableFlow: isEditableFlow
+        });
+
+        handleCredentialUpdate(wid, payload);
+      } else {
+        const entities = {
+          ...connectionDataFlow.entities,
+          [getCredentialObjKey(type)]: {
+            ...connectionDataFlow.entities[getCredentialObjKey(type)],
+            //TODO : after check, get the name from the response and send it here instead displayName
+            config: {
+              ...payload.config,
+              name: displayName
+            }
           }
+        };
+
+        dispatch(setEntities(entities));
+
+        if (!isConnectionAutomationFlow({ mode, type })) {
+          setStatus('success');
+          nextStep();
         }
-      };
-
-      dispatch(setEntities(entities));
-
-      if (!isConnectionAutomationFlow({ mode, type })) {
-        setStatus('success');
-        nextStep();
       }
     }
   };
 
-  const handleConnectionError = async (err: any) => {
-    setStatus('error');
+  const handleCredentialUpdate = async (workspaceId: string, payload: any) => {
+    const credentialUpdateURL = `/workspaces/${workspaceId}/credentials/update`;
+    await httpPostRequestHandler({
+      route: apiRoutes['proxyURL'],
+      url: credentialUpdateURL,
+      payload,
+      errorCb: handleCredentialUpdateError,
+      successCb: handleCredentialUpdateSuccess
+    });
+  };
 
+  const handleCredentialUpdateError = (err: unknown) => {
+    console.log('handle credential error:_', err);
+    setStatus('error');
+    handleAlertOpen({ message: err, alertType: 'error' });
+  };
+
+  const handleCredentialUpdateSuccess = (res: any) => {
+    setStatus('success');
+    handleAlertOpen({ message: 'Credential updated successfully!', alertType: 'success' });
+    const type = displayName.toLowerCase();
+    redirectToCredentials({ router, wid, type });
+  };
+
+  const handleConnectionError = (err: any) => {
+    setStatus('error');
     handleAlertOpen({ message: err, alertType: 'error' });
   };
 
@@ -202,11 +241,11 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   // STATE: Discover State - BEGIN
   useEffect(() => {
     // This object is set on completion of check Query
-    if (connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
+    if (!isEditableFlow && connectionDataFlow.entities[getCredentialObjKey(type)]?.config) {
       // if config exists in connectionDataFlow then run discover call -- but do it only once.
       discoverState().run();
     }
-  }, [connectionDataFlow.entities[getCredentialObjKey(type)]?.config]);
+  }, [isEditableFlow, connectionDataFlow.entities[getCredentialObjKey(type)]?.config]);
 
   const discoverState = () => {
     //
@@ -322,7 +361,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
   };
 
   return (
-    <ConnectorLayout title={`Connect to ${displayName}`}>
+    <ConnectorLayout title={`CONNECT TO ${displayName?.toUpperCase()}`}>
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}
@@ -336,6 +375,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
         specData={data?.spec ?? undefined}
         handleSubmit={handleSubmit}
         status={status}
+        isEditableFlow={isEditableFlow}
         key={'IntegrationSpec'}
       />
     </ConnectorLayout>

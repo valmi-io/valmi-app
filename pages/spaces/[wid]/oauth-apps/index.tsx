@@ -94,8 +94,6 @@ const OAuthAppsPage: NextPageWithLayout = () => {
   const configured = getConnectors({ connectors: configuredConnectors });
   const notConfigured = getConnectors({ connectors: notConfiguredConnectors });
 
-  console.log('configured connectors', { configured, notConfigured });
-
   return (
     <PageLayout pageHeadTitle="OAuth" title="" displayButton={false}>
       {configured.length > 0 && (
