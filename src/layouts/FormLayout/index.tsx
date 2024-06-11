@@ -18,7 +18,7 @@ export const FormContainer = styled(Stack)(({}) => ({
 
 const FormLayout = ({ formComp: FormComp, instructionsComp: InstructionsComp }: layoutProps) => {
   return (
-    <Stack direction="row" divider={<Divider sx={{ mx: 1 }} orientation="vertical" flexItem />}>
+    <Stack direction="row" divider={<Divider sx={{ mx: 2 }} orientation="vertical" flexItem />}>
       <Box sx={{ width: '70%' }}>
         {/* display fields */} {FormComp && FormComp}
       </Box>
