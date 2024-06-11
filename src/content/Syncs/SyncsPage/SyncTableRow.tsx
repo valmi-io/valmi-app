@@ -44,7 +44,11 @@ const SyncTableRow = ({ sync, onClick }: SyncTableRowProps) => {
   return (
     <CustomizedTableRow hover key={sync.id} onClick={() => onClick({ syncId: sync.id })}>
       <TableCellComponent text={sync.name} />
-
+      <TableCellWithImage
+        title={sync.source.name}
+        size={ImageSize.small}
+        src={`/connectors/${getConnectorName(sync, 'source').toLowerCase()}.svg`}
+      />
       <TableCell>
         <ArrowForwardIcon style={{ fontSize: 18 }} />
       </TableCell>

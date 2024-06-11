@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/router';
 
-import { Table, TableBody, TableHead, TableContainer } from '@mui/material';
+import { Table, TableBody, TableHead, TableContainer, Paper } from '@mui/material';
 
 import SyncTableRow from './SyncTableRow';
 
@@ -41,7 +41,7 @@ const SyncsTable = ({ syncs }) => {
   return (
     <>
       {/* Syncs Table*/}
-      <TableContainer>
+      <TableContainer component={Paper} variant="outlined">
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>

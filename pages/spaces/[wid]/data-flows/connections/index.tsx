@@ -22,8 +22,6 @@ import { useFetch } from '@/hooks/useFetch';
 import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { useSession } from 'next-auth/react';
-import DataFlows from '@/pagesspaces/[wid]/data-flows/DataFlows';
 
 const PageContent = ({ data }: { data: any }) => {
   if (data.length > 0) {
