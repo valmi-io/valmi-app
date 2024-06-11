@@ -39,6 +39,7 @@ import { stringAvatar } from '@utils/lib';
 import { ConnectionColumns } from './ConnectionColumns';
 import TableHeader from '../../components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToCreateConnection } from '@/utils/router-utils';
 
 interface ConnectionsTableProps {
   className?: string;
@@ -76,7 +77,8 @@ const ConnectionsTable = ({ connections = [], connectionType = '' }: Connections
         }
       })
     );
-    router.push(`/spaces/${workspaceId}/connections/create`);
+
+    redirectToCreateConnection({ router, wid: workspaceId });
   };
 
   const userAccountTableCell = (account) => {

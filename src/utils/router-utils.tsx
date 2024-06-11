@@ -27,7 +27,7 @@ export const redirectToHomePage = (wid: string, router: NextRouter) => {
 
 export const redirectToCreateConnection = ({ router, wid }: { router: NextRouter; wid: string }) => {
   if (wid) {
-    router.push(`${getBaseRoute(wid)}/data-flows/create`);
+    router.push(`${getBaseRoute(wid)}/data-flows/connections/create`);
   }
 };
 

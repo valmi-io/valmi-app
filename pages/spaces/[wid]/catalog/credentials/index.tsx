@@ -12,7 +12,7 @@ import CredentialsTable from '@/content/Credentials/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
-import { getSearchParams } from '@/utils/router-utils';
+import { getSearchParams, redirectToCreateConnection } from '@/utils/router-utils';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { TCredential } from '@/utils/typings.d';
 import { useCredentials } from '@/content/Credentials/useCredentials';
@@ -68,15 +68,10 @@ const CredentialsPage: NextPageWithLayout = () => {
     };
 
     dispatch(setConnectionFlowState(updatedConnectionDataFlow));
-    // if (hasConnections(catalog)) {
-    //   redirectToCredentials({ router, wid: workspaceId, type: type });
-    // } else {
-    //   redirectToCreateConnection({ router, wid: workspaceId });
-    // }
   }, []);
 
   const handleCreateConnectionOnClick = () => {
-    router.push(`${getBaseRoute(workspaceId as string)}/connections/create`);
+    redirectToCreateConnection({ router, wid: workspaceId });
   };
 
   return (

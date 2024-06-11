@@ -29,11 +29,6 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleCredentialEdit = ({ credential }: { credential: TCredential }) => {
-    // redirect to connections/create page.
-    // router.push(`/spaces/${workspaceId}/connections/create`);
-
-    // const { connector_type="", connector_config={} } = credential;
-
     const key = getSelectedConnectorKey();
 
     const {
