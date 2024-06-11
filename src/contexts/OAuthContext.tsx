@@ -3,8 +3,13 @@ import { useRouter } from 'next/router';
 import { ReactNode, createContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
-import { getSelectedConnectorKey, getShopifyIntegrationType } from '@/utils/connectionFlowUtils';
-import { getBaseRoute } from '@/utils/lib';
+import {
+  getCredentialObjKey,
+  getExtrasObjKey,
+  getSelectedConnectorKey,
+  getShopifyIntegrationType
+} from '@/utils/connectionFlowUtils';
+import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import { getOauthRoute } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
@@ -38,12 +43,19 @@ function OAuthContextProvider({ children }: Props) {
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
+  const extras = connectionDataFlow.entities[getExtrasObjKey()] ?? {};
+
+  const isEditableFlow = !!(!isObjectEmpty(extras) && extras?.isEditableFlow);
+
   let { oauth_keys = 'private', type = '' } = selectedConnector;
+
+  const { config = {}, id: credentialId = '' } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
   const { wid = '' } = params ?? {};
 
   let initialData = {};
-  if (type === getShopifyIntegrationType()) {
+
+  if (type === getShopifyIntegrationType() && !isEditableFlow) {
     initialData = {
       credentials: {
         auth_method: 'api_password'
@@ -51,9 +63,11 @@ function OAuthContextProvider({ children }: Props) {
     };
   }
 
-  const [formState, setFormState] = useState(initialData);
+  if (isEditableFlow) {
+    initialData = config;
+  }
 
-  const [isoAuthStepDone, setIsOAuthStepDone] = useState(false);
+  const [formState, setFormState] = useState(initialData);
 
   const handleOnConfigureButtonClick = () => {
     let { type = '' } = selectedConnector;

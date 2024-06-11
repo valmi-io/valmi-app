@@ -21,7 +21,8 @@ const IntegrationSpec = ({
   isLoading,
   specData,
   handleSubmit,
-  status
+  status,
+  isEditableFlow
 }: {
   error: any;
   traceError: any;
@@ -29,6 +30,7 @@ const IntegrationSpec = ({
   specData: any;
   status: string;
   handleSubmit: (payload: any) => void;
+  isEditableFlow: boolean;
 }) => {
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
@@ -46,7 +48,7 @@ const IntegrationSpec = ({
   };
 
   const getButtonTitle = () => {
-    return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
+    return isEditableFlow ? 'Update' : isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
   };
 
   const renderComponent = () => {

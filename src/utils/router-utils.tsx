@@ -15,7 +15,8 @@ export const getSearchParams = (params: any) => {
 export const apiRoutes = {
   checkURL: `/api/checkConnection`,
   defaultURL: `/`,
-  fbTokenURL: '/api/getFbLongLivedToken'
+  fbTokenURL: '/api/getFbLongLivedToken',
+  proxyURL: `/api/proxyApiRequest`
 };
 
 export const redirectToHomePage = (wid: string, router: NextRouter) => {

@@ -10,15 +10,18 @@ import SidebarLayout from '@layouts/SidebarLayout';
 import ContentLayout from '@/layouts/ContentLayout';
 import CredentialsTable from '@/content/Credentials/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { useLazyFetchCredentialsQuery } from '@/store/api/apiSlice';
 import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams } from '@/utils/router-utils';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { TCredential } from '@/utils/typings.d';
+import { useCredentials } from '@/content/Credentials/useCredentials';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 
 const PageContent = ({ data }: { data: TCredential[] }) => {
-  console.log('page content:_', data);
   if (data.length > 0) {
     // Display credentials when credentials data length > 0
     return <CredentialsTable credentials={data} />;
@@ -30,6 +33,7 @@ const PageContent = ({ data }: { data: TCredential[] }) => {
 
 const CredentialsPage: NextPageWithLayout = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const { workspaceId = '' } = useWorkspaceId();
   const searchParams = useSearchParams();
 
@@ -37,19 +41,28 @@ const CredentialsPage: NextPageWithLayout = () => {
 
   const { type = '' } = params;
 
-  const [
-    fetchCredentials,
-    { data: data, isError: isError, error: error, isLoading: isLoading, isFetching: isFetching }
-  ] = useLazyFetchCredentialsQuery();
-
-  const filteredData = (type: any) => {
-    const arr = data?.resultData?.filter((item: any) => item?.display_name.toLowerCase() === type);
-    return arr;
-  };
+  const { filteredCredentials, error, isFetching, isError } = useCredentials({
+    workspaceId: workspaceId,
+    integrationType: type
+  });
 
   useEffect(() => {
-    fetchCredentials({ workspaceId });
-  }, [workspaceId, fetchCredentials]);
+    // dispatch(clearConnectionFlowState());
+    // const type = catalog?.display_name.toLowerCase();
+    // const key = getSelectedConnectorKey();
+    // const objToDispatch = {
+    //   ids: [key],
+    //   entities: {
+    //     [key]: {  } // initially setting oauth_params, oauth_error to empty in store
+    //   }
+    // };
+    // dispatch(setConnectionFlowState(objToDispatch));
+    // if (hasConnections(catalog)) {
+    //   redirectToCredentials({ router, wid: workspaceId, type: type });
+    // } else {
+    //   redirectToCreateConnection({ router, wid: workspaceId });
+    // }
+  }, []);
 
   const handleCreateConnectionOnClick = () => {
     router.push(`${getBaseRoute(workspaceId as string)}/connections/create`);
@@ -65,8 +78,8 @@ const CredentialsPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`credentialsPage`}
         error={isError}
-        PageContent={<PageContent data={filteredData(type)} />}
-        displayComponent={!error && !isFetching && data?.resultData}
+        PageContent={<PageContent data={filteredCredentials} />}
+        displayComponent={!error && !isFetching && filteredCredentials}
         isLoading={isFetching}
         traceError={error}
       />

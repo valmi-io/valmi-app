@@ -8,7 +8,7 @@ import {
 } from '@jsonforms/core';
 import { JsonFormsDispatch, withJsonFormsOneOfProps } from '@jsonforms/react';
 import { Card, FormControl, FormHelperText, Hidden, Tab, Tabs } from '@mui/material';
-import { isEmpty, merge } from 'lodash';
+import { merge } from 'lodash';
 import { useFocus } from '@jsonforms/material-renderers';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import FormFieldAuth from '@/components/FormInput/FormFieldAuth';
@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
 import {
   getCredentialObjKey,
+  getExtrasObjKey,
   getSelectedConnectorKey,
   isIntegrationAuthorized,
   isIntegrationConfigured,
@@ -59,9 +60,19 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const entitiesInStore = connectionDataFlow?.entities ?? {};
 
+  const extras = connectionDataFlow.entities[getExtrasObjKey()] ?? {};
+
+  const isEditableFlow = !!(!isObjectEmpty(extras) && extras?.isEditableFlow);
+
   const { type = '', oauth_keys: oauthKeys = '', oauth_error = '', oauth_params = null } = selectedConnector;
 
-  const { oauthCredentials = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
+  const {
+    oauthCredentials = {},
+    config: credentialConfig = {},
+    account = {}
+  } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
+
+  const { id: credentialId = '' } = credentialConfig ?? {};
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [newSelectedIndex, setNewSelectedIndex] = useState(0);
@@ -77,9 +88,21 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
     appliedUiSchemaOptions.showUnfocusedDescription
   );
 
+  useEffect(() => {
+    if (isEditableFlow) {
+      const selectedAuthMethod = credentialConfig?.credentials?.auth_method ?? '';
+
+      oAuthOptions.forEach((option: any, index: number) => {
+        if (selectedAuthMethod === option?.properties?.auth_method.const ?? '') {
+          setSelectedIndex(index);
+        }
+      });
+    }
+  }, [isEditableFlow]);
+
   //if oauth_params exists then set the index of tabbed to oauth after redirecting back
   useEffect(() => {
-    if (!isObjectEmpty(oauth_params)) {
+    if (oauth_params && !isObjectEmpty(oauth_params)) {
       oAuthOptions.forEach((option: any, index: number) => {
         if (option?.title?.toLowerCase() === 'oauth2.0') {
           setSelectedIndex(index);
@@ -140,6 +163,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const handleTabChange = useCallback(
     (_event: any, newOneOfIndex: number) => {
+      console.log('newOneOfIndex', newOneOfIndex);
       setNewSelectedIndex(newOneOfIndex);
 
       setConfirmDialogOpen(true);
@@ -166,8 +190,9 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
     return !!(oAuthOptions[option].title?.toLowerCase() === 'oauth2.0');
   };
 
-  const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
   const secondFormHelperText = showDescription && !isValid ? errors : null;
+
+  console.log('oneOfRenderInfos', oneOfRenderInfos);
 
   return (
     <Hidden xsUp={!visible}>
@@ -212,7 +237,6 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
               open={confirmDialogOpen}
               handleClose={handleClose}
             />
-            {/* <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText> */}
             <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
           </FormControl>
         )}

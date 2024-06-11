@@ -7,7 +7,12 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { CredentialsColumns } from '@/content/Credentials/CredentialsTableColumns';
 import CredentialsTableRow from '@/content/Credentials/CredentialsTableRow';
 import { TCredential } from '@/utils/typings.d';
-import { getCredentialObjKey, getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
+import {
+  getCredentialObjKey,
+  getExtrasObjKey,
+  getSelectedConnectorKey,
+  getSelectedConnectorObj
+} from '@/utils/connectionFlowUtils';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
@@ -18,14 +23,12 @@ export interface SyncOnClickProps {
 }
 
 const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
-  console.log('Credentials', credentials);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleCredentialEdit = ({ credential }: { credential: TCredential }) => {
-    console.log('handle on click:_', credential);
     // redirect to connections/create page.
     // router.push(`/spaces/${workspaceId}/connections/create`);
 
@@ -33,25 +36,35 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
 
     const key = getSelectedConnectorKey();
 
-    const { account = {}, connector_config = {}, name: sourceCredentialName = '', ...item } = credential ?? {};
+    const {
+      account = {},
+      connector_config = {},
+      name: sourceCredentialName = '',
+      id: sourceCredentialId,
+      ...item
+    } = credential ?? {};
 
     const obj = getSelectedConnectorObj(item, key);
 
     const objToDispatch = {
-      ids: [key, getCredentialObjKey(obj.type)],
+      ids: [key, getCredentialObjKey(obj.type), getExtrasObjKey()],
       entities: {
         [key]: getSelectedConnectorObj(item, key),
         [getCredentialObjKey(obj.type)]: {
           config: {
             ...connector_config,
-            name: sourceCredentialName
-          }
+            name: sourceCredentialName,
+            id: sourceCredentialId
+          },
+          account: account
+        },
+        [getExtrasObjKey()]: {
+          isEditableFlow: true
         }
       }
     };
 
-    console.log('obj to dispatch: ', objToDispatch);
-
+    console.log('obj to dispatch:_', { objToDispatch, credential });
     dispatch(setConnectionFlowState(objToDispatch));
 
     redirectToCreateConnection({ router: router, wid: workspaceId });
