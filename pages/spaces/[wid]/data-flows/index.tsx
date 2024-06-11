@@ -24,6 +24,7 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import DataFlows from '@/content/DataFlows';
 
 const PageContent = ({ data }: { data: any }) => {
+  console.log('Page content:_', data);
   if (data.length > 0) {
     // Display syncs when syncs data length > 0
     return <DataFlows syncs={data} />;
@@ -33,21 +34,21 @@ const PageContent = ({ data }: { data: any }) => {
   return <ListEmptyComponent description={'No connections found in this workspace'} />;
 };
 
-const ConnectionsPage: NextPageWithLayout = () => {
+const DataFlowsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const {
-    data: syncs,
+    data: connections,
     error,
     isFetching,
     traceError
   } = useFetch({
     query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
   });
-  console.log('syncs:', syncs);
+
   const handleCreateConnectionOnClick = () => {
     router.push(`/spaces/${workspaceId}/catalog`);
   };
@@ -67,8 +68,8 @@ const ConnectionsPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`connectionsPage`}
         error={error}
-        PageContent={<PageContent data={syncs} />}
-        displayComponent={!error && !isFetching && syncs}
+        PageContent={<PageContent data={connections} />}
+        displayComponent={!error && !isFetching && connections}
         isLoading={isFetching}
         traceError={traceError}
       />
@@ -76,8 +77,8 @@ const ConnectionsPage: NextPageWithLayout = () => {
   );
 };
 
-ConnectionsPage.getLayout = function getLayout(page: ReactElement) {
+DataFlowsPage.getLayout = function getLayout(page: ReactElement) {
   return <SidebarLayout>{page}</SidebarLayout>;
 };
 
-export default ConnectionsPage;
+export default DataFlowsPage;
