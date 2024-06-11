@@ -12,7 +12,7 @@ const CatalogInstuctions = ({ data, selected_connector }: { data: any; selected_
 
   const documentationUrl = `https://www.valmi.io/docs/integrations/${connectorType}/${name}`;
 
-  const title = 'Connection Documentation';
+  const title = 'INSTRUCTIONS';
   const linkText = selected_connector ? selected_connector.display_name : '';
 
   return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'connection'} />;

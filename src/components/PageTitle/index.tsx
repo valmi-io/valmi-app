@@ -8,6 +8,7 @@ import { FC } from 'react';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { Typography, Button, Grid, CircularProgress } from '@mui/material';
 import Link from 'next/link';
+import VButton from '@/components/VButton';
 
 interface PageTitleProps {
   title: string;
@@ -73,16 +74,25 @@ const PageTitle: FC<PageTitleProps> = ({
                   </Button>
                 </Link>
               ) : (
-                <Button
-                  size="small"
+                <VButton
+                  buttonText={buttonTitle}
+                  buttonType="submit"
                   endIcon={endIcon}
                   startIcon={startIcon}
+                  onClick={onClick}
+                  size="small"
                   disabled={disabled}
                   variant="contained"
-                  onClick={onClick}
-                >
-                  {buttonTitle}
-                </Button>
+                />
+                // <Button
+
+                //   disabled={disabled}
+                //   variant="contained"
+                //   onClick={onClick}
+                //   disableElevation
+                // >
+                //   {buttonTitle}
+                // </Button>
               )}
             </Grid>
           )}

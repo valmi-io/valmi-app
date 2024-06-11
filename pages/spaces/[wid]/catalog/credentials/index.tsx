@@ -16,10 +16,11 @@ import { getSearchParams } from '@/utils/router-utils';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { TCredential } from '@/utils/typings.d';
 import { useCredentials } from '@/content/Credentials/useCredentials';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { RootState } from '@/store/reducers';
 
 const PageContent = ({ data }: { data: TCredential[] }) => {
   if (data.length > 0) {
@@ -41,22 +42,32 @@ const CredentialsPage: NextPageWithLayout = () => {
 
   const { type = '' } = params;
 
+  /** Redux store */
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
   const { filteredCredentials, error, isFetching, isError } = useCredentials({
     workspaceId: workspaceId,
     integrationType: type
   });
 
   useEffect(() => {
+    console.log('update connection flow state:_ ');
     // dispatch(clearConnectionFlowState());
-    // const type = catalog?.display_name.toLowerCase();
-    // const key = getSelectedConnectorKey();
-    // const objToDispatch = {
-    //   ids: [key],
-    //   entities: {
-    //     [key]: {  } // initially setting oauth_params, oauth_error to empty in store
-    //   }
-    // };
-    // dispatch(setConnectionFlowState(objToDispatch));
+    const selectedConnectorKey = getSelectedConnectorKey();
+
+    console.log('Connection data flow:_', connectionDataFlow);
+    const updatedConnectionDataFlow = {
+      ids: [selectedConnectorKey],
+      entities: {
+        [selectedConnectorKey]: {
+          ...connectionDataFlow.entities[selectedConnectorKey],
+          oauth_params: {},
+          oauth_error: ''
+        }
+      }
+    };
+
+    dispatch(setConnectionFlowState(updatedConnectionDataFlow));
     // if (hasConnections(catalog)) {
     //   redirectToCredentials({ router, wid: workspaceId, type: type });
     // } else {

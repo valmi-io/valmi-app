@@ -34,7 +34,8 @@ const ConnectionFlowComponent = ({ params }: { params: any }) => {
     <OAuthContextProvider>
       <PageLayout
         pageHeadTitle={constants.connections.CREATE_CONNECTION_TITLE}
-        title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
+        title=""
+        // title={isEditableFlow ? 'Edit connection' : 'Create a new connection'}
         displayButton={false}
       >
         {/** Stepper */}

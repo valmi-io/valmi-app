@@ -11,7 +11,6 @@ import { Card, FormControl, FormHelperText, Hidden, Tab, Tabs } from '@mui/mater
 import { merge } from 'lodash';
 import { useFocus } from '@jsonforms/material-renderers';
 import { OAuthContext } from '@/contexts/OAuthContext';
-import FormFieldAuth from '@/components/FormInput/FormFieldAuth';
 import { TabSwitchConfirmDialog } from '@/components/FormInput/TabSwitchConfirmDialog';
 import { isObjectEmpty } from '@/utils/lib';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +25,7 @@ import {
 } from '@/utils/connectionFlowUtils';
 import { AppDispatch } from '@/store/store';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
+import ConnectionLoginButton from '@/content/ConnectionFlow/ConnectionConfig/ConnectionLoginButton';
 
 const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   const [focused, onFocus, onBlur] = useFocus();
@@ -173,7 +173,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const renderOAuthButton = () => {
     return (
-      <FormFieldAuth
+      <ConnectionLoginButton
         onClick={handleOAuthButtonClick}
         isConfigurationRequired={isOAuthConfigurationRequired(oauthKeys)}
         isConnectorConfigured={isIntegrationConfigured(oauthCredentials, type)}
@@ -192,11 +192,9 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   const secondFormHelperText = showDescription && !isValid ? errors : null;
 
-  console.log('oneOfRenderInfos', oneOfRenderInfos);
-
   return (
     <Hidden xsUp={!visible}>
-      <Card sx={{ py: 2 }}>
+      <Card>
         {visible && (
           <FormControl
             fullWidth={!appliedUiSchemaOptions.trim}
@@ -205,7 +203,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
             id={id}
             variant={'standard'}
           >
-            <Tabs value={selectedIndex} onChange={handleTabChange}>
+            <Tabs indicatorColor="secondary" textColor="secondary" value={selectedIndex} onChange={handleTabChange}>
               {hasOneOfArr &&
                 oneOfRenderInfos.map((option: any, index: number) => <Tab key={option?.label} label={option?.label} />)}
             </Tabs>

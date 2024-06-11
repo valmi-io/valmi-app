@@ -365,7 +365,7 @@ export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type:
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
 };
 
-const EXCLUDE_SCOPES = ['locations', 'shop','products_graph_ql'];
+const EXCLUDE_SCOPES = ['locations', 'shop', 'products_graph_ql'];
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {

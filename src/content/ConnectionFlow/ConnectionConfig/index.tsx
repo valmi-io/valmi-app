@@ -34,7 +34,6 @@ import {
   useLazyCreateDefaultWarehouseConnectionQuery,
   useLazyUpdateConnectionQuery
 } from '@/store/api/connectionApiSlice';
-import { useSession } from 'next-auth/react';
 import { useIntegrationQuery } from '@/content/ConnectionFlow/useIntegrationQuery';
 import IntegrationSpec from '@/content/ConnectionFlow/IntegrationSpec';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
@@ -43,7 +42,7 @@ import { useUser } from '@/hooks/useUser';
 import { getOAuthParams } from '@/utils/oauth-utils';
 
 const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertProps) => {
-  const { wid = '', connectionId = '' } = params ?? {};
+  const { wid = '' } = params ?? {};
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
@@ -362,7 +361,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   };
 
   return (
-    <ConnectorLayout title={`Connect to ${displayName}`}>
+    <ConnectorLayout title={`CONNECT TO ${displayName?.toUpperCase()}`}>
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}

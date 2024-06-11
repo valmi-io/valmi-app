@@ -7,13 +7,53 @@ import FormLayout from '@/layouts/FormLayout';
 import { RootState } from '@/store/reducers';
 import { getSelectedConnectorKey, isConnectionAutomationFlow } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { jsonFormValidator } from '@/utils/form-utils';
+import { FormStatus, jsonFormValidator } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
 import { materialCells } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import { Stack } from '@mui/material';
-import { useContext } from 'react';
+import { Stack, styled } from '@mui/material';
+import { useCallback, useContext } from 'react';
 import { useSelector } from 'react-redux';
+
+const FormButtonStack = styled(Stack)(({}) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center'
+}));
+
+const FormButton = ({
+  isEditableFlow,
+  mode,
+  type,
+  status,
+  valid,
+  onClick
+}: {
+  isEditableFlow: boolean;
+  mode: string;
+  type: string;
+  status: FormStatus;
+  valid: boolean;
+  onClick: () => void;
+}) => {
+  const getButtonTitle = () => {
+    return isEditableFlow ? 'UPDATE' : isConnectionAutomationFlow({ mode, type }) ? 'CREATE' : 'CHECK';
+  };
+
+  return (
+    <FormButtonStack>
+      <SubmitButton
+        buttonText={getButtonTitle()}
+        data={status === 'success'}
+        isFetching={status === 'submitting'}
+        size="small"
+        disabled={!valid || status === 'submitting'}
+        onClick={onClick}
+      />
+    </FormButtonStack>
+  );
+};
 
 const IntegrationSpec = ({
   error,
@@ -28,7 +68,7 @@ const IntegrationSpec = ({
   traceError: any;
   isLoading: boolean;
   specData: any;
-  status: string;
+  status: FormStatus;
   handleSubmit: (payload: any) => void;
   isEditableFlow: boolean;
 }) => {
@@ -47,9 +87,9 @@ const IntegrationSpec = ({
     setFormState(data);
   };
 
-  const getButtonTitle = () => {
-    return isEditableFlow ? 'Update' : isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
-  };
+  const handleOnClick = useCallback(() => {
+    handleSubmit(formState);
+  }, []);
 
   const renderComponent = () => {
     if (error) {
@@ -67,7 +107,7 @@ const IntegrationSpec = ({
     if (specData) {
       const schema: any = specData?.spec?.connectionSpecification ?? {};
 
-      const { valid, errors } = jsonFormValidator(schema, formState);
+      const { valid } = jsonFormValidator(schema, formState);
 
       return (
         <FormLayout
@@ -81,22 +121,15 @@ const IntegrationSpec = ({
                 cells={materialCells}
                 onChange={handleFormChange}
               />
-              <Stack
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center'
-                }}
-              >
-                <SubmitButton
-                  buttonText={getButtonTitle()}
-                  data={status === 'success'}
-                  isFetching={status === 'submitting'}
-                  disabled={!valid || status === 'submitting'}
-                  onClick={() => handleSubmit(formState)}
-                />
-              </Stack>
+              <FormButton
+                key={'FormButton'}
+                isEditableFlow={isEditableFlow}
+                mode={mode}
+                type={type}
+                status={status}
+                onClick={handleOnClick}
+                valid={valid}
+              />
             </>
           }
           instructionsComp={<CatalogInstuctions data={specData} selected_connector={selectedConnector} />}
