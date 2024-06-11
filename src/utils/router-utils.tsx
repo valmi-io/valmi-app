@@ -72,9 +72,3 @@ export const redirectToConnectionRunLogs = ({
     router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs/${runId}/logs`);
   }
 };
-
-export const redirectToCredentials = ({ router, wid, type }: { router: NextRouter; wid: string; type: string }) => {
-  if (wid) {
-    router.push(`${getBaseRoute(wid)}/catalog/credentials?type=${type}`);
-  }
-};
