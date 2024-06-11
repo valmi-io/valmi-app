@@ -13,7 +13,7 @@ import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
 
 const credentialsAdapter: any = createEntityAdapter();
-const initialState = credentialsAdapter.getInitialState();
+const initialCredentialsState = credentialsAdapter.getInitialState();
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
@@ -56,7 +56,8 @@ export const apiSlice = createApi({
     'Prompt',
     'Preview',
     'Explore',
-    'Package'
+    'Package',
+    'Credential'
   ],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
@@ -65,120 +66,12 @@ export const apiSlice = createApi({
   baseQuery: staggeredBaseQueryWithBailOut,
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
-    // The `getSpaces` endpoint is a "query" operation that returns data
-    fetchWorkSpaces: builder.query({
-      // The URL for the request is '/api/v1/spaces'
-      query: () => ({
-        url: '/spaces/'
-      })
-    }),
-
-    signupUser: builder.query({
-      // The URL for the request is '/api/v1/users/'
-      query: (arg) => {
-        return {
-          url: '/users/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
     logoutUser: builder.query({
       query: () => {
         return {
           url: '/token/logout/',
           method: 'POST'
         };
-      }
-    }),
-
-    activateUser: builder.query({
-      // The URL for the request is '/api/v1/users/activation/'
-      query: (arg) => {
-        return {
-          url: '/users/activation/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    resendActivationToken: builder.query({
-      // The URL for the request is '/api/v1/users/resend_activation/'
-      query: (arg) => {
-        return {
-          url: '/users/resend_activation/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    resetPassword: builder.query({
-      // The URL for the request is '/api/v1/users/reset_password//'
-      query: (arg) => {
-        return {
-          url: '/users/reset_password/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    confirmPasswordReset: builder.query({
-      // The URL for the request is '/api/v1/users/reset_password_confirm/'
-      query: (arg) => {
-        return {
-          url: '/users/reset_password_confirm/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    loginAndFetchWorkSpaces: builder.query({
-      async queryFn(arg, queryApi, extraOptions, baseQuery) {
-        const user = await baseQuery({
-          url: '/token/login',
-          method: 'POST',
-          body: arg,
-          prepareHeaders: (headers) => {
-            headers.set('Content-Type', 'multipart/form-data');
-            return headers;
-          }
-        });
-        if (user.error) return { error: user.error };
-        const accessToken = user.data.auth_token;
-
-        /**
-         * Set accesstoken in cookie
-         * */
-
-        const cookieObj = {
-          accessToken
-        };
-
-        const result = await setCookie('AUTH', JSON.stringify(cookieObj), {
-          maxAge: 60 * 60 * 24 * 7, // 1 week
-          // sameSite: 'none',
-          path: '/'
-        });
-
-        if (result.success) {
-          const result = await baseQuery('/spaces/');
-
-          if (result.error) {
-            if (result.error?.data?.detail === 'Unauthorized') {
-              // check if "AUTH" cookie exists
-              // destroy auth token
-              signOutUser();
-            }
-            return { error: result.error };
-          }
-          return result.data && { data: result.data };
-        }
-        return { error: 'Failed to set cookie' };
       }
     }),
 
@@ -246,20 +139,32 @@ export const apiSlice = createApi({
       }
     }),
 
+    // fetchCredentials: builder.query({
+    //   queryFn: async (arg, queryApi, extraOptions, baseQuery) => {
+    //     const { workspaceId, queryId } = arg;
+
+    //     const result = await baseQuery({
+    //       url: `/workspaces/${workspaceId}/credentials/`
+    //     });
+
+    //     return result.data
+    //       ? { data: { resultData: result.data, queryId: queryId } }
+    //       : { error: { errorData: result.error, queryId: queryId } };
+    //   }
+    // }),
     fetchCredentials: builder.query({
-      queryFn: async (arg, queryApi, extraOptions, baseQuery) => {
-        const { workspaceId, queryId } = arg;
+      query: ({ workspaceId }) => `/workspaces/${workspaceId}/credentials/`,
+      transformResponse: (responseData) => {
+        return credentialsAdapter.setAll(initialCredentialsState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Credential' as const, id })), { type: 'Credential' as const }]
+          : [{ type: 'Credential' as const }];
 
-        const result = await baseQuery({
-          url: `/workspaces/${workspaceId}/credentials/`
-        });
-
-        return result.data
-          ? { data: { resultData: result.data, queryId: queryId } }
-          : { error: { errorData: result.error, queryId: queryId } };
+        return tags;
       }
     }),
-
     addSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const { src, dest, schedule, uiState, syncName, workspaceId } = arg;
@@ -430,18 +335,9 @@ export const apiSlice = createApi({
 });
 
 export const {
-  useLazyFetchWorkSpacesQuery,
-  useLazyLoginAndFetchWorkSpacesQuery,
   useLazyFetchIntegrationSpecQuery,
-
   useFetchIntegrationSpecQuery,
-
   useFetchConnectorsQuery,
-  useLazySignupUserQuery,
-  useLazyActivateUserQuery,
-  useLazyResendActivationTokenQuery,
-  useLazyResetPasswordQuery,
-  useLazyConfirmPasswordResetQuery,
   useLazyCreateConnectorQuery,
   useLazyDiscoverConnectorQuery,
   useFetchCredentialsQuery,
@@ -460,14 +356,15 @@ export const {
   useLazyLogoutUserQuery
 } = apiSlice;
 
-export const fetchCredentialsSelectors = (workspaceId: string) => {
-  const fetchCredentialsResult = extendedApiSlice.endpoints.fetchCredentials.select(workspaceId);
+/* Getting selectors from the transformed response */
+export const getCredentialsSelectors = (workspaceId: string) => {
+  const getCredentialsResult = apiSlice.endpoints.fetchCredentials.select({ workspaceId });
 
-  const fetchCredentialsData = createSelector(fetchCredentialsResult, (usersResult) => usersResult.data);
+  const getCredentialsData = createSelector(getCredentialsResult, (usersResult) => usersResult.data);
 
-  const { selectAll: fetchAllCredentials, selectById: fetchAllCredentialsId } =
+  const { selectAll: selectAllCredentials, selectById: selectCredentialById } =
     // @ts-ignore
-    credentialsAdapter.getSelectors((state) => fetchCredentialsData(state) ?? initialState);
+    credentialsAdapter.getSelectors((state) => getCredentialsData(state) ?? initialCredentialsState);
 
-  return { fetchAllCredentials, fetchAllCredentialsId };
+  return { selectAllCredentials, selectCredentialById };
 };

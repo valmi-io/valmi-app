@@ -4,7 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { ControlProps, JsonSchema, isDescriptionHidden } from '@jsonforms/core';
+import { ControlProps, JsonSchema } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { Card, FormControl, Hidden, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@mui/material';
 import { merge } from 'lodash';
@@ -46,13 +46,6 @@ export const FormInputControl = (props: ControlProps) => {
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
 
-  const showDescription = !isDescriptionHidden(
-    visible,
-    description,
-    focused,
-    appliedUiSchemaOptions.showUnfocusedDescription
-  );
-
   const [showInput, setShowInput] = useState(false);
 
   const handleClick = () => setShowInput((show) => !show);
@@ -70,7 +63,9 @@ export const FormInputControl = (props: ControlProps) => {
     return val;
   };
 
-  const formErrorHelperText = showDescription && !isValid ? errors : null;
+  console.log('form error helper text:-', errors);
+
+  const formErrorHelperText = !isValid ? errors : null;
 
   const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue, timeout);
 

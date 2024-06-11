@@ -15,7 +15,8 @@ export const getSearchParams = (params: any) => {
 export const apiRoutes = {
   checkURL: `/api/checkConnection`,
   defaultURL: `/`,
-  fbTokenURL: '/api/getFbLongLivedToken'
+  fbTokenURL: '/api/getFbLongLivedToken',
+  proxyURL: `/api/proxyApiRequest`
 };
 
 export const redirectToHomePage = (wid: string, router: NextRouter) => {
@@ -69,5 +70,11 @@ export const redirectToConnectionRunLogs = ({
 }) => {
   if (wid && connId && runId) {
     router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs/${runId}/logs`);
+  }
+};
+
+export const redirectToCredentials = ({ router, wid, type }: { router: NextRouter; wid: string; type: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/catalog/credentials?type=${type}`);
   }
 };

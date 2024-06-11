@@ -4,16 +4,12 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { Box, CardHeader, Divider, Link, Typography, styled } from '@mui/material';
+import { Box, Link, Typography, styled } from '@mui/material';
 
 const InstructionsBox = styled(Box)(({}) => ({
   display: 'flex',
   flexDirection: 'column',
   width: '100%'
-}));
-
-export const InstructionsHeader = styled(CardHeader)(({}) => ({
-  paddingLeft: 0
 }));
 
 export const InstructionsText = styled(Typography)(({ theme }) => ({
@@ -33,11 +29,13 @@ const Instructions = (props: InstructionsProps) => {
 
   return (
     <InstructionsBox>
-      <InstructionsHeader title={title} />
-      <Divider />
+      <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+        {title}
+      </Typography>
+
       <InstructionsText variant="body1">
         Refer to step-by-step instructions to setup a{' '}
-        <Link href={documentationUrl} target="_blank" rel="noreferrer" underline="always">
+        <Link color="secondary" href={documentationUrl} target="_blank" rel="noreferrer" underline="always">
           {linkText}
         </Link>
         {type && type === 'connection' && <> {'connection.'}</>}

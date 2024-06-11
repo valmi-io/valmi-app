@@ -12,7 +12,7 @@ interface JsonFormData {
 interface JsonFormsWrapperProps {
   schema: JsonSchema; // Use the type from @jsonforms/react
   data?: JsonFormData; // Optional initial data with specific types
-  onChange: (data: JsonFormData) => void; // Callback with typed data,
+  onChange: any; // Callback with typed data,
   renderers: any;
   formValidationState: formValidationMode;
 }

@@ -5,7 +5,7 @@ import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
 import { isObjectEmpty } from '@/utils/lib';
-import { TCatalog, TData } from '@/utils/typings.d';
+import { TAccount, TCatalog, TData } from '@/utils/typings.d';
 
 export type TStream = {
   name: string;
@@ -66,14 +66,29 @@ export const getSelectedConnectorObj = (item: TCatalog, key: string) => {
   return obj;
 };
 
-export const generateCredentialPayload = (credentialConfig: any, type: string, user: any) => {
-  const { name, ...config } = credentialConfig;
-  const payload = {
+export const generateCredentialPayload = ({
+  credentialConfig,
+  type,
+  user,
+  isEditableFlow
+}: {
+  credentialConfig: any;
+  type: string;
+  user: any;
+  isEditableFlow: boolean;
+}) => {
+  const { name, id = '', ...config } = credentialConfig;
+  const payload: any = {
     connector_type: type,
     connector_config: config,
     name: name,
     account: generateAccountPayload(user)
   };
+
+  if (isEditableFlow) {
+    payload.id = id;
+    payload.account.id = user.id ?? '';
+  }
 
   return payload;
 };
@@ -101,7 +116,7 @@ export const generateConnectionPayload = ({
 
   const { name = '', run_interval = '' } = schedulePayload ?? {};
 
-  if (type === getShopifyIntegrationType()) {
+  if (type === getShopifyIntegrationType() && !isEditableFlow) {
     // TODO: handle for isEditableFlow=true
     const { name, ...config } = sourceCredentials;
     payload = {
@@ -139,8 +154,13 @@ export const generateConnectionPayload = ({
   }
 
   if (!isEditableFlow) {
-    credentialPayload = generateCredentialPayload(sourceCredentials, type, user);
-    destCredentialPayload = generateCredentialPayload(sourceCredentials, 'DEST_POSTGRES-DEST', user);
+    credentialPayload = generateCredentialPayload({ credentialConfig: sourceCredentials, type, user, isEditableFlow });
+    destCredentialPayload = generateCredentialPayload({
+      credentialConfig: sourceCredentials,
+      type: 'DEST_POSTGRES-DEST',
+      user,
+      isEditableFlow
+    });
     payload.credentialPayload = credentialPayload;
     payload.destCredentialPayload = destCredentialPayload;
   }
@@ -345,7 +365,7 @@ export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type:
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
 };
 
-const EXCLUDE_SCOPES = ['locations', 'shop','products_graph_ql'];
+const EXCLUDE_SCOPES = ['locations', 'shop', 'products_graph_ql'];
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
@@ -393,7 +413,8 @@ export const initializeConnectionFlowState = ({
 export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
 
 export const isIntegrationConfigured = (data: TData, type: string) => {
-  return !!data?.entities[type];
+  console.log('isIntegrationConfigured:_', { data, type });
+  return !!data?.entities?.[type];
 };
 
 export const isIntegrationAuthorized = (oAuthParams: any, isEditableFlow: boolean) => {

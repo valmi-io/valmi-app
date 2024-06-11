@@ -25,10 +25,10 @@ export const TabSwitchConfirmDialog = ({ open, handleClose, confirm, cancel, id 
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={cancel} color="primary">
+        <Button onClick={cancel} color="secondary">
           No
         </Button>
-        <Button onClick={confirm} color="primary" autoFocus id={`${id}-confirm-yes`}>
+        <Button onClick={confirm} color="error" autoFocus id={`${id}-confirm-yes`}>
           Yes
         </Button>
       </DialogActions>

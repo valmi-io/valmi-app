@@ -1,4 +1,5 @@
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
+import { JsonFormsWrapper } from '@/components/JsonFormsWrapper';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import SubmitButton from '@/components/SubmitButton';
 import CatalogInstuctions from '@/content/Catalog/CatalogInstuctions';
@@ -7,13 +8,49 @@ import FormLayout from '@/layouts/FormLayout';
 import { RootState } from '@/store/reducers';
 import { getSelectedConnectorKey, isConnectionAutomationFlow } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
-import { jsonFormValidator } from '@/utils/form-utils';
+import { FormStatus, formValidationMode, jsonFormValidator } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
-import { materialCells } from '@jsonforms/material-renderers';
-import { JsonForms } from '@jsonforms/react';
-import { Stack } from '@mui/material';
-import { useContext } from 'react';
+import { Stack, styled } from '@mui/material';
+import { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
+
+const FormButtonStack = styled(Stack)(({}) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center'
+}));
+
+const FormButton = ({
+  isEditableFlow,
+  mode,
+  type,
+  status,
+  onClick
+}: {
+  isEditableFlow: boolean;
+  mode: string;
+  type: string;
+  status: FormStatus;
+  onClick: () => void;
+}) => {
+  const getButtonTitle = () => {
+    return isEditableFlow ? 'UPDATE' : isConnectionAutomationFlow({ mode, type }) ? 'CREATE' : 'CHECK';
+  };
+
+  return (
+    <FormButtonStack>
+      <SubmitButton
+        buttonText={getButtonTitle()}
+        data={status === 'success'}
+        isFetching={status === 'submitting'}
+        size="small"
+        disabled={status === 'submitting'}
+        onClick={onClick}
+      />
+    </FormButtonStack>
+  );
+};
 
 const IntegrationSpec = ({
   error,
@@ -21,34 +58,17 @@ const IntegrationSpec = ({
   isLoading,
   specData,
   handleSubmit,
-  status
+  status,
+  isEditableFlow
 }: {
   error: any;
   traceError: any;
   isLoading: boolean;
   specData: any;
-  status: string;
+  status: FormStatus;
   handleSubmit: (payload: any) => void;
+  isEditableFlow: boolean;
 }) => {
-  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
-
-  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
-
-  const { type = '', mode = '' } = selectedConnector;
-
-  // customJsonRenderers
-  const customRenderers = getCustomRenderers({ invisibleFields: ['auth_method'] });
-
-  const { formState, setFormState } = useContext(OAuthContext);
-
-  const handleFormChange = async ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-    setFormState(data);
-  };
-
-  const getButtonTitle = () => {
-    return isConnectionAutomationFlow({ mode, type }) ? 'Create' : 'Check';
-  };
-
   const renderComponent = () => {
     if (error) {
       return <ErrorComponent error={error} />;
@@ -63,42 +83,8 @@ const IntegrationSpec = ({
     }
 
     if (specData) {
-      const schema: any = specData?.spec?.connectionSpecification ?? {};
-
-      const { valid, errors } = jsonFormValidator(schema, formState);
-
       return (
-        <FormLayout
-          formComp={
-            <>
-              <JsonForms
-                readonly={status === 'submitting'}
-                schema={schema}
-                data={formState}
-                renderers={customRenderers}
-                cells={materialCells}
-                onChange={handleFormChange}
-              />
-              <Stack
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                  alignItems: 'center'
-                }}
-              >
-                <SubmitButton
-                  buttonText={getButtonTitle()}
-                  data={status === 'success'}
-                  isFetching={status === 'submitting'}
-                  disabled={!valid || status === 'submitting'}
-                  onClick={() => handleSubmit(formState)}
-                />
-              </Stack>
-            </>
-          }
-          instructionsComp={<CatalogInstuctions data={specData} selected_connector={selectedConnector} />}
-        />
+        <IntegrationForm data={specData} isEditableFlow={isEditableFlow} status={status} handleSubmit={handleSubmit} />
       );
     }
   };
@@ -107,3 +93,79 @@ const IntegrationSpec = ({
 };
 
 export default IntegrationSpec;
+
+const IntegrationForm = ({
+  data,
+  isEditableFlow,
+  status,
+  handleSubmit
+}: {
+  data: any;
+  isEditableFlow: boolean;
+  status: FormStatus;
+  handleSubmit: (payload: any) => void;
+}) => {
+  const schema: any = data?.spec?.connectionSpecification ?? {};
+
+  const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
+
+  const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
+
+  const { type = '', mode = '' } = selectedConnector;
+
+  const { formState, setFormState } = useContext(OAuthContext);
+  const [formValidationState, setFormValidationState] = useState<formValidationMode>('ValidateAndHide');
+
+  /**
+   * Retrieves custom renderers for the JSONForms component based on the provided configuration
+   * (e.g., hiding specific fields).
+   */
+  const handleFormRenderers = getCustomRenderers({ invisibleFields: ['auth_method'] });
+
+  /**
+   * Validates the user-submitted data (`formData`) against the defined schema (`schema`)
+   * and returns an object containing a `valid` flag and any encountered `errors`.
+   */
+  const { valid, errors } = jsonFormValidator(schema, formState);
+
+  /**
+   * Updates the `formData` state with the new data received from the JSONForms component
+   * when the user interacts with the form.
+   */
+  const handleFormDataChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setFormState(data);
+  };
+
+  const handleOnClick = () => {
+    if (!valid) {
+      setFormValidationState('ValidateAndShow');
+      return;
+    }
+    handleSubmit(formState);
+  };
+
+  return (
+    <FormLayout
+      formComp={
+        <>
+          <JsonFormsWrapper
+            formValidationState={formValidationState}
+            onChange={handleFormDataChange}
+            renderers={handleFormRenderers}
+            schema={schema}
+            data={formState}
+          />
+          <FormButton
+            key={'FormButton'}
+            isEditableFlow={isEditableFlow}
+            mode={mode}
+            type={type}
+            status={status}
+            onClick={handleOnClick}
+          />
+        </>
+      }
+      instructionsComp={<CatalogInstuctions data={data} selected_connector={selectedConnector} />}
+    />
+  );
+};
