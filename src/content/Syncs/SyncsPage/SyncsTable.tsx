@@ -14,6 +14,7 @@ import SyncTableRow from './SyncTableRow';
 import { SyncColumns } from './SyncColumns';
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToConnectionRuns } from '@/utils/router-utils';
 
 export interface SyncOnClickProps {
   syncId: string;
@@ -34,7 +35,7 @@ const SyncsTable = ({ syncs }) => {
 
   const handleOnClick = ({ syncId }: SyncOnClickProps) => {
     // navigate to sync runs
-    router.push(`/spaces/${workspaceId}/data-flows/${syncId}/runs`);
+    redirectToConnectionRuns({ router, wid: workspaceId, connId: syncId });
   };
 
   return (

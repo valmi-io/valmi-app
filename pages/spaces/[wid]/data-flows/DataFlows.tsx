@@ -7,6 +7,7 @@ import Xarrow, { Xwrapper } from 'react-xarrows';
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
 
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToConnectionRuns } from '@/utils/router-utils';
 
 type ConnectionLayoutProps = {
   type: string;
@@ -194,9 +195,7 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
   };
 
   const handleLinkOnClick = ({ syncId }: { syncId: string }) => {
-    if (syncId) {
-      router.push(`${getBaseRoute(workspaceId)}/data-flows/${syncId}/runs`);
-    }
+    redirectToConnectionRuns({ router, wid: workspaceId, connId: syncId });
   };
 
   const handleOnMouseEnter = ({ id }: { id: string }) => {

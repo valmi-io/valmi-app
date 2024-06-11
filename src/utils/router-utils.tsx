@@ -41,3 +41,33 @@ export const redirectToDataFlows = ({ router, wid }: { router: NextRouter; wid: 
     router.push(`${getBaseRoute(wid)}/data-flows`);
   }
 };
+
+export const redirectToConnectionRuns = ({
+  router,
+  wid,
+  connId
+}: {
+  router: NextRouter;
+  wid: string;
+  connId: string;
+}) => {
+  if (wid && connId) {
+    router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs`);
+  }
+};
+
+export const redirectToConnectionRunLogs = ({
+  router,
+  wid,
+  connId,
+  runId
+}: {
+  router: NextRouter;
+  wid: string;
+  connId: string;
+  runId: string;
+}) => {
+  if (wid && connId && runId) {
+    router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs/${runId}/logs`);
+  }
+};

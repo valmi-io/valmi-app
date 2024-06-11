@@ -48,7 +48,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
 
   const navigateToSyncRunLogs = (syncRun, connection) => {
     router.push({
-      pathname: `/spaces/${workspaceId}/connections/${syncId}/runs/${syncRun.run_id}/logs`,
+      pathname: `/spaces/${workspaceId}/data-flows/connections/${syncId}/runs/${syncRun.run_id}/logs`,
       query: { connection_type: connection }
     });
   };

@@ -7,7 +7,7 @@ import { getBaseRoute } from '@/utils/lib';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useFetch } from '@/hooks/useFetch';
 import { useSearchParams } from 'next/navigation';
-import { getSearchParams } from '@/utils/router-utils';
+import { getSearchParams, redirectToConnectionRuns } from '@/utils/router-utils';
 
 const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
@@ -30,7 +30,7 @@ const ExploresList = ({ data }: { data: TData }) => {
   const src = `/connectors/google-sheets.svg`;
 
   const handleIconOnClick = (item: any) => {
-    router.push(`${getBaseRoute(workspaceId!)}/connections/${item.sync_id}/runs`);
+    redirectToConnectionRuns({ router, wid: workspaceId, connId: item.sync_id });
   };
 
   const handlePreviewOnClick = (item: any) => {
