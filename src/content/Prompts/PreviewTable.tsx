@@ -79,22 +79,11 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
 
-      let response =
-      {
-        prompt_req: {
-          filters: payload,
-          schema_id: schemaID,
-          time_window: {
-            label: 'custom',
-            range: {
-              start: moment().subtract(1, 'months').toISOString(),
-              end: moment().toISOString()
-            }
-          }
-        }
-      };
-      console.log(response);
-      preview(response);
+      console.log("filters:", payload);
+      preview({workspaceId: wid,
+        promptId: pid,
+        prompt: payload
+      });
     },
     [schemaID]
   );
@@ -152,9 +141,21 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
 
   const applyFilters = (payload: any) => {
     const { schemas = [] } = prompt;
-    payload.schema_id = schemas.length ? schemas[0].id : '';
 
-    previewPrompt(payload);
+    previewPrompt(
+      {
+        schema_id: schemas.length ? schemas[0].id : '',
+        time_window: {
+          label: 'custom',
+                range: {
+                  start: moment().subtract(1, 'months').toISOString(),
+                  end: moment().toISOString()
+                }
+        },
+        filters: payload
+      }
+    );
+
   };
 
   return (

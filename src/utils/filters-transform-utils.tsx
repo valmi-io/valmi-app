@@ -11,22 +11,22 @@ export const transformFilters = (appliedFilters: AppliedFilter[]): AppliedFilter
     const transformedFilter = { ...filter };
 
     // Transform integer values
-    if (filter.column_type === 'INTEGER') {
+    if (filter.column_type.toLowerCase() === 'integer') {
       transformedFilter.value = parseInt(filter.value, 10);
     }
 
     // Transform float values
-    if (filter.column_type === 'FLOAT') {
+    if (filter.column_type.toLowerCase() === 'float') {
       transformedFilter.value = parseFloat(filter.value);
     }
 
     // Transform boolean values
-    if (filter.column_type === 'BOOLEAN') {
+    if (filter.column_type.toLowerCase() === 'boolean') {
       transformedFilter.value = filter.value.toLowerCase() === 'true' ? 'true' : 'false';
     }
 
     // Transform string values with 'IN' operator
-    if (filter.column_type === 'STRING' && filter.operator === 'IN') {
+    if (filter.column_type.toLowerCase() === 'string' && filter.operator === 'IN') {
       transformedFilter.value = filter.value
         .split(',')
         .map((item: string) => `'${item.trim()}'`)
@@ -34,7 +34,7 @@ export const transformFilters = (appliedFilters: AppliedFilter[]): AppliedFilter
     }
 
     // Transform date values
-    if (filter.column_type === 'DATE' || filter.column_type === 'TIMESTAMP') {
+    if (filter.column_type.toLowerCase() === 'date' || filter.column_type.toLowerCase() === 'timestamp') {
       const date = new Date(filter.value);
       transformedFilter.value = date.toISOString();
     }
