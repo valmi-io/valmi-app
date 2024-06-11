@@ -6,7 +6,7 @@
 
 import React from 'react';
 
-import { Box, Chip, Stack, Switch, Typography } from '@mui/material';
+import { Box, Button, Chip, Paper, Stack, Switch, Typography, styled } from '@mui/material';
 
 import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
 
@@ -22,6 +22,32 @@ type SyncDetailsCardProps = {
   handleEditSync: (data: any) => void;
   isPublicSync?: boolean;
 };
+
+const CardWrapper = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  gap: theme.spacing(2),
+  padding: theme.spacing(2)
+}));
+
+const DetailsContainer = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  width: '100%',
+  gap: theme.spacing(1)
+}));
+
+const ScheduleInfoContainer = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'baseline',
+  justifyContent: 'flex-start',
+  gap: theme.spacing(1)
+}));
 
 const SyncDetailsCard = ({
   syncData,
@@ -41,20 +67,40 @@ const SyncDetailsCard = ({
   } = syncData || {};
 
   return (
-    <StackLayout spacing={2}>
-      {/** Sync name */}
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-        <Stack spacing={0.5} direction="row" alignItems="center">
-          {appIcons.NAME}
-
-          <Typography variant="body2">{isPublicSync ? 'public_sync' : `${syncName}`}</Typography>
-        </Stack>
-
-        <Stack spacing={0.5} direction="row" alignItems="center" justifyContent="space-between">
-          <Chip
-            color={!isPublicSync ? (status === 'active' ? 'secondary' : 'warning') : 'secondary'}
-            label={isPublicSync ? 'active' : status}
+    <CardWrapper variant="outlined">
+      <DetailsContainer>
+        <Paper
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '100%',
+            gap: '10px'
+          }}
+        >
+          <ConnectionCard
+            connectionType={isPublicSync ? 'SRC_POSTGRES' : sourceConnectionType}
+            connectionTitle={isPublicSync ? '"dvdrental"."public"."one_m_data"' : sourceName}
           />
+          <CustomIcon icon={appIcons.ARROW_RIGHT} />
+          <ConnectionCard
+            connectionType={isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType}
+            connectionTitle={isPublicSync ? process.env.PUBLIC_SYNC_URL : destinationName}
+          />
+        </Paper>
+        <Paper
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            width: '100%',
+            gap: '10px'
+          }}
+        >
+          <Typography variant="body1" sx={{ color: (theme) => theme.colors.primary.main }}>
+            {isPublicSync ? 'ACTIVE' : status.toUpperCase()}
+          </Typography>
           {!isPublicSync && (
             <Switch
               size="medium"
@@ -64,59 +110,26 @@ const SyncDetailsCard = ({
               }}
             />
           )}
-        </Stack>
-      </Stack>
+        </Paper>
+      </DetailsContainer>
+      <ScheduleInfoContainer>
+        <CustomIcon icon={appIcons.SCHEDULE} />
+        <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
+          isPublicSync ? '18000000' : run_interval
+        )}`}</Typography>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-      >
-        {/** Source -  Destination */}
-        <Stack display="flex" direction="row" alignItems="flex-start" justifyContent="space-between">
-          <Stack display="flex" direction="row" alignItems="center" spacing={3}>
-            <ConnectionCard
-              connectionType={isPublicSync ? 'SRC_POSTGRES' : sourceConnectionType}
-              connectionTitle={isPublicSync ? '"dvdrental"."public"."one_m_data"' : sourceName}
-            />
-
-            {/* right arrow icon */}
-            <CustomIcon icon={appIcons.ARROW_RIGHT} />
-
-            <ConnectionCard
-              connectionType={isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType}
-              connectionTitle={isPublicSync ? process.env.PUBLIC_SYNC_URL : destinationName}
-            />
-          </Stack>
-          {/** Schedule */}
-        </Stack>
-        <Stack display="flex" direction="column" justifyContent="space-between">
-          <Stack spacing={0.5} direction="row">
-            <CustomIcon icon={appIcons.SCHEDULE} />
-            <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
-              isPublicSync ? '18000000' : run_interval
-            )}`}</Typography>
-          </Stack>
-
-          {!isPublicSync && (
-            <Stack spacing={0.5} direction="row">
-              <CustomIcon icon={appIcons.EDIT} />
-
-              <Typography
-                // onClick={() => handleEditSync(syncData)}
-                variant="body2"
-                sx={{
-                  cursor: 'not-allowed'
-                }}
-              >
-                {'Edit'}
-              </Typography>
-            </Stack>
-          )}
-        </Stack>
-      </Box>
-    </StackLayout>
+        {!isPublicSync && (
+          <>
+            <Button
+              variant="text"
+              // onClick={() => handleEditSync(syncData)}
+            >
+              {'EDIT'}
+            </Button>
+          </>
+        )}
+      </ScheduleInfoContainer>
+    </CardWrapper>
   );
 };
 

@@ -73,7 +73,7 @@ const ConnectionItem = ({
         cursor: 'pointer',
         alignItems: 'center'
       }}
-      onClick={() => console.log('')}
+      onClick={() => handleConnectionOnClick({ id })}
       id={id}
     >
       <ImageComponent
@@ -161,8 +161,8 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
     const lines: { from: any; to: any; selected?: boolean; syncId: string }[] = [];
     const logoId = 'logo';
     syncs.forEach((sync: any) => {
-      const fromId = sync?.source?.name !== 'default warehouse' && sync?.source?.id;
-      const toId = sync?.destination?.name !== 'default warehouse' && sync?.destination?.id;
+      const fromId = sync?.source?.name !== 'VALMI_ENGINE' && sync?.source?.id;
+      const toId = sync?.source?.name === 'VALMI_ENGINE' && sync?.destination?.id;
       const syncId = sync?.id;
 
       if (fromId) {
@@ -187,11 +187,9 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
     router.push(`${getBaseRoute(workspaceId)}/data-flows/connections`);
   };
 
-  const handleConnectionOnClick = ({ connectionType, id }: { connectionType: any; id: string }) => {
-    if (connectionType === 'STREAM') {
-      router.push(`${getBaseRoute(workspaceId)}/streams?id=${id}`);
-    } else if (connectionType === 'DESTINATION') {
-      router.push(`${getBaseRoute(workspaceId)}/destination-warehouses?id=${id}`);
+  const handleConnectionOnClick = ({ id }: { id: string }) => {
+    if (id) {
+      router.push(`${getBaseRoute(workspaceId)}/data-flows/connections`);
     }
   };
 
@@ -222,7 +220,7 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
       <Xwrapper>
         <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
           {syncs.map((connection: any) => {
-            if (connection?.source?.name !== 'default warehouse') {
+            if (connection?.source?.name !== 'VALMI_ENGINE') {
               return (
                 <ConnectionLayout
                   data={connection?.source}
@@ -262,7 +260,7 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
 
         <Stack spacing={2} sx={{ display: 'flex', width: '100%', mt: 1 }}>
           {syncs.map((connection: any) => {
-            if (connection?.destination?.name !== 'default warehouse') {
+            if (connection?.source?.name === 'VALMI_ENGINE') {
               return (
                 <ConnectionLayout
                   data={connection?.destination}

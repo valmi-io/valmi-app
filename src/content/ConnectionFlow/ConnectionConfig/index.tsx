@@ -277,7 +277,7 @@ const ConnectionConfig = ({ params }: TConnectionUpsertProps) => {
           successCb: (data: any) => {
             setStatus('success');
             handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
-            router.push(`/spaces/${wid}/connections`);
+            router.push(`/spaces/${wid}/data-flows`);
           },
           errorCb: (err) => {
             setStatus('error');

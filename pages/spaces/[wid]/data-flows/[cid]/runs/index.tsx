@@ -28,7 +28,7 @@ const SyncRunsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   return (
-    <PageLayout pageHeadTitle="Sync Runs" title={'Sync Details'} displayButton={false}>
+    <PageLayout pageHeadTitle="Sync Runs" title={'FLOW DETAILS'} displayButton={false}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
           <SyncDetails syncId={cid} workspaceId={workspaceId} />

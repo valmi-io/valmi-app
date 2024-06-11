@@ -40,7 +40,7 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
   return (
     <SyncRunContext.Provider value={contextValue}>
       <PageTitle
-        title={'Run History'}
+        title={'RUNS'}
         displayButton={true}
         buttonTitle={getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), syncRuns, isPromisePending)}
         disabled={isPromisePending}
@@ -56,7 +56,13 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
 
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
-          <SyncRunPopover syncRuns={syncRuns} isQueryPending={isPromisePending} workspaceId={workspaceId} syncId={syncId} closePopover={handlePopoverClose} />
+          <SyncRunPopover
+            syncRuns={syncRuns}
+            isQueryPending={isPromisePending}
+            workspaceId={workspaceId}
+            syncId={syncId}
+            closePopover={handlePopoverClose}
+          />
         </PopoverComponent>
       )}
     </SyncRunContext.Provider>
