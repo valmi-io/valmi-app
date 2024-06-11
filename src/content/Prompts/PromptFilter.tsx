@@ -7,7 +7,8 @@ import { transformFilters } from '@/utils/filters-transform-utils';
 
 // Interface for filter options
 interface Filter {
-  column: string;
+  db_column: string;
+  display_column: string;
   column_type: string;
 }
 
@@ -62,18 +63,26 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     setSelectedColumnIndex(index);
     handleFilterChange(index, 'column', value);
 
-    const filter = filters.find((filter) => filter.column === value);
+    const filter = filters.find((filter) => filter.display_column === value);
     const columnType = filter ? filter.column_type : 'string';
     handleFilterChange(index, 'column_type', columnType);
   };
 
   const handleSubmit = () => {
-    const combinedFilters = [
-      ...appliedFilters,
+    const combinedFilters = appliedFilters.map((filter) => {
+      const correspondingFilter = filters.find((f) => f.display_column === filter.column);
+      return {
+        ...filter,
+        column: correspondingFilter ? correspondingFilter.db_column : filter.column
+      };
+    });
+
+    const dateRangeFilters = [
       { column: 'updated_at', column_type: 'DATE', operator: '>=', value: dateRange.start_date.toISOString() },
       { column: 'updated_at', column_type: 'DATE', operator: '<=', value: dateRange.end_date.toISOString() }
     ];
-    applyFilters(transformFilters(combinedFilters));
+
+    applyFilters(transformFilters([...combinedFilters, ...dateRangeFilters]));
   };
 
   return (
@@ -88,8 +97,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           >
             <MenuItem value="">Select Column</MenuItem>
             {filters.map((filter) => (
-              <MenuItem key={filter.column} value={filter.column}>
-                {filter.column}
+              <MenuItem key={filter.display_column} value={filter.display_column}>
+                {filter.display_column}
               </MenuItem>
             ))}
           </Select>
