@@ -9,7 +9,7 @@ import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 import { RootState } from '@store/reducers';
 import { useWizard } from 'react-use-wizard';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
-import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
+import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/data-flows/create';
 import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';

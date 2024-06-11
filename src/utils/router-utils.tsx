@@ -26,12 +26,18 @@ export const redirectToHomePage = (wid: string, router: NextRouter) => {
 
 export const redirectToCreateConnection = ({ router, wid }: { router: NextRouter; wid: string }) => {
   if (wid) {
-    router.push(`${getBaseRoute(wid)}/connections/create`);
+    router.push(`${getBaseRoute(wid)}/data-flows/create`);
   }
 };
 
 export const redirectToCredentials = ({ router, wid, type }: { router: NextRouter; wid: string; type: string }) => {
   if (wid) {
     router.push(`${getBaseRoute(wid)}/catalog/credentials?type=${type}`);
+  }
+};
+
+export const redirectToDataFlows = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows`);
   }
 };

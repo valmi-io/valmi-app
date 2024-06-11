@@ -12,7 +12,7 @@ import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { useDispatch, useSelector } from 'react-redux';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
 import { RootState } from '@/store/reducers';
-import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
+import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/data-flows/create';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import {

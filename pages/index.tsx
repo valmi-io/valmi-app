@@ -61,7 +61,7 @@ const HomePage = () => {
     if (workspaceId) {
       // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
       setAuthTokenCookie(session?.authToken ?? '');
-      router.push(`/spaces/${workspaceId}/connections`);
+      router.push(`/spaces/${workspaceId}/data-flows`);
     }
   }, [workspaceId]);
 

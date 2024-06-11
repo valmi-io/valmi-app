@@ -21,26 +21,16 @@ const ConnectionCard = (props: any) => {
   return (
     <Paper variant="outlined">
       <Stack spacing={1}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={1}
-          sx={{ padding: (theme) => theme.spacing(1) }}
-        >
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ padding: (theme) => theme.spacing(1) }}>
           <ImageComponent
-            src={`/connectors/${connectionType
-              .split('_')[1]
-              .toLowerCase()}.svg`}
+            src={`/connectors/${connectionType.split('_')[1].toLowerCase()}.svg`}
             alt="connector"
             style={{ marginRight: 10 }}
             size={ImageSize.large}
           />
 
           <Stack spacing={0.5}>
-            <ConnectorChip
-              size="small"
-              label={capitalizeFirstLetter(connectionType.split('_')[1])}
-            />
+            <ConnectorChip size="small" label={capitalizeFirstLetter(connectionType.split('_')[1])} />
             <Typography variant="body2">{connectionTitle}</Typography>
           </Stack>
         </Stack>

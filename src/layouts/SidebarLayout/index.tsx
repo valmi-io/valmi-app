@@ -36,7 +36,7 @@ const ContentWrapper = styled(Stack)(({ theme }) => ({
   flex: 1,
   width: '100%',
   alignItems: 'center',
-  maxWidth: '1600px'
+  maxWidth: '1320px'
 }));
 
 // Wrapper for the header to style it properly

@@ -41,7 +41,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
     {
       id: 1,
-      path: `/spaces/${workspaceId}/connections`,
+      path: `/spaces/${workspaceId}/data-flows`,
       sidebarProps: {
         displayText: 'DATA FLOWS',
         icon: appIcons.DATA_FLOWS,

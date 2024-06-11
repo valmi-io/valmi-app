@@ -34,7 +34,7 @@ const SyncsTable = ({ syncs }) => {
 
   const handleOnClick = ({ syncId }: SyncOnClickProps) => {
     // navigate to sync runs
-    router.push(`/spaces/${workspaceId}/connections/${syncId}/runs`);
+    router.push(`/spaces/${workspaceId}/data-flows/${syncId}/runs`);
   };
 
   return (

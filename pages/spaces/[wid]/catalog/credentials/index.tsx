@@ -51,7 +51,7 @@ const CredentialsPage: NextPageWithLayout = () => {
   }, [workspaceId, fetchCredentials]);
 
   const handleCreateConnectionOnClick = () => {
-    router.push(`${getBaseRoute(workspaceId as string)}/connections/create`);
+    router.push(`${getBaseRoute(workspaceId as string)}/data-flows/create`);
   };
 
   return (
