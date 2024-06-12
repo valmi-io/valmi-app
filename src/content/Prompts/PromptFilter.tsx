@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Select, MenuItem, Button, Stack } from '@mui/material';
+import { Select, MenuItem, Button, Stack, Paper } from '@mui/material';
 import FilterInput from './FilterInput';
 import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
 import { transformFilters } from '@/utils/filters-transform-utils';
-
 
 // Interface for filter options
 interface Filter {
@@ -30,7 +29,6 @@ interface PromptFilterProps {
   operators: Operator;
   applyFilters: (data: AppliedFilter[]) => void;
 }
-
 
 const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standardOperators, applyFilters }) => {
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
@@ -84,46 +82,49 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
     applyFilters(transformFilters([...combinedFilters, ...dateRangeFilters]));
   };
-
   return (
-    <Stack spacing={2} p={2}>
-      <DateRangePicker dateRange={dateRange} onDateRangeChange={handleDateRangeChange} setDateRange={setDateRange} />
-
-      {appliedFilters.map((appliedFilter, index) => (
-        <Stack direction="row" spacing={2} key={index}>
-          <Select
-            value={appliedFilter.column}
-            onChange={(e) => handleColumnChange(index, e.target.value as string)}
-          >
-            <MenuItem value="">Select Column</MenuItem>
-            {filters.map((filter) => (
-              <MenuItem key={filter.display_column} value={filter.display_column}>
-                {filter.display_column}
-              </MenuItem>
-            ))}
-          </Select>
-          {selectedColumnIndex === index && (
-            <>
-              <Select
-                value={appliedFilter.operator}
-                onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
-              >
-                <MenuItem value="">Select Operator</MenuItem>
-                {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
-              </Select>
-              <FilterInput appliedFilter={appliedFilter} index={index} handleFilterChange={handleFilterChange} />
-            </>
-          )}
-          <Button onClick={() => handleRemoveFilter(index)}>Remove</Button>
-        </Stack>
-      ))}
-      <Button onClick={handleAddFilter}>Add Filter</Button>
-      <Button onClick={handleSubmit}>Apply Filters</Button>
-    </Stack>
+    <>
+      <Stack spacing={2} p={2} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <DateRangePicker dateRange={dateRange} onDateRangeChange={handleDateRangeChange} setDateRange={setDateRange} />
+        <Paper sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
+          <Button onClick={handleAddFilter}>Add Filter</Button>
+          <Button onClick={handleSubmit} disabled={!appliedFilters.length} variant="outlined">
+            Apply Filters
+          </Button>
+        </Paper>
+      </Stack>
+      <Paper sx={{ display: 'flex' }}>
+        {appliedFilters.map((appliedFilter, index) => (
+          <Stack direction="row" spacing={2} key={index}>
+            <Select value={appliedFilter.column} onChange={(e) => handleColumnChange(index, e.target.value as string)}>
+              <MenuItem value="">Select Column</MenuItem>
+              {filters?.map((filter) => (
+                <MenuItem key={filter.display_column} value={filter.display_column}>
+                  {filter.display_column}
+                </MenuItem>
+              ))}
+            </Select>
+            {selectedColumnIndex === index && (
+              <>
+                <Select
+                  value={appliedFilter.operator}
+                  onChange={(e) => handleFilterChange(index, 'operator', e.target.value as string)}
+                >
+                  <MenuItem value="">Select Operator</MenuItem>
+                  {standardOperators[appliedFilter.column_type]?.map((op) => (
+                    <MenuItem key={op} value={op}>
+                      {op}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FilterInput appliedFilter={appliedFilter} index={index} handleFilterChange={handleFilterChange} />
+              </>
+            )}
+            <Button onClick={() => handleRemoveFilter(index)}>Remove</Button>
+          </Stack>
+        ))}
+      </Paper>
+    </>
   );
 };
 

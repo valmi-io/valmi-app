@@ -15,6 +15,9 @@ import { signOutUser } from '@/utils/lib';
 const credentialsAdapter: any = createEntityAdapter();
 const initialCredentialsState = credentialsAdapter.getInitialState();
 
+const syncsAdapter: any = createEntityAdapter();
+const initialSyncsState = syncsAdapter.getInitialState();
+
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
@@ -57,7 +60,8 @@ export const apiSlice = createApi({
     'Preview',
     'Explore',
     'Package',
-    'Credential'
+    'Credential',
+    'Connection'
   ],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
@@ -367,4 +371,16 @@ export const getCredentialsSelectors = (workspaceId: string) => {
     credentialsAdapter.getSelectors((state) => getCredentialsData(state) ?? initialCredentialsState);
 
   return { selectAllCredentials, selectCredentialById };
+};
+
+export const getSyncDetails = (workspaceId: string, syncId: string) => {
+  const getSyncsResult = apiSlice.endpoints.getSyncById.select({ workspaceId, syncId });
+
+  const getSyncsData = createSelector(getSyncsResult, (syncResult) => syncResult.data);
+
+  const { selectById: selectSyncById } =
+    // @ts-ignore
+    syncsAdapter.getSelectors((state) => getSyncsData(state) ?? initialSyncsState);
+
+  return { selectSyncById };
 };

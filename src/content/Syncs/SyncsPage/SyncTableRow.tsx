@@ -23,7 +23,7 @@ const ChipComponent = styled(Chip)(({ theme }) => ({
 const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
   cursor: 'pointer',
   '&.Mui-selected': {
-    backgroundColor: theme.colors.secondary.lighter
+    backgroundColor: theme.colors.alpha.black[10]
   }
 }));
 

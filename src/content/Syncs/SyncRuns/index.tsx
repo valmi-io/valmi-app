@@ -17,6 +17,8 @@ import { useSyncRuns } from './useSyncRuns';
 import SyncRunsHeader from './SyncRunsHeader';
 import { SyncRunRootContext } from '@contexts/Contexts';
 import ContentLayout from '@/layouts/ContentLayout';
+import { getSyncDetails } from '@store/api/apiSlice';
+import { useSelector } from 'react-redux';
 
 /**
  * Responsible for displaying `Runs` page and its components.
@@ -49,6 +51,14 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     syncId: syncId,
     workspaceId: workspaceId
   });
+
+  // const { selectCredentialById } = getCredentialsSelectors(wid as string);
+  // const credentialData = useSelector((state) => selectCredentialById(state, credentialId));
+
+  const { selectSyncById } = getSyncDetails(workspaceId, syncId);
+  // const syncData = useSelector((state) => selectSyncById(state, syncId));
+
+  // console.log('SYNCDATA:', syncData);
 
   /**
    * Fetches sync runs every 3 seconds by updating last sync timestamp

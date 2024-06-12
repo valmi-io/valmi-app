@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Table, TableBody, TableContainer, TableHead } from '@mui/material';
+import { Paper, Table, TableBody, TableContainer, TableHead } from '@mui/material';
 
 import { getErrorInSyncRun } from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
@@ -57,7 +57,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
     <>
       <AlertComponent open={errorDialog} onClose={handleClose} message={syncErrorMessage} isError={true} />
       {/* Syncs Table*/}
-      <TableContainer>
+      <TableContainer component={Paper} variant="outlined">
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>
