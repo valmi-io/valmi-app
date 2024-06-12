@@ -3,8 +3,6 @@
  * Created Date: Tuesday, May 2nd 2023, 10:25:52 am
  * Author: Nagendra S @ valmi.io
  */
-
-import { ConnectionSelectionState } from '@/content/SyncFlow/Warehouse/ConnectionSelectionState';
 import { checkIfPropExistsInObject, isObjectEmpty } from '@utils/lib';
 
 export const hasErrorsInData = (data: any) => {
