@@ -18,7 +18,7 @@ const ConnectionCard = (props: any) => {
         style={{ marginRight: 5 }}
         size={ImageSize.syncDetailsCard}
       />
-      <Typography variant="body1">{connectionTitle}</Typography>
+      <Typography variant="body1">{connectionTitle.toLowerCase()}</Typography>
     </Paper>
   );
 };

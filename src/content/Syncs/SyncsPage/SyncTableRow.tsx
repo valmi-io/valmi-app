@@ -20,13 +20,17 @@ const ChipComponent = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]
 }));
 
-const CustomizedTableRow = styled(TableRow)(({}) => ({
-  cursor: 'pointer'
+const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: 'pointer',
+  '&.Mui-selected': {
+    backgroundColor: theme.colors.secondary.lighter
+  }
 }));
 
 interface SyncTableRowProps {
   sync: any;
   onClick: (syncId: SyncOnClickProps) => void;
+  selected?: boolean;
 }
 
 /**
@@ -36,13 +40,13 @@ interface SyncTableRowProps {
  * - Responsible for passing `syncId` on click.
  */
 
-const SyncTableRow = ({ sync, onClick }: SyncTableRowProps) => {
+const SyncTableRow = ({ sync, onClick, selected = false }: SyncTableRowProps) => {
   const getConnectorName = (sync: any, connectionType: any) => {
     return sync[connectionType].credential.connector_type.split('_')[1];
   };
 
   return (
-    <CustomizedTableRow hover key={sync.id} onClick={() => onClick({ syncId: sync.id })}>
+    <CustomizedTableRow hover key={sync.id} onClick={() => onClick({ syncId: sync.id })} selected={selected}>
       <TableCellComponent text={sync.name} />
       <TableCellWithImage
         title={sync.source.name}

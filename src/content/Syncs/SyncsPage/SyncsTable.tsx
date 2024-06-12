@@ -28,7 +28,7 @@ export interface SyncOnClickProps {
  * - Responsible for handling sync `onClick`
  */
 
-const SyncsTable = ({ syncs }) => {
+const SyncsTable = ({ syncs, id: queryId }: { syncs: any; id: string }) => {
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
@@ -50,7 +50,10 @@ const SyncsTable = ({ syncs }) => {
           {/* Syncs Table Body */}
           <TableBody>
             {syncs.map((sync) => {
-              return <SyncTableRow key={sync.id} sync={sync} onClick={handleOnClick} />;
+              console.log('SYNC ITEM:', sync);
+              const sourceId = sync?.source?.id;
+              const selected = sourceId === queryId;
+              return <SyncTableRow key={sync.id} sync={sync} onClick={handleOnClick} selected={selected} />;
             })}
           </TableBody>
         </Table>

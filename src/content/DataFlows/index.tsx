@@ -74,7 +74,7 @@ const ConnectionItem = ({
         cursor: 'pointer',
         alignItems: 'center'
       }}
-      onClick={() => handleConnectionOnClick({ id })}
+      onClick={() => handleConnectionOnClick({ connectionId: id })}
       id={id}
     >
       <ImageComponent
@@ -188,9 +188,10 @@ const DataFlows = ({ syncs }: { syncs: any }) => {
     router.push(`${getBaseRoute(workspaceId)}/data-flows/connections`);
   };
 
-  const handleConnectionOnClick = ({ id }: { id: string }) => {
-    if (id) {
-      router.push(`${getBaseRoute(workspaceId)}/data-flows/connections`);
+  const handleConnectionOnClick = ({ connectionId }: { connectionId: string }) => {
+    console.log('IIDDD:-', connectionId);
+    if (connectionId) {
+      router.push(`${getBaseRoute(workspaceId)}/data-flows/connections?id=${connectionId}`);
     }
   };
 
