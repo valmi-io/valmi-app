@@ -4,6 +4,8 @@ import NextAuth, { User } from 'next-auth';
 import GoogleProviders from 'next-auth/providers/google';
 
 import { getErrorsInData, handleAxiosError, hasErrorsInData } from '@/components/Error/ErrorUtils';
+import { isObjectEmpty } from '@/utils/lib';
+import { getAuthMetaCookie } from '@/lib/cookies';
 
 const GOOGLE_AUTHORIZATION_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
@@ -120,11 +122,9 @@ export const nextAuthOptions = (req, res) => {
               image: token?.picture
             };
 
-            console.log('[next-auth] account:_', account);
+            let authMeta = getAuthMetaCookieFromReq(req);
 
-            console.log('[next-auth] authMeta', JSON.parse(req?.cookies?.authMeta ?? {}));
-
-            let authMeta = JSON.parse(req?.cookies?.authMeta ?? {});
+            console.log('[next-auth] authMeta:_', authMeta);
 
             let payload = {
               account: {
@@ -141,7 +141,7 @@ export const nextAuthOptions = (req, res) => {
                 name: token.name,
                 email: token.email,
                 meta: {
-                  ...authMeta?.meta
+                  ...authMeta
                 }
               }
             };
@@ -217,3 +217,31 @@ const handleSocialLogin = async (payload, successCb, errorCb) => {
     handleAxiosError(error, (err) => errorCb(err));
   }
 };
+
+function getAuthMetaCookieFromReq(req) {
+  // Check for missing request object
+  if (!req) {
+    return {};
+  }
+
+  // Check for missing cookies
+  const cookies = req?.cookies ?? {};
+  if (isObjectEmpty(cookies)) {
+    return {};
+  }
+
+  // Get the cookie name (assuming getAuthMetaCookie returns a string)
+  const cookieName = getAuthMetaCookie();
+  if (!cookieName) {
+    return {};
+  }
+
+  // Try to retrieve the cookie and handle potential parsing errors
+  const cookie = cookies[cookieName] ?? '{}'; // Use empty string as default
+  try {
+    const parsedCookie = JSON.parse(cookie);
+    return parsedCookie?.meta ?? {}; // Extract and return meta property
+  } catch (error) {
+    return {};
+  }
+}
