@@ -413,7 +413,6 @@ export const initializeConnectionFlowState = ({
 export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
 
 export const isIntegrationConfigured = (data: TData, type: string) => {
-  console.log('isIntegrationConfigured:_', { data, type });
   return !!data?.entities?.[type];
 };
 

@@ -7,16 +7,14 @@ import SidebarLayout from '@layouts/SidebarLayout';
 
 import ContentLayout from '@/layouts/ContentLayout';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import { useFetch } from '@/hooks/useFetch';
-import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import DataFlows from '@/content/DataFlows';
+import { useConnectionsData } from '@/content/Connections/useConnectionsData';
+import { TConnection } from '@/utils/typings.d';
 
-const PageContent = ({ data }: { data: any }) => {
-  console.log('Page content:_', data);
+const PageContent = ({ data }: { data: TConnection[] }) => {
   if (data.length > 0) {
-    // Display syncs when syncs data length > 0
-    return <DataFlows syncs={data} />;
+    return <DataFlows connections={data} />;
   }
 
   // Display empty component
@@ -26,22 +24,15 @@ const PageContent = ({ data }: { data: any }) => {
 const DataFlowsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
-  const {
-    data: connections,
-    error,
-    isFetching,
-    traceError
-  } = useFetch({
-    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
-  });
+  const { data, error, isFetching, traceError } = useConnectionsData(workspaceId);
 
   return (
     <PageLayout pageHeadTitle="Data Flows" title="DATA FLOWS" displayButton={false}>
       <ContentLayout
-        key={`connectionsPage`}
+        key={`dataflowspage`}
         error={error}
-        PageContent={<PageContent data={connections} />}
-        displayComponent={!error && !isFetching && connections}
+        PageContent={<PageContent data={data} />}
+        displayComponent={!error && !isFetching && data}
         isLoading={isFetching}
         traceError={traceError}
       />

@@ -64,3 +64,68 @@ export type TAccount = {
   meta_data: any;
   profile: string;
 };
+export interface TConnection {
+  id: string;
+  name: string;
+  status: string;
+  ui_state: any;
+  schedule: Schedule;
+  source: TConfiguredSource;
+  destination: TConfiguredDestination;
+}
+export interface Schedule {
+  run_interval: number;
+}
+export interface TConfiguredSource {
+  id: string;
+  name: string;
+  catalog: TConfiguredSourceCatalog;
+  credential: TCredential;
+}
+
+export interface TConfiguredSourceCatalog {
+  streams: TConfiguredSourceStream[];
+}
+
+export interface TConfiguredSourceStream {
+  stream: TSourceStream;
+  sync_mode: string;
+  primary_key: string[][];
+  cursor_field: string[];
+  destination_sync_mode: string;
+}
+
+export interface TSourceStream {
+  name: string;
+  json_schema: any;
+  default_cursor_field?: string[];
+  supported_sync_modes?: string[];
+  source_defined_cursor?: boolean;
+  source_defined_primary_key?: string[][];
+}
+
+export interface TConfiguredDestination {
+  name: string;
+  catalog: TConfiguredDestinationCatalog;
+  id: string;
+  credential: TCredential;
+}
+export interface TConfiguredDestinationCatalog {
+  streams: TConfiguredDestinationStream[];
+}
+export interface TConfiguredDestinationStream {
+  stream: TDestinationStream;
+  sync_mode?: string;
+  primary_key?: string[][];
+  cursor_field?: string[];
+  destination_sync_mode?: string;
+}
+
+export interface TDestinationStream {
+  name: string;
+  json_schema?: any;
+  default_cursor_field?: string[];
+  supported_sync_modes?: string[];
+  source_defined_cursor?: boolean;
+  source_defined_primary_key?: string[][];
+}

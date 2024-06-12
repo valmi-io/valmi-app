@@ -73,8 +73,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   const { selectCredentialById } = getCredentialsSelectors(wid as string);
   const credentialData = useSelector((state) => selectCredentialById(state, credentialId));
 
-  console.log('Credential data:_', credentialData);
-
   // discover call query
   const [fetchObjects] = useLazyDiscoverConnectorQuery();
 
@@ -106,8 +104,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   useEffect(() => {
     if (data) {
       const { spec, packages, oauthCredentials } = data ?? {};
-
-      console.log('use effect data:_', data);
 
       // initializing connection flow state.
       initializeConnectionFlowState({
@@ -219,7 +215,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   };
 
   const handleCredentialUpdateError = (err: unknown) => {
-    console.log('handle credential error:_', err);
     setStatus('error');
     handleAlertOpen({ message: err, alertType: 'error' });
   };

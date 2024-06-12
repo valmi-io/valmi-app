@@ -10,7 +10,6 @@ import SidebarLayout from '@layouts/SidebarLayout';
 import ContentLayout from '@/layouts/ContentLayout';
 import CredentialsTable from '@/content/Credentials/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { getBaseRoute } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
 import { getSearchParams, redirectToCreateConnection } from '@/utils/router-utils';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
@@ -18,7 +17,7 @@ import { TCredential } from '@/utils/typings.d';
 import { useCredentials } from '@/content/Credentials/useCredentials';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { clearConnectionFlowState, setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
+import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 import { RootState } from '@/store/reducers';
 
@@ -51,8 +50,6 @@ const CredentialsPage: NextPageWithLayout = () => {
   });
 
   useEffect(() => {
-    console.log('update connection flow state:_ ');
-    // dispatch(clearConnectionFlowState());
     const selectedConnectorKey = getSelectedConnectorKey();
 
     console.log('Connection data flow:_', connectionDataFlow);

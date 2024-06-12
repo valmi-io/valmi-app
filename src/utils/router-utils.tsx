@@ -72,3 +72,9 @@ export const redirectToConnectionRunLogs = ({
     router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs/${runId}/logs`);
   }
 };
+
+export const redirectToConnections = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows/connections`);
+  }
+};

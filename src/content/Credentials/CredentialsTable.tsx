@@ -59,7 +59,6 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
       }
     };
 
-    console.log('obj to dispatch:_', { objToDispatch, credential });
     dispatch(setConnectionFlowState(objToDispatch));
 
     redirectToCreateConnection({ router: router, wid: workspaceId });

@@ -1,8 +1,3 @@
-/*
- * Connections page
- * This component represents a page for displaying connections table and creating / editing connection.
- */
-
 import { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
@@ -17,16 +12,15 @@ import SidebarLayout from '@layouts/SidebarLayout';
 import { AppDispatch } from '@store/store';
 import ContentLayout from '@/layouts/ContentLayout';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
-import SyncsTable from '@/content/Syncs/SyncsPage/SyncsTable';
-import { useFetch } from '@/hooks/useFetch';
-import { useFetchSyncsQuery } from '@/store/api/apiSlice';
 import { clearConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { useConnectionsData } from '@/content/Connections/useConnectionsData';
+import ConnectionsTable from '@/content/Connections/ConnectionsTable';
+import { TConnection } from '@/utils/typings.d';
 
-const PageContent = ({ data, id }: { data: any; id: string }) => {
+const PageContent = ({ data, id }: { data: TConnection[]; id: string }) => {
   if (data.length > 0) {
-    // Display syncs when syncs data length > 0
-    return <SyncsTable syncs={data} id={id} />;
+    return <ConnectionsTable connections={data} id={id} />;
   }
 
   // Display empty component
@@ -40,36 +34,29 @@ const ConnectionsPage: NextPageWithLayout = () => {
 
   const { workspaceId = '' } = useWorkspaceId();
 
-  const {
-    data: syncs,
-    error,
-    isFetching,
-    traceError
-  } = useFetch({
-    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
-  });
-  console.log('syncs:', syncs);
+  const { data, error, isFetching, traceError } = useConnectionsData(workspaceId);
+
   const handleCreateConnectionOnClick = () => {
     router.push(`/spaces/${workspaceId}/catalog`);
   };
 
   useEffect(() => {
-    // initialising sync flow state
+    // reset connection flow state.
     dispatch(clearConnectionFlowState());
   }, []);
 
   return (
     <PageLayout
-      pageHeadTitle="Data Flows"
-      title="DATA FLOWS"
+      pageHeadTitle="Connections"
+      title="Connections"
       buttonTitle="Connection"
       handleButtonOnClick={handleCreateConnectionOnClick}
     >
       <ContentLayout
         key={`connectionsPage`}
         error={error}
-        PageContent={<PageContent data={syncs} id={id} />}
-        displayComponent={!error && !isFetching && syncs}
+        PageContent={<PageContent data={data} id={id as string} />}
+        displayComponent={!error && !isFetching && data}
         isLoading={isFetching}
         traceError={traceError}
       />
