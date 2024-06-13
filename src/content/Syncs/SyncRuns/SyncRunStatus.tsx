@@ -16,10 +16,6 @@ interface SyncRunStatusProps {
   isRetlFlow: boolean;
 }
 
-const ChipComponent = styled(Chip)(({ theme }) => ({
-  color: theme.colors.alpha.white[100]
-}));
-
 const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps) => {
   let runStatus = getRunStatus(syncRun);
 
@@ -37,10 +33,21 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
         gap: (theme) => theme.spacing(1)
       }}
     >
-      <ChipComponent
-        label={runStatus}
-        color={runStatus === 'failed' ? 'error' : runStatus === 'success' ? 'success' : 'secondary'}
-      />
+      <Typography
+        variant="caption"
+        sx={{
+          color:
+            runStatus === 'failed'
+              ? (theme) => theme.colors.error.main
+              : runStatus === 'terminated'
+              ? (theme) => theme.colors.error.main
+              : runStatus === 'success'
+              ? (theme) => theme.colors.success.main
+              : (theme) => theme.colors.success.main
+        }}
+      >
+        {runStatus.toUpperCase()}
+      </Typography>
 
       {runStatus === 'failed' && (
         <RunStatusIcon onClick={handleStatusOnClick} status={runStatus} tooltipTitle={'Show Error'} />
