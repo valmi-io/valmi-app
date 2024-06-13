@@ -59,28 +59,33 @@ export const redirectToConnectionRuns = ({
   connId: string;
 }) => {
   if (wid && connId) {
-    router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs`);
+    router.push(`${getBaseRoute(wid)}/data-flows/${connId}/runs`);
   }
 };
 
-export const redirectToConnectionRunLogs = ({
+export const redirectToDataFlowRunLogs = ({
   router,
   wid,
   connId,
-  runId
+  runId,
+  connectionType
 }: {
   router: NextRouter;
   wid: string;
   connId: string;
   runId: string;
+  connectionType: string;
 }) => {
   if (wid && connId && runId) {
-    router.push(`${getBaseRoute(wid)}/data-flows/connections/${connId}/runs/${runId}/logs`);
+    router.push({
+      pathname: `${getBaseRoute(wid)}/data-flows/${connId}/runs/${runId}/logs`,
+      query: { connection_type: connectionType }
+    });
   }
 };
 
-export const redirectToConnections = ({ router, wid }: { router: NextRouter; wid: string }) => {
+export const redirectToDataFlowsList = ({ router, wid }: { router: NextRouter; wid: string }) => {
   if (wid) {
-    router.push(`${getBaseRoute(wid)}/data-flows/connections`);
+    router.push(`${getBaseRoute(wid)}/data-flows/list`);
   }
 };

@@ -7,18 +7,7 @@ import { getSearchParams } from '@/utils/router-utils';
 import { isEmpty } from 'lodash';
 
 import ConnectionFlowComponent from '@/content/ConnectionFlow/ConnectionFlowComponent';
-
-type TConnectionUpsertParams = {
-  type: string;
-  wid: string;
-  mode: 'etl' | 'retl';
-  connectionId?: string;
-};
-
-export type TConnectionUpsertProps = {
-  params: TConnectionUpsertParams;
-  isEditableFlow?: boolean;
-};
+import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/data-flows/create';
 
 const DataflowEditPageLayout = () => {
   const searchParams = useSearchParams();

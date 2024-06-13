@@ -1,5 +1,5 @@
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
-import { redirectToConnections } from '@/utils/router-utils';
+import { redirectToDataFlowsList } from '@/utils/router-utils';
 import { Stack, Tooltip, styled } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -19,12 +19,12 @@ const DataFlowsLogo = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleLogoOnClick = () => {
-    redirectToConnections({ router, wid: workspaceId });
+    redirectToDataFlowsList({ router, wid: workspaceId });
   };
 
   return (
     <LogoContainer>
-      <Tooltip title="connections">
+      <Tooltip title="data flows">
         <Image
           id="logo"
           priority={true}

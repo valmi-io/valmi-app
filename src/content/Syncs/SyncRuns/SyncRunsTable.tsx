@@ -19,6 +19,7 @@ import { SyncRunColumns } from './SyncRunColumns';
 import SyncRunTableRow from './SyncRunTableRow';
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToDataFlowRunLogs } from '@/utils/router-utils';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
@@ -49,10 +50,13 @@ const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTablePr
     showErrorDialog(false);
   };
 
-  const navigateToSyncRunLogs = (syncRun, connection) => {
-    router.push({
-      pathname: `/spaces/${workspaceId}/data-flows/connections/${syncId}/runs/${syncRun.run_id}/logs`,
-      query: { connection_type: connection }
+  const navigateToLogs = (syncRun, connection) => {
+    redirectToDataFlowRunLogs({
+      router,
+      wid: workspaceId,
+      connectionType: connection,
+      connId: syncId,
+      runId: syncRun.run_id
     });
   };
 
@@ -77,7 +81,7 @@ const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTablePr
                     key={`run_key ${index}`}
                     displayError={displayError}
                     syncRun={syncRun}
-                    onLogClick={navigateToSyncRunLogs}
+                    onLogClick={navigateToLogs}
                     isRetlFlow={isRetlFlow}
                   />
                 );

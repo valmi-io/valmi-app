@@ -47,9 +47,9 @@ const ConnectionsPage: NextPageWithLayout = () => {
 
   return (
     <PageLayout
-      pageHeadTitle="Connections"
-      title="Connections"
-      buttonTitle="Connection"
+      pageHeadTitle="Data Flows"
+      title="DATA FLOWS"
+      buttonTitle="Data Flow"
       handleButtonOnClick={handleCreateConnectionOnClick}
     >
       <ContentLayout
