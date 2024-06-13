@@ -21,6 +21,10 @@ const LayoutRoot = styled(Stack)(({ theme }) => ({
 const MainContainer = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flex: 1,
+  width: '100%',
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
+  alignItems: 'center',
   [theme.breakpoints.up('lg')]: {
     marginLeft: `${theme.sidebar.width}` // Adds margin to accommodate sidebar width on large screens
   }
@@ -30,8 +34,9 @@ const MainContainer = styled(Stack)(({ theme }) => ({
 const ContentWrapper = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flex: 1,
-  marginLeft: theme.spacing(2),
-  marginRight: theme.spacing(2)
+  width: '100%',
+  alignItems: 'center',
+  maxWidth: '1320px'
 }));
 
 // Wrapper for the header to style it properly
@@ -41,8 +46,6 @@ const HeaderWrapper = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   height: theme.header.height,
-  paddingLeft: theme.spacing(2),
-  paddingRight: theme.spacing(2),
   backgroundColor: alpha(theme.header.background!, 0.95)
 }));
 

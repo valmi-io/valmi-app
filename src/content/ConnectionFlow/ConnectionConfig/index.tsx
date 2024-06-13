@@ -9,7 +9,7 @@ import { getCredentialsSelectors, useLazyDiscoverConnectorQuery } from '@store/a
 import { RootState } from '@store/reducers';
 import { useWizard } from 'react-use-wizard';
 import { setEntities } from '@/store/reducers/connectionDataFlow';
-import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
+import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/data-flows/create';
 import { httpPostRequestHandler, queryHandler } from '@/services';
 import { apiRoutes, redirectToCredentials } from '@/utils/router-utils';
 import { OAuthContext } from '@/contexts/OAuthContext';
@@ -73,8 +73,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   const { selectCredentialById } = getCredentialsSelectors(wid as string);
   const credentialData = useSelector((state) => selectCredentialById(state, credentialId));
 
-  console.log('Credential data:_', credentialData);
-
   // discover call query
   const [fetchObjects] = useLazyDiscoverConnectorQuery();
 
@@ -106,8 +104,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   useEffect(() => {
     if (data) {
       const { spec, packages, oauthCredentials } = data ?? {};
-
-      console.log('use effect data:_', data);
 
       // initializing connection flow state.
       initializeConnectionFlowState({
@@ -219,7 +215,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   };
 
   const handleCredentialUpdateError = (err: unknown) => {
-    console.log('handle credential error:_', err);
     setStatus('error');
     handleAlertOpen({ message: err, alertType: 'error' });
   };
@@ -316,7 +311,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
           successCb: (data: any) => {
             setStatus('success');
             handleAlertOpen({ message: 'Connection created successfully!', alertType: 'success' });
-            router.push(`/spaces/${wid}/connections`);
+            router.push(`/spaces/${wid}/data-flows`);
           },
           errorCb: (err) => {
             setStatus('error');

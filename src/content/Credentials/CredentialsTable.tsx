@@ -16,24 +16,19 @@ import {
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
-import { redirectToCreateConnection } from '@/utils/router-utils';
+import { redirectToEditDataFlow } from '@/utils/router-utils';
 
 export interface SyncOnClickProps {
   syncId: string;
 }
 
-const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
+const CredentialsTable = ({ credentials, id: queryId }: { credentials: TCredential[]; id: string }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const handleCredentialEdit = ({ credential }: { credential: TCredential }) => {
-    // redirect to connections/create page.
-    // router.push(`/spaces/${workspaceId}/connections/create`);
-
-    // const { connector_type="", connector_config={} } = credential;
-
     const key = getSelectedConnectorKey();
 
     const {
@@ -64,10 +59,9 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
       }
     };
 
-    console.log('obj to dispatch:_', { objToDispatch, credential });
     dispatch(setConnectionFlowState(objToDispatch));
 
-    redirectToCreateConnection({ router: router, wid: workspaceId });
+    redirectToEditDataFlow({ router: router, wid: workspaceId });
   };
 
   return (
@@ -78,7 +72,16 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
         </TableHead>
         <TableBody>
           {credentials.map((credential: TCredential) => {
-            return <CredentialsTableRow key={credential.id} credential={credential} onClick={handleCredentialEdit} />;
+            const sourceId = credential?.id;
+            const selected = sourceId === queryId;
+            return (
+              <CredentialsTableRow
+                key={credential.id}
+                credential={credential}
+                onClick={handleCredentialEdit}
+                selected={selected}
+              />
+            );
           })}
         </TableBody>
       </Table>

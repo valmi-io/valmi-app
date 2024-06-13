@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { Alert, Select, MenuItem, Button, Stack, Chip, Box, Popover, FormControl, InputLabel, TextField } from '@mui/material';
+import {
+  Alert,
+  Select,
+  MenuItem,
+  Button,
+  Stack,
+  Chip,
+  Box,
+  Popover,
+  FormControl,
+  InputLabel,
+  TextField
+} from '@mui/material';
 import FilterInput from './FilterInput';
 import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
 import { transformFilters } from '@/utils/filters-transform-utils';
@@ -35,8 +47,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([
     { column: 'payment_method', column_type: 'string', operator: '=', value: 'xyz' },
     { column: 'payment_method', column_type: 'string', operator: '!=', value: 'as' }
-
-
   ]);
   const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>(
     getDateRange('last30days')
@@ -70,13 +80,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
       handleClose();
     }
 
-    if(filterInputIndex! > 0){
-    setFilterInputIndex(filterInputIndex! - 1);
-    }
-    else if (newAppliedFilters.length > 0) {
+    if (filterInputIndex! > 0) {
+      setFilterInputIndex(filterInputIndex! - 1);
+    } else if (newAppliedFilters.length > 0) {
       setFilterInputIndex(0);
-    }
-    else {
+    } else {
       setFilterInputIndex(null);
     }
 
@@ -98,13 +106,15 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   };
 
   const handleSubmitFilter = () => {
-    if(appliedFilters[filterInputIndex!].column === '' || appliedFilters[filterInputIndex!].operator === '' || appliedFilters[filterInputIndex!].value === '')
-      {
-        alert('complete your filter.')
-      }
-      else {
+    if (
+      appliedFilters[filterInputIndex!].column === '' ||
+      appliedFilters[filterInputIndex!].operator === '' ||
+      appliedFilters[filterInputIndex!].value === ''
+    ) {
+      alert('complete your filter.');
+    } else {
       handleClose();
-      }
+    }
   };
 
   const handleSubmit = () => {
@@ -125,22 +135,17 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   };
 
   const isValidFilters = () => {
-
     return false;
   };
 
   const FiltersStatus = () => {
-    for(let i=0; i < appliedFilters.length; i++)
-      {
-        if(appliedFilters[i].column === '' || appliedFilters[i].operator === '' || appliedFilters[i].value === '')
-          {
-          return (
-            <Alert severity="warning">Please fill your filters completely</Alert>
-            );
-          }
+    for (let i = 0; i < appliedFilters.length; i++) {
+      if (appliedFilters[i].column === '' || appliedFilters[i].operator === '' || appliedFilters[i].value === '') {
+        return <Alert severity="warning">Please fill your filters completely</Alert>;
       }
-      return null;
-  }
+    }
+    return null;
+  };
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
@@ -160,10 +165,20 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
               />
             ))}
           </Stack>
-          <CustomPopover appliedFilters={appliedFilters} filters={filters} standardOperators={standardOperators} isList={true} canAdd={true} />
+          <CustomPopover
+            appliedFilters={appliedFilters}
+            filters={filters}
+            standardOperators={standardOperators}
+            isList={true}
+            canAdd={true}
+          />
         </Box>
         <Stack direction="row" spacing={2} alignItems="center">
-          <DateRangePicker dateRange={dateRange} onDateRangeChange={handleDateRangeChange} setDateRange={setDateRange} />
+          <DateRangePicker
+            dateRange={dateRange}
+            onDateRangeChange={handleDateRangeChange}
+            setDateRange={setDateRange}
+          />
           <Button onClick={handleSubmit} variant="contained" color="primary">
             Apply Filters
           </Button>
@@ -179,11 +194,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
       >
         {filterInputIndex !== null && (
@@ -233,21 +248,17 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   );
 };
 
-
-
-
 export default PromptFilter;
 
-interface PopoverParams
-{
-  appliedFilters: AppliedFilter[],
-  filters: Filter[],
-  standardOperators: Operator,
-  isList: boolean,
-  canAdd: boolean
+interface PopoverParams {
+  appliedFilters: AppliedFilter[];
+  filters: Filter[];
+  standardOperators: Operator;
+  isList: boolean;
+  canAdd: boolean;
 }
 
-const CustomPopover = ({appliedFilters, filters, standardOperators, isList, canAdd}: PopoverParams): any => {
+const CustomPopover = ({ appliedFilters, filters, standardOperators, isList, canAdd }: PopoverParams): any => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -273,10 +284,10 @@ const CustomPopover = ({appliedFilters, filters, standardOperators, isList, canA
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
       >
-        <Box sx={{border:'1px solid black', p:2}} minWidth={600}>
+        <Box sx={{ border: '1px solid black', p: 2 }} minWidth={600}>
           <Stack spacing={2} direction="column">
             {appliedFilters.map((appliedFilter, index) => (
               <Stack spacing={1} direction="row">
@@ -295,7 +306,6 @@ const CustomPopover = ({appliedFilters, filters, standardOperators, isList, canA
                         {filter.display_column}
                       </MenuItem>
                     ))}
-
                   </Select>
                 </FormControl>
 
@@ -309,23 +319,19 @@ const CustomPopover = ({appliedFilters, filters, standardOperators, isList, canA
                     onChange={() => console.log('changing')}
                     defaultValue={appliedFilter.operator}
                   >
-                  {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
+                    {standardOperators[appliedFilter.column_type]?.map((op) => (
+                      <MenuItem key={op} value={op}>
+                        {op}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
-
 
                 <TextField
                   value={appliedFilter.value}
                   onChange={() => console.log('changingg')}
                   placeholder="Enter value"
                 />
-
-
-
               </Stack>
             ))}
 
@@ -336,6 +342,4 @@ const CustomPopover = ({appliedFilters, filters, standardOperators, isList, canA
       </Popover>
     </div>
   );
-
-}
-
+};

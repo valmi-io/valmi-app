@@ -3,7 +3,7 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { getOAuthObjInStore, getSelectedConnectorKey, getSelectedConnectorObj } from '@/utils/connectionFlowUtils';
-import { redirectToCreateConnection, redirectToCredentials } from '@/utils/router-utils';
+import { redirectToCreateDataFlow, redirectToCredentials } from '@/utils/router-utils';
 import { TCatalog } from '@/utils/typings.d';
 import { Grid } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -56,7 +56,7 @@ const CatalogList = ({ catalogs }: { catalogs: TCatalog[] }) => {
     if (hasConnections(catalog)) {
       redirectToCredentials({ router, wid: workspaceId, type: type });
     } else {
-      redirectToCreateConnection({ router, wid: workspaceId });
+      redirectToCreateDataFlow({ router, wid: workspaceId });
     }
   };
 

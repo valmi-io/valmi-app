@@ -63,8 +63,6 @@ export const FormInputControl = (props: ControlProps) => {
     return val;
   };
 
-  console.log('form error helper text:-', errors);
-
   const formErrorHelperText = !isValid ? errors : null;
 
   const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue, timeout);

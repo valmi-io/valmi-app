@@ -25,14 +25,67 @@ export const redirectToHomePage = (wid: string, router: NextRouter) => {
   }
 };
 
-export const redirectToCreateConnection = ({ router, wid }: { router: NextRouter; wid: string }) => {
+export const redirectToCreateDataFlow = ({ router, wid }: { router: NextRouter; wid: string }) => {
   if (wid) {
-    router.push(`${getBaseRoute(wid)}/connections/create`);
+    router.push(`${getBaseRoute(wid)}/data-flows/create`);
+  }
+};
+
+export const redirectToEditDataFlow = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows/edit`);
   }
 };
 
 export const redirectToCredentials = ({ router, wid, type }: { router: NextRouter; wid: string; type: string }) => {
   if (wid) {
     router.push(`${getBaseRoute(wid)}/catalog/credentials?type=${type}`);
+  }
+};
+
+export const redirectToDataFlows = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows`);
+  }
+};
+
+export const redirectToConnectionRuns = ({
+  router,
+  wid,
+  connId
+}: {
+  router: NextRouter;
+  wid: string;
+  connId: string;
+}) => {
+  if (wid && connId) {
+    router.push(`${getBaseRoute(wid)}/data-flows/${connId}/runs`);
+  }
+};
+
+export const redirectToDataFlowRunLogs = ({
+  router,
+  wid,
+  connId,
+  runId,
+  connectionType
+}: {
+  router: NextRouter;
+  wid: string;
+  connId: string;
+  runId: string;
+  connectionType: string;
+}) => {
+  if (wid && connId && runId) {
+    router.push({
+      pathname: `${getBaseRoute(wid)}/data-flows/${connId}/runs/${runId}/logs`,
+      query: { connection_type: connectionType }
+    });
+  }
+};
+
+export const redirectToDataFlowsList = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows/list`);
   }
 };

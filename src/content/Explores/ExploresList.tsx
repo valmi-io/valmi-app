@@ -7,7 +7,7 @@ import { getBaseRoute } from '@/utils/lib';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useFetch } from '@/hooks/useFetch';
 import { useSearchParams } from 'next/navigation';
-import { getSearchParams } from '@/utils/router-utils';
+import { getSearchParams, redirectToConnectionRuns } from '@/utils/router-utils';
 
 const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
@@ -19,7 +19,7 @@ const Container = styled(Grid)(({ theme }) => ({
   isolation: 'isolate'
 }));
 
-const ExploresList = ({ data }: { data: TData }) => {
+const ExploresList = ({ data, id: queryId }: { data: TData; id: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -30,7 +30,7 @@ const ExploresList = ({ data }: { data: TData }) => {
   const src = `/connectors/google-sheets.svg`;
 
   const handleIconOnClick = (item: any) => {
-    router.push(`${getBaseRoute(workspaceId!)}/connections/${item.sync_id}/runs`);
+    redirectToConnectionRuns({ router, wid: workspaceId, connId: item.sync_id });
   };
 
   const handlePreviewOnClick = (item: any) => {
@@ -39,15 +39,20 @@ const ExploresList = ({ data }: { data: TData }) => {
 
   return (
     <Container container>
-      {data.ids.map((id: string) => (
-        <ExploreCard
-          key={id}
-          item={data.entities[id]}
-          handleIconOnClick={handleIconOnClick}
-          handlePreviewOnClick={handlePreviewOnClick}
-          src={src}
-        />
-      ))}
+      {data.ids.map((id: string) => {
+        const syncIdOfExplore = data.entities[id].sync_id;
+        const selected = syncIdOfExplore === queryId;
+        return (
+          <ExploreCard
+            key={id}
+            item={data.entities[id]}
+            handleIconOnClick={handleIconOnClick}
+            handlePreviewOnClick={handlePreviewOnClick}
+            src={src}
+            selected={selected}
+          />
+        );
+      })}
     </Container>
   );
 };

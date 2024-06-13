@@ -149,6 +149,7 @@ const IntegrationForm = ({
       formComp={
         <>
           <JsonFormsWrapper
+            readonly={status === 'submitting'}
             formValidationState={formValidationState}
             onChange={handleFormDataChange}
             renderers={handleFormRenderers}

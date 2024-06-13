@@ -22,10 +22,11 @@ interface ConnectionMetricsProps {
   syncRun: any;
   connection: any;
   displayError: any;
+  isRetlFlow: boolean;
   onLogClick: (syncRun: any, connection: any) => void;
 }
 
-const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick }: ConnectionMetricsProps) => {
+const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick, isRetlFlow }: ConnectionMetricsProps) => {
   let connectionStatus = getConnectionStatus(syncRun, connection);
 
   // let disableLogs = true;
@@ -85,20 +86,22 @@ const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick }: Co
       </Stack>
 
       {/** Connection metrics stack */}
-      <Stack spacing={1} direction="row" alignItems="center">
-        {getConnectionMetrics(syncRun, connection).length > 0
-          ? getConnectionMetrics(syncRun, connection).map((metrics, index) => (
-              <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
-                <MetricChip
-                  size="small"
-                  label={`${capitalizeFirstLetter(metrics.key)}
+      {isRetlFlow && (
+        <Stack spacing={1} direction="row" alignItems="center">
+          {getConnectionMetrics(syncRun, connection).length > 0
+            ? getConnectionMetrics(syncRun, connection).map((metrics, index) => (
+                <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
+                  <MetricChip
+                    size="small"
+                    label={`${capitalizeFirstLetter(metrics.key)}
                       `}
-                />
-                <Typography sx={{ fontSize: 12 }}>{splitNumberByCommas(metrics.value)}</Typography>
-              </Stack>
-            ))
-          : '-'}
-      </Stack>
+                  />
+                  <Typography sx={{ fontSize: 12 }}>{splitNumberByCommas(metrics.value)}</Typography>
+                </Stack>
+              ))
+            : '-'}
+        </Stack>
+      )}
     </Stack>
   );
 };

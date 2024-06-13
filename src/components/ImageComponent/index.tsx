@@ -13,7 +13,8 @@ export enum ImageSize {
   large = '48',
   connectorCard = '64',
   logo = '200',
-  extralarge = '320'
+  extralarge = '320',
+  syncDetailsCard = '24'
 }
 
 export interface ImageComponentProps {

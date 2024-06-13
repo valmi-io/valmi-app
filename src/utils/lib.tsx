@@ -80,6 +80,13 @@ export const getConnectorImage = (connectorType) => {
   return `/connectors/${connectorType.toLowerCase()}.svg`;
 };
 
+export const getConnectorImageName = ({ type = '' }: { type: string }) => {
+  if (type) {
+    const name = type.split('_')[1].toLowerCase();
+    return `/connectors/${name}.svg`;
+  } else return '';
+};
+
 export const signOutUser = async (router, dispatch, query) => {
   // Get access_token from cookie
   const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';

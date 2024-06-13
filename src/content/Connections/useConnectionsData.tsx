@@ -1,49 +1,16 @@
-// @ts-nocheck
+import { useFetchSyncsQuery } from '@store/api/apiSlice';
 
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Tuesday, October 17th 2023, 3:28:21 pm
- * Author: Nagendra S @ valmi.io
- */
-
-import { useState } from 'react';
-
-import { useFetchCredentialsQuery } from '@store/api/apiSlice';
-
-import { useTraceErrorCheck } from '@hooks/useTraceErrorCheck';
-
-import { sendErrorToBugsnag } from '@lib/bugsnag';
+import { useFetch } from '@/hooks/useFetch';
 
 export const useConnectionsData = (workspaceId: string) => {
-  const [connectionsError, setConnectionsError] = useState<any>(null);
-
-  const { data, isFetching, isLoading, isError, error } = useFetchCredentialsQuery(
-    {
-      workspaceId,
-      queryId: 0
-    },
-    { refetchOnMountOrArgChange: true, skip: !workspaceId }
-  );
-
-  // Use the custom hook to check for trace errors in the data
-  const traceError = useTraceErrorCheck(data && data.resultData);
-
-  if (traceError) {
-    // Send error to Bugsnag when a trace error is detected
-    sendErrorToBugsnag(traceError);
-  }
-
-  if (isError && !connectionsError) {
-    // Send error to Bugsnag when a general error occurs
-    setConnectionsError(error?.errorData);
-    sendErrorToBugsnag(error?.errorData);
-  }
+  const { data, error, isFetching, traceError } = useFetch({
+    query: useFetchSyncsQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
+  });
 
   return {
-    data: data ? data?.resultData : [],
+    data,
     isFetching,
     traceError,
-    isLoading,
-    connectionsError
+    error
   };
 };

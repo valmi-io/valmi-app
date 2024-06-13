@@ -15,6 +15,9 @@ import { signOutUser } from '@/utils/lib';
 const credentialsAdapter: any = createEntityAdapter();
 const initialCredentialsState = credentialsAdapter.getInitialState();
 
+const connectionsAdapter: any = createEntityAdapter();
+const initialConnectionsState = connectionsAdapter.getInitialState();
+
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
@@ -57,7 +60,8 @@ export const apiSlice = createApi({
     'Preview',
     'Explore',
     'Package',
-    'Credential'
+    'Credential',
+    'Connection'
   ],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
@@ -269,11 +273,16 @@ export const apiSlice = createApi({
     }),
 
     getSyncById: builder.query({
-      query: (arg) => {
-        const { workspaceId, syncId } = arg;
-        return {
-          url: `/workspaces/${workspaceId}/syncs/${syncId}`
-        };
+      query: ({ workspaceId, syncId }) => `/workspaces/${workspaceId}/syncs/${syncId}`,
+      transformResponse: (responseData) => {
+        return connectionsAdapter.setOne(initialConnectionsState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Connection' as const, id })), { type: 'Connection' as const }]
+          : [{ type: 'Connection' as const }];
+
+        return tags;
       }
     }),
 
@@ -367,4 +376,16 @@ export const getCredentialsSelectors = (workspaceId: string) => {
     credentialsAdapter.getSelectors((state) => getCredentialsData(state) ?? initialCredentialsState);
 
   return { selectAllCredentials, selectCredentialById };
+};
+
+export const getSyncDetails = (workspaceId: string, syncId: string) => {
+  const getSyncsResult = apiSlice.endpoints.getSyncById.select({ workspaceId, syncId });
+
+  const getSyncsData = createSelector(getSyncsResult, (syncResult) => syncResult.data);
+
+  const { selectById: selectSyncById } =
+    // @ts-ignore
+    connectionsAdapter.getSelectors((state) => getSyncsData(state) ?? initialConnectionsState);
+
+  return { selectSyncById };
 };
