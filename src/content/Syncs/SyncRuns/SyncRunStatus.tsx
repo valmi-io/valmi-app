@@ -26,7 +26,6 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
   return (
     <Stack
       spacing={0.5}
-      direction="row"
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -55,7 +54,17 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
 
       {getConnectionMetrics(syncRun, 'src').length > 0
         ? getConnectionMetrics(syncRun, 'src').map((metrics, index) => (
-            <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
+            <Stack
+              key={`metrics-${index}`}
+              direction="row"
+              spacing={0.5}
+              alignItems="start"
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start'
+              }}
+            >
               <Typography sx={{ fontSize: 12 }} variant="body2">
                 {'TOTAL RECORDS LOADED: '}
               </Typography>
