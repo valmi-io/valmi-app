@@ -10,6 +10,7 @@ type TExploreProps = {
   handleIconOnClick: (item: any) => void;
   handlePreviewOnClick: (item: any) => void;
   src: string;
+  selected: boolean;
 };
 
 type TExploreFooterProps = {
@@ -193,10 +194,13 @@ const ExploreDescription = ({ description }: { description: string }) => {
   );
 };
 
-const ExploreCard = ({ item, handlePreviewOnClick, src, handleIconOnClick }: TExploreProps) => {
+const ExploreCard = ({ item, handlePreviewOnClick, src, handleIconOnClick, selected }: TExploreProps) => {
   return (
     <Grid item xs={'auto'}>
-      <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
+      <Card
+        variant="outlined"
+        sx={{ opacity: item?.enabled ? 1 : 0.6, bgcolor: selected ? (theme) => theme.colors.secondary.lighter : '' }}
+      >
         <ExploreIconContainer>
           <Rectangle>
             <ImageComponent

@@ -80,7 +80,7 @@ export const oneOfControlTester = (uischema: any, schema: JsonSchema, context: T
   const hasOauthInCredentials =
     schema?.properties?.credentials && schema?.properties?.credentials?.title?.toLowerCase().includes('oauth');
 
-  return !!(hasOneOfType && hasOauthInCredentials);
+  return !!(hasOneOfType || hasOauthInCredentials);
 };
 
 export const jsonFormValidator = (schema: any, data: any) => {

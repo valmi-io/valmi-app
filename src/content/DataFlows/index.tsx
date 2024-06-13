@@ -29,9 +29,19 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
 
   const [onHoverState, setOnHoverState] = useState<{ id: string }>({ id: '' });
 
-  const handleConnectionOnClick = ({ connectionId, type }: { connectionId: string; type: string }) => {
-    if (connectionId && type) {
+  const handleConnectionOnClick = ({
+    connectionId,
+    type,
+    catalogType
+  }: {
+    connectionId: string;
+    type: string;
+    catalogType: string;
+  }) => {
+    if (catalogType === 'SOURCE' && connectionId && type) {
       router.push(`${getBaseRoute(workspaceId)}/catalog/credentials?type=${type}&id=${connectionId}`);
+    } else if (catalogType === 'DESTINATION' && connectionId && type) {
+      router.push(`${getBaseRoute(workspaceId)}/explores?id=${connectionId}`);
     }
   };
 
@@ -65,6 +75,7 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
                     handleOnMouseEnter={handleOnMouseEnter}
                     handleOnMouseLeave={handleOnMouseLeave}
                     onHoverState={onHoverState}
+                    syncId={connection?.id}
                   />
                 </React.Fragment>
               );
@@ -87,6 +98,7 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
                     handleOnMouseEnter={handleOnMouseEnter}
                     handleOnMouseLeave={handleOnMouseLeave}
                     onHoverState={onHoverState}
+                    syncId={connection?.id}
                   />
                 </React.Fragment>
               );

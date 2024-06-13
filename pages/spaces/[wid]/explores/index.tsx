@@ -15,11 +15,17 @@ import ListEmptyComponent from '@/components/ListEmptyComponent';
 import ExploresList from '@/content/Explores/ExploresList';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { TData } from '@/utils/typings.d';
+import { useSearchParams } from 'next/navigation';
+import { getSearchParams } from '@/utils/router-utils';
 
 const ExploresPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
+  const searchParams = useSearchParams();
+
+  const params = getSearchParams(searchParams);
+  const { id = '' } = params;
 
   const { data, error, isLoading, traceError } = useFetch({
     query: useGetExploresQuery({ workspaceId }, { refetchOnMountOrArgChange: true, skip: !workspaceId })
@@ -38,7 +44,7 @@ const ExploresPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`explores-page`}
         error={error}
-        PageContent={<PageContent data={data} />}
+        PageContent={<PageContent data={data} id={id} />}
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -53,10 +59,10 @@ ExploresPage.getLayout = function getLayout(page: ReactElement) {
 
 export default ExploresPage;
 
-const PageContent = ({ data }: { data: TData }) => {
+const PageContent = ({ data, id }: { data: TData; id: string }) => {
   if (isDataEmpty(data)) {
     return <ListEmptyComponent description={'No explores found in this workspace'} />;
   }
 
-  return <ExploresList data={data} />;
+  return <ExploresList data={data} id={id} />;
 };

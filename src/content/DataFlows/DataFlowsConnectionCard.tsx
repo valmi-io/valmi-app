@@ -10,6 +10,7 @@ type DataFlowsConnectionCardProps = {
   handleConnectionOnClick: any;
   id: string;
   data: any;
+  syncId: string;
 };
 
 const Container = styled(Card)(({ theme }) => ({
@@ -28,8 +29,14 @@ const DataFlowsConnectionCard = ({
   handleOnMouseEnter,
   handleOnMouseLeave,
   onHoverState,
-  id
+  id,
+  syncId
 }: DataFlowsConnectionCardProps) => {
+  const getConnectorImageName = ({ type = '' }: { type: string }) => {
+    if (type) {
+      return type.split('_')[1].toLowerCase();
+    } else return '';
+  };
   return (
     <Container
       onMouseEnter={() => {
@@ -43,19 +50,16 @@ const DataFlowsConnectionCard = ({
       }}
       onClick={() =>
         handleConnectionOnClick({
-          connectionId: data?.credential?.id,
-          type: data?.credential?.display_name.toLowerCase()
+          connectionId: (type === 'SOURCE' && data?.credential?.id) || (type === 'DESTINATION' && syncId),
+          type: data?.credential?.display_name.toLowerCase(),
+          catalogType: type
         })
       }
       id={id}
     >
       <ImageComponent
         title={item}
-        src={
-          type.toLowerCase() === 'dest_google-sheets'
-            ? `/connectors/google-sheets.svg`
-            : `/connectors/${type.toLowerCase()}.svg`
-        }
+        src={`/connectors/${getConnectorImageName({ type: data?.credential?.connector_type })}.svg`}
         size={ImageSize.medium}
         alt={`connectionIcon`}
         style={{ marginRight: '8px' }}

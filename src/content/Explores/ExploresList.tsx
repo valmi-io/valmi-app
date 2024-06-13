@@ -19,7 +19,7 @@ const Container = styled(Grid)(({ theme }) => ({
   isolation: 'isolate'
 }));
 
-const ExploresList = ({ data }: { data: TData }) => {
+const ExploresList = ({ data, id: queryId }: { data: TData; id: string }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -39,15 +39,20 @@ const ExploresList = ({ data }: { data: TData }) => {
 
   return (
     <Container container>
-      {data.ids.map((id: string) => (
-        <ExploreCard
-          key={id}
-          item={data.entities[id]}
-          handleIconOnClick={handleIconOnClick}
-          handlePreviewOnClick={handlePreviewOnClick}
-          src={src}
-        />
-      ))}
+      {data.ids.map((id: string) => {
+        const syncIdOfExplore = data.entities[id].sync_id;
+        const selected = syncIdOfExplore === queryId;
+        return (
+          <ExploreCard
+            key={id}
+            item={data.entities[id]}
+            handleIconOnClick={handleIconOnClick}
+            handlePreviewOnClick={handlePreviewOnClick}
+            src={src}
+            selected={selected}
+          />
+        );
+      })}
     </Container>
   );
 };

@@ -8,6 +8,7 @@ interface DataFlowsConnectionsListProps {
   onHoverState: any;
   handleConnectionOnClick: any;
   name: string;
+  syncId: string;
 }
 
 const DataFlowsConnectionsList = ({
@@ -17,7 +18,8 @@ const DataFlowsConnectionsList = ({
   handleConnectionOnClick,
   handleOnMouseEnter,
   handleOnMouseLeave,
-  onHoverState
+  onHoverState,
+  syncId
 }: DataFlowsConnectionsListProps) => {
   return (
     <DataFlowsConnectionCard
@@ -27,9 +29,10 @@ const DataFlowsConnectionsList = ({
       handleOnMouseEnter={handleOnMouseEnter}
       handleOnMouseLeave={handleOnMouseLeave}
       onHoverState={onHoverState}
-      type={data?.name}
+      type={type}
       id={data?.id}
       data={data}
+      syncId={syncId}
     />
   );
 };
