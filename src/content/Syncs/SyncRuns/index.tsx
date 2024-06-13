@@ -1,10 +1,4 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Tuesday, May 30th 2023, 1:03:45 pm
- * Author: Nagendra S @ valmi.io
- */
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { useTheme } from '@mui/material';
 
@@ -19,6 +13,9 @@ import { SyncRunRootContext } from '@contexts/Contexts';
 import ContentLayout from '@/layouts/ContentLayout';
 import { getSyncDetails } from '@store/api/apiSlice';
 import { useSelector } from 'react-redux';
+import { isDataEmpty } from '@/utils/lib';
+import { TData } from '@/utils/typings.d';
+
 
 /**
  * Responsible for displaying `Runs` page and its components.
@@ -34,6 +31,11 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   const [alertMessage, setAlertMessage] = useState<string>('');
   const [alertDialog, showAlertDialog] = useState(false);
   const [isErrorAlert, setIsErrorAlert] = useState(false);
+
+  const [runs, setRuns] = useState<{ ids: string[]; entities: {} }>({
+    ids: [],
+    entities: {}
+  });
 
   /**
    * Hook -  Responsible for fetching sync runs.
@@ -60,31 +62,59 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    */
   useEffect(() => {
     if (syncRuns?.length > 0) {
-      const interval = 3000; // in milliseconds
+      setRunsData(syncRuns);
+    }
+  }, [syncRuns]);
 
+  const setRunsData = (data: any) => {
+    const objs = data;
+
+    const ids: string[] = [];
+    const entities: any = {};
+
+    objs.forEach((obj: any) => {
+      const runId = obj?.run_id;
+      if (!ids.includes(runId)) {
+        ids.push(runId);
+      }
+      entities[runId] = obj;
+    });
+
+    setRuns({
+      ids: ids,
+      entities: entities
+    });
+  };
+
+  useEffect(() => {
+    if (!isDataEmpty(runs) && !error && !traceError) {
+      const interval = 5000; // in milliseconds
       const runInterval = setInterval(updateLastSync, interval);
       return () => {
         clearInterval(runInterval);
       };
     }
-  }, [syncRuns]);
+  }, [runs, error, traceError]);
 
   /**
    * Responsible for opening alert dialog.
    */
-  const handleAlertDialog = (message: string, isError: boolean) => {
-    showAlertDialog(true);
-    setIsErrorAlert(isError);
-    setAlertMessage(message);
-  };
+  const handleAlertDialog = useCallback(
+    (message: string, isError: boolean) => {
+      showAlertDialog(true);
+      setIsErrorAlert(isError);
+      setAlertMessage(message);
+    },
+    [syncId]
+  );
 
   /**
    * Responsible for closing alert dialog.
    */
-  const handleAlertClose = () => {
+  const handleAlertClose = useCallback(() => {
     setAlertMessage('');
     showAlertDialog(false);
-  };
+  }, [syncId]);
 
   /**
    * Context - which can be accessed by children down the UI Tree.
@@ -92,35 +122,56 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    */
   const rootContextValue = useMemo(() => ({ updateLastSync, handleAlertDialog }), [updateLastSync]);
 
-  /**
-   * Responsible for displaying Runs Table and EmptyRuns.
-   * @returns Runs, Empty Component based on data.
-   */
-  const PageContent = () => {
-    if (syncRuns.length > 0) {
-      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} connectionData={connectionData} />;
-    }
+  const currentSyncRun: any = useMemo(() => {
+    if (runs.ids.length > 0) {
+      const currentId = runs.ids[0];
+      return runs.entities[currentId];
 
-    return <ListEmptyComponent description={'No runs found in this sync'} />;
-  };
+    }
+    return null;
+  }, [runs.ids.length]);
 
   return (
     <SyncRunRootContext.Provider value={rootContextValue}>
-      <SyncRunsHeader workspaceId={workspaceId} syncId={syncId} syncRuns={syncRuns} />
+      <SyncRunsHeader workspaceId={workspaceId} syncId={syncId} currentSyncRun={currentSyncRun} />
 
-      <AlertComponent open={alertDialog} onClose={handleAlertClose} message={alertMessage} isError={isErrorAlert} />
+      <AlertComponent
+        key={`alert-${syncId}`}
+        open={alertDialog}
+        onClose={handleAlertClose}
+        message={alertMessage}
+        isError={isErrorAlert}
+      />
 
       <ContentLayout
         key={`syncsRunsPage-${syncId}`}
         error={error}
-        PageContent={<PageContent />}
-        displayComponent={!error && !isLoading && syncRuns}
+        PageContent={<PageContent connectionData={connectionData} data={runs} syncId={syncId} />}
+        displayComponent={!error && !isLoading && !!runs.ids.length}
         isLoading={isLoading}
         traceError={traceError}
         cardStyles={{ marginTop: theme.spacing(4) }}
       />
     </SyncRunRootContext.Provider>
   );
+};
+
+/**
+ * Responsible for displaying Runs Table and EmptyRuns.
+ * @returns Runs, Empty Component based on data.
+ */
+const PageContent = ({ data, syncId, connectionData }: { data: TData; syncId: string; connectionData: any }) => {
+  const isRetlFlow = useMemo(() => {
+    if (connectionData) {
+      return connectionData?.source?.name === 'VALMI_ENGINE' ? true : false;
+    }
+  }, [connectionData]);
+
+  if (!isDataEmpty(data)) {
+    return <SyncRunsTable syncId={syncId} syncRunsData={data} isRetlFlow={!!isRetlFlow} />;
+  }
+
+  return <ListEmptyComponent description={'No runs found in this sync'} />;
 };
 
 export default SyncRuns;

@@ -20,14 +20,18 @@ import SyncRunTableRow from './SyncRunTableRow';
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { redirectToDataFlowRunLogs } from '@/utils/router-utils';
+ 
+import { TData } from '@/utils/typings.d';
+
 
 type SyncRunsTableProps = {
-  syncRunsData: any;
+  syncRunsData: TData;
   syncId: string;
-  connectionData: any;
+  isRetlFlow: boolean;
 };
 
-const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTableProps) => {
+const SyncRunsTable = ({ syncRunsData, syncId, isRetlFlow }: SyncRunsTableProps) => {
+
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
@@ -73,19 +77,20 @@ const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTablePr
 
           {/* Syncs Table Body */}
           <TableBody>
-            {syncRunsData &&
-              syncRunsData.length > 0 &&
-              syncRunsData.map((syncRun, index) => {
-                return (
-                  <SyncRunTableRow
-                    key={`run_key ${index}`}
-                    displayError={displayError}
-                    syncRun={syncRun}
-                    onLogClick={navigateToLogs}
-                    isRetlFlow={isRetlFlow}
-                  />
-                );
-              })}
+             {syncRunsData.ids.map((id) => {
+              const run = syncRunsData.entities[id];
+
+              return (
+                <SyncRunTableRow
+                  key={`run_key ${run.run_id}`}
+                  displayError={displayError}
+                  syncRun={run}
+                  onLogClick={navigateToLogs}
+                  isRetlFlow={isRetlFlow}
+                />
+              );
+            })}
+
           </TableBody>
         </Table>
       </TableContainer>
