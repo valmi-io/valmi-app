@@ -15,7 +15,7 @@ const CatalogInstuctions = ({ data, selected_connector }: { data: any; selected_
   const title = 'INSTRUCTIONS';
   const linkText = selected_connector ? selected_connector.display_name : '';
 
-  return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'connection'} />;
+  return <Instructions documentationUrl={documentationUrl} title={title} linkText={linkText} type={'credential'} />;
 };
 
 export default memo(CatalogInstuctions);

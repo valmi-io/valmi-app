@@ -35,7 +35,7 @@ const UserBoxButton = styled(Button)(
 const MenuUserBox = styled(Box)(
   ({ theme }) => `
         background: ${theme.colors.alpha.black[5]};
-        padding: ${theme.spacing(2)};
+        padding: ${theme.spacing(1, 2)};
 `
 );
 

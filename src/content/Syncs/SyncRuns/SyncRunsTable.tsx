@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { Table, TableBody, TableContainer, TableHead } from '@mui/material';
+import { Paper, Table, TableBody, TableContainer, TableHead } from '@mui/material';
 
 import { getErrorInSyncRun } from '@content/Syncs/SyncRuns/SyncRunsUtils';
 
@@ -19,19 +19,23 @@ import { SyncRunColumns } from './SyncRunColumns';
 import SyncRunTableRow from './SyncRunTableRow';
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToDataFlowRunLogs } from '@/utils/router-utils';
 
 type SyncRunsTableProps = {
   syncRunsData: any;
   syncId: string;
+  connectionData: any;
 };
 
-const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
+const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTableProps) => {
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');
+
+  const isRetlFlow = connectionData?.source?.name === 'VALMI_ENGINE' ? true : false;
 
   {
     /** Sync Run Error */
@@ -46,10 +50,13 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
     showErrorDialog(false);
   };
 
-  const navigateToSyncRunLogs = (syncRun, connection) => {
-    router.push({
-      pathname: `/spaces/${workspaceId}/connections/${syncId}/runs/${syncRun.run_id}/logs`,
-      query: { connection_type: connection }
+  const navigateToLogs = (syncRun, connection) => {
+    redirectToDataFlowRunLogs({
+      router,
+      wid: workspaceId,
+      connectionType: connection,
+      connId: syncId,
+      runId: syncRun.run_id
     });
   };
 
@@ -57,7 +64,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
     <>
       <AlertComponent open={errorDialog} onClose={handleClose} message={syncErrorMessage} isError={true} />
       {/* Syncs Table*/}
-      <TableContainer>
+      <TableContainer component={Paper} variant="outlined">
         <Table>
           {/* Syncs Table Columns */}
           <TableHead>
@@ -74,7 +81,8 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
                     key={`run_key ${index}`}
                     displayError={displayError}
                     syncRun={syncRun}
-                    onLogClick={navigateToSyncRunLogs}
+                    onLogClick={navigateToLogs}
+                    isRetlFlow={isRetlFlow}
                   />
                 );
               })}

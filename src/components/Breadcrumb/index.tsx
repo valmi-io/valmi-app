@@ -62,7 +62,7 @@ const HeaderTitle = () => {
     const routeName = name.replace(/-/g, '').toUpperCase();
 
     switch (routeName) {
-      case 'CONNECTIONS':
+      case 'DATAFLOWS':
         return appIcons.DATA_FLOWS;
       case 'OAUTHAPPS':
         return appIcons.APPS;

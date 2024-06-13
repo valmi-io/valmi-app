@@ -373,7 +373,7 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
 
   const rows = results?.catalog?.streams ?? [];
 
-  const namesInScopes = scopes.map((item: string) => item.split('read_')[1]);
+  const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
 
   const streams = rows.filter(({ name }: { name: string }) => {
     // HACK: return true if stream and namesInScopes are the same
@@ -413,7 +413,6 @@ export const initializeConnectionFlowState = ({
 export const isOAuthConfigurationRequired = (oauthKeys: string) => oauthKeys === 'private';
 
 export const isIntegrationConfigured = (data: TData, type: string) => {
-  console.log('isIntegrationConfigured:_', { data, type });
   return !!data?.entities?.[type];
 };
 

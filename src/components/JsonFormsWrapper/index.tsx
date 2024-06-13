@@ -15,11 +15,20 @@ interface JsonFormsWrapperProps {
   onChange: any; // Callback with typed data,
   renderers: any;
   formValidationState: formValidationMode;
+  readonly?: boolean;
 }
 
-export const JsonFormsWrapper = ({ schema, data, onChange, renderers, formValidationState }: JsonFormsWrapperProps) => {
+export const JsonFormsWrapper = ({
+  schema,
+  data,
+  onChange,
+  renderers,
+  formValidationState,
+  readonly = false
+}: JsonFormsWrapperProps) => {
   return (
     <JsonForms
+      readonly={readonly}
       i18n={{ translateError: translateFormError }}
       schema={schema}
       data={data}

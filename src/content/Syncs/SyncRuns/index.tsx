@@ -17,6 +17,8 @@ import { useSyncRuns } from './useSyncRuns';
 import SyncRunsHeader from './SyncRunsHeader';
 import { SyncRunRootContext } from '@contexts/Contexts';
 import ContentLayout from '@/layouts/ContentLayout';
+import { getSyncDetails } from '@store/api/apiSlice';
+import { useSelector } from 'react-redux';
 
 /**
  * Responsible for displaying `Runs` page and its components.
@@ -49,6 +51,9 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     syncId: syncId,
     workspaceId: workspaceId
   });
+
+  const { selectSyncById } = getSyncDetails(workspaceId, syncId);
+  const connectionData = useSelector((state) => selectSyncById(state, syncId));
 
   /**
    * Fetches sync runs every 3 seconds by updating last sync timestamp
@@ -93,7 +98,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    */
   const PageContent = () => {
     if (syncRuns.length > 0) {
-      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} />;
+      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} connectionData={connectionData} />;
     }
 
     return <ListEmptyComponent description={'No runs found in this sync'} />;

@@ -4,7 +4,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useWizard } from 'react-use-wizard';
 import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
-import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/connections/create';
+import { TConnectionUpsertProps } from '@/pagesspaces/[wid]/data-flows/create';
 import ErrorComponent, { ErrorStatusText } from '@/components/Error';
 import { getErrorsInData, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import SkeletonLoader from '@/components/SkeletonLoader';

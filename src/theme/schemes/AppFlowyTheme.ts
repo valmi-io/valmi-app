@@ -136,7 +136,8 @@ const colors = {
     dark: '#01579B',
     main: themeColors.info,
     contrast: themeColors.white
-  }
+  },
+  elevation: elevationOutlinedColor
 };
 
 export const AppFlowyTheme = createTheme({
@@ -280,6 +281,7 @@ export const AppFlowyTheme = createTheme({
       disabled: '#e6e6e6'
     },
     divider: '#616161',
+
     background: {
       paper: colors.alpha.white[100],
       default: colors.layout.general.bodyBg
