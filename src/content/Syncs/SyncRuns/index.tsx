@@ -52,13 +52,8 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     workspaceId: workspaceId
   });
 
-  // const { selectCredentialById } = getCredentialsSelectors(wid as string);
-  // const credentialData = useSelector((state) => selectCredentialById(state, credentialId));
-
   const { selectSyncById } = getSyncDetails(workspaceId, syncId);
-  // const syncData = useSelector((state) => selectSyncById(state, syncId));
-
-  // console.log('SYNCDATA:', syncData);
+  const connectionData = useSelector((state) => selectSyncById(state, syncId));
 
   /**
    * Fetches sync runs every 3 seconds by updating last sync timestamp
@@ -103,7 +98,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    */
   const PageContent = () => {
     if (syncRuns.length > 0) {
-      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} />;
+      return <SyncRunsTable syncId={syncId} syncRunsData={syncRuns} connectionData={connectionData} />;
     }
 
     return <ListEmptyComponent description={'No runs found in this sync'} />;

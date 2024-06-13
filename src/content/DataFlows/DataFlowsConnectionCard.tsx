@@ -44,7 +44,7 @@ const DataFlowsConnectionCard = ({
     >
       <ImageComponent
         title={item}
-        src={`/connectors/${type.toLowerCase()}.svg`}
+        src={type === 'DEST_GOOGLE-SHEETS' ? `/connectors/google-sheets.svg` : `/connectors/${type.toLowerCase()}.svg`}
         size={ImageSize.medium}
         alt={`connectionIcon`}
         style={{ marginRight: '8px' }}

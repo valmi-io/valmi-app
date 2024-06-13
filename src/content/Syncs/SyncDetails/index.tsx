@@ -18,7 +18,7 @@ import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
 
-import { useLazyGetSyncByIdQuery, useLazyToggleSyncQuery } from '@store/api/apiSlice';
+import { useGetSyncByIdQuery, useLazyGetSyncByIdQuery, useLazyToggleSyncQuery } from '@store/api/apiSlice';
 import { getRouterPathname, isPublicSync } from '@utils/routes';
 import { getBaseRoute } from '@/utils/lib';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
@@ -31,6 +31,7 @@ import {
   getSelectedConnectorKey,
   getSelectedConnectorObj
 } from '@/utils/connectionFlowUtils';
+import { useFetch } from '@/hooks/useFetch';
 
 const SyncDetails = ({ syncId, workspaceId }: any) => {
   const router = useRouter();
@@ -43,7 +44,9 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
   const [traceError, setTraceError] = useState<any>(null);
   const [syncDetails, setSyncDetails] = useState(null);
 
-  const [getSyncDetails, { data, isFetching, isError, error }] = useLazyGetSyncByIdQuery();
+  const { data, error, isLoading } = useFetch({
+    query: useGetSyncByIdQuery({ syncId: syncId, workspaceId: workspaceId })
+  });
 
   const [toggleSync, { data: updateSyncData }] = useLazyToggleSyncQuery();
 
@@ -56,7 +59,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
           syncId: syncId,
           workspaceId: workspaceId
         };
-        getSyncDetails(payload);
+        // getSyncDetails(payload);
       }
     }
   }, [updateSyncData, workspaceId]);
@@ -70,7 +73,7 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
         workspaceId: workspaceId
       };
 
-      getSyncDetails(payload);
+      // getSyncDetails(payload);
     }
   }, [router.isReady, workspaceId]);
 
@@ -80,7 +83,9 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
         const traceError = getErrorsInData(data);
         setTraceError(traceError);
       } else {
-        setSyncDetails(data);
+        const { ids, entities } = data;
+        const connectionData = entities[ids[0]] ?? {};
+        setSyncDetails(connectionData);
       }
     }
   }, [data]);
@@ -162,16 +167,16 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
   return (
     <Card variant="outlined">
       {/** Display Errors */}
-      {isError && <ErrorComponent error={error} />}
+      {error && <ErrorComponent error={error} />}
 
       {/** Display Trace Error */}
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
-      <SkeletonLoader loading={isFetching} />
+      <SkeletonLoader loading={isLoading} />
 
       {publicSync
         ? displayPageContent(publicSync)
-        : !isError && !isFetching && syncDetails && displayPageContent(publicSync)}
+        : !error && !isLoading && syncDetails && displayPageContent(publicSync)}
     </Card>
   );
 };

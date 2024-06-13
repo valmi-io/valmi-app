@@ -43,7 +43,6 @@ const ConnectionsTable = ({ connections, id: queryId }: { connections: any; id: 
           {/* Connections Table Body */}
           <TableBody>
             {connections.map((connection) => {
-              console.log('CONNECTION ITEM:', connection);
               const sourceId = connection?.source?.id;
               const selected = sourceId === queryId;
               return (

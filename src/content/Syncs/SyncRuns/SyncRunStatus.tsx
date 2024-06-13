@@ -5,20 +5,22 @@
  */
 
 import React from 'react';
-import { getRunStatus } from './SyncRunsUtils';
-import { Chip, Stack, styled } from '@mui/material';
+import { getConnectionMetrics, getRunStatus } from './SyncRunsUtils';
+import { Chip, Stack, Typography, styled } from '@mui/material';
 import RunStatusIcon from './RunStatusIcon';
+import { capitalizeFirstLetter, splitNumberByCommas } from '@/utils/lib';
 
 interface SyncRunStatusProps {
   syncRun: any;
   displayError: any;
+  isRetlFlow: boolean;
 }
 
 const ChipComponent = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]
 }));
 
-const SyncRunStatus = ({ syncRun, displayError }: SyncRunStatusProps) => {
+const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps) => {
   let runStatus = getRunStatus(syncRun);
 
   const handleStatusOnClick = () => {
@@ -26,7 +28,15 @@ const SyncRunStatus = ({ syncRun, displayError }: SyncRunStatusProps) => {
   };
 
   return (
-    <Stack spacing={0.5} direction="row" alignItems="center">
+    <Stack
+      spacing={0.5}
+      direction="row"
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: (theme) => theme.spacing(1)
+      }}
+    >
       <ChipComponent
         label={runStatus}
         color={runStatus === 'failed' ? 'error' : runStatus === 'success' ? 'success' : 'secondary'}
@@ -35,6 +45,19 @@ const SyncRunStatus = ({ syncRun, displayError }: SyncRunStatusProps) => {
       {runStatus === 'failed' && (
         <RunStatusIcon onClick={handleStatusOnClick} status={runStatus} tooltipTitle={'Show Error'} />
       )}
+
+      {getConnectionMetrics(syncRun, 'src').length > 0
+        ? getConnectionMetrics(syncRun, 'src').map((metrics, index) => (
+            <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
+              <Typography sx={{ fontSize: 12 }} variant="body2">
+                {'TOTAL RECORDS LOADED: '}
+              </Typography>
+              <Typography sx={{ fontSize: 12 }} variant="body1">
+                {splitNumberByCommas(metrics.value)}
+              </Typography>
+            </Stack>
+          ))
+        : '-'}
     </Stack>
   );
 };

@@ -23,15 +23,18 @@ import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 type SyncRunsTableProps = {
   syncRunsData: any;
   syncId: string;
+  connectionData: any;
 };
 
-const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
+const SyncRunsTable = ({ syncRunsData, syncId, connectionData }: SyncRunsTableProps) => {
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');
+
+  const isRetlFlow = connectionData?.source?.name === 'VALMI_ENGINE' ? true : false;
 
   {
     /** Sync Run Error */
@@ -75,6 +78,7 @@ const SyncRunsTable = ({ syncRunsData, syncId }: SyncRunsTableProps) => {
                     displayError={displayError}
                     syncRun={syncRun}
                     onLogClick={navigateToSyncRunLogs}
+                    isRetlFlow={isRetlFlow}
                   />
                 );
               })}

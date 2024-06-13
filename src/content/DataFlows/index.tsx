@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Stack, styled } from '@mui/material';
 import { useRouter } from 'next/router';
 import { getBaseRoute } from '@/utils/lib';
@@ -56,15 +56,17 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
           {connections.map((connection: TConnection) => {
             if (connection?.source?.name !== 'VALMI_ENGINE') {
               return (
-                <DataFlowsConnectionsList
-                  data={connection?.source}
-                  name={connection?.name}
-                  type="SOURCE"
-                  handleConnectionOnClick={handleConnectionOnClick}
-                  handleOnMouseEnter={handleOnMouseEnter}
-                  handleOnMouseLeave={handleOnMouseLeave}
-                  onHoverState={onHoverState}
-                />
+                <React.Fragment key={connection?.id}>
+                  <DataFlowsConnectionsList
+                    data={connection?.source}
+                    name={connection?.name}
+                    type="SOURCE"
+                    handleConnectionOnClick={handleConnectionOnClick}
+                    handleOnMouseEnter={handleOnMouseEnter}
+                    handleOnMouseLeave={handleOnMouseLeave}
+                    onHoverState={onHoverState}
+                  />
+                </React.Fragment>
               );
             }
           })}
@@ -76,15 +78,17 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
           {connections.map((connection: TConnection) => {
             if (connection?.destination?.name !== 'VALMI_ENGINE') {
               return (
-                <DataFlowsConnectionsList
-                  data={connection?.destination}
-                  name={connection?.name}
-                  type="DESTINATION"
-                  handleConnectionOnClick={handleConnectionOnClick}
-                  handleOnMouseEnter={handleOnMouseEnter}
-                  handleOnMouseLeave={handleOnMouseLeave}
-                  onHoverState={onHoverState}
-                />
+                <React.Fragment key={connection?.id}>
+                  <DataFlowsConnectionsList
+                    data={connection?.destination}
+                    name={connection?.name}
+                    type="DESTINATION"
+                    handleConnectionOnClick={handleConnectionOnClick}
+                    handleOnMouseEnter={handleOnMouseEnter}
+                    handleOnMouseLeave={handleOnMouseLeave}
+                    onHoverState={onHoverState}
+                  />
+                </React.Fragment>
               );
             }
           })}
