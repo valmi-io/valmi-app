@@ -116,13 +116,31 @@ export type TPayloadOut = {
   time_window: TimeWindowType;
 };
 
-export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
+export const generateOnMountPreviewPayload = ( schema : string) => {
   const payload: TPayloadOut = {
     // schema_id: schema.length ? schema[0].id : '',
     schema_id: schema,
-
-    filters: filters,
-    time_window: time_window
+    filters: [
+      {
+          "column": "updated_at",
+          "column_type": "DATE",
+          "operator": ">=",
+          "value": new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+          "column": "updated_at",
+          "column_type": "DATE",
+          "operator": "<=",
+          "value": new Date().toISOString()
+      }
+    ],
+    time_window: {
+      label: 'custom',
+        range: {
+          start: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          end: new Date().toISOString()
+        }
+    }
   };
 
   return payload;

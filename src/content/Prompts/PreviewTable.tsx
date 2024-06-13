@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Container, MenuItem, Paper, TextField } from '@mui/material';
 import moment from 'moment';
-import { TPayloadOut, generatePreviewPayload } from '@/content/Prompts/promptUtils';
+import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
@@ -50,31 +50,14 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
   });
 
   useEffect(() => {
-    if (pid) {
-      const { schemas = [] } = prompt;
+    if (pid && schemaID) {
 
-      const payload: TPayloadOut = generatePreviewPayload({
-        schema: schemaID,
-        filters: [],
-        time_window: {
-          label: 'custom',
-          range: {
-            // 1 month range
-            start: moment().subtract(1, 'months').toISOString(),
-            end: moment().toISOString()
-          }
-        }
-      });
+      const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
 
       previewPrompt(payload);
     }
   }, [pid, schemaID]);
 
-  // useEffect(() => {
-  //   if (filter) {
-  //     getData();
-  //   }
-  // }, [filter]);
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
@@ -141,10 +124,9 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
 
   const applyFilters = (payload: any) => {
     const { schemas = [] } = prompt;
-
     previewPrompt(
       {
-        schema_id: schemas.length ? schemas[0].id : '',
+        schema_id: schemaID,
         time_window: {
           label: 'custom',
                 range: {
