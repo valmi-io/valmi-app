@@ -20,7 +20,9 @@ import SyncRunTableRow from './SyncRunTableRow';
 import TableHeader from '@components/Table/TableHeader';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { redirectToDataFlowRunLogs } from '@/utils/router-utils';
+ 
 import { TData } from '@/utils/typings.d';
+
 
 type SyncRunsTableProps = {
   syncRunsData: TData;
@@ -29,12 +31,15 @@ type SyncRunsTableProps = {
 };
 
 const SyncRunsTable = ({ syncRunsData, syncId, isRetlFlow }: SyncRunsTableProps) => {
+
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();
 
   const [errorDialog, showErrorDialog] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState('');
+
+  const isRetlFlow = connectionData?.source?.name === 'VALMI_ENGINE' ? true : false;
 
   {
     /** Sync Run Error */
@@ -72,7 +77,7 @@ const SyncRunsTable = ({ syncRunsData, syncId, isRetlFlow }: SyncRunsTableProps)
 
           {/* Syncs Table Body */}
           <TableBody>
-            {syncRunsData.ids.map((id) => {
+             {syncRunsData.ids.map((id) => {
               const run = syncRunsData.entities[id];
 
               return (
@@ -85,6 +90,7 @@ const SyncRunsTable = ({ syncRunsData, syncId, isRetlFlow }: SyncRunsTableProps)
                 />
               );
             })}
+
           </TableBody>
         </Table>
       </TableContainer>

@@ -8,6 +8,7 @@ import React from 'react';
 
 import { Paper, Switch, Typography, styled } from '@mui/material';
 
+
 import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
 
 import { convertDurationToMinutesOrHours } from '@utils/lib';
@@ -86,6 +87,7 @@ const SyncDetailsCard = ({
             connectionType={isPublicSync ? 'DEST_WEBHOOK' : destinationConnectionType}
             connectionTitle={isPublicSync ? process.env.PUBLIC_SYNC_URL : destinationName}
           />
+
         </Paper>
         <Paper
           sx={{

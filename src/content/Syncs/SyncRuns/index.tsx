@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 import { isDataEmpty } from '@/utils/lib';
 import { TData } from '@/utils/typings.d';
 
+
 /**
  * Responsible for displaying `Runs` page and its components.
  *
@@ -125,6 +126,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     if (runs.ids.length > 0) {
       const currentId = runs.ids[0];
       return runs.entities[currentId];
+
     }
     return null;
   }, [runs.ids.length]);

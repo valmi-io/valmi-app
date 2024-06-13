@@ -60,7 +60,8 @@ const SyncRunsHeader = ({
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
           <SyncRunPopover
-            currentSyncRun={currentSyncRun}
+             currentSyncRun={currentSyncRun}
+ 
             isQueryPending={isPromisePending}
             workspaceId={workspaceId}
             syncId={syncId}
