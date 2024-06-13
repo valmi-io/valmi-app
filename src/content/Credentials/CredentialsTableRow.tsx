@@ -13,6 +13,7 @@ import { stringAvatar } from '@/utils/lib';
 interface CredentialsTableRowProps {
   credential: any;
   onClick: (credentialId: any) => void;
+  selected: boolean;
 }
 
 const UserAccountLayout = styled(Box)(({ theme }) => ({
@@ -20,7 +21,14 @@ const UserAccountLayout = styled(Box)(({ theme }) => ({
   alignItems: 'center'
 }));
 
-const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) => {
+const CustomizedTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: 'pointer',
+  '&.Mui-selected': {
+    backgroundColor: theme.colors.secondary.lighter
+  }
+}));
+
+const CredentialsTableRow = ({ credential, onClick, selected = false }: CredentialsTableRowProps) => {
   const userAccountTableCell = (account: any) => {
     const { external_id = 'account', profile = '' } = account || {};
     let imageSrc = '';
@@ -58,7 +66,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
   };
 
   return (
-    <TableRow hover key={credential?.id}>
+    <CustomizedTableRow hover key={credential?.id} selected={selected}>
       <TableCellComponent text={getNameCellValue(credential)} />
       <TableCell>{userAccountTableCell(credential?.account)}</TableCell>
       <TableCellWithImage
@@ -67,7 +75,7 @@ const CredentialsTableRow = ({ credential, onClick }: CredentialsTableRowProps) 
         size={ImageSize.small}
       />
       <TableCellWithActionButton tooltip={'Edit credential'} onClick={() => onClick({ credential: credential })} />
-    </TableRow>
+    </CustomizedTableRow>
   );
 };
 

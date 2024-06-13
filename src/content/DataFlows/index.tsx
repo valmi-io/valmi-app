@@ -29,9 +29,9 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
 
   const [onHoverState, setOnHoverState] = useState<{ id: string }>({ id: '' });
 
-  const handleConnectionOnClick = ({ connectionId }: { connectionId: string }) => {
-    if (connectionId) {
-      router.push(`${getBaseRoute(workspaceId)}/data-flows/connections?id=${connectionId}`);
+  const handleConnectionOnClick = ({ connectionId, type }: { connectionId: string; type: string }) => {
+    if (connectionId && type) {
+      router.push(`${getBaseRoute(workspaceId)}/catalog/credentials?type=${type}&id=${connectionId}`);
     }
   };
 

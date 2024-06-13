@@ -22,7 +22,7 @@ export interface SyncOnClickProps {
   syncId: string;
 }
 
-const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
+const CredentialsTable = ({ credentials, id: queryId }: { credentials: TCredential[]; id: string }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -72,7 +72,16 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
         </TableHead>
         <TableBody>
           {credentials.map((credential: TCredential) => {
-            return <CredentialsTableRow key={credential.id} credential={credential} onClick={handleCredentialEdit} />;
+            const sourceId = credential?.id;
+            const selected = sourceId === queryId;
+            return (
+              <CredentialsTableRow
+                key={credential.id}
+                credential={credential}
+                onClick={handleCredentialEdit}
+                selected={selected}
+              />
+            );
           })}
         </TableBody>
       </Table>

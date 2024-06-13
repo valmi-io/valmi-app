@@ -6,15 +6,14 @@
 
 import React from 'react';
 
-import { Avatar, Chip, TableCell, TableRow, Typography, styled } from '@mui/material';
+import { Chip, TableCell, TableRow, styled } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import { TableCellComponent, TableCellWithImage } from '@components/Table/TableCellComponent';
 import { ImageSize } from '@components/ImageComponent';
 import { convertDurationToMinutesOrHours, stringAvatar } from '@utils/lib';
-import { SyncOnClickProps } from './SyncsTable';
-import { BoxLayout } from '@/components/Layouts/Layouts';
+import { SyncOnClickProps } from '@/content/Credentials/CredentialsTable';
 
 const ChipComponent = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]

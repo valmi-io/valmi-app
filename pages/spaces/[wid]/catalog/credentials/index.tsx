@@ -21,10 +21,10 @@ import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 import { RootState } from '@/store/reducers';
 
-const PageContent = ({ data }: { data: TCredential[] }) => {
+const PageContent = ({ data, id }: { data: TCredential[]; id: string }) => {
   if (data.length > 0) {
     // Display credentials when credentials data length > 0
-    return <CredentialsTable credentials={data} />;
+    return <CredentialsTable credentials={data} id={id} />;
   }
 
   /** Display empty component */
@@ -39,7 +39,7 @@ const CredentialsPage: NextPageWithLayout = () => {
 
   const params = getSearchParams(searchParams);
 
-  const { type = '' } = params;
+  const { type = '', id = '' } = params;
 
   /** Redux store */
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
@@ -81,7 +81,7 @@ const CredentialsPage: NextPageWithLayout = () => {
       <ContentLayout
         key={`credentialsPage`}
         error={isError}
-        PageContent={<PageContent data={filteredCredentials} />}
+        PageContent={<PageContent data={filteredCredentials} id={id} />}
         displayComponent={!error && !isFetching && filteredCredentials}
         isLoading={isFetching}
         traceError={error}

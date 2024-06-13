@@ -9,6 +9,7 @@ type DataFlowsConnectionCardProps = {
   onHoverState: any;
   handleConnectionOnClick: any;
   id: string;
+  data: any;
 };
 
 const Container = styled(Card)(({ theme }) => ({
@@ -21,6 +22,7 @@ const Container = styled(Card)(({ theme }) => ({
 
 const DataFlowsConnectionCard = ({
   item,
+  data,
   type,
   handleConnectionOnClick,
   handleOnMouseEnter,
@@ -39,12 +41,21 @@ const DataFlowsConnectionCard = ({
         borderWidth: onHoverState.id === id ? 2 : 1,
         borderColor: (theme) => (onHoverState.id === id ? theme.colors.secondary.main : '#E0E0E0')
       }}
-      onClick={() => handleConnectionOnClick({ connectionId: id })}
+      onClick={() =>
+        handleConnectionOnClick({
+          connectionId: data?.credential?.id,
+          type: data?.credential?.display_name.toLowerCase()
+        })
+      }
       id={id}
     >
       <ImageComponent
         title={item}
-        src={type === 'DEST_GOOGLE-SHEETS' ? `/connectors/google-sheets.svg` : `/connectors/${type.toLowerCase()}.svg`}
+        src={
+          type.toLowerCase() === 'dest_google-sheets'
+            ? `/connectors/google-sheets.svg`
+            : `/connectors/${type.toLowerCase()}.svg`
+        }
         size={ImageSize.medium}
         alt={`connectionIcon`}
         style={{ marginRight: '8px' }}

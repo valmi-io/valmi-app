@@ -44,9 +44,10 @@ const DetailsContainer = styled(Paper)(({ theme }) => ({
 const ScheduleInfoContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'baseline',
+  alignItems: 'center',
   justifyContent: 'flex-start',
-  gap: theme.spacing(1)
+  gap: theme.spacing(1),
+  marginLeft: 3
 }));
 
 const SyncDetailsCard = ({
@@ -118,7 +119,7 @@ const SyncDetailsCard = ({
           isPublicSync ? '18000000' : run_interval
         )}`}</Typography>
 
-        {!isPublicSync && (
+        {/* {!isPublicSync && (
           <>
             <Button
               variant="text"
@@ -127,7 +128,7 @@ const SyncDetailsCard = ({
               {'EDIT'}
             </Button>
           </>
-        )}
+        )} */}
       </ScheduleInfoContainer>
     </CardWrapper>
   );

@@ -29,6 +29,7 @@ const DataFlowsConnectionsList = ({
       onHoverState={onHoverState}
       type={data?.name}
       id={data?.id}
+      data={data}
     />
   );
 };
