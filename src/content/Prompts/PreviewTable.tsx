@@ -231,11 +231,23 @@ const PageContent = ({
   const { data, isLoading, handleSaveAsExplore, status } = prompt;
 
   if (isDataEmpty(data)) {
-    return <ListEmptyComponent description={'No data found for this prompt'} />;
+    return (
+      <>
+    <ListEmptyComponent description={'No data found for this prompt'} />
+      <SubmitButton
+      buttonText={'Save as explore'}
+      data={status === 'success'}
+      isFetching={status === 'submitting'}
+      disabled={isLoading || status === 'submitting'}
+      onClick={handleSaveAsExplore}
+      />
+    </>
+    )
   }
 
   return (
     <>
+      <DataTable data={data} />
       <SubmitButton
         buttonText={'Save as explore'}
         data={status === 'success'}
@@ -243,7 +255,7 @@ const PageContent = ({
         disabled={isLoading || status === 'submitting'}
         onClick={handleSaveAsExplore}
       />
-      <DataTable data={data} />
+
     </>
   );
 };
