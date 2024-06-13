@@ -25,9 +25,15 @@ export const redirectToHomePage = (wid: string, router: NextRouter) => {
   }
 };
 
-export const redirectToCreateConnection = ({ router, wid }: { router: NextRouter; wid: string }) => {
+export const redirectToCreateDataFlow = ({ router, wid }: { router: NextRouter; wid: string }) => {
   if (wid) {
-    router.push(`${getBaseRoute(wid)}/data-flows/connections/create`);
+    router.push(`${getBaseRoute(wid)}/data-flows/create`);
+  }
+};
+
+export const redirectToEditDataFlow = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/data-flows/edit`);
   }
 };
 

@@ -10,10 +10,10 @@ import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 
 import { RootState } from '@store/reducers';
 import { AppDispatch } from '@store/store';
-import { getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
+import { getExtrasObjKey, getSelectedConnectorKey } from '@/utils/connectionFlowUtils';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { isObjectEmpty } from '@/utils/lib';
-import { apiRoutes, redirectToCreateConnection, redirectToHomePage } from '@/utils/router-utils';
+import { apiRoutes, redirectToCreateDataFlow, redirectToEditDataFlow, redirectToHomePage } from '@/utils/router-utils';
 import { updateOAuthStateInRedux } from '@/utils/oauth-utils';
 
 const handleFacebookLogin = async (queryParams: any, successCb: (res: any) => void, errorCb: (err: any) => void) => {
@@ -41,6 +41,10 @@ const OAuthCallbackPage = () => {
   /** Redux store */
   const connectionDataFlow = useSelector((state: RootState) => state.connectionDataFlow);
 
+  const extras = connectionDataFlow.entities[getExtrasObjKey()] ?? {};
+
+  const isEditableFlow = !!(!isObjectEmpty(extras) && extras?.isEditableFlow);
+
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
   const { oauth_params: oAuthParams = {}, oauth_error: oAuthError = '' } = selectedConnector;
@@ -59,10 +63,17 @@ const OAuthCallbackPage = () => {
 
   useEffect(() => {
     if ((oAuthParams && !isObjectEmpty(oAuthParams)) || oAuthError) {
-      redirectToCreateConnection({
-        router: router,
-        wid: workspaceId
-      });
+      if (isEditableFlow) {
+        redirectToEditDataFlow({
+          router: router,
+          wid: workspaceId
+        });
+      } else {
+        redirectToCreateDataFlow({
+          router: router,
+          wid: workspaceId
+        });
+      }
     }
   }, [oAuthParams, oAuthError]);
 

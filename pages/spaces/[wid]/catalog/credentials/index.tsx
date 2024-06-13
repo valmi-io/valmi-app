@@ -11,7 +11,7 @@ import ContentLayout from '@/layouts/ContentLayout';
 import CredentialsTable from '@/content/Credentials/CredentialsTable';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 import { useSearchParams } from 'next/navigation';
-import { getSearchParams, redirectToCreateConnection } from '@/utils/router-utils';
+import { getSearchParams, redirectToCreateDataFlow } from '@/utils/router-utils';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
 import { TCredential } from '@/utils/typings.d';
 import { useCredentials } from '@/content/Credentials/useCredentials';
@@ -68,7 +68,7 @@ const CredentialsPage: NextPageWithLayout = () => {
   }, []);
 
   const handleCreateConnectionOnClick = () => {
-    redirectToCreateConnection({ router, wid: workspaceId });
+    redirectToCreateDataFlow({ router, wid: workspaceId });
   };
 
   return (

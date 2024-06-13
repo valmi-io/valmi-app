@@ -16,7 +16,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
-import { redirectToCreateConnection } from '@/utils/router-utils';
+import { redirectToEditDataFlow } from '@/utils/router-utils';
 
 export interface SyncOnClickProps {
   syncId: string;
@@ -61,7 +61,7 @@ const CredentialsTable = ({ credentials }: { credentials: TCredential[] }) => {
 
     dispatch(setConnectionFlowState(objToDispatch));
 
-    redirectToCreateConnection({ router: router, wid: workspaceId });
+    redirectToEditDataFlow({ router: router, wid: workspaceId });
   };
 
   return (
