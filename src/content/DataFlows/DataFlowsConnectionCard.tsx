@@ -1,4 +1,5 @@
 import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import { getConnectorImageName } from '@/utils/lib';
 import { Card, styled } from '@mui/material';
 
 type DataFlowsConnectionCardProps = {
@@ -32,11 +33,6 @@ const DataFlowsConnectionCard = ({
   id,
   syncId
 }: DataFlowsConnectionCardProps) => {
-  const getConnectorImageName = ({ type = '' }: { type: string }) => {
-    if (type) {
-      return type.split('_')[1].toLowerCase();
-    } else return '';
-  };
   return (
     <Container
       onMouseEnter={() => {
@@ -59,7 +55,7 @@ const DataFlowsConnectionCard = ({
     >
       <ImageComponent
         title={item}
-        src={`/connectors/${getConnectorImageName({ type: data?.credential?.connector_type })}.svg`}
+        src={getConnectorImageName({ type: data?.credential?.connector_type })}
         size={ImageSize.medium}
         alt={`connectionIcon`}
         style={{ marginRight: '8px' }}
