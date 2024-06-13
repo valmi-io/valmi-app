@@ -5,6 +5,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { isObjectEmpty } from '@/utils/lib';
 import { getErrorsInData, getErrorsInErrorObject, hasErrorsInData } from '@components/Error/ErrorUtils';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { faCheckCircle, faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
@@ -104,9 +105,9 @@ export const isSyncRunning = (syncRun) => {
   return runStatus === 'running' || runStatus === 'scheduled' ? true : false;
 };
 
-export const hasRunningSyncs = (syncRuns) => {
-  if (!syncRuns) return false;
-  const currentSyncRun = getCurrentSyncRun(syncRuns);
+export const hasRunningSyncs = (currentSyncRun) => {
+  if (!currentSyncRun || isObjectEmpty(currentSyncRun)) return false;
+  console.log('getRunStatus:_', getRunStatus(currentSyncRun));
   let status = getRunStatus(currentSyncRun);
   if (status === 'scheduled' || status === 'running') return true;
 };
@@ -134,9 +135,8 @@ export const syncRunNetworkHandler = async (query, payload, responseHandler, err
   }
 };
 
-export const getPageButtonTitle = (isPublicSync, syncRuns, isPromisePending) => {
-  if (isPublicSync) return 'LIVE DATA';
-  return hasRunningSyncs(syncRuns)
+export const getPageButtonTitle = (currentSyncRun, isPromisePending) => {
+  return hasRunningSyncs(currentSyncRun)
     ? isPromisePending
       ? 'STOPPING...'
       : 'STOP SYNC'

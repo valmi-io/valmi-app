@@ -6,11 +6,9 @@
 
 import React from 'react';
 
-import { Box, Button, Chip, Paper, Stack, Switch, Typography, styled } from '@mui/material';
+import { Paper, Switch, Typography, styled } from '@mui/material';
 
 import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
-
-import { StackLayout } from '@components/Layouts/Layouts';
 
 import { convertDurationToMinutesOrHours } from '@utils/lib';
 import appIcons from '@utils/icon-utils';

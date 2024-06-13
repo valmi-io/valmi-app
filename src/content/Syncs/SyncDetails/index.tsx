@@ -100,6 +100,8 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
       enable: val,
       workspaceId: workspaceId
     };
+    console.log('toggle sync:_', payload);
+
     toggleSync(payload);
   };
 
