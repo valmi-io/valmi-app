@@ -1,5 +1,6 @@
 import { TConnection } from '@/utils/typings.d';
 import { useTheme } from '@mui/material';
+import { useState } from 'react';
 import Xarrow from 'react-xarrows';
 
 const getLines = ({ connections }: { connections: TConnection[] }) => {
@@ -43,6 +44,16 @@ const LineArrow = ({
 }) => {
   const theme = useTheme();
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
   const handleArrowOnClick = () => {
     handleLinkOnClick({ connId: connId });
   };
@@ -51,10 +62,18 @@ const LineArrow = ({
     <Xarrow
       passProps={{
         onClick: handleArrowOnClick,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave
       }}
       showHead={false}
-      lineColor={selected ? theme.colors.secondary.main : theme.colors.secondary.lighter}
+      lineColor={
+        selected
+          ? theme.colors.secondary.main
+          : isHovered
+          ? theme.colors.secondary.main
+          : theme.colors.secondary.lighter
+      }
       strokeWidth={5}
       key={`stream${from + to}`}
       start={from}
