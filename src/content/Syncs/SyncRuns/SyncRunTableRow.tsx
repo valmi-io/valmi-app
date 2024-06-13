@@ -28,6 +28,7 @@ interface SyncRunTableRowProps {
  */
 
 const SyncRunTableRow = ({ syncRun, displayError, onLogClick, isRetlFlow }: SyncRunTableRowProps) => {
+
   return (
     <TableRow hover>
       <TableCell>

@@ -6,9 +6,10 @@
 
 import React from 'react';
 import { getConnectionMetrics, getRunStatus } from './SyncRunsUtils';
-import { Chip, Stack, Typography, styled } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import RunStatusIcon from './RunStatusIcon';
-import { capitalizeFirstLetter, splitNumberByCommas } from '@/utils/lib';
+import { splitNumberByCommas } from '@/utils/lib';
+
 
 interface SyncRunStatusProps {
   syncRun: any;
@@ -32,48 +33,42 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
         gap: (theme) => theme.spacing(1)
       }}
     >
-      <Typography
-        variant="caption"
-        sx={{
-          color:
-            runStatus === 'failed'
-              ? (theme) => theme.colors.error.main
-              : runStatus === 'terminated'
-              ? (theme) => theme.colors.error.main
-              : runStatus === 'success'
-              ? (theme) => theme.colors.success.main
-              : (theme) => theme.colors.success.main
-        }}
-      >
-        {runStatus.toUpperCase()}
-      </Typography>
+       <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color:
+              runStatus === 'failed'
+                ? (theme) => theme.colors.error.main
+                : runStatus === 'terminated'
+                ? (theme) => theme.colors.error.main
+                : runStatus === 'success'
+                ? (theme) => theme.colors.success.main
+                : (theme) => theme.colors.success.main
+          }}
+        >
+          {runStatus.toUpperCase()}
+        </Typography>
 
-      {runStatus === 'failed' && (
-        <RunStatusIcon onClick={handleStatusOnClick} status={runStatus} tooltipTitle={'Show Error'} />
-      )}
+        {runStatus === 'failed' && (
+          <RunStatusIcon onClick={handleStatusOnClick} status={runStatus} tooltipTitle={'Show Error'} />
+        )}
+      </Stack>
 
-      {getConnectionMetrics(syncRun, 'src').length > 0
-        ? getConnectionMetrics(syncRun, 'src').map((metrics, index) => (
-            <Stack
-              key={`metrics-${index}`}
-              direction="row"
-              spacing={0.5}
-              alignItems="start"
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start'
-              }}
-            >
-              <Typography sx={{ fontSize: 12 }} variant="body2">
-                {'TOTAL RECORDS LOADED: '}
-              </Typography>
-              <Typography sx={{ fontSize: 12 }} variant="body1">
-                {splitNumberByCommas(metrics.value)}
-              </Typography>
-            </Stack>
-          ))
-        : '-'}
+      {!isRetlFlow &&
+        (getConnectionMetrics(syncRun, 'src').length > 0
+          ? getConnectionMetrics(syncRun, 'src').map((metrics, index) => (
+              <Stack key={`metrics-${index}`} direction="row" spacing={0.5} alignItems="center">
+                <Typography sx={{ fontSize: 12 }} variant="body2">
+                  {'TOTAL RECORDS LOADED: '}
+                </Typography>
+                <Typography sx={{ fontSize: 12 }} variant="body1">
+                  {splitNumberByCommas(metrics.value)}
+                </Typography>
+              </Stack>
+            ))
+          : '-')}
+ 
     </Stack>
   );
 };
