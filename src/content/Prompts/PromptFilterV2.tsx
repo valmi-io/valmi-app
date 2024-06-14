@@ -1,16 +1,31 @@
 import React, { useState } from 'react';
-import { Alert, Select, MenuItem, Button, Stack, Chip, Box, Popover, FormControl, InputLabel, TextField } from '@mui/material';
+import {
+  Alert,
+  Select,
+  MenuItem,
+  Button,
+  Stack,
+  Chip,
+  Box,
+  Popover,
+  FormControl,
+  InputLabel,
+  TextField,
+  Paper
+} from '@mui/material';
 import FilterInput from './FilterInput';
 import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
 import { transformFilters } from '@/utils/filters-transform-utils';
 import CheckIcon from '@mui/icons-material/Check';
 
 import dayjs, { Dayjs } from 'dayjs';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
+import VButton from '@/components/VButton';
+import appIcons from '@/utils/icon-utils';
+import CustomIcon from '@/components/Icon/CustomIcon';
 
 // Interface for filter options
 interface Filter {
@@ -44,9 +59,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     { column: 'payment_method', column_type: 'string', operator: '!=', value: 'as' }
   ]);
 
-  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs().subtract(7, 'days'));
-  const [endDate, setEndDate]     = React.useState<Dayjs | null>(dayjs());
-  const [dateRange, setDateRange] = React.useState('last7days');
+  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs().subtract(7, 'days'));
 
   const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
@@ -74,13 +88,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
       handleClose();
     }
 
-    if(filterInputIndex! > 0){
-    setFilterInputIndex(filterInputIndex! - 1);
-    }
-    else if (newAppliedFilters.length > 0) {
+    if (filterInputIndex! > 0) {
+      setFilterInputIndex(filterInputIndex! - 1);
+    } else if (newAppliedFilters.length > 0) {
       setFilterInputIndex(0);
-    }
-    else {
+    } else {
       setFilterInputIndex(null);
     }
 
@@ -102,13 +114,15 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   };
 
   const handleSubmitFilter = () => {
-    if(appliedFilters[filterInputIndex!].column === '' || appliedFilters[filterInputIndex!].operator === '' || appliedFilters[filterInputIndex!].value === '')
-      {
-        alert('complete your filter.')
-      }
-      else {
+    if (
+      appliedFilters[filterInputIndex!].column === '' ||
+      appliedFilters[filterInputIndex!].operator === '' ||
+      appliedFilters[filterInputIndex!].value === ''
+    ) {
+      alert('complete your filter.');
+    } else {
       handleClose();
-      }
+    }
   };
 
   const handleSubmit = () => {
@@ -121,115 +135,133 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     });
 
     let start_date, end_date;
-    switch(dateRange) {
+    switch (dateRange) {
       case 'last7days':
-        start_date = "now() - INTERVAL '7 days'"
-        end_date = "now()"
+        start_date = "now() - INTERVAL '7 days'";
+        end_date = 'now()';
         break;
       case 'last14days':
-        start_date = "now() - INTERVAL '14 days'"
-        end_date = "now()"
+        start_date = "now() - INTERVAL '14 days'";
+        end_date = 'now()';
         break;
       case 'last30days':
-        start_date = "now() - INTERVAL '30 days'"
-        end_date = "now()"
+        start_date = "now() - INTERVAL '30 days'";
+        end_date = 'now()';
         break;
       case 'custom':
-        start_date = startDate
-        end_date = endDate
+        start_date = startDate;
+        end_date = endDate;
         break;
       default:
-        console.log('nothing here...')
-
+        console.log('nothing here...');
     }
 
-    applyFilters({combinedFilters, dateRange, start_date, end_date});
+    applyFilters({ combinedFilters, dateRange, start_date, end_date });
   };
 
   const isValidFilters = () => {
-
     return false;
   };
 
   const FiltersStatus = () => {
-    for(let i=0; i < appliedFilters.length; i++)
-      {
-        if(appliedFilters[i].column === '' || appliedFilters[i].operator === '' || appliedFilters[i].value === '')
-          {
-          return (
-            <Alert severity="warning">Please fill your filters completely</Alert>
-            );
-          }
+    for (let i = 0; i < appliedFilters.length; i++) {
+      if (appliedFilters[i].column === '' || appliedFilters[i].operator === '' || appliedFilters[i].value === '') {
+        return <Alert severity="warning">Please fill your filters completely</Alert>;
       }
-      return null;
-  }
+    }
+    return null;
+  };
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  const handleRemoveFilterChip = (index) => {};
+
+  const handleEditFilterChip = (index, event) => {};
+  const startIcon = () => {
+    return <CustomIcon icon={appIcons.DATA_FLOWS} />;
+  };
 
   return (
-    <>
-        <Stack spacing={1} p={1} direction="row">
-            {/* appliedFilters chip box */}
-            <Stack spacing={1} direction="column">
-              <Box minWidth={600}>
-                  {appliedFilters.map((appliedFilter, index) => (
-                      <Chip
-                          key={index}
-                          label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
-                          onDelete={() => handleRemoveFilter(index)}
-                          onClick={(event) => handleEditFilter(index, event)}
-                          color={filterInputIndex === index ? 'primary' : 'default'}
-                      />
-                  ))
-                  }
-              </Box>
+    <Paper sx={{ border: '2px solid greenyellow' }}>
+      <Box sx={{ display: 'flex', bgcolor: 'cyan', justifyContent: 'space-between' }}>
+        <VButton
+          buttonText={'Filters'}
+          buttonType="submit"
+          endIcon={false}
+          startIcon={startIcon()}
+          onClick={() => alert('hello')}
+          size="small"
+          disabled={false}
+          variant="contained"
+        />
 
-              <CustomPopover
-                appliedFilters={appliedFilters}
-                setAppliedFilters={setAppliedFilters}
-                filters={filters}
-                standardOperators={standardOperators}
-                isList={true}
-                canAdd={true} />
-            </Stack>
-
-            <DateRangePickerPopover
-              dateRange={dateRange}
-              setDateRange={setDateRange}
-              startDate={startDate}
-              endDate={endDate}
-              setStartDate={setStartDate}
-              setEndDate={setEndDate}
+        <Box minWidth={600} sx={{ bgcolor: 'pink' }}>
+          {appliedFilters.map((appliedFilter, index) => (
+            <Chip
+              key={index}
+              label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
+              onDelete={() => handleRemoveFilterChip(index)}
+              onClick={(event) => handleEditFilterChip(index, event)}
+              // color={selectedFilterChipIndex === index ? 'primary' : 'default'}
             />
+          ))}
+        </Box>
+        <DateRangePickerPopup />
+        <DatePickerValue />
+      </Box>
 
-
-
-
+      <Stack spacing={2} p={2} direction="row" alignItems="center">
+        <Box flex={1}>
+          <CustomPopover
+            appliedFilters={appliedFilters}
+            filters={filters}
+            standardOperators={standardOperators}
+            isList={true}
+            canAdd={true}
+          />
+        </Box>
+        <Stack direction="row" spacing={2} alignItems="center">
+          {/* <DateRangePicker
+            dateRange={dateRange}
+            onDateRangeChange={handleDateRangeChange}
+            setDateRange={setDateRange}
+          /> */}
         </Stack>
+      </Stack>
 
-
-    </>
+      <FiltersStatus />
+    </Paper>
   );
 };
 
-
-
-
 export default PromptFilter;
 
+const DateRangePickerPopup = () => {
+  const [startDate, setStartDate] = React.useState<Dayjs>(dayjs('2023-01-01'));
+  const [endDate, setEndDate] = React.useState<Dayjs>(dayjs('2024-01-01'));
 
-interface PopoverParams
-{
-  appliedFilters: AppliedFilter[],
-  setAppliedFilters: any,
-  filters: Filter[],
-  standardOperators: Operator,
-  isList: boolean,
-  canAdd: boolean
+  <div>{/* <Button aria-describedby={id} variant="text" onClick={handleClick}></Button> */}</div>;
+};
+
+const DatePickerValue = () => {
+  const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17'));
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      {/* <DemoContainer components={['DatePicker']}>
+        <DatePicker label="Controlled picker" value={value} onChange={(newValue) => setValue(newValue)} />
+      </DemoContainer> */}
+    </LocalizationProvider>
+  );
+};
+
+interface PopoverParams {
+  appliedFilters: AppliedFilter[];
+  filters: Filter[];
+  standardOperators: Operator;
+  isList: boolean;
+  canAdd: boolean;
 }
 
-const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOperators, isList, canAdd}: PopoverParams): any => {
+const CustomPopover = ({ appliedFilters, filters, standardOperators, isList, canAdd }: PopoverParams): any => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -242,14 +274,14 @@ const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOper
 
   const handleAddFilter = () => {
     setAppliedFilters([...appliedFilters, { column: '', column_type: '', operator: '', value: '' }]);
-  }
+  };
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
   return (
     <div>
-      <Button aria-describedby={id} variant="text" onClick={handleClick}>
+      <Button aria-describedby={id} variant="text" onClick={handleClick} sx={{ bgcolor: 'yellow' }}>
         Add Filters
       </Button>
       <Popover
@@ -259,10 +291,10 @@ const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOper
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
       >
-        <Box sx={{border:'1px solid black', p:2}} minWidth={600}>
+        <Box sx={{ border: '1px solid black', p: 2 }} minWidth={600}>
           <Stack spacing={2} direction="column">
             {appliedFilters.map((appliedFilter, index) => (
               <Stack spacing={1} direction="row">
@@ -281,7 +313,6 @@ const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOper
                         {filter.display_column}
                       </MenuItem>
                     ))}
-
                   </Select>
                 </FormControl>
 
@@ -295,23 +326,19 @@ const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOper
                     onChange={() => console.log('changing')}
                     defaultValue={appliedFilter.operator}
                   >
-                  {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
+                    {standardOperators[appliedFilter.column_type]?.map((op) => (
+                      <MenuItem key={op} value={op}>
+                        {op}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
-
 
                 <TextField
                   value={appliedFilter.value}
                   onChange={() => console.log('changingg')}
                   placeholder="Enter value"
                 />
-
-
-
               </Stack>
             ))}
 
@@ -322,6 +349,4 @@ const CustomPopover = ({appliedFilters, setAppliedFilters, filters, standardOper
       </Popover>
     </div>
   );
-
-}
-
+};
