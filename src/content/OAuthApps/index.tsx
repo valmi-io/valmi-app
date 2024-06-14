@@ -40,17 +40,17 @@ const PageContent = ({
 
       <Stack sx={{ display: 'flex' }} spacing={3}>
         {/** connectors */}
-        <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-          {catalogs.map((catalog: TCatalog) => {
-            return (
-              <CatalogCard
-                key={catalog.type}
-                catalog={catalog}
-                handleCatalogOnClick={(item) => handleItemOnClick({ item, configured: false })}
-              />
-            );
-          })}
-        </Grid>
+        {/* <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}> */}
+        {catalogs.map((catalog: TCatalog) => {
+          return (
+            <CatalogCard
+              key={catalog.type}
+              catalog={catalog}
+              handleCatalogOnClick={(item) => handleItemOnClick({ item, configured: false })}
+            />
+          );
+        })}
+        {/* </Grid> */}
       </Stack>
     </>
   );
