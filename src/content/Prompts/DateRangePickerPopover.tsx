@@ -1,34 +1,13 @@
-import * as React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
-
-import {
-  Button,
-  List,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Chip,
-  Box,
-  Popover,
-  FormControl,
-  InputLabel,
-  TextField
-} from '@mui/material';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useState } from 'react';
+import { TextField, MenuItem, Stack } from '@mui/material';
+import PopoverComponent from '@/components/Popover';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import VButton from '@/components/VButton';
-import CustomIcon from '@/components/Icon/CustomIcon';
-import appIcons from '@/utils/icon-utils';
 
 interface DateRangePickerProps {
   dateRange: string;
   setDateRange: any;
-  startDate: Dayjs | null;
-  endDate: Dayjs | null;
-  setStartDate: (date: dayjs.Dayjs | null) => void;
-  setEndDate: (date: dayjs.Dayjs | null) => void;
 }
 
 const DateRangePickerPopover = ({
@@ -39,105 +18,64 @@ const DateRangePickerPopover = ({
   setStartDate,
   setEndDate
 }: DateRangePickerProps) => {
-  const possibleDateRanges = ['last7days', 'last14days', 'last30days', 'custom'];
-  const [anchorElement, setAnchorElement] = React.useState<HTMLButtonElement | null>(null);
+  const possibleDateRanges = ['last 7 days', 'last 14 days', 'last 30 days', 'custom'];
+  const [isCustomRangeSelected, setIsCustomRangeSelected] = useState<Boolean>(false);
 
-  const handleDateRangeButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    {
-      /* know all contents of event ?? console.log and check */
+  const handlePopoverClose = (): void => {
+    setIsCustomRangeSelected(false);
+  };
+
+  const handleDateRangeChange = (event: any) => {
+    if (event.target.value === 'custom') {
+      setIsCustomRangeSelected(true);
     }
-    setAnchorElement(event.currentTarget);
+    setDateRange(event.target.value);
   };
-
-  const handlePopoverClose = () => {
-    setAnchorElement(null);
-  };
-
-  const handleDateRangeChange = (possibleDateRange: string) => {
-    switch (possibleDateRange) {
-      case 'last7days':
-        setDateRange('last7days');
-        setStartDate(dayjs().subtract(7, 'days'));
-        setEndDate(dayjs());
-        break;
-      case 'last14days':
-        setDateRange('last14days');
-        setStartDate(dayjs().subtract(14, 'days'));
-        setEndDate(dayjs());
-        break;
-      case 'last30days':
-        setDateRange('last30days');
-        setStartDate(dayjs().subtract(30, 'days'));
-        setEndDate(dayjs());
-        break;
-      case 'custom':
-        setDateRange('custom');
-        break;
-      default:
-        console.log('nothing here...');
-    }
-  };
-
-  const open = Boolean(anchorElement);
-  const id = open ? 'simple-popover' : undefined;
-
   return (
     <>
-      <VButton
-        buttonText={dateRange}
-        buttonType="submit"
-        endIcon={<CustomIcon icon={appIcons.ARROW_RIGHT} />}
-        onClick={handleDateRangeButtonClick}
+      <TextField
         size="small"
-        disabled={false}
-        variant="contained"
-      />
-      {/* <Button onClick={handleDateRangeButtonClick}>{dateRange}</Button> */}
-
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorElement}
-        onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left'
+        select={true}
+        value={dateRange}
+        onChange={handleDateRangeChange}
+        InputLabelProps={{
+          shrink: true
         }}
       >
-        <Stack spacing={2} direction="column">
-          <List sx={{ width: '100%', maxWidth: 360 }}>
-            {possibleDateRanges.map((possibleDateRange, index) => (
-              <ListItemButton onClick={() => handleDateRangeChange(possibleDateRange)}>
-                <ListItemText key={index} primary={possibleDateRange} />
-              </ListItemButton>
-            ))}
-          </List>
+        {possibleDateRanges?.map((item: string) => {
+          return (
+            <MenuItem key={item} value={item}>
+              {item}
+            </MenuItem>
+          );
+        })}
+      </TextField>
 
+      {isCustomRangeSelected && (
+        <PopoverComponent anchorEl={isCustomRangeSelected} onClose={handlePopoverClose}>
           <Stack spacing={1} direction="row">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['StaticDatePicker']}>
-                <DatePicker
-                  label="start date"
-                  value={startDate}
-                  onChange={(newValue: dayjs.Dayjs | null) => setStartDate(newValue)}
-                  readOnly={dateRange !== 'custom'}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
+            <TextField
+              label={'Start Date'}
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={['StaticDatePicker']}>
-                <DatePicker
-                  label="end date"
-                  value={endDate}
-                  onChange={(newValue: dayjs.Dayjs | null) => setEndDate(newValue)}
-                  readOnly={dateRange !== 'custom'}
-                />
-              </DemoContainer>
-            </LocalizationProvider>
+            <TextField
+              label={'End Date'}
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
           </Stack>
-        </Stack>
-      </Popover>
+        </PopoverComponent>
+      )}
     </>
   );
 };
