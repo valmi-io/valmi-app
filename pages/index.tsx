@@ -49,6 +49,7 @@ const HomePage = () => {
 
   // This effect checks if the user has initiated a login flow
   // "DEFAULT" means not initiated.
+
   useEffect(() => {
     //@ts-ignore
     if (isObjectEmpty(loginFlowState) || !loginFlowState || loginFlowState === 'DEFAULT') {
@@ -58,12 +59,12 @@ const HomePage = () => {
 
   // If workspaceId exists, navigate to connections
   useEffect(() => {
-    if (workspaceId) {
+    if (workspaceId && session) {
       // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
       setAuthTokenCookie(session?.authToken ?? '');
       router.push(`/spaces/${workspaceId}/data-flows`);
     }
-  }, [workspaceId]);
+  }, [workspaceId, session]);
 
   // This function checks if session exists. If exists, saves session to redux store.
   useEffect(() => {
