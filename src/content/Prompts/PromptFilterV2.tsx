@@ -27,6 +27,8 @@ import VButton from '@/components/VButton';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
 
+import FilterListIcon from '@mui/icons-material/FilterList';
+
 // Interface for filter options
 interface Filter {
   db_column: string;
@@ -64,7 +66,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
   const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
   const handleAddFilter = (event: React.MouseEvent<HTMLElement>) => {
     setFilterInputIndex(appliedFilters.length);
@@ -74,6 +76,10 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
   const handleEditFilter = (index: number, event: React.MouseEvent<HTMLElement>) => {
     setFilterInputIndex(index);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -175,19 +181,16 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   const handleRemoveFilterChip = (index) => {};
 
   const handleEditFilterChip = (index, event) => {};
-  const startIcon = () => {
-    return <CustomIcon icon={appIcons.DATA_FLOWS} />;
-  };
 
   return (
     <Paper sx={{ border: '2px solid greenyellow' }}>
       <Box sx={{ display: 'flex', bgcolor: 'cyan', justifyContent: 'space-between' }}>
         <VButton
-          buttonText={'Filters'}
+          buttonText={'FILTERS'}
           buttonType="submit"
           endIcon={false}
-          startIcon={startIcon()}
-          onClick={() => alert('hello')}
+          startIcon={<FilterListIcon />}
+          onClick={handleClick}
           size="small"
           disabled={false}
           variant="contained"
@@ -211,6 +214,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
       <Stack spacing={2} p={2} direction="row" alignItems="center">
         <Box flex={1}>
           <CustomPopover
+            anchorEl={anchorEl}
+            handleClose={handleClose}
             appliedFilters={appliedFilters}
             filters={filters}
             standardOperators={standardOperators}
@@ -254,6 +259,8 @@ const DatePickerValue = () => {
 };
 
 interface PopoverParams {
+  anchorEl: any;
+  handleClose: any;
   appliedFilters: AppliedFilter[];
   filters: Filter[];
   standardOperators: Operator;
@@ -261,16 +268,24 @@ interface PopoverParams {
   canAdd: boolean;
 }
 
-const CustomPopover = ({ appliedFilters, filters, standardOperators, isList, canAdd }: PopoverParams): any => {
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+const CustomPopover = ({
+  anchorEl,
+  handleClose,
+  appliedFilters,
+  filters,
+  standardOperators,
+  isList,
+  canAdd
+}: PopoverParams): any => {
+  // const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   const handleAddFilter = () => {
     setAppliedFilters([...appliedFilters, { column: '', column_type: '', operator: '', value: '' }]);
@@ -281,9 +296,9 @@ const CustomPopover = ({ appliedFilters, filters, standardOperators, isList, can
 
   return (
     <div>
-      <Button aria-describedby={id} variant="text" onClick={handleClick} sx={{ bgcolor: 'yellow' }}>
+      {/* <Button aria-describedby={id} variant="text" onClick={handleClick} sx={{ bgcolor: 'yellow' }}>
         Add Filters
-      </Button>
+      </Button> */}
       <Popover
         id={id}
         open={open}
