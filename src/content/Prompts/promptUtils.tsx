@@ -1,4 +1,5 @@
 import { TPromptSource } from '@/utils/typings.d';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface JsonSchema {
   $schema: string;
@@ -116,13 +117,19 @@ export type TPayloadOut = {
   time_window: TimeWindowType;
 };
 
-export const generatePreviewPayload = ({ schema, filters, time_window }: TPayloadIn) => {
+export const generateOnMountPreviewPayload = ( schema : string) => {
   const payload: TPayloadOut = {
     // schema_id: schema.length ? schema[0].id : '',
     schema_id: schema,
-
-    filters: filters,
-    time_window: time_window
+    filters: [
+    ],
+    time_window: {
+      label: 'last7days',
+        range: {
+          start: "now() - INTERVAL '7 days'",
+          end: "now()"
+        }
+    }
   };
 
   return payload;
