@@ -125,6 +125,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
   const currentSyncRun: any = useMemo(() => {
     if (runs.ids.length > 0) {
       const currentId = runs.ids[0];
+      //@ts-ignore
       return runs.entities[currentId];
     }
     return null;
@@ -149,7 +150,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
         displayComponent={!error && !isLoading && !!runs.ids.length}
         isLoading={isLoading}
         traceError={traceError}
-        cardStyles={{ marginTop: theme.spacing(4) }}
+        cardStyles={{ marginTop: theme.spacing(1) }}
       />
     </SyncRunRootContext.Provider>
   );

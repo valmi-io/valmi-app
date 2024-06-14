@@ -256,7 +256,7 @@ export const apiSlice = createApi({
       }
     }),
 
-    toggleSync: builder.query({
+    updateDataFlowStatus: builder.query({
       query: (arg) => {
         const { workspaceId, enable, config } = arg;
         let url = `/workspaces/${workspaceId}/syncs/disable`;
@@ -354,7 +354,7 @@ export const {
   useLazyAddSyncQuery,
   useLazyUpdateSyncQuery,
   useFetchSyncsQuery,
-  useLazyToggleSyncQuery,
+  useLazyUpdateDataFlowStatusQuery,
   useLazyCheckConnectorQuery,
   useLazyGetSyncRunsByIdQuery,
   useLazyGetSyncByIdQuery,

@@ -69,6 +69,8 @@ const ConnectionMetrics = ({ syncRun, connection, displayError, onLogClick, isRe
           sx={{ mt: { xs: 2, md: 0 }, fontWeight: 500, fontSize: 12 }}
           variant="text"
           size="small"
+          disableElevation
+          disableRipple
           onClick={() => onLogClick(syncRun, connection)}
         >
           Logs
