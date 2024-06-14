@@ -1,3 +1,4 @@
+import { getValmiDataStoreName } from '@/utils/app-utils';
 import { TConnection } from '@/utils/typings.d';
 import { useTheme } from '@mui/material';
 import { useState } from 'react';
@@ -7,8 +8,8 @@ const getLines = ({ connections }: { connections: TConnection[] }) => {
   const lines: { from: any; to: any; selected?: boolean; connId: string }[] = [];
   const logoId = 'logo';
   connections.forEach((connection: TConnection) => {
-    const fromId = connection?.source?.name !== 'VALMI_ENGINE' && connection?.source?.id;
-    const toId = connection?.source?.name === 'VALMI_ENGINE' && connection?.destination?.id;
+    const fromId = connection?.source?.name !== getValmiDataStoreName() && connection?.source?.id;
+    const toId = connection?.source?.name === getValmiDataStoreName() && connection?.destination?.id;
     const connId = connection?.id;
 
     if (fromId) {
