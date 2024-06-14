@@ -13,22 +13,13 @@ import {
   TextField,
   Paper
 } from '@mui/material';
-import FilterInput from './FilterInput';
-import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
-import { transformFilters } from '@/utils/filters-transform-utils';
-import CheckIcon from '@mui/icons-material/Check';
 
 import dayjs, { Dayjs } from 'dayjs';
-// import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import VButton from '@/components/VButton';
-import appIcons from '@/utils/icon-utils';
-import CustomIcon from '@/components/Icon/CustomIcon';
 import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
-
 import FilterListIcon from '@mui/icons-material/FilterList';
+import PopoverComponent from '@/components/Popover';
+import { transformFilters } from '@/utils/filters-transform-utils';
 
 // Interface for filter options
 interface Filter {
@@ -62,13 +53,13 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     { column: 'payment_method', column_type: 'string', operator: '!=', value: 'as' }
   ]);
 
-  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
-  const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs().subtract(7, 'days'));
-  const [dateRange, setDateRange] = React.useState('last7days');
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs().subtract(7, 'days'));
+  const [dateRange, setDateRange] = useState('last 7 days');
 
   const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleAddFilter = (event: React.MouseEvent<HTMLElement>) => {
     setFilterInputIndex(appliedFilters.length);
@@ -144,15 +135,15 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
     let start_date, end_date;
     switch (dateRange) {
-      case 'last7days':
+      case 'last 7 days':
         start_date = "now() - INTERVAL '7 days'";
         end_date = 'now()';
         break;
-      case 'last14days':
+      case 'last 14 days':
         start_date = "now() - INTERVAL '14 days'";
         end_date = 'now()';
         break;
-      case 'last30days':
+      case 'last 30 days':
         start_date = "now() - INTERVAL '30 days'";
         end_date = 'now()';
         break;
@@ -164,7 +155,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
         console.log('nothing here...');
     }
 
-    applyFilters({ combinedFilters, dateRange, start_date, end_date });
+    applyFilters(transformFilters([...combinedFilters]), dateRange, start_date, end_date);
   };
 
   const isValidFilters = () => {
@@ -179,10 +170,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     }
     return null;
   };
-
-  const handleRemoveFilterChip = (index) => {};
-
-  const handleEditFilterChip = (index, event) => {};
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
@@ -225,16 +212,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
             setEndDate={setEndDate}
           />
         </Box>
-
-        {/* <DateRangePickerPopover
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        /> */}
-
       </Box>
 
       <Stack spacing={2} p={2} direction="row" alignItems="center">
@@ -272,7 +249,7 @@ interface PopoverParams {
   setAppliedFilters: () => void;
   filters: Filter[];
   standardOperators: Operator;
-  handleSubmit: () => void
+  handleSubmit: () => void;
 }
 
 const CustomPopover = ({
@@ -369,44 +346,45 @@ const CustomPopover = ({
                   </Select>
                 </FormControl>
 
-              <FormControl fullWidth required>
-                <InputLabel id="select-operator-label">Select Operator</InputLabel>
-                <Select
-                  labelId="select-operator-label"
-                  id="select-operator"
-                  value={appliedFilter.operator}
-                  label="Select Operator"
-                  onChange={(event) => {
-                    updateExistingFilter(index, 'operator', event.target.value)
-                  }}
-                  defaultValue={appliedFilter.operator}
-                >
-                {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
-                </Select>
-              </FormControl>
+                <FormControl fullWidth required>
+                  <InputLabel id="select-operator-label">Select Operator</InputLabel>
+                  <Select
+                    labelId="select-operator-label"
+                    id="select-operator"
+                    value={appliedFilter.operator}
+                    label="Select Operator"
+                    onChange={(event) => {
+                      updateExistingFilter(index, 'operator', event.target.value);
+                    }}
+                    defaultValue={appliedFilter.operator}
+                  >
+                    {standardOperators[appliedFilter.column_type]?.map((op) => (
+                      <MenuItem key={op} value={op}>
+                        {op}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-              <TextField
-                sx={{width:800}}
-                value={appliedFilter.value}
-                onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
-                placeholder="Enter value"
-              />
-
-            </Stack>
+                <TextField
+                  sx={{ width: 800 }}
+                  value={appliedFilter.value}
+                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
+                  placeholder="Enter value"
+                />
+              </Stack>
             ))}
 
             <Stack spacing={1} direction="row">
               <Button onClick={handleClose}>Cancel</Button>
               <Button onClick={handleAddFilter}>Add Filter</Button>
-              <Button onClick={() => {
-                handleClose();
-                handleSubmit();
-                }}>
-                  Apply Filters
+              <Button
+                onClick={() => {
+                  handleClose();
+                  handleSubmit();
+                }}
+              >
+                Apply Filters
               </Button>
             </Stack>
           </Stack>
