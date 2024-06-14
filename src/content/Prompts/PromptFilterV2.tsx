@@ -189,39 +189,43 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
   return (
     <Paper sx={{ border: '2px solid greenyellow' }}>
-      <Box sx={{ display: 'flex', gap: 2, bgcolor: 'yellow' }}>
-        <VButton
-          buttonText={'FILTERS'}
-          buttonType="submit"
-          endIcon={false}
-          startIcon={<FilterListIcon />}
-          onClick={handleClick}
-          size="small"
-          disabled={false}
-          variant="contained"
-        />
+      <Box sx={{ display: 'flex', gap: 2, bgcolor: 'yellow', justifyContent: 'space-between' }}>
+        <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+          <VButton
+            buttonText={'FILTERS'}
+            buttonType="submit"
+            endIcon={false}
+            startIcon={<FilterListIcon />}
+            onClick={handleClick}
+            size="small"
+            disabled={false}
+            variant="contained"
+          />
 
-        <Box minWidth={600}>
-          {appliedFilters.map((appliedFilter, index) => (
-            <Chip
-              key={index}
-              label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
-              onDelete={() => handleRemoveFilter(index)}
-              onClick={(event) => handleEditFilter(index, event)}
-              color={filterInputIndex === index ? 'primary' : 'default'}
-            />
-          ))}
+          <Box minWidth={600}>
+            {appliedFilters.map((appliedFilter, index) => (
+              <Chip
+                key={index}
+                label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
+                onDelete={() => handleRemoveFilter(index)}
+                onClick={(event) => handleEditFilter(index, event)}
+                color={filterInputIndex === index ? 'primary' : 'default'}
+              />
+            ))}
+          </Box>
+        </Stack>
+
+        <Box sx={{}}>
+          <DateRangePickerPopover
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            startDate={startDate}
+            endDate={endDate}
+            setStartDate={setStartDate}
+            setEndDate={setEndDate}
+          />
         </Box>
-
-        {/* <DateRangePickerPopover
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          startDate={startDate}
-          endDate={endDate}
-          setStartDate={setStartDate}
-          setEndDate={setEndDate}
-        /> */}
-        <DatePickerValue />
+        {/* <DatePickerValue /> */}
       </Box>
 
       <Stack spacing={2} p={2} direction="row" alignItems="center">
@@ -252,7 +256,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 };
 
 export default PromptFilter;
-
 
 interface PopoverParams {
   anchorEl: any;
@@ -289,7 +292,7 @@ const CustomPopover = ({
     const newAppliedFilters = [...appliedFilters];
     newAppliedFilters[index][field] = value;
     setAppliedFilters(newAppliedFilters);
-  }
+  };
 
   const handleAddFilter = () => {
     setAppliedFilters([...appliedFilters, { column: '', column_type: '', operator: '', value: '' }]);
@@ -317,57 +320,55 @@ const CustomPopover = ({
           <Stack spacing={2} direction="column">
             {appliedFilters.map((appliedFilter, index) => (
               <Stack spacing={1} direction="row">
-              <FormControl fullWidth required>
-                <InputLabel id="select-column-label">Select Column</InputLabel>
-                <Select
-                  labelId="select-column-label"
-                  id="select-column"
-                  value={appliedFilter.column}
-                  label="Select Column"
-                  onChange={(event) => {
-                    updateExistingFilter(index, 'column', event.target.value as string)
-                    const filter = filters.find((filter) => filter.display_column === event.target.value as string);
-                    const columnType = filter ? filter.column_type : 'string';
-                    updateExistingFilter(index, 'column_type', columnType);
-                  }}
-                  defaultValue={appliedFilter.column}
-                >
-                  {filters.map((filter, index) => (
-                    <MenuItem key={filter.display_column} value={filter.display_column}>
-                      {filter.display_column}
-                    </MenuItem>
-                  ))}
+                <FormControl fullWidth required>
+                  <InputLabel id="select-column-label">Select Column</InputLabel>
+                  <Select
+                    labelId="select-column-label"
+                    id="select-column"
+                    value={appliedFilter.column}
+                    label="Select Column"
+                    onChange={(event) => {
+                      updateExistingFilter(index, 'column', event.target.value as string);
+                      const filter = filters.find((filter) => filter.display_column === (event.target.value as string));
+                      const columnType = filter ? filter.column_type : 'string';
+                      updateExistingFilter(index, 'column_type', columnType);
+                    }}
+                    defaultValue={appliedFilter.column}
+                  >
+                    {filters.map((filter, index) => (
+                      <MenuItem key={filter.display_column} value={filter.display_column}>
+                        {filter.display_column}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-                </Select>
-              </FormControl>
+                <FormControl fullWidth required>
+                  <InputLabel id="select-operator-label">Select Operator</InputLabel>
+                  <Select
+                    labelId="select-operator-label"
+                    id="select-operator"
+                    value={appliedFilter.operator}
+                    label="Select Operator"
+                    onChange={(event) => {
+                      updateExistingFilter(index, 'operator', event.target.value);
+                    }}
+                    defaultValue={appliedFilter.operator}
+                  >
+                    {standardOperators[appliedFilter.column_type]?.map((op) => (
+                      <MenuItem key={op} value={op}>
+                        {op}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
-              <FormControl fullWidth required>
-                <InputLabel id="select-operator-label">Select Operator</InputLabel>
-                <Select
-                  labelId="select-operator-label"
-                  id="select-operator"
-                  value={appliedFilter.operator}
-                  label="Select Operator"
-                  onChange={(event) => {
-                    updateExistingFilter(index, 'operator', event.target.value)
-                  }}
-                  defaultValue={appliedFilter.operator}
-                >
-                {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                value={appliedFilter.value}
-                onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
-                placeholder="Enter value"
-              />
-
-            </Stack>
+                <TextField
+                  value={appliedFilter.value}
+                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
+                  placeholder="Enter value"
+                />
+              </Stack>
             ))}
 
             <Button onClick={handleAddFilter}>Add Filter</Button>

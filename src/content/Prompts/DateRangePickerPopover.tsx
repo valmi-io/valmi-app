@@ -18,6 +18,9 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import VButton from '@/components/VButton';
+import CustomIcon from '@/components/Icon/CustomIcon';
+import appIcons from '@/utils/icon-utils';
 
 interface DateRangePickerProps {
   dateRange: string;
@@ -80,7 +83,16 @@ const DateRangePickerPopover = ({
 
   return (
     <>
-      <Button onClick={handleDateRangeButtonClick}>{dateRange}</Button>
+      <VButton
+        buttonText={dateRange}
+        buttonType="submit"
+        endIcon={<CustomIcon icon={appIcons.ARROW_RIGHT} />}
+        onClick={handleDateRangeButtonClick}
+        size="small"
+        disabled={false}
+        variant="contained"
+      />
+      {/* <Button onClick={handleDateRangeButtonClick}>{dateRange}</Button> */}
 
       <Popover
         id={id}
