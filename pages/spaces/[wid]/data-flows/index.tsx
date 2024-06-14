@@ -18,7 +18,7 @@ const PageContent = ({ data }: { data: TConnection[] }) => {
   }
 
   // Display empty component
-  return <ListEmptyComponent description={'No connections found in this workspace'} />;
+  return <ListEmptyComponent description={'No dataflows found in this workspace'} />;
 };
 
 const DataFlowsPage: NextPageWithLayout = () => {
