@@ -10,6 +10,7 @@ import { TConnection } from '@/utils/typings.d';
 import DataFlowsLogo from '@/content/DataFlows/DataFlowsLogo';
 import DataFlowsConnectionsList from '@/content/DataFlows/DataFlowsConnectionsList';
 import DataFlowsConnectionLinks from '@/content/DataFlows/DataFlowsConnectionLinks';
+import { getValmiDataStoreName } from '@/utils/app-utils';
 
 const Container = styled(Stack)(({}) => ({
   display: 'flex',
@@ -64,7 +65,7 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
       <Xwrapper>
         <ConnectionsContainer spacing={3}>
           {connections.map((connection: TConnection) => {
-            if (connection?.source?.name !== 'VALMI_ENGINE') {
+            if (connection?.source?.name !== getValmiDataStoreName()) {
               return (
                 <React.Fragment key={connection?.id}>
                   <DataFlowsConnectionsList
@@ -87,7 +88,7 @@ const DataFlows = ({ connections }: { connections: TConnection[] }) => {
 
         <ConnectionsContainer spacing={3}>
           {connections.map((connection: TConnection) => {
-            if (connection?.destination?.name !== 'VALMI_ENGINE') {
+            if (connection?.destination?.name !== getValmiDataStoreName()) {
               return (
                 <React.Fragment key={connection?.id}>
                   <DataFlowsConnectionsList

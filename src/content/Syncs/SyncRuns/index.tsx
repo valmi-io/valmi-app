@@ -15,7 +15,7 @@ import { getSyncDetails } from '@store/api/apiSlice';
 import { useSelector } from 'react-redux';
 import { isDataEmpty } from '@/utils/lib';
 import { TData } from '@/utils/typings.d';
-
+import { getValmiDataStoreName } from '@/utils/app-utils';
 
 /**
  * Responsible for displaying `Runs` page and its components.
@@ -126,7 +126,6 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     if (runs.ids.length > 0) {
       const currentId = runs.ids[0];
       return runs.entities[currentId];
-
     }
     return null;
   }, [runs.ids.length]);
@@ -163,7 +162,7 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
 const PageContent = ({ data, syncId, connectionData }: { data: TData; syncId: string; connectionData: any }) => {
   const isRetlFlow = useMemo(() => {
     if (connectionData) {
-      return connectionData?.source?.name === 'VALMI_ENGINE' ? true : false;
+      return connectionData?.source?.name === getValmiDataStoreName() ? true : false;
     }
   }, [connectionData]);
 
