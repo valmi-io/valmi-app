@@ -1,28 +1,32 @@
-//@S-Nagendra
-import { StackLayout } from '@/components/Layouts/Layouts';
-import { TPrompt } from '@/content/Prompts/PromptCard';
-import appIcons from '@/utils/icon-utils';
-import { Card, Stack, Typography } from '@mui/material';
+import PromptDetailsTitleCard from '@/content/Prompts/PromptDetailsTitleCard';
+import { TPrompt } from '@/utils/typings.d';
+import { Paper, Stack, Typography, styled } from '@mui/material';
+
+const CardWrapper = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  justifyContent: 'center',
+  gap: theme.spacing(2),
+  padding: theme.spacing(2)
+}));
+
+const PromptDescription = ({ description }: { description: string }) => {
+  return (
+    <Stack>
+      <Typography variant="body1">{description}</Typography>
+    </Stack>
+  );
+};
 
 const PromptDetails = ({ item }: { item: TPrompt }) => {
   return (
-    <Card variant="outlined">
-      <StackLayout spacing={2}>
-        <Stack spacing={1} direction="row">
-          {appIcons.NAME}
-          <Typography variant="body1" color="text.primary">
-            {item.name}
-          </Typography>
-        </Stack>
+    <CardWrapper variant="outlined">
+      <PromptDetailsTitleCard item={item} />
 
-        {/** Prompt description */}
-
-        <Stack spacing={1} direction="row">
-          {appIcons.NAME}
-          <Typography variant="body2">{item.description}</Typography>
-        </Stack>
-      </StackLayout>
-    </Card>
+      <PromptDescription description={item?.description ?? ''} />
+    </CardWrapper>
   );
 };
 
