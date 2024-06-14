@@ -14,7 +14,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 
-import PromptFilter from '@/content/Prompts/PromptFilter';
+// import PromptFilter from '@/content/Prompts/PromptFilter';
+import PromptFilter from '@/content/Prompts/PromptFilterV2';
 import { Container, MenuItem, Paper, TextField } from '@mui/material';
 import moment from 'moment';
 import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';

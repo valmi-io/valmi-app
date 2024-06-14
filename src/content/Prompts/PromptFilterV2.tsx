@@ -5,6 +5,13 @@ import DateRangePicker, { getDateRange } from '@components/DateRangePicker';
 import { transformFilters } from '@/utils/filters-transform-utils';
 import CheckIcon from '@mui/icons-material/Check';
 
+import dayjs, { Dayjs } from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+
 // Interface for filter options
 interface Filter {
   db_column: string;
@@ -38,15 +45,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
 
   ]);
-  const [dateRange, setDateRange] = useState<{ timeRange: string; start_date: Date; end_date: Date }>(
-    getDateRange('last30days')
-  );
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
-  const handleDateRangeChange = (value: string) => {
-    setDateRange(getDateRange(value));
-  };
+  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate]     = React.useState<Dayjs | null>(dayjs().subtract(7, 'days'));
+
+  const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
   const handleAddFilter = (event: React.MouseEvent<HTMLElement>) => {
     setFilterInputIndex(appliedFilters.length);
@@ -142,11 +145,48 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
       return null;
   }
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+
+    const handleRemoveFilterChip = (index) => {
+
+    }
+
+    const handleEditFilterChip = (index, event) => {
+
+    }
+
+
 
   return (
     <>
+        <Stack spacing={1} p={1} direction="row">
+            {/* appliedFilters chip box */}
+            <Box minWidth={600} sx={{bgcolor:'pink'}}>
+                {appliedFilters.map((appliedFilter, index) => (
+                    <Chip
+                        key={index}
+                        label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
+                        onDelete={() => handleRemoveFilterChip(index)}
+                        onClick={(event) => handleEditFilterChip(index, event)}
+                        // color={selectedFilterChipIndex === index ? 'primary' : 'default'}
+                    />
+                ))
+                }
+            </Box>
+
+
+            <DateRangePickerPopup />
+            <DatePickerValue />
+
+
+
+
+
+
+
+        </Stack>
+
+
+
       <Stack spacing={2} p={2} direction="row" alignItems="center">
         <Box flex={1}>
           <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -172,63 +212,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
       <FiltersStatus />
 
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-      >
-        {filterInputIndex !== null && (
-          <Box p={2} minWidth={400} display="flex" flexDirection="column" gap={2}>
-            <FormControl fullWidth>
-              <InputLabel>Select Column</InputLabel>
-              <Select
-                label="Select Column"
-                value={appliedFilters[filterInputIndex].column}
-                onChange={(e) => handleColumnChange(filterInputIndex, e.target.value as string)}
-              >
-                <MenuItem value="">Select Column</MenuItem>
-                {filters.map((filter) => (
-                  <MenuItem key={filter.display_column} value={filter.display_column}>
-                    {filter.display_column}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Select Operator</InputLabel>
-              <Select
-                label="Select Operator"
-                value={appliedFilters[filterInputIndex].operator}
-                onChange={(e) => handleFilterChange(filterInputIndex, 'operator', e.target.value as string)}
-              >
-                <MenuItem value="">Select Operator</MenuItem>
-                {standardOperators[appliedFilters[filterInputIndex].column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FilterInput
-              appliedFilter={appliedFilters[filterInputIndex]}
-              index={filterInputIndex}
-              handleFilterChange={handleFilterChange}
-            />
-            <Button onClick={handleSubmitFilter} variant="contained" color="primary" fullWidth>
-              OK
-            </Button>
-          </Box>
-        )}
-      </Popover>
+
     </>
   );
 };
@@ -237,6 +221,34 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
 
 export default PromptFilter;
+
+const DateRangePickerPopup = () => {
+    const [startDate, setStartDate] = React.useState<Dayjs> (dayjs('2023-01-01'));
+    const [endDate, setEndDate] = React.useState<Dayjs> (dayjs('2024-01-01'));
+
+    <div>
+        <Button aria-describedby={id} variant="text" onClick={handleClick}>
+
+        </Button>
+    </div>
+}
+
+
+const DatePickerValue = () => {
+    const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17'));
+
+    return (
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DemoContainer components={['DatePicker']}>
+          <DatePicker
+            label="Controlled picker"
+            value={value}
+            onChange={(newValue) => setValue(newValue)}
+          />
+        </DemoContainer>
+      </LocalizationProvider>
+    );
+  }
 
 interface PopoverParams
 {
