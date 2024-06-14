@@ -22,17 +22,11 @@ type props = {
   closePopover: () => void;
   query: any;
   url: string;
-  syncRuns: any;
+  currentSyncRun: any;
   workspaceId: string;
 };
 
-const StopSyncPopoverComponent = ({
-  closePopover,
-  query,
-  url,
-  syncRuns,
-  workspaceId
-}: props) => {
+const StopSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, workspaceId }: props) => {
   // Sync run abort query
   const [abortSyncRunQuery] = useLazyAbortSyncRunByIdQuery();
 
@@ -74,7 +68,7 @@ const StopSyncPopoverComponent = ({
     handlePromiseStatus(true);
     // current running sync
 
-    const currentSyncRun = getCurrentSyncRun(syncRuns);
+    // const currentSyncRun = getCurrentSyncRun(syncRuns);
 
     const syncId = currentSyncRun.sync_id;
     const runId = currentSyncRun.run_id;
@@ -82,20 +76,13 @@ const StopSyncPopoverComponent = ({
     // generate stop sync run payload
     const payload = generateStopSyncPayload(workspaceId, syncId, runId);
 
-    syncRunNetworkHandler(
-      abortSyncRunQuery,
-      payload,
-      successHandler,
-      errorHandler
-    );
+    syncRunNetworkHandler(abortSyncRunQuery, payload, successHandler, errorHandler);
   };
 
   return (
     <>
       <Box sx={{ padding: (theme) => theme.spacing(3) }}>
-        <Typography variant="body1">
-          This sync is currently in progress. Do you want to stop it?
-        </Typography>
+        <Typography variant="body1">This sync is currently in progress. Do you want to stop it?</Typography>
       </Box>
       <Divider />
 
@@ -104,13 +91,7 @@ const StopSyncPopoverComponent = ({
           <Typography variant="body1">NO</Typography>
         </Button>
         <Button color="primary" fullWidth onClick={stopSyncRun}>
-          <Typography variant="body1">
-            {getPageButtonTitle(
-              isPublicSync(getRouterPathname(query, url)),
-              syncRuns,
-              isPromisePending
-            )}
-          </Typography>
+          <Typography variant="body1">{getPageButtonTitle(currentSyncRun, isPromisePending)}</Typography>
         </Button>
       </Box>
     </>
