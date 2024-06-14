@@ -123,16 +123,16 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: any })
     });
   };
 
-  const applyFilters = (payload: any) => {
+  const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
     const { schemas = [] } = prompt;
     previewPrompt(
       {
         schema_id: schemaID,
         time_window: {
-          label: 'custom',
+          label: dateRange,
                 range: {
-                  start: moment().subtract(1, 'months').toISOString(),
-                  end: moment().toISOString()
+                  start: start_date,
+                  end: end_date
                 }
         },
         filters: payload

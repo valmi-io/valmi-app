@@ -1,4 +1,5 @@
 import { TPromptSource } from '@/utils/typings.d';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface JsonSchema {
   $schema: string;
@@ -121,24 +122,12 @@ export const generateOnMountPreviewPayload = ( schema : string) => {
     // schema_id: schema.length ? schema[0].id : '',
     schema_id: schema,
     filters: [
-      {
-          "column": "updated_at",
-          "column_type": "DATE",
-          "operator": ">=",
-          "value": new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-          "column": "updated_at",
-          "column_type": "DATE",
-          "operator": "<=",
-          "value": new Date().toISOString()
-      }
     ],
     time_window: {
-      label: 'custom',
+      label: 'last7days',
         range: {
-          start: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          end: new Date().toISOString()
+          start: "now() - INTERVAL '7 days'",
+          end: "now()"
         }
     }
   };
