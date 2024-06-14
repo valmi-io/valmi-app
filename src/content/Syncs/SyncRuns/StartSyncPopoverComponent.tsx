@@ -29,12 +29,12 @@ type props = {
   closePopover: () => void;
   query: any;
   url: string;
-  syncRuns: any;
+  currentSyncRun: any;
   workspaceId: string;
   syncId: string;
 };
 
-const StartSyncPopoverComponent = ({ closePopover, query, url, syncRuns, workspaceId, syncId }: props) => {
+const StartSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, workspaceId, syncId }: props) => {
   // Create a new sync run query
   const [createNewSyncRunQuery] = useLazyCreateNewSyncRunQuery();
 
@@ -116,9 +116,7 @@ const StartSyncPopoverComponent = ({ closePopover, query, url, syncRuns, workspa
 
       <Box sx={{ m: 1 }}>
         <Button color="primary" fullWidth onClick={startSyncRun}>
-          <Typography variant="body1">
-            {getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), syncRuns, isPromisePending)}
-          </Typography>
+          <Typography variant="body1">{getPageButtonTitle(currentSyncRun, isPromisePending)}</Typography>
         </Button>
       </Box>
     </>
