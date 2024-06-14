@@ -49,10 +49,7 @@ interface PromptFilterProps {
 }
 
 const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standardOperators, applyFilters }) => {
-  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([
-    { column: 'payment_method', column_type: 'string', operator: '=', value: 'xyz' },
-    { column: 'payment_method', column_type: 'string', operator: '!=', value: 'as' }
-  ]);
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs().subtract(7, 'days'));
@@ -74,6 +71,9 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (appliedFilters.length < 1) {
+      setAppliedFilters([{ column: '', column_type: '', operator: '', value: '' }]);
+    }
     setAnchorEl(event.currentTarget);
   };
 
@@ -176,8 +176,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   const id = open ? 'simple-popover' : undefined;
 
   return (
-    <Paper sx={{ border: '2px solid greenyellow' }}>
-      <Box sx={{ display: 'flex', gap: 2, bgcolor: 'yellow', justifyContent: 'space-between' }}>
+    <Paper>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', mt: 2 }}>
         <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           <VButton
             buttonText={'FILTERS'}
@@ -190,7 +190,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
             variant="contained"
           />
 
-          <Box minWidth={600}>
+          <Box minWidth={300} sx={{ display: 'flex', alignItems: 'center' }}>
             {appliedFilters.map((appliedFilter, index) => (
               <Chip
                 key={index}

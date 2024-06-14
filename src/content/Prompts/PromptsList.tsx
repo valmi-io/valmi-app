@@ -3,8 +3,8 @@ import { Grid, styled } from '@mui/material';
 
 import PromptCard from '@/content/Prompts/PromptCard';
 import { useRouter } from 'next/router';
-import { getBaseRoute } from '@/utils/lib';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { redirectToPromptPreview } from '@/utils/router-utils';
 
 const Container = styled(Grid)(({ theme }) => ({
   display: 'flex',
@@ -23,7 +23,7 @@ const PromptsList = ({ data }: { data: TData }) => {
 
   const handleOnClick = (prompt: TPrompt) => {
     // redirect to preview page
-    router.push(`${getBaseRoute(workspaceId)}/prompts/${prompt.id}?filter=Last 7 days`);
+    redirectToPromptPreview({ router, wid: workspaceId, promptId: prompt.id });
   };
 
   return (

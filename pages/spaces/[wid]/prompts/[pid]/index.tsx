@@ -21,6 +21,7 @@ import PreviewTable from '@/content/Prompts/PreviewTable';
 export interface IPreviewPage extends IParams {
   pid: string;
   filter: string;
+  query: string;
 }
 
 const PreviewPageLayout: NextPageWithLayout = () => {
@@ -33,6 +34,8 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 };
 
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
+  console.log('Preview page:_', params);
+
   const { pid = '', filter = '', wid = '' } = params;
 
   const { data, error, isLoading, traceError } = useFetch({
@@ -44,7 +47,7 @@ const PreviewPage = ({ params }: { params: IPreviewPage }) => {
       <ContentLayout
         key={`prompt-preview-page`}
         error={error}
-        PageContent={<PageContent data={data} filter={filter} params={params} />}
+        PageContent={<PageContent data={data} params={params} />}
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -59,7 +62,7 @@ PreviewPageLayout.getLayout = function getLayout(page: ReactElement) {
 
 export default PreviewPageLayout;
 
-const PageContent = ({ data, filter, params }: { data: TData; filter: string; params: IPreviewPage }) => {
+const PageContent = ({ data, params }: { data: TData; params: IPreviewPage }) => {
   const { ids, entities } = data;
 
   if (isDataEmpty(data)) {

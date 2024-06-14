@@ -89,3 +89,17 @@ export const redirectToDataFlowsList = ({ router, wid }: { router: NextRouter; w
     router.push(`${getBaseRoute(wid)}/data-flows/list`);
   }
 };
+
+export const redirectToPromptPreview = ({
+  router,
+  wid,
+  promptId
+}: {
+  router: NextRouter;
+  wid: string;
+  promptId: string;
+}) => {
+  if (wid && promptId) {
+    router.push(`${getBaseRoute(wid)}/prompts/${promptId}`);
+  }
+};
