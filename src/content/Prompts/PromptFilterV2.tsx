@@ -230,6 +230,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
             anchorEl={anchorEl}
             handleClose={handleClose}
             appliedFilters={appliedFilters}
+            setAppliedFilters={setAppliedFilters}
             filters={filters}
             standardOperators={standardOperators}
             isList={true}
@@ -252,29 +253,12 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
 export default PromptFilter;
 
-const DateRangePickerPopup = () => {
-  const [startDate, setStartDate] = React.useState<Dayjs>(dayjs('2023-01-01'));
-  const [endDate, setEndDate] = React.useState<Dayjs>(dayjs('2024-01-01'));
-
-  <div>{/* <Button aria-describedby={id} variant="text" onClick={handleClick}></Button> */}</div>;
-};
-
-const DatePickerValue = () => {
-  const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17'));
-
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {/* <DemoContainer components={['DatePicker']}>
-        <DatePicker label="Controlled picker" value={value} onChange={(newValue) => setValue(newValue)} />
-      </DemoContainer> */}
-    </LocalizationProvider>
-  );
-};
 
 interface PopoverParams {
   anchorEl: any;
   handleClose: any;
   appliedFilters: AppliedFilter[];
+  setAppliedFilters: () => void;
   filters: Filter[];
   standardOperators: Operator;
   isList: boolean;
@@ -285,6 +269,7 @@ const CustomPopover = ({
   anchorEl,
   handleClose,
   appliedFilters,
+  setAppliedFilters,
   filters,
   standardOperators,
   isList,
@@ -299,6 +284,12 @@ const CustomPopover = ({
   // const handleClose = () => {
   //   setAnchorEl(null);
   // };
+
+  const updateExistingFilter = (index: number, field: any, value: string) => {
+    const newAppliedFilters = [...appliedFilters];
+    newAppliedFilters[index][field] = value;
+    setAppliedFilters(newAppliedFilters);
+  }
 
   const handleAddFilter = () => {
     setAppliedFilters([...appliedFilters, { column: '', column_type: '', operator: '', value: '' }]);
@@ -326,55 +317,57 @@ const CustomPopover = ({
           <Stack spacing={2} direction="column">
             {appliedFilters.map((appliedFilter, index) => (
               <Stack spacing={1} direction="row">
-                <FormControl fullWidth required>
-                  <InputLabel id="select-column-label">Select Column</InputLabel>
-                  <Select
-                    labelId="select-column-label"
-                    id="select-column"
-                    value={appliedFilter.column}
-                    label="Select Column"
-                    onChange={(event) => {
-                      updateExistingFilter(index, 'column', event.target.value as string);
-                      const filter = filters.find((filter) => filter.display_column === (event.target.value as string));
-                      const columnType = filter ? filter.column_type : 'string';
-                      updateExistingFilter(index, 'column_type', columnType);
-                    }}
-                    defaultValue={appliedFilter.column}
-                  >
-                    {filters.map((filter, index) => (
-                      <MenuItem key={filter.display_column} value={filter.display_column}>
-                        {filter.display_column}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+              <FormControl fullWidth required>
+                <InputLabel id="select-column-label">Select Column</InputLabel>
+                <Select
+                  labelId="select-column-label"
+                  id="select-column"
+                  value={appliedFilter.column}
+                  label="Select Column"
+                  onChange={(event) => {
+                    updateExistingFilter(index, 'column', event.target.value as string)
+                    const filter = filters.find((filter) => filter.display_column === event.target.value as string);
+                    const columnType = filter ? filter.column_type : 'string';
+                    updateExistingFilter(index, 'column_type', columnType);
+                  }}
+                  defaultValue={appliedFilter.column}
+                >
+                  {filters.map((filter, index) => (
+                    <MenuItem key={filter.display_column} value={filter.display_column}>
+                      {filter.display_column}
+                    </MenuItem>
+                  ))}
 
-                <FormControl fullWidth required>
-                  <InputLabel id="select-operator-label">Select Operator</InputLabel>
-                  <Select
-                    labelId="select-operator-label"
-                    id="select-operator"
-                    value={appliedFilter.operator}
-                    label="Select Operator"
-                    onChange={(event) => {
-                      updateExistingFilter(index, 'operator', event.target.value);
-                    }}
-                    defaultValue={appliedFilter.operator}
-                  >
-                    {standardOperators[appliedFilter.column_type]?.map((op) => (
-                      <MenuItem key={op} value={op}>
-                        {op}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                </Select>
+              </FormControl>
 
-                <TextField
-                  value={appliedFilter.value}
-                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
-                  placeholder="Enter value"
-                />
-              </Stack>
+              <FormControl fullWidth required>
+                <InputLabel id="select-operator-label">Select Operator</InputLabel>
+                <Select
+                  labelId="select-operator-label"
+                  id="select-operator"
+                  value={appliedFilter.operator}
+                  label="Select Operator"
+                  onChange={(event) => {
+                    updateExistingFilter(index, 'operator', event.target.value)
+                  }}
+                  defaultValue={appliedFilter.operator}
+                >
+                {standardOperators[appliedFilter.column_type]?.map((op) => (
+                  <MenuItem key={op} value={op}>
+                    {op}
+                  </MenuItem>
+                ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                value={appliedFilter.value}
+                onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
+                placeholder="Enter value"
+              />
+
+            </Stack>
             ))}
 
             <Button onClick={handleAddFilter}>Add Filter</Button>
