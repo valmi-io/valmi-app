@@ -29,6 +29,7 @@ import CustomIcon from '@/components/Icon/CustomIcon';
 import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
+import { ImageSize } from '@/components/ImageComponent';
 
 // Interface for filter options
 interface Filter {
@@ -234,7 +235,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         /> */}
-
       </Box>
 
       <Stack spacing={2} p={2} direction="row" alignItems="center">
@@ -272,7 +272,7 @@ interface PopoverParams {
   setAppliedFilters: () => void;
   filters: Filter[];
   standardOperators: Operator;
-  handleSubmit: () => void
+  handleSubmit: () => void;
 }
 
 const CustomPopover = ({
@@ -327,87 +327,102 @@ const CustomPopover = ({
             {appliedFilters.map((appliedFilter, index) => (
               <Stack spacing={1} direction="row">
                 <FormControl fullWidth required>
-                  <InputLabel id="select-column-label">Select Column</InputLabel>
-                  <Select
-                    labelId="select-column-label"
+                  <TextField
+                    size="small"
                     id="select-column"
                     value={appliedFilter.column}
                     label="Select Column"
+                    select={true}
+                    required
+                    fullWidth
                     onChange={(event) => {
                       updateExistingFilter(index, 'column', event.target.value as string);
                       const filter = filters.find((filter) => filter.display_column === (event.target.value as string));
                       const columnType = filter ? filter.column_type : 'string';
                       updateExistingFilter(index, 'column_type', columnType);
                     }}
-                    defaultValue={appliedFilter.column}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   >
                     {filters.map((filter, index) => (
                       <MenuItem key={filter.display_column} value={filter.display_column}>
                         {filter.display_column}
                       </MenuItem>
                     ))}
-                  </Select>
+                  </TextField>
                 </FormControl>
 
                 <FormControl fullWidth required>
-                  <InputLabel id="select-operator-label">Select Operator</InputLabel>
-                  <Select
-                    labelId="select-operator-label"
+                  <TextField
+                    size="small"
                     id="select-operator"
                     value={appliedFilter.operator}
                     label="Select Operator"
+                    select={true}
+                    required
+                    fullWidth
                     onChange={(event) => {
                       updateExistingFilter(index, 'operator', event.target.value);
                     }}
-                    defaultValue={appliedFilter.operator}
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                   >
                     {standardOperators[appliedFilter.column_type]?.map((op) => (
                       <MenuItem key={op} value={op}>
                         {op}
                       </MenuItem>
                     ))}
-                  </Select>
+                  </TextField>
                 </FormControl>
 
-              <FormControl fullWidth required>
-                <InputLabel id="select-operator-label">Select Operator</InputLabel>
-                <Select
-                  labelId="select-operator-label"
-                  id="select-operator"
-                  value={appliedFilter.operator}
-                  label="Select Operator"
-                  onChange={(event) => {
-                    updateExistingFilter(index, 'operator', event.target.value)
-                  }}
-                  defaultValue={appliedFilter.operator}
-                >
-                {standardOperators[appliedFilter.column_type]?.map((op) => (
-                  <MenuItem key={op} value={op}>
-                    {op}
-                  </MenuItem>
-                ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                sx={{width:800}}
-                value={appliedFilter.value}
-                onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
-                placeholder="Enter value"
-              />
-
-            </Stack>
+                <TextField
+                  size="small"
+                  value={appliedFilter.value}
+                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
+                  placeholder="Enter value"
+                />
+              </Stack>
             ))}
 
-            <Stack spacing={1} direction="row">
-              <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleAddFilter}>Add Filter</Button>
-              <Button onClick={() => {
-                handleClose();
-                handleSubmit();
-                }}>
-                  Apply Filters
-              </Button>
+            <Stack spacing={1} direction="row" sx={{ justifyContent: 'space-between' }}>
+              <VButton
+                buttonText={'+ ADD'}
+                buttonType="submit"
+                endIcon={false}
+                onClick={handleAddFilter}
+                size="small"
+                disabled={false}
+                variant="text"
+              />
+
+              <Stack spacing={1} direction="row">
+                <VButton
+                  buttonText={'CANCEL'}
+                  buttonType="submit"
+                  endIcon={false}
+                  startIcon={false}
+                  onClick={handleClose}
+                  size="small"
+                  disabled={false}
+                  variant="text"
+                />
+
+                <VButton
+                  buttonText={'APPLY'}
+                  buttonType="submit"
+                  endIcon={false}
+                  startIcon={false}
+                  onClick={() => {
+                    handleClose();
+                    handleSubmit();
+                  }}
+                  size="small"
+                  disabled={false}
+                  variant="text"
+                />
+              </Stack>
             </Stack>
           </Stack>
         </Box>
