@@ -10,7 +10,6 @@ import { Stack, Typography } from '@mui/material';
 import RunStatusIcon from './RunStatusIcon';
 import { splitNumberByCommas } from '@/utils/lib';
 
-
 interface SyncRunStatusProps {
   syncRun: any;
   displayError: any;
@@ -33,7 +32,7 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
         gap: (theme) => theme.spacing(1)
       }}
     >
-       <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
+      <Stack direction="row" sx={{ display: 'flex', alignItems: 'center' }}>
         <Typography
           variant="caption"
           sx={{
@@ -68,7 +67,6 @@ const SyncRunStatus = ({ syncRun, displayError, isRetlFlow }: SyncRunStatusProps
               </Stack>
             ))
           : '-')}
- 
     </Stack>
   );
 };

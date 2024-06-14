@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { ReactElement } from 'react';
 
 import { useRouter } from 'next/router';
@@ -16,9 +10,9 @@ import SidebarLayout from '@layouts/SidebarLayout';
 import PageLayout from '@layouts/PageLayout';
 
 import SyncRuns from '@content/Syncs/SyncRuns';
-import SyncDetails from '@content/Syncs/SyncDetails';
 
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import DataflowDetails from '@/content/DataFlowDetails/DataFlowDetails';
 
 const SyncRunsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -28,10 +22,10 @@ const SyncRunsPage: NextPageWithLayout = () => {
   const { workspaceId = '' } = useWorkspaceId();
 
   return (
-    <PageLayout pageHeadTitle="Sync Runs" title={'FLOW DETAILS'} displayButton={false}>
+    <PageLayout pageHeadTitle="Runs" title={'FLOW DETAILS'} displayButton={false}>
       <Grid container direction="row" justifyContent="center" alignItems="stretch" spacing={3}>
         <Grid item xs={12}>
-          <SyncDetails syncId={cid} workspaceId={workspaceId} />
+          <DataflowDetails syncId={cid as string} />
         </Grid>
         <Grid item xs={12}>
           <SyncRuns syncId={cid} workspaceId={workspaceId} />

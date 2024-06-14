@@ -1,4 +1,5 @@
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { getValmiLogoSrc } from '@/utils/app-utils';
 import { redirectToDataFlowsList } from '@/utils/router-utils';
 import { Stack, Tooltip, styled } from '@mui/material';
 import Image from 'next/image';
@@ -11,8 +12,6 @@ const LogoContainer = styled(Stack)(({}) => ({
   alignItems: 'center',
   justifyContent: 'center'
 }));
-
-const VALMI_LOGO = '/images/valmi_logo_no_text.svg';
 
 const DataFlowsLogo = () => {
   const router = useRouter();
@@ -28,7 +27,7 @@ const DataFlowsLogo = () => {
         <Image
           id="logo"
           priority={true}
-          src={VALMI_LOGO}
+          src={getValmiLogoSrc()}
           alt="Logo"
           width={60}
           height={60}

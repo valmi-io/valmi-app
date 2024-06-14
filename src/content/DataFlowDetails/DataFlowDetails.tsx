@@ -1,10 +1,4 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Wednesday, May 17th 2023, 7:40:50 am
- * Author: Nagendra S @ valmi.io
- */
-
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -12,14 +6,11 @@ import { useDispatch } from 'react-redux';
 
 import { Card } from '@mui/material';
 
-import SyncDetailsCard from '@content/Syncs/SyncDetails/SyncDetailsCard';
-
 import { getErrorsInData, hasErrorsInData } from '@components/Error/ErrorUtils';
 import ErrorComponent, { ErrorStatusText } from '@components/Error';
 import SkeletonLoader from '@components/SkeletonLoader';
 
-import { useGetSyncByIdQuery, useLazyGetSyncByIdQuery, useLazyToggleSyncQuery } from '@store/api/apiSlice';
-import { getRouterPathname, isPublicSync } from '@utils/routes';
+import { useLazyGetSyncByIdQuery, useLazyUpdateDataFlowStatusQuery } from '@store/api/apiSlice';
 import { getBaseRoute } from '@/utils/lib';
 import { setConnectionFlowState } from '@/store/reducers/connectionDataFlow';
 import {
@@ -31,49 +22,44 @@ import {
   getSelectedConnectorKey,
   getSelectedConnectorObj
 } from '@/utils/connectionFlowUtils';
-import { useFetch } from '@/hooks/useFetch';
+import DataFlowDetailsCard from '@/content/DataFlowDetails/DataFlowDetailsCard';
+import { TConnection } from '@/utils/typings.d';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
-const SyncDetails = ({ syncId, workspaceId }: any) => {
+const DataflowDetails = ({ syncId }: { syncId: string }) => {
   const router = useRouter();
-
-  const url = router.pathname;
-  const query = router.query;
 
   const dispatch = useDispatch();
 
+  const { workspaceId = '' } = useWorkspaceId();
+
   const [traceError, setTraceError] = useState<any>(null);
-  const [syncDetails, setSyncDetails] = useState(null);
+  const [dataFlowDetails, setDataFlowDetails] = useState<TConnection | null>(null);
 
-  const { data, error, isLoading } = useFetch({
-    query: useGetSyncByIdQuery({ syncId: syncId, workspaceId: workspaceId })
-  });
+  const [getDataFlow, { data, isLoading, error }] = useLazyGetSyncByIdQuery();
 
-  const [toggleSync, { data: updateSyncData }] = useLazyToggleSyncQuery();
-
-  let publicSync = useMemo(() => isPublicSync(getRouterPathname(query, url)), [query, url]);
+  const [updateDataFlowStatus, { data: updateSyncData }] = useLazyUpdateDataFlowStatusQuery();
 
   useEffect(() => {
     if (updateSyncData) {
-      if (!isPublicSync(getRouterPathname(query, url)) && workspaceId) {
-        const payload = {
-          syncId: syncId,
-          workspaceId: workspaceId
-        };
-        // getSyncDetails(payload);
-      }
+      const payload = {
+        syncId: syncId,
+        workspaceId: workspaceId
+      };
+      getDataFlow(payload);
     }
   }, [updateSyncData, workspaceId]);
 
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (!publicSync && workspaceId) {
+    if (workspaceId) {
       const payload = {
         syncId: syncId,
         workspaceId: workspaceId
       };
 
-      // getSyncDetails(payload);
+      getDataFlow(payload);
     }
   }, [router.isReady, workspaceId]);
 
@@ -84,13 +70,14 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
         setTraceError(traceError);
       } else {
         const { ids, entities } = data;
-        const connectionData = entities[ids[0]] ?? {};
-        setSyncDetails(connectionData);
+        const result = entities[ids[0]] ?? {};
+        setDataFlowDetails(result);
       }
     }
   }, [data]);
 
-  const handleSyncSwitch = (event: React.ChangeEvent<HTMLInputElement>, val: any, syncData: any) => {
+  // Update dataflow status
+  const handleSwitchOnChange = (event: React.ChangeEvent<HTMLInputElement>, val: any, syncData: any) => {
     event.stopPropagation();
 
     const payload = {
@@ -100,9 +87,8 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
       enable: val,
       workspaceId: workspaceId
     };
-    console.log('toggle sync:_', payload);
 
-    toggleSync(payload);
+    updateDataFlowStatus(payload);
   };
 
   const handleEditSync = (data: any) => {
@@ -155,17 +141,6 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
     router.push(pathname + '?' + params);
   };
 
-  const displayPageContent = (isPublicSync: boolean) => {
-    return (
-      <SyncDetailsCard
-        syncData={syncDetails}
-        handleSyncSwitch={handleSyncSwitch}
-        handleEditSync={handleEditSync}
-        isPublicSync={isPublicSync}
-      />
-    );
-  };
-
   return (
     <Card variant="outlined">
       {/** Display Errors */}
@@ -175,12 +150,15 @@ const SyncDetails = ({ syncId, workspaceId }: any) => {
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
       <SkeletonLoader loading={isLoading} />
-
-      {publicSync
-        ? displayPageContent(publicSync)
-        : !error && !isLoading && syncDetails && displayPageContent(publicSync)}
+      {!error && !isLoading && dataFlowDetails && (
+        <DataFlowDetailsCard
+          data={dataFlowDetails}
+          handleSwitchOnChange={handleSwitchOnChange}
+          handleEditSync={handleEditSync}
+        />
+      )}
     </Card>
   );
 };
 
-export default SyncDetails;
+export default DataflowDetails;
