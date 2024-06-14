@@ -26,6 +26,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import VButton from '@/components/VButton';
 import appIcons from '@/utils/icon-utils';
 import CustomIcon from '@/components/Icon/CustomIcon';
+import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
 
@@ -63,6 +64,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
   const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
   const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs().subtract(7, 'days'));
+  const [dateRange, setDateRange] = React.useState('last7days');
 
   const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
 
@@ -182,9 +184,12 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
   const handleEditFilterChip = (index, event) => {};
 
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
     <Paper sx={{ border: '2px solid greenyellow' }}>
-      <Box sx={{ display: 'flex', bgcolor: 'cyan', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', gap: 2, bgcolor: 'yellow' }}>
         <VButton
           buttonText={'FILTERS'}
           buttonType="submit"
@@ -196,18 +201,26 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           variant="contained"
         />
 
-        <Box minWidth={600} sx={{ bgcolor: 'pink' }}>
+        <Box minWidth={600}>
           {appliedFilters.map((appliedFilter, index) => (
             <Chip
               key={index}
               label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
-              onDelete={() => handleRemoveFilterChip(index)}
-              onClick={(event) => handleEditFilterChip(index, event)}
-              // color={selectedFilterChipIndex === index ? 'primary' : 'default'}
+              onDelete={() => handleRemoveFilter(index)}
+              onClick={(event) => handleEditFilter(index, event)}
+              color={filterInputIndex === index ? 'primary' : 'default'}
             />
           ))}
         </Box>
-        <DateRangePickerPopup />
+
+        {/* <DateRangePickerPopover
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+        /> */}
         <DatePickerValue />
       </Box>
 
@@ -320,7 +333,12 @@ const CustomPopover = ({
                     id="select-column"
                     value={appliedFilter.column}
                     label="Select Column"
-                    onChange={() => console.log('changing')}
+                    onChange={(event) => {
+                      updateExistingFilter(index, 'column', event.target.value as string);
+                      const filter = filters.find((filter) => filter.display_column === (event.target.value as string));
+                      const columnType = filter ? filter.column_type : 'string';
+                      updateExistingFilter(index, 'column_type', columnType);
+                    }}
                     defaultValue={appliedFilter.column}
                   >
                     {filters.map((filter, index) => (
@@ -336,9 +354,11 @@ const CustomPopover = ({
                   <Select
                     labelId="select-operator-label"
                     id="select-operator"
-                    value={appliedFilter.column}
+                    value={appliedFilter.operator}
                     label="Select Operator"
-                    onChange={() => console.log('changing')}
+                    onChange={(event) => {
+                      updateExistingFilter(index, 'operator', event.target.value);
+                    }}
                     defaultValue={appliedFilter.operator}
                   >
                     {standardOperators[appliedFilter.column_type]?.map((op) => (
@@ -351,7 +371,7 @@ const CustomPopover = ({
 
                 <TextField
                   value={appliedFilter.value}
-                  onChange={() => console.log('changingg')}
+                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
                   placeholder="Enter value"
                 />
               </Stack>
