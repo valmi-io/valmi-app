@@ -221,7 +221,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         /> */}
-        <DatePickerValue />
+
       </Box>
 
       <Stack spacing={2} p={2} direction="row" alignItems="center">
@@ -233,8 +233,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
             setAppliedFilters={setAppliedFilters}
             filters={filters}
             standardOperators={standardOperators}
-            isList={true}
-            canAdd={true}
+            handleSubmit={handleSubmit}
           />
         </Box>
         <Stack direction="row" spacing={2} alignItems="center">
@@ -261,8 +260,7 @@ interface PopoverParams {
   setAppliedFilters: () => void;
   filters: Filter[];
   standardOperators: Operator;
-  isList: boolean;
-  canAdd: boolean;
+  handleSubmit: () => void
 }
 
 const CustomPopover = ({
@@ -272,8 +270,7 @@ const CustomPopover = ({
   setAppliedFilters,
   filters,
   standardOperators,
-  isList,
-  canAdd
+  handleSubmit
 }: PopoverParams): any => {
   // const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -362,6 +359,7 @@ const CustomPopover = ({
               </FormControl>
 
               <TextField
+                sx={{width:800}}
                 value={appliedFilter.value}
                 onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
                 placeholder="Enter value"
@@ -370,8 +368,16 @@ const CustomPopover = ({
             </Stack>
             ))}
 
-            <Button onClick={handleAddFilter}>Add Filter</Button>
-            <Button>Apply Filters</Button>
+            <Stack spacing={1} direction="row">
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleAddFilter}>Add Filter</Button>
+              <Button onClick={() => {
+                handleClose();
+                handleSubmit();
+                }}>
+                  Apply Filters
+              </Button>
+            </Stack>
           </Stack>
         </Box>
       </Popover>
