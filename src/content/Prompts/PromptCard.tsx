@@ -44,9 +44,12 @@ const Rectangle = styled(Paper)(({}) => ({
 const PromptHeaderContainer = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'center',
-  gap: theme.spacing(1)
+  gap: theme.spacing(1),
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  width: '100%'
 }));
 
 const PromptDescriptionContainer = styled(Stack)(({ theme }) => ({
@@ -119,7 +122,6 @@ const PromptCard = ({ item, handleOnClick }: TPromptProps) => {
   }, [item]);
 
   return (
- 
     // <Grid item xs={'auto'}>
     <Card variant="outlined" sx={{ opacity: item?.enabled ? 1 : 0.6 }}>
       <PromptIconContainer>
