@@ -78,13 +78,14 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   };
 
   const handleClose = () => {
-    {/* delete empty filters; optional; do better, later */}
-    const properFilters = []
-    for(let i = 0; i < appliedFilters.length; i++){
-      if(appliedFilters[i].column !== '' && appliedFilters[i].operator !== '' && appliedFilters[i].value !== '')
-        {
-          properFilters.push(appliedFilters[i])
-        }
+    {
+      /* delete empty filters; optional; do better, later */
+    }
+    const properFilters = [];
+    for (let i = 0; i < appliedFilters.length; i++) {
+      if (appliedFilters[i].column !== '' && appliedFilters[i].operator !== '' && appliedFilters[i].value !== '') {
+        properFilters.push(appliedFilters[i]);
+      }
     }
     setAppliedFilters(properFilters);
     setAnchorEl(null);
