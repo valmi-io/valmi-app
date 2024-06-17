@@ -92,32 +92,40 @@ const MyApp: FC<AppPropsWithLayout> = ({
   const router = useRouter();
 
   useEffect(() => {
-    const handleRouteChange = ({ shallow }: { shallow: boolean }) => {
+    const handleRouteChange = (url, { shallow }) => {
+      console.log('url:_', { url, shallow });
+
       if (!shallow) {
         NProgress.start();
       }
     };
 
-    // Track page views
-    const handleRouteComplete = () => {
-      // posthog?.capture('$pageview');
+    const handleRouteChangeError = (err, url) => {
+      if (err.cancelled) {
+        console.log(`Route to ${url} was cancelled!`);
+      }
+      NProgress.done();
+    };
 
+    // Track page views
+    const handleRouteComplete = (url, { shallow }) => {
+      // posthog?.capture('$pageview');
       NProgress.done();
     };
     router.events.on('routeChangeComplete', handleRouteComplete);
 
     router.events.on('routeChangeStart', handleRouteChange);
     router.events.on('routeChangeComplete', handleRouteComplete);
-    router.events.on('routeChangeError', () => NProgress.done());
+    router.events.on('routeChangeError', handleRouteChangeError);
 
     // If the component is unmounted, unsubscribe
     // from the event with the `off` method:
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
       router.events.off('routeChangeComplete', handleRouteComplete);
-      router.events.off('routeChangeError', () => NProgress.done());
+      router.events.off('routeChangeError', handleRouteChangeError);
     };
-  }, []);
+  }, [router]);
 
   return (
     <SessionProvider session={session}>

@@ -46,9 +46,35 @@ interface PromptFilterProps {
   filters: Filter[];
   operators: Operator;
   applyFilters: any;
+  resetFilters: () => void;
+  searchParams?: {
+    filters: string;
+    timeWindow: string;
+  };
 }
 
-const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standardOperators, applyFilters }) => {
+const PromptFilter: React.FC<PromptFilterProps> = ({
+  filters,
+  operators: standardOperators,
+  applyFilters,
+  resetFilters,
+  searchParams
+}) => {
+  console.log('Search params:_', searchParams);
+
+  let defaultFilters: AppliedFilter[] = [];
+  let defaultTimeWindow = {};
+
+  if (searchParams?.filters) {
+    defaultFilters = JSON.parse(searchParams.filters);
+  }
+
+  if (searchParams?.timeWindow) {
+    defaultTimeWindow = JSON.parse(searchParams.timeWindow);
+  }
+
+  console.log('Default time window:_', defaultTimeWindow);
+
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(7, 'days'));
@@ -126,6 +152,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
     });
 
     let start_date, end_date;
+
     switch (dateRange) {
       case 'last 7 days':
         start_date = "now() - INTERVAL '7 days'";
@@ -162,15 +189,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  const handleResetOnClick = () => {
-    alert('RESET HANDLER');
-  };
-
   const handleCustomApplyOnClick = () => {};
 
   return (
-    <Paper>
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', mt: 2 }}>
+    <Paper sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between' }}>
         <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           <VButton
             buttonText={'FILTERS'}
@@ -184,7 +207,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           />
 
           <Box minWidth={300} sx={{ display: 'flex', alignItems: 'center' }}>
-            {appliedFilters.map((appliedFilter, index) => (
+            {defaultFilters.map((appliedFilter, index) => (
               <Chip
                 key={index}
                 label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
@@ -199,7 +222,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <DateRangePickerPopover
-            dateRange={dateRange}
+            dateRange={defaultTimeWindow?.label ?? ''}
             setDateRange={setDateRange}
             startDate={startDate}
             endDate={endDate}
@@ -212,7 +235,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({ filters, operators: standar
           <VButton
             buttonText={'RESET'}
             buttonType="submit"
-            onClick={handleResetOnClick}
+            onClick={resetFilters}
             size="small"
             disabled={false}
             variant="text"

@@ -9,8 +9,7 @@ import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
 import { getBaseRoute, isDataEmpty, isObjectEmpty } from '@/utils/lib';
 import { TData, TPrompt } from '@/utils/typings.d';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { NextRouter, useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
@@ -19,6 +18,7 @@ import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/pr
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const Sources = ({
   schemaID,
@@ -61,18 +61,20 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
+  const pathname = usePathname();
+
   // Mutation for creating stream
   const [preview, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewMutation();
 
   const [createObject] = useCreateExploreMutation();
 
-  const { data: session } = useSession();
-  // const { user = {} } = session ?? {};
   const { user } = useUser();
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
-  const [schemaID, setSchemaID] = useState<string>('');
+  // const [schemaID, setSchemaID] = useState<string>('');
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [exploreName, setExploreName] = useState<string>('');
 
@@ -83,36 +85,45 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     type: 'empty'
   });
 
-  // useEffect(() => {
-  //   if (pid && schemaID) {
-  //     const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
+  const schemaID = searchParams.get('schemaID');
 
-  //     previewPrompt(payload);
-  //   }
-  // }, [pid, schemaID]);
+  const filters = searchParams.get('filters');
+
+  const timeWindow = searchParams.get('timeWindow');
+
+  console.log('PreviewTable....', {
+    timeWindow,
+    filters
+  });
 
   useEffect(() => {
-    if (router.query && !isObjectEmpty(router.query)) {
-      console.log('router query.............', router.query);
-      if (query) {
-        let queryState = JSON.parse(query as string);
-        console.log('Schema id...........', queryState?.schemaId);
+    if (schemaID) {
+      const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
 
-        const newSchemaId = queryState?.schemaId ?? '';
-
-        setSchemaID(newSchemaId);
-
-        const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
-
-        preview({ workspaceId: wid, promptId: pid, prompt: payload });
-      }
+      previewPrompt(payload);
     }
-  }, [router.query]);
+  }, [schemaID]);
+
+  useEffect(() => {
+    if (timeWindow || filters) {
+      const parsedFilters = filters ? JSON.parse(filters!) : [];
+      const parsedTimeWindow = JSON.parse(timeWindow!);
+
+      console.log('parsedTimeWindow', parsedTimeWindow);
+      previewPrompt({
+        schema_id: schemaID as string,
+        time_window: parsedTimeWindow,
+        filters: parsedFilters
+      });
+    }
+  }, [timeWindow, filters]);
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
-      console.log('payload', { workspaceId: wid, promptId: pid, prompt: payload });
-      preview({ workspaceId: wid, promptId: pid, prompt: payload });
+      console.log('Preview prompt payload:_', payload);
+      if (schemaID) {
+        preview({ workspaceId: wid, promptId: pid, prompt: payload });
+      }
     },
     [schemaID]
   );
@@ -123,7 +134,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const handleSave = () => {
     setOpenModal(false);
-    const payload = generateExplorePayload(wid, pid, user, schemaID, exploreName, []);
+    const payload = generateExplorePayload(wid, pid, user, schemaID as string, exploreName, []);
     setStatus('submitting');
     createExploreHandler({ query: createObject, payload: payload });
   };
@@ -169,77 +180,61 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
-    const { schemas = [] } = prompt;
-    previewPrompt({
-      schema_id: schemaID,
-      time_window: {
-        label: dateRange,
-        range: {
-          start: start_date,
-          end: end_date
-        }
-      },
-      filters: payload
-    });
+    const timeWindow = {
+      label: dateRange,
+      range: {
+        start: start_date,
+        end: end_date
+      }
+    };
+
+    const filters = payload;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('schemaID', schemaID as string);
+    params.set('timeWindow', JSON.stringify(timeWindow));
+    params.set('filters', JSON.stringify(filters));
+
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleOnChange = (val: string) => {
-    console.log('handle on change:_', val);
+    const params = new URLSearchParams(searchParams.toString());
 
-    let queryState = {};
+    if (val) {
+      params.set('schemaID', val);
 
-    if (query) {
-      queryState = JSON.parse(query as string);
+      const defaultTimeWindow = {
+        label: 'last 7 days',
+        range: {
+          start: "now() - INTERVAL '7 days'",
+          end: 'now()'
+        }
+      };
+      params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+      params.delete('filters');
+    } else {
+      params.delete('schemaID');
     }
 
-    console.log('query state: val_', queryState?.schemaId);
-
-    queryState = {
-      schemaId: val
-    };
-
-    setSchemaID(val);
-
-    // if (type === 'bulker_batch.all') {
-    //   if (!queryState.viewState.bulker) {
-    //     queryState = {
-    //       ...queryState,
-    //       viewState: {
-    //         ...queryState.viewState,
-    //         bulker: {
-    //           actorId: ''
-    //         }
-    //       }
-    //     };
-    //   }
-    // } else if (type === 'incoming.all') {
-    //   if (!queryState.viewState.incoming) {
-    //     queryState = {
-    //       ...queryState,
-
-    //       viewState: {
-    //         ...queryState.viewState,
-    //         incoming: {
-    //           actorId: ''
-    //         }
-    //       }
-    //     };
-    //   }
-    // }
-
-    // queryState['activeView'] = type;
-
-    router.push(
-      {
-        pathname: `${getBaseRoute(wid)}/prompts/${pid}`,
-        query: { query: JSON.stringify(queryState) }
-      },
-      undefined,
-      { shallow: true }
-    );
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  console.log('prompt:_', prompt);
+  const resetFilters = () => {
+    console.log('resetting filters...');
+    const params = new URLSearchParams(searchParams.toString());
+    const defaultTimeWindow = {
+      label: 'last 7 days',
+      range: {
+        start: "now() - INTERVAL '7 days'",
+        end: 'now()'
+      }
+    };
+    params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+    params.delete('filters');
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <Paper variant="elevation">
@@ -251,11 +246,21 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       />
 
       {/* List of available sources to apply prompt on */}
-      <Sources schemaID={schemaID} schemas={prompt?.schemas ?? []} handleOnChange={handleOnChange} />
+      <Sources
+        schemaID={searchParams.get('schemaID')?.toString() ?? ''}
+        schemas={prompt?.schemas ?? []}
+        handleOnChange={handleOnChange}
+      />
 
       {schemaID && (
         <Container>
-          <PromptFilter filters={prompt.filters} operators={prompt.operators} applyFilters={applyFilters} />
+          <PromptFilter
+            filters={prompt.filters}
+            operators={prompt.operators}
+            applyFilters={applyFilters}
+            searchParams={{ filters: filters!, timeWindow: timeWindow! }}
+            resetFilters={resetFilters}
+          />
           <ContentLayout
             key={`PreviewPage`}
             error={error}
