@@ -43,7 +43,7 @@ const PreviewPage = ({ params }: { params: IPreviewPage }) => {
   });
 
   return (
-    <PageLayout pageHeadTitle="DATA PREVIEW" title="DATA PREVIEW" displayButton={false}>
+    <PageLayout pageHeadTitle="Data Preview" title="DATA PREVIEW" displayButton={false}>
       <ContentLayout
         key={`prompt-preview-page`}
         error={error}
