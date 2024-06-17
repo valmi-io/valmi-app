@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { TextField, MenuItem, Stack } from '@mui/material';
 import PopoverComponent from '@/components/Popover';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface DateRangePickerProps {
   dateRange: string;
-  setDateRange: any;
+  setDateRange: () => void;
+  startDate: Dayjs;
+  endDate: Dayjs;
+  setStartDate: () => void;
+  setEndDate: () => void;
 }
 
 const DateRangePickerPopover = ({
@@ -20,6 +25,7 @@ const DateRangePickerPopover = ({
 }: DateRangePickerProps) => {
   const possibleDateRanges = ['last 7 days', 'last 14 days', 'last 30 days', 'custom'];
   const [isCustomRangeSelected, setIsCustomRangeSelected] = useState<Boolean>(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const handlePopoverClose = (): void => {
     setIsCustomRangeSelected(false);
@@ -29,8 +35,12 @@ const DateRangePickerPopover = ({
     if (event.target.value === 'custom') {
       setIsCustomRangeSelected(true);
     }
-    setDateRange(event.target.value);
+    setDateRange(event.target.value as string);
   };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  }
   return (
     <>
       <TextField
@@ -38,6 +48,7 @@ const DateRangePickerPopover = ({
         select={true}
         value={dateRange}
         onChange={handleDateRangeChange}
+        onClick={handleClick}
         InputLabelProps={{
           shrink: true
         }}
@@ -52,7 +63,7 @@ const DateRangePickerPopover = ({
       </TextField>
 
       {isCustomRangeSelected && (
-        <PopoverComponent anchorEl={isCustomRangeSelected} onClose={handlePopoverClose}>
+        <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
           <Stack spacing={1} direction="row">
             <TextField
               label={'Start Date'}

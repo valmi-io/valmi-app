@@ -15,11 +15,15 @@ type PopoverProps = {
 
 const PopoverComponent = (props: PopoverProps) => {
   const { onClose, anchorEl, children } = props;
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
     <Popover
+      id={id}
+      open={open}
       anchorEl={anchorEl}
       onClose={onClose}
-      open={Boolean(anchorEl)}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'right'

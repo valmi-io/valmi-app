@@ -11,12 +11,10 @@ import { getBaseRoute, isDataEmpty, isObjectEmpty } from '@/utils/lib';
 import { TData, TPrompt } from '@/utils/typings.d';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { ChangeEventHandler, SyntheticEvent, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-// import PromptFilter from '@/content/Prompts/PromptFilter';
-import PromptFilter from '@/content/Prompts/PromptFilterV2';
+import PromptFilter from '@/content/Prompts/PromptFilter';
 import { Container, MenuItem, Paper, TextField, Tooltip } from '@mui/material';
-import moment from 'moment';
 import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
@@ -299,10 +297,17 @@ const PageContent = ({
 }) => {
   const { data, isLoading, handleSaveAsExplore, status } = prompt;
 
-  if (isDataEmpty(data)) {
     return (
       <>
+      {
+        isDataEmpty(data) &&
         <ListEmptyComponent description={'No data found for this prompt'} />
+      }
+
+      {
+        !isDataEmpty(data) &&
+        <DataTable data={data} />
+      }
         <SubmitButton
           buttonText={'Save as explore'}
           data={status === 'success'}
@@ -312,20 +317,7 @@ const PageContent = ({
         />
       </>
     );
-  }
 
-  return (
-    <>
-      <DataTable data={data} />
-      <SubmitButton
-        buttonText={'Save as explore'}
-        data={status === 'success'}
-        isFetching={status === 'submitting'}
-        disabled={isLoading || status === 'submitting'}
-        onClick={handleSaveAsExplore}
-      />
-    </>
-  );
 };
 
 // import * as React from 'react';
