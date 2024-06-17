@@ -117,18 +117,16 @@ export type TPayloadOut = {
   time_window: TimeWindowType;
 };
 
-export const generateOnMountPreviewPayload = ( schema : string) => {
+export const generateOnMountPreviewPayload = (schema: string) => {
   const payload: TPayloadOut = {
-    // schema_id: schema.length ? schema[0].id : '',
     schema_id: schema,
-    filters: [
-    ],
+    filters: [],
     time_window: {
       label: 'last7days',
-        range: {
-          start: "now() - INTERVAL '7 days'",
-          end: "now()"
-        }
+      range: {
+        start: "now() - INTERVAL '7 days'",
+        end: 'now()'
+      }
     }
   };
 

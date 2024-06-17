@@ -27,12 +27,23 @@ export type TPrompt = {
   package_id?: string;
   query?: string;
   schemas?: TPromptSchema[];
-  spec?: any;
-  table?: string;
   type: string;
   description: string;
-  enabled: boolean;
+  filters: TPromptFilter[];
+  operators: TPromptOperator;
 };
+
+// Interface for filter options
+export interface TPromptFilter {
+  db_column: string;
+  display_column: string;
+  column_type: string;
+}
+
+// Interface for operators
+interface TPromptOperator {
+  [key: string]: string[];
+}
 
 export type TCatalogModes = 'etl' | 'retl';
 
