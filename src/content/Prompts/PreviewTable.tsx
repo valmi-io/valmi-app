@@ -44,7 +44,6 @@ const Sources = ({
         sx={{ width: '50%' }}
       >
         {schemas?.map(({ id, sources }: { id: string; sources: any }) => {
-          console.log('id:_', id);
           return (
             <MenuItem key={id} value={id}>
               {sources[0]?.name}

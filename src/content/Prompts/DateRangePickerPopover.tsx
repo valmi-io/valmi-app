@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextField, MenuItem, Stack, Paper } from '@mui/material';
+import { TextField, MenuItem, Stack, Paper, Box } from '@mui/material';
 import PopoverComponent from '@/components/Popover'; // Adjust the import path as per your project structure
 import { Dayjs } from 'dayjs';
 import VButton from '@/components/VButton';
@@ -13,7 +13,10 @@ interface DateRangePickerProps {
   setEndDate: (date: any) => void;
   dateRangeAnchorEl: any;
   setDateRangeAnchorEl: (el: any) => void;
-  handleCustomApplyOnClick: () => void;
+  handleCustomApplyOnClick: any;
+  isCustomRangeSelected: boolean;
+  setIsCustomRangeSelected: any;
+  handleSubmit: any;
 }
 
 const DateRangePickerPopover = ({
@@ -25,10 +28,12 @@ const DateRangePickerPopover = ({
   setEndDate,
   dateRangeAnchorEl,
   setDateRangeAnchorEl,
-  handleCustomApplyOnClick
+  handleCustomApplyOnClick,
+  isCustomRangeSelected,
+  setIsCustomRangeSelected,
+  handleSubmit
 }: DateRangePickerProps) => {
   const possibleDateRanges = ['last 7 days', 'last 14 days', 'last 30 days', 'custom'];
-  const [isCustomRangeSelected, setIsCustomRangeSelected] = React.useState<boolean>(false);
 
   const handlePopoverClose = (): void => {
     setIsCustomRangeSelected(false);
@@ -38,9 +43,11 @@ const DateRangePickerPopover = ({
     const selectedValue = event.target.value as string;
     if (selectedValue === 'custom') {
       setIsCustomRangeSelected(true);
+      setDateRange(selectedValue);
     } else {
       setIsCustomRangeSelected(false);
       setDateRange(selectedValue);
+      handleSubmit({ dateRange: selectedValue, startDate: startDate, endDate: endDate });
     }
   };
 
@@ -66,32 +73,33 @@ const DateRangePickerPopover = ({
 
       {isCustomRangeSelected && (
         <PopoverComponent anchorEl={dateRangeAnchorEl} onClose={handlePopoverClose}>
-          <Paper sx={{ padding: 1, display: 'flex', gap: (theme) => theme.spacing(1) }}>
-            <TextField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              size="small"
-            />
+          <Paper sx={{ padding: 1, display: 'flex' }}>
+            <Box sx={{ display: 'flex', gap: (theme) => theme.spacing(1), alignItems: 'center' }}>
+              <TextField
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                size="small"
+              />
 
-            <TextField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              <TextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                size="small"
+              />
+            </Box>
+            <VButton
+              buttonText={'Apply'}
+              buttonType="submit"
+              onClick={() => handleCustomApplyOnClick({ dateRange, startDate, endDate })}
               size="small"
+              disabled={false}
+              variant="text"
             />
           </Paper>
-          <VButton
-            buttonText={'Apply'}
-            buttonType="submit"
-            onClick={handleCustomApplyOnClick}
-            size="small"
-            disabled={false}
-            variant="text"
-            styles={{ alignItems: 'flex-end' }}
-          />
         </PopoverComponent>
       )}
     </>

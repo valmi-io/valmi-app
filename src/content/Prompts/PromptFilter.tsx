@@ -1,25 +1,11 @@
 import React, { useState } from 'react';
-import {
-  Alert,
-  Select,
-  MenuItem,
-  Button,
-  Stack,
-  Chip,
-  Box,
-  Popover,
-  FormControl,
-  InputLabel,
-  TextField,
-  Paper
-} from '@mui/material';
+import { Alert, MenuItem, Stack, Chip, Box, Popover, FormControl, TextField, Paper } from '@mui/material';
 
 import dayjs, { Dayjs } from 'dayjs';
 import VButton from '@/components/VButton';
 import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { ImageSize } from '@/components/ImageComponent';
-import PopoverComponent from '@/components/Popover';
+
 import { transformFilters } from '@/utils/filters-transform-utils';
 
 // Interface for filter options
@@ -85,6 +71,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [dateRangeAnchorEl, setDateRangeAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [isCustomRangeSelected, setIsCustomRangeSelected] = React.useState<boolean>(false);
 
   const handleAddFilter = (event: React.MouseEvent<HTMLElement>) => {
     setFilterInputIndex(appliedFilters.length);
@@ -142,7 +129,15 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
     setAppliedFilters(newAppliedFilters);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = ({
+    dateRange,
+    start_Date = startDate,
+    end_Date = endDate
+  }: {
+    dateRange: string;
+    start_Date: any;
+    end_Date: any;
+  }) => {
     const combinedFilters = appliedFilters.map((filter) => {
       const correspondingFilter = filters.find((f) => f.display_column === filter.column);
       return {
@@ -167,8 +162,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
         end_date = 'now()';
         break;
       case 'custom':
-        start_date = startDate;
-        end_date = endDate;
+        start_date = start_Date;
+        end_date = end_Date;
         break;
       default:
         console.log('nothing here...');
@@ -189,7 +184,18 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  const handleCustomApplyOnClick = () => {};
+  const handleCustomApplyOnClick = ({
+    dateRange,
+    startDate,
+    endDate
+  }: {
+    dateRange: any;
+    startDate: any;
+    endDate: any;
+  }) => {
+    handleSubmit({ dateRange: dateRange, start_Date: startDate, end_Date: endDate });
+    setIsCustomRangeSelected(false);
+  };
 
   return (
     <Paper sx={{ mt: 2 }}>
@@ -231,6 +237,9 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             dateRangeAnchorEl={dateRangeAnchorEl}
             setDateRangeAnchorEl={setDateRangeAnchorEl}
             handleCustomApplyOnClick={handleCustomApplyOnClick}
+            isCustomRangeSelected={isCustomRangeSelected}
+            setIsCustomRangeSelected={setIsCustomRangeSelected}
+            handleSubmit={handleSubmit}
           />
           <VButton
             buttonText={'RESET'}
@@ -253,11 +262,14 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             filters={filters}
             standardOperators={standardOperators}
             handleSubmit={handleSubmit}
+            startDate={startDate}
+            endDate={endDate}
+            dateRange={dateRange}
           />
         </Box>
       </Stack>
 
-      <FiltersStatus />
+      {/* <FiltersStatus /> */}
     </Paper>
   );
 };
@@ -271,7 +283,10 @@ interface PopoverParams {
   setAppliedFilters: () => void;
   filters: Filter[];
   standardOperators: Operator;
-  handleSubmit: () => void;
+  handleSubmit: any;
+  startDate: any;
+  endDate: any;
+  dateRange: any;
 }
 
 const CustomPopover = ({
@@ -281,7 +296,10 @@ const CustomPopover = ({
   setAppliedFilters,
   filters,
   standardOperators,
-  handleSubmit
+  handleSubmit,
+  startDate,
+  endDate,
+  dateRange
 }: PopoverParams): any => {
   const updateExistingFilter = (index: number, field: any, value: string) => {
     const newAppliedFilters = [...appliedFilters];
@@ -311,7 +329,7 @@ const CustomPopover = ({
         <Box sx={{ border: '1px solid black', p: 2 }} minWidth={600}>
           <Stack spacing={2} direction="column">
             {appliedFilters.map((appliedFilter, index) => (
-              <Stack spacing={1} direction="row">
+              <Stack spacing={1} direction="row" key={index}>
                 <FormControl fullWidth required>
                   <TextField
                     size="small"
@@ -402,7 +420,7 @@ const CustomPopover = ({
                   startIcon={false}
                   onClick={() => {
                     handleClose();
-                    handleSubmit();
+                    handleSubmit({ dateRange, startDate, endDate });
                   }}
                   size="small"
                   disabled={false}
