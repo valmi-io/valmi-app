@@ -367,6 +367,15 @@ export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type:
 
 const EXCLUDE_SCOPES = ['locations', 'shop', 'products_graph_ql'];
 
+const INCLUDE_SCOPES = [
+  'orders',
+  'abandoned_checkouts',
+  'products',
+  'transactions',
+  'order_line_items',
+  'orders_refunds_transactions'
+];
+
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
   const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
@@ -377,7 +386,7 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
 
   const streams = rows.filter(({ name }: { name: string }) => {
     // HACK: return true if stream and namesInScopes are the same
-    if (!EXCLUDE_SCOPES.includes(name)) return true;
+    if (INCLUDE_SCOPES.includes(name)) return true;
   });
 
   return streams;
