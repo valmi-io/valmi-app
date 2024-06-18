@@ -102,7 +102,7 @@ function DataTable({ data }: { data: TData }) {
   return (
     <Paper sx={{ width: '100%', height: 400, overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 500 }}>
-        <Table stickyHeader>
+        <Table stickyHeader sx={{ width: '1120px', display: 'flex', flexDirection: 'column' }}>
           <TableHead>
             <TableRow>
               {headers.map((header, index) => (

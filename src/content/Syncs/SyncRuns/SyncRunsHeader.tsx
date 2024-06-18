@@ -72,4 +72,4 @@ const SyncRunsHeader = ({
   );
 };
 
-export default React.memo(SyncRunsHeader);
+export default SyncRunsHeader;

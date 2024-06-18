@@ -235,8 +235,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
   return (
     <Paper sx={{ mt: 2 }}>
-      <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between' }}>
-        <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+      <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Box>
           <VButton
             buttonText={'FILTERS'}
             buttonType="submit"
@@ -247,22 +247,26 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             disabled={false}
             variant="contained"
           />
-
-          <Box minWidth={300} sx={{ display: 'flex', alignItems: 'center' }}>
-            {defaultFilters.map((appliedFilter, index) => (
-              <Chip
-                key={index}
-                label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
-                onDelete={() => handleRemoveFilter(index)}
-                // enable below options to edit individual filter chips
-                // onClick={(event) => handleEditFilter(index, event)}
-                // color={filterInputIndex === index ? 'primary' : 'default'}
-              />
-            ))}
-          </Box>
-        </Stack>
-
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        </Box>
+        {/* Middle Section - Filters */}
+        <Box
+          minWidth={300}
+          sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', flexGrow: 1, paddingX: 1 }}
+        >
+          {defaultFilters.map((appliedFilter, index) => (
+            <Chip
+              key={index}
+              label={`${appliedFilter.column} ${appliedFilter.operator} ${appliedFilter.value}`}
+              onDelete={() => handleRemoveFilter(index)}
+              size="small"
+              // enable below options to edit individual filter chips
+              // onClick={(event) => handleEditFilter(index, event)}
+              // color={filterInputIndex === index ? 'primary' : 'default'}
+            />
+          ))}
+        </Box>
+        {/* Right Section - Date Range Picker and RESET button */}{' '}
+        <Box sx={{ display: 'flex', alignItems: 'center', alignSelf: 'flex-end' }}>
           <DateRangePickerPopover
             selectedDateRange={defaultTimeWindow?.label ?? ''}
             // setDateRange={setDateRange}
@@ -287,8 +291,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             variant="text"
           />
         </Box>
-      </Box>
-
+      </Stack>
       <Stack spacing={2} p={2} direction="row" alignItems="center">
         <Box flex={1}>
           <CustomPopover
