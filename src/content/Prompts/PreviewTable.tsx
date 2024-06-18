@@ -127,15 +127,15 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       };
 
       if (prompt.time_grain_enabled) {
-        previewPromptpayload.time_grain = timeGrain || '';
+        previewPromptpayload.time_grain = JSON.parse(timeGrain!) || '';
       }
+
       previewPrompt(previewPromptpayload);
     }
   }, [timeWindow, filters, timeGrain]);
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
-      // console.log('Preview prompt payload:_', payload);
       if (schemaID) {
         preview({ workspaceId: wid, promptId: pid, prompt: payload });
       }
@@ -258,6 +258,10 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       }
     };
     params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+    if (prompt.time_grain_enabled) {
+      params.set('timeGrain', JSON.stringify('day'));
+    }
+
     params.delete('filters');
 
     router.replace(`${pathname}?${params.toString()}`);
