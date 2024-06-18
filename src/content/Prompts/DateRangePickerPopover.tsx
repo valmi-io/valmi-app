@@ -38,8 +38,6 @@ const getDateRange = (dateRange: string) => {
 };
 
 const DateRangePickerPopover = ({ selectedDateRange, handleTimeWindowChange }: DateRangePickerProps) => {
-  console.log('Date range popover is rendered........', selectedDateRange);
-
   const {
     label = '',
     range: { start = '', end = '' }

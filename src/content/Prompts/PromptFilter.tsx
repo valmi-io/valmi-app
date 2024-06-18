@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Stack, Chip, Box, Paper, Popover } from '@mui/material';
 
-import dayjs, { Dayjs } from 'dayjs';
 import VButton from '@/components/VButton';
 import DateRangePickerPopover from '@/content/Prompts/DateRangePickerPopover';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
 import { transformFilters } from '@/utils/filters-transform-utils';
 import { TimeWindowType } from '@/content/Prompts/promptUtils';
-import PopoverComponent from '@/components/Popover';
 import PromptPreviewFilter from '@/content/Prompts/PromptPreviewFilter';
+import TimeGrainPickerPopover from '@/content/Prompts/TimeGrainPickerPopover';
 
 // Interface for filter options
 interface Filter {
@@ -34,6 +33,8 @@ interface AppliedFilter {
 interface PromptFilterProps {
   filters: Filter[];
   operators: Operator;
+  timeGrainEnabled?: boolean;
+  timeWindowEnabled?: boolean;
   applyFilters: any;
   applyTimeWindowFilters: any;
   resetFilters: () => void;
@@ -46,6 +47,8 @@ interface PromptFilterProps {
 const PromptFilter: React.FC<PromptFilterProps> = ({
   filters,
   operators: standardOperators,
+  timeGrainEnabled = false,
+  timeWindowEnabled = false,
   applyFilters,
   applyTimeWindowFilters,
   resetFilters,
@@ -104,7 +107,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
     let newAppliedFilters = appliedFilters.filter((_, index) => index !== indexToRemove);
 
-    console.log('new array');
     console.table(newAppliedFilters);
 
     setAppliedFilters(transformFilters([...newAppliedFilters]));
@@ -113,15 +115,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   };
 
   const handleFiltersChange = () => {
-    const combinedFilters = appliedFilters.map((filter) => {
-      const correspondingFilter = filters.find((f) => f.display_column === filter.column);
-      return {
-        ...filter,
-        column: correspondingFilter ? correspondingFilter.db_column : filter.column
-      };
-    });
-
-    applyFilters({ filters: transformFilters([...combinedFilters]) });
+    applyFilters({ filters: transformFilters([...appliedFilters]) });
   };
 
   const handleTimeWindowChange = ({
@@ -138,17 +132,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
     applyTimeWindowFilters({ timeWindow: timeWindow });
   };
 
+  const handleTimeGrainChange = ({ val }: { val: string }) => {
+    console.log('handle time grain change', val);
+  };
+
   const open = Boolean(anchorEl);
-
-  console.log('Default filters:_');
-
-  console.table(defaultFilters);
-
-  console.log('Filters:_');
-
-  console.table(filters);
-
-  console.table(appliedFilters);
 
   return (
     <Paper sx={{ mt: 2 }}>
@@ -191,10 +179,16 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
         </Box>
 
         <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-          <DateRangePickerPopover
-            selectedDateRange={defaultTimeWindow}
-            handleTimeWindowChange={handleTimeWindowChange}
-          />
+          {timeGrainEnabled && Boolean(timeGrainEnabled) && (
+            <TimeGrainPickerPopover label="Time Grain" value="" handleTimeGrainChange={handleTimeGrainChange} />
+          )}
+
+          {timeWindowEnabled && Boolean(timeWindowEnabled) && (
+            <DateRangePickerPopover
+              selectedDateRange={defaultTimeWindow}
+              handleTimeWindowChange={handleTimeWindowChange}
+            />
+          )}
           <VButton
             buttonText={'RESET'}
             buttonType="submit"

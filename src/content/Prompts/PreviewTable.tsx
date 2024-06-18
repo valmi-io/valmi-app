@@ -101,12 +101,23 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     }
   }, [schemaID]);
 
+  const transformFilters = (appliedFilters: any[], filters: any[]) => {
+    const combinedFilters = appliedFilters.map((filter) => {
+      const correspondingFilter = filters.find((f) => f.display_column === filter.column);
+      return {
+        ...filter,
+        column: correspondingFilter ? correspondingFilter.db_column : filter.column
+      };
+    });
+
+    return combinedFilters;
+  };
+
   useEffect(() => {
     if (timeWindow || filters) {
-      const parsedFilters = filters ? JSON.parse(filters!) : [];
-      const parsedTimeWindow = JSON.parse(timeWindow!);
+      const parsedFilters = filters ? transformFilters(JSON.parse(filters!), prompt.filters) : [];
+      const parsedTimeWindow = timeWindow ? JSON.parse(timeWindow!) : {};
 
-      // console.log('parsedTimeWindow', parsedTimeWindow);
       previewPrompt({
         schema_id: schemaID as string,
         time_window: parsedTimeWindow,
@@ -177,8 +188,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   const applyFilters = ({ filters = [] }: { filters: any[] }) => {
-    console.log('apply filters is called...........', filters);
-
     const params = new URLSearchParams(searchParams.toString());
     params.set('filters', JSON.stringify(filters));
     router.replace(`${pathname}?${params.toString()}`);
@@ -195,7 +204,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       };
     };
   }) => {
-    console.log('applyTimeWindowFilters is called...........', timeWindow);
     const params = new URLSearchParams(searchParams.toString());
     params.set('timeWindow', JSON.stringify(timeWindow));
     router.replace(`${pathname}?${params.toString()}`);
@@ -259,6 +267,8 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
           <PromptFilter
             filters={prompt.filters}
             operators={prompt.operators}
+            timeGrainEnabled={prompt?.time_grain_enabled ?? false}
+            timeWindowEnabled={prompt?.time_window ?? false}
             applyFilters={applyFilters}
             applyTimeWindowFilters={applyTimeWindowFilters}
             searchParams={{ filters: filters!, timeWindow: timeWindow! }}
