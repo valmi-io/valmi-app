@@ -236,6 +236,10 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
         }
       };
       params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+      if (prompt.time_grain_enabled) {
+        params.set('timeGrain', JSON.stringify('day'));
+      }
+
       params.delete('filters');
     } else {
       params.delete('schemaID');
