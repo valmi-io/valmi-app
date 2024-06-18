@@ -107,7 +107,7 @@ export const isSyncRunning = (syncRun) => {
 
 export const hasRunningSyncs = (currentSyncRun) => {
   if (!currentSyncRun || isObjectEmpty(currentSyncRun)) return false;
-  console.log('getRunStatus:_', getRunStatus(currentSyncRun));
+
   let status = getRunStatus(currentSyncRun);
   if (status === 'scheduled' || status === 'running') return true;
 };

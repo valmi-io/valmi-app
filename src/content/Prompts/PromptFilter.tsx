@@ -35,6 +35,7 @@ interface PromptFilterProps {
   operators: Operator;
   timeGrainEnabled?: boolean;
   timeWindowEnabled?: boolean;
+  timeGrain: null | string[];
   applyFilters: any;
   applyTimeWindowFilters: any;
   applyTimeGrainFilters: any;
@@ -42,6 +43,7 @@ interface PromptFilterProps {
   searchParams?: {
     filters: string;
     timeWindow: string;
+    timeGrain: string;
   };
 }
 
@@ -50,6 +52,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   operators: standardOperators,
   timeGrainEnabled = false,
   timeWindowEnabled = false,
+  timeGrain,
   applyFilters,
   applyTimeWindowFilters,
   applyTimeGrainFilters,
@@ -64,6 +67,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
       start: ''
     }
   };
+  let appliedTimeGrain = '';
 
   if (searchParams?.filters) {
     defaultFilters = JSON.parse(searchParams.filters);
@@ -71,6 +75,10 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
   if (searchParams?.timeWindow) {
     defaultTimeWindow = JSON.parse(searchParams.timeWindow);
+  }
+
+  if (searchParams?.timeGrain) {
+    appliedTimeGrain = JSON.parse(searchParams.timeGrain);
   }
 
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>(defaultFilters);
@@ -182,7 +190,12 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
         <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
           {timeGrainEnabled && Boolean(timeGrainEnabled) && (
-            <TimeGrainPickerPopover label="Time Grain" value="" handleTimeGrainChange={handleTimeGrainChange} />
+            <TimeGrainPickerPopover
+              label="Time Grain"
+              value={appliedTimeGrain}
+              data={timeGrain ?? []}
+              handleTimeGrainChange={handleTimeGrainChange}
+            />
           )}
 
           {timeWindowEnabled && Boolean(timeWindowEnabled) && (

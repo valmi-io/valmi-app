@@ -88,8 +88,6 @@ export const getConnectorImageName = ({ type = '' }: { type: string }) => {
 };
 
 export const signOutUser = async (router, dispatch, query) => {
-  console.log('Signing out user...');
-
   // Get access_token from cookie
   const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 

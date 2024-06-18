@@ -123,10 +123,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       const previewPromptpayload: any = {
         schema_id: schemaID as string,
         time_window: parsedTimeWindow,
-        filters: parsedFilters,
-        time_grain: timeGrain || ''
+        filters: parsedFilters
       };
 
+      if (prompt.time_grain_enabled) {
+        previewPromptpayload.time_grain = timeGrain || '';
+      }
       previewPrompt(previewPromptpayload);
     }
   }, [timeWindow, filters, timeGrain]);
@@ -279,11 +281,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
             filters={prompt.filters}
             operators={prompt.operators}
             timeGrainEnabled={prompt?.time_grain_enabled ?? false}
+            timeGrain={prompt?.time_grain ?? null}
             timeWindowEnabled={prompt?.time_window_enabled ?? false}
             applyFilters={applyFilters}
             applyTimeWindowFilters={applyTimeWindowFilters}
             applyTimeGrainFilters={applyTimeGrainFilters}
-            searchParams={{ filters: filters!, timeWindow: timeWindow! }}
+            searchParams={{ filters: filters!, timeWindow: timeWindow!, timeGrain: timeGrain! }}
             resetFilters={resetFilters}
           />
           <ContentLayout
