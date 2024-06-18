@@ -176,27 +176,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     });
   };
 
-  // const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
-  //   const timeWindow = {
-  //     label: dateRange,
-  //     range: {
-  //       start: start_date,
-  //       end: end_date
-  //     }
-  //   };
-
-  //   const filters = payload;
-
-  //   // console.log('time_windo:_', { timeWindow, filters });
-
-  //   const params = new URLSearchParams(searchParams.toString());
-  //   params.set('schemaID', schemaID as string);
-  //   params.set('timeWindow', JSON.stringify(timeWindow));
-  //   params.set('filters', JSON.stringify(filters));
-
-  //   router.replace(`${pathname}?${params.toString()}`);
-  // };
-
   const applyFilters = ({ filters = [] }: { filters: any[] }) => {
     console.log('apply filters is called...........', filters);
 
@@ -222,7 +201,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const handleOnChange = (val: string) => {
+  const handleSourceChange = (val: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
     if (val) {
@@ -245,7 +224,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   const resetFilters = () => {
-    console.log('resetting filters...');
     const params = new URLSearchParams(searchParams.toString());
     const defaultTimeWindow = {
       label: 'last 7 days',
@@ -273,7 +251,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       <Sources
         schemaID={searchParams.get('schemaID')?.toString() ?? ''}
         schemas={prompt?.schemas ?? []}
-        handleOnChange={handleOnChange}
+        handleOnChange={handleSourceChange}
       />
 
       {schemaID && (

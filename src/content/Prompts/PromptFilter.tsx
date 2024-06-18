@@ -68,7 +68,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
     defaultTimeWindow = JSON.parse(searchParams.timeWindow);
   }
 
-  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>(defaultFilters);
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -100,22 +100,16 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   };
 
   const handleRemoveFilter = (index: number) => {
-    console.log('handle remove filter:_', index);
-    // const newAppliedFilters = [...appliedFilters];
-    // newAppliedFilters.splice(index, 1);
-    // if (index === filterInputIndex) {
-    //   handleClose();
-    // }
+    let indexToRemove = index; // index of the element to remove
 
-    // if (filterInputIndex! > 0) {
-    //   setFilterInputIndex(filterInputIndex! - 1);
-    // } else if (newAppliedFilters.length > 0) {
-    //   setFilterInputIndex(0);
-    // } else {
-    //   setFilterInputIndex(null);
-    // }
+    let newAppliedFilters = appliedFilters.filter((_, index) => index !== indexToRemove);
 
-    // setAppliedFilters(newAppliedFilters);
+    console.log('new array');
+    console.table(newAppliedFilters);
+
+    setAppliedFilters(transformFilters([...newAppliedFilters]));
+
+    applyFilters({ filters: transformFilters([...newAppliedFilters]) });
   };
 
   const handleFiltersChange = () => {
@@ -145,6 +139,16 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   };
 
   const open = Boolean(anchorEl);
+
+  console.log('Default filters:_');
+
+  console.table(defaultFilters);
+
+  console.log('Filters:_');
+
+  console.table(filters);
+
+  console.table(appliedFilters);
 
   return (
     <Paper sx={{ mt: 2 }}>

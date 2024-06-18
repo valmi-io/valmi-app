@@ -38,9 +38,14 @@ const PromptPreviewFilter = ({
   standardOperators,
   handleSubmit
 }: PopoverParams): any => {
+  console.log('promptPreviewFilter', appliedFilters);
+
   const updateExistingFilter = (index: number, field: any, value: string) => {
     const newAppliedFilters: any = [...appliedFilters];
     newAppliedFilters[index][field] = value;
+
+    console.log('updating existing filter', newAppliedFilters);
+
     setAppliedFilters(newAppliedFilters);
   };
 
