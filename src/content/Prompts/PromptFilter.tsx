@@ -235,7 +235,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
   return (
     <Paper sx={{ mt: 2 }}>
-      <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
         <Box>
           <VButton
             buttonText={'FILTERS'}
@@ -246,12 +246,20 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             size="small"
             disabled={false}
             variant="contained"
+            styles={{ height: '35px' }}
           />
         </Box>
-        {/* Middle Section - Filters */}
+
         <Box
           minWidth={300}
-          sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', flexGrow: 1, paddingX: 1 }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            flexWrap: 'wrap',
+            flexGrow: 1,
+            paddingX: 1
+          }}
         >
           {defaultFilters.map((appliedFilter, index) => (
             <Chip
@@ -265,8 +273,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             />
           ))}
         </Box>
-        {/* Right Section - Date Range Picker and RESET button */}{' '}
-        <Box sx={{ display: 'flex', alignItems: 'center', alignSelf: 'flex-end' }}>
+
+        <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
           <DateRangePickerPopover
             selectedDateRange={defaultTimeWindow?.label ?? ''}
             // setDateRange={setDateRange}
