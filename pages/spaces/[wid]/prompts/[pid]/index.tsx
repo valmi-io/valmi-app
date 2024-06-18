@@ -34,7 +34,7 @@ const PreviewPageLayout: NextPageWithLayout = () => {
 };
 
 const PreviewPage = ({ params }: { params: IPreviewPage }) => {
-  console.log('Preview page:_', params);
+  // console.log('Preview page:_', params);
 
   const { pid = '', filter = '', wid = '' } = params;
 

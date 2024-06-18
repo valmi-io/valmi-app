@@ -52,7 +52,6 @@ const CredentialsPage: NextPageWithLayout = () => {
   useEffect(() => {
     const selectedConnectorKey = getSelectedConnectorKey();
 
-    console.log('Connection data flow:_', connectionDataFlow);
     const updatedConnectionDataFlow = {
       ids: [selectedConnectorKey],
       entities: {

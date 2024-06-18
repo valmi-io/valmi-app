@@ -13,12 +13,13 @@ import { NextRouter, useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 
 import PromptFilter from '@/content/Prompts/PromptFilter';
-import { Container, MenuItem, Paper, TextField, Tooltip } from '@mui/material';
+import { Container, MenuItem, Paper, Stack, TextField, Tooltip, styled } from '@mui/material';
 import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
 import { usePathname, useSearchParams } from 'next/navigation';
+import VButton from '@/components/VButton';
 
 const Sources = ({
   schemaID,
@@ -90,10 +91,10 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const timeWindow = searchParams.get('timeWindow');
 
-  console.log('PreviewTable....', {
-    timeWindow,
-    filters
-  });
+  // console.log('PreviewTable....', {
+  //   timeWindow,
+  //   filters
+  // });
 
   useEffect(() => {
     if (schemaID) {
@@ -108,7 +109,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       const parsedFilters = filters ? JSON.parse(filters!) : [];
       const parsedTimeWindow = JSON.parse(timeWindow!);
 
-      console.log('parsedTimeWindow', parsedTimeWindow);
+      // console.log('parsedTimeWindow', parsedTimeWindow);
       previewPrompt({
         schema_id: schemaID as string,
         time_window: parsedTimeWindow,
@@ -119,7 +120,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
-      console.log('Preview prompt payload:_', payload);
+      // console.log('Preview prompt payload:_', payload);
       if (schemaID) {
         preview({ workspaceId: wid, promptId: pid, prompt: payload });
       }
@@ -178,22 +179,49 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     });
   };
 
-  const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
-    const timeWindow = {
-      label: dateRange,
-      range: {
-        start: start_date,
-        end: end_date
-      }
-    };
+  // const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
+  //   const timeWindow = {
+  //     label: dateRange,
+  //     range: {
+  //       start: start_date,
+  //       end: end_date
+  //     }
+  //   };
 
-    const filters = payload;
+  //   const filters = payload;
+
+  //   // console.log('time_windo:_', { timeWindow, filters });
+
+  //   const params = new URLSearchParams(searchParams.toString());
+  //   params.set('schemaID', schemaID as string);
+  //   params.set('timeWindow', JSON.stringify(timeWindow));
+  //   params.set('filters', JSON.stringify(filters));
+
+  //   router.replace(`${pathname}?${params.toString()}`);
+  // };
+
+  const applyFilters = ({ filters = [] }: { filters: any[] }) => {
+    console.log('apply filters is called...........', filters);
 
     const params = new URLSearchParams(searchParams.toString());
-    params.set('schemaID', schemaID as string);
-    params.set('timeWindow', JSON.stringify(timeWindow));
     params.set('filters', JSON.stringify(filters));
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
+  const applyTimeWindowFilters = ({
+    timeWindow
+  }: {
+    timeWindow: {
+      label: string;
+      range: {
+        start: string;
+        end: string;
+      };
+    };
+  }) => {
+    console.log('applyTimeWindowFilters is called...........', timeWindow);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('timeWindow', JSON.stringify(timeWindow));
     router.replace(`${pathname}?${params.toString()}`);
   };
 
@@ -257,6 +285,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
             filters={prompt.filters}
             operators={prompt.operators}
             applyFilters={applyFilters}
+            applyTimeWindowFilters={applyTimeWindowFilters}
             searchParams={{ filters: filters!, timeWindow: timeWindow! }}
             resetFilters={resetFilters}
           />
@@ -289,6 +318,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
 export default PreviewTable;
 
+const FooterStack = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end'
+}));
+
 const PageContent = ({
   prompt
 }: {
@@ -301,31 +336,38 @@ const PageContent = ({
 }) => {
   const { data, isLoading, handleSaveAsExplore, status } = prompt;
 
-  if (isDataEmpty(data)) {
-    return (
-      <>
-        <ListEmptyComponent description={'No data found for this prompt'} />
-        <SubmitButton
-          buttonText={'Save as explore'}
-          data={status === 'success'}
-          isFetching={status === 'submitting'}
-          disabled={isLoading || status === 'submitting'}
-          onClick={handleSaveAsExplore}
-        />
-      </>
-    );
-  }
+  const renderComponent = () => {
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No data found for this prompt'} />;
+    }
+    return <DataTable data={data} />;
+  };
+
+  const handleCancel = () => {};
 
   return (
     <>
-      <DataTable data={data} />
-      <SubmitButton
-        buttonText={'Save as explore'}
-        data={status === 'success'}
-        isFetching={status === 'submitting'}
-        disabled={isLoading || status === 'submitting'}
-        onClick={handleSaveAsExplore}
-      />
+      {renderComponent()}
+      <FooterStack>
+        <Stack display={'flex'} direction={'row'} spacing={1}>
+          <VButton
+            buttonText={'CANCEL'}
+            buttonType="submit"
+            onClick={handleCancel}
+            size="small"
+            disabled={false}
+            variant="text"
+          />
+          <SubmitButton
+            buttonText={'SAVE AS EXPLORE'}
+            data={status === 'success'}
+            isFetching={status === 'submitting'}
+            disabled={isLoading || status === 'submitting'}
+            onClick={handleSaveAsExplore}
+            size="small"
+          />
+        </Stack>
+      </FooterStack>
     </>
   );
 };

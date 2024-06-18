@@ -32,6 +32,7 @@ interface PromptFilterProps {
   filters: Filter[];
   operators: Operator;
   applyFilters: any;
+  applyTimeWindowFilters: any;
   resetFilters: () => void;
   searchParams?: {
     filters: string;
@@ -43,10 +44,11 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   filters,
   operators: standardOperators,
   applyFilters,
+  applyTimeWindowFilters,
   resetFilters,
   searchParams
 }) => {
-  console.log('Search params:_', searchParams);
+  // console.log('Search params:_', searchParams);
 
   let defaultFilters: AppliedFilter[] = [];
   let defaultTimeWindow = {};
@@ -59,7 +61,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
     defaultTimeWindow = JSON.parse(searchParams.timeWindow);
   }
 
-  console.log('Default time window:_', defaultTimeWindow);
+  // console.log('Default time window:_', defaultTimeWindow);
 
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
 
@@ -129,15 +131,9 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
     setAppliedFilters(newAppliedFilters);
   };
 
-  const handleSubmit = ({
-    dateRange,
-    start_Date = startDate,
-    end_Date = endDate
-  }: {
-    dateRange: string;
-    start_Date: any;
-    end_Date: any;
-  }) => {
+  const handleSubmit = ({ start_Date = startDate, end_Date = endDate }: { start_Date: any; end_Date: any }) => {
+    console.log('handle submit:_', dateRange);
+
     const combinedFilters = appliedFilters.map((filter) => {
       const correspondingFilter = filters.find((f) => f.display_column === filter.column);
       return {
@@ -146,7 +142,55 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
       };
     });
 
-    let start_date, end_date;
+    applyFilters({ filters: transformFilters([...combinedFilters]) });
+
+    // let start_date, end_date;
+
+    // switch (dateRange) {
+    //   case 'last 7 days':
+    //     start_date = "now() - INTERVAL '7 days'";
+    //     end_date = 'now()';
+    //     break;
+    //   case 'last 14 days':
+    //     start_date = "now() - INTERVAL '14 days'";
+    //     end_date = 'now()';
+    //     break;
+    //   case 'last 30 days':
+    //     start_date = "now() - INTERVAL '30 days'";
+    //     end_date = 'now()';
+    //     break;
+    //   case 'custom':
+    //     start_date = start_Date;
+    //     end_date = end_Date;
+    //     break;
+    //   default:
+    //     console.log('nothing here...');
+    // }
+
+    // applyFilters(transformFilters([...combinedFilters]), dateRange, start_date, end_date);
+  };
+
+  const handleTimeWindowChange = ({
+    timeWindow
+  }: {
+    timeWindow: {
+      label: string;
+      range: {
+        start: string;
+        end: string;
+      };
+    };
+  }) => {
+    applyTimeWindowFilters({ timeWindow: timeWindow });
+  };
+
+  const handleFiltersChange = () => {
+    // update params.set("filters") with new values.
+  };
+
+  const getStartAndEndDates = (dateRange: string) => {
+    let start_date = '';
+    let end_date = '';
 
     switch (dateRange) {
       case 'last 7 days':
@@ -169,7 +213,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
         console.log('nothing here...');
     }
 
-    applyFilters(transformFilters([...combinedFilters]), dateRange, start_date, end_date);
+    return { start_date, end_date };
   };
 
   const FiltersStatus = () => {
@@ -184,16 +228,8 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
 
-  const handleCustomApplyOnClick = ({
-    dateRange,
-    startDate,
-    endDate
-  }: {
-    dateRange: any;
-    startDate: any;
-    endDate: any;
-  }) => {
-    handleSubmit({ dateRange: dateRange, start_Date: startDate, end_Date: endDate });
+  const handleCustomApplyOnClick = ({ startDate, endDate }: { startDate: any; endDate: any }) => {
+    handleSubmit({ start_Date: startDate, end_Date: endDate });
     setIsCustomRangeSelected(false);
   };
 
@@ -228,18 +264,19 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <DateRangePickerPopover
-            dateRange={defaultTimeWindow?.label ?? ''}
-            setDateRange={setDateRange}
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-            dateRangeAnchorEl={dateRangeAnchorEl}
-            setDateRangeAnchorEl={setDateRangeAnchorEl}
+            selectedDateRange={defaultTimeWindow?.label ?? ''}
+            // setDateRange={setDateRange}
+            // startDate={startDate}
+            // endDate={endDate}
+            // setStartDate={setStartDate}
+            // setEndDate={setEndDate}
+            // dateRangeAnchorEl={dateRangeAnchorEl}
+            // setDateRangeAnchorEl={setDateRangeAnchorEl}
             handleCustomApplyOnClick={handleCustomApplyOnClick}
             isCustomRangeSelected={isCustomRangeSelected}
             setIsCustomRangeSelected={setIsCustomRangeSelected}
             handleSubmit={handleSubmit}
+            handleTimeWindowChange={handleTimeWindowChange}
           />
           <VButton
             buttonText={'RESET'}
@@ -328,67 +365,74 @@ const CustomPopover = ({
       >
         <Box sx={{ border: '1px solid black', p: 2 }} minWidth={600}>
           <Stack spacing={2} direction="column">
-            {appliedFilters.map((appliedFilter, index) => (
-              <Stack spacing={1} direction="row" key={index}>
-                <FormControl fullWidth required>
+            {appliedFilters.map((appliedFilter, index) => {
+              return (
+                <Stack spacing={1} direction="row" key={index}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      size="small"
+                      id="select-column"
+                      value={appliedFilter.column}
+                      label="Select Column"
+                      select={true}
+                      required
+                      fullWidth
+                      onChange={(event) => {
+                        updateExistingFilter(index, 'column', event.target.value as string);
+                        const filter = filters.find(
+                          (filter) => filter.display_column === (event.target.value as string)
+                        );
+                        const columnType = filter ? filter.column_type : 'string';
+                        updateExistingFilter(index, 'column_type', columnType);
+                      }}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                    >
+                      {filters.map((filter, index) => (
+                        <MenuItem key={filter.display_column} value={filter.display_column}>
+                          {filter.display_column}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </FormControl>
+
+                  <FormControl fullWidth required>
+                    <TextField
+                      size="small"
+                      id="select-operator"
+                      value={appliedFilter.operator}
+                      label="Select Operator"
+                      select={true}
+                      required
+                      fullWidth
+                      onChange={(event) => {
+                        updateExistingFilter(index, 'operator', event.target.value);
+                      }}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                    >
+                      {appliedFilter.column_type
+                        ? standardOperators[appliedFilter.column_type]?.map((op) => (
+                            <MenuItem key={op} value={op}>
+                              {op}
+                            </MenuItem>
+                          ))
+                        : []}
+                      []
+                    </TextField>
+                  </FormControl>
+
                   <TextField
                     size="small"
-                    id="select-column"
-                    value={appliedFilter.column}
-                    label="Select Column"
-                    select={true}
-                    required
-                    fullWidth
-                    onChange={(event) => {
-                      updateExistingFilter(index, 'column', event.target.value as string);
-                      const filter = filters.find((filter) => filter.display_column === (event.target.value as string));
-                      const columnType = filter ? filter.column_type : 'string';
-                      updateExistingFilter(index, 'column_type', columnType);
-                    }}
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                  >
-                    {filters.map((filter, index) => (
-                      <MenuItem key={filter.display_column} value={filter.display_column}>
-                        {filter.display_column}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </FormControl>
-
-                <FormControl fullWidth required>
-                  <TextField
-                    size="small"
-                    id="select-operator"
-                    value={appliedFilter.operator}
-                    label="Select Operator"
-                    select={true}
-                    required
-                    fullWidth
-                    onChange={(event) => {
-                      updateExistingFilter(index, 'operator', event.target.value);
-                    }}
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                  >
-                    {standardOperators[appliedFilter.column_type]?.map((op) => (
-                      <MenuItem key={op} value={op}>
-                        {op}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </FormControl>
-
-                <TextField
-                  size="small"
-                  value={appliedFilter.value}
-                  onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
-                  placeholder="Enter value"
-                />
-              </Stack>
-            ))}
+                    value={appliedFilter.value}
+                    onChange={(event) => updateExistingFilter(index, 'value', event.target.value as string)}
+                    placeholder="Enter value"
+                  />
+                </Stack>
+              );
+            })}
 
             <Stack spacing={1} direction="row" sx={{ justifyContent: 'space-between' }}>
               <VButton
@@ -420,7 +464,7 @@ const CustomPopover = ({
                   startIcon={false}
                   onClick={() => {
                     handleClose();
-                    handleSubmit({ dateRange, startDate, endDate });
+                    handleSubmit({ startDate, endDate });
                   }}
                   size="small"
                   disabled={false}

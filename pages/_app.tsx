@@ -93,8 +93,6 @@ const MyApp: FC<AppPropsWithLayout> = ({
 
   useEffect(() => {
     const handleRouteChange = (url, { shallow }) => {
-      console.log('url:_', { url, shallow });
-
       if (!shallow) {
         NProgress.start();
       }
@@ -102,7 +100,7 @@ const MyApp: FC<AppPropsWithLayout> = ({
 
     const handleRouteChangeError = (err, url) => {
       if (err.cancelled) {
-        console.log(`Route to ${url} was cancelled!`);
+        // console.log(`Route to ${url} was cancelled!`);
       }
       NProgress.done();
     };

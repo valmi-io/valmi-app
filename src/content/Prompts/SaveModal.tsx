@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Paper, Dialog, DialogActions, DialogTitle, Stack } from '@mui/material';
+import VButton from '@/components/VButton';
 
 export default function SaveModal({
   Title,
@@ -29,8 +29,8 @@ export default function SaveModal({
       <Dialog open={openModal} onClose={handleClose}>
         <Paper sx={{ minWidth: '400px' }}>
           <DialogTitle>{Title}</DialogTitle>
-          <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <DialogContentText>{Description}</DialogContentText>
+
+          <Stack sx={{ display: 'flex', px: 2, my: 2 }}>
             <TextField
               label={'Name of the explore'}
               required={true}
@@ -43,12 +43,24 @@ export default function SaveModal({
                 shrink: true
               }}
             />
-          </DialogContent>
+          </Stack>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit" onClick={handleSaveExplore}>
-              Save
-            </Button>
+            <VButton
+              buttonText={'CANCEL'}
+              buttonType="submit"
+              onClick={handleClose}
+              size="small"
+              disabled={false}
+              variant="text"
+            />
+            <VButton
+              buttonText={'SAVE'}
+              buttonType="submit"
+              onClick={handleSaveExplore}
+              size="small"
+              disabled={false}
+              variant="text"
+            />
           </DialogActions>
         </Paper>
       </Dialog>
