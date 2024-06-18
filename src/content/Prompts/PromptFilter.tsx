@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stack, Chip, Box, Paper } from '@mui/material';
+import { Stack, Chip, Box, Paper, Popover } from '@mui/material';
 
 import dayjs, { Dayjs } from 'dayjs';
 import VButton from '@/components/VButton';
@@ -70,8 +70,6 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
 
   const [appliedFilters, setAppliedFilters] = useState<AppliedFilter[]>([]);
 
-  const [filterInputIndex, setFilterInputIndex] = useState<number | null>(null);
-
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -102,21 +100,22 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   };
 
   const handleRemoveFilter = (index: number) => {
-    const newAppliedFilters = [...appliedFilters];
-    newAppliedFilters.splice(index, 1);
-    if (index === filterInputIndex) {
-      handleClose();
-    }
+    console.log('handle remove filter:_', index);
+    // const newAppliedFilters = [...appliedFilters];
+    // newAppliedFilters.splice(index, 1);
+    // if (index === filterInputIndex) {
+    //   handleClose();
+    // }
 
-    if (filterInputIndex! > 0) {
-      setFilterInputIndex(filterInputIndex! - 1);
-    } else if (newAppliedFilters.length > 0) {
-      setFilterInputIndex(0);
-    } else {
-      setFilterInputIndex(null);
-    }
+    // if (filterInputIndex! > 0) {
+    //   setFilterInputIndex(filterInputIndex! - 1);
+    // } else if (newAppliedFilters.length > 0) {
+    //   setFilterInputIndex(0);
+    // } else {
+    //   setFilterInputIndex(null);
+    // }
 
-    setAppliedFilters(newAppliedFilters);
+    // setAppliedFilters(newAppliedFilters);
   };
 
   const handleFiltersChange = () => {
@@ -187,7 +186,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
           ))}
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+        <Stack sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
           <DateRangePickerPopover
             selectedDateRange={defaultTimeWindow}
             handleTimeWindowChange={handleTimeWindowChange}
@@ -200,11 +199,19 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             disabled={false}
             variant="text"
           />
-        </Box>
+        </Stack>
       </Stack>
 
       {open && (
-        <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
+        <Popover
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handlePopoverClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left'
+          }}
+        >
           <PromptPreviewFilter
             handleClose={handleClose}
             appliedFilters={appliedFilters}
@@ -213,7 +220,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
             standardOperators={standardOperators}
             handleSubmit={handleFiltersChange}
           />
-        </PopoverComponent>
+        </Popover>
       )}
     </Paper>
   );
