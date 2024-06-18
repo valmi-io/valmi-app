@@ -1,3 +1,8 @@
+import { useCallback, useEffect, useState } from 'react';
+import { NextRouter, useRouter } from 'next/router';
+import { Container, MenuItem, Paper, Stack, TextField, Tooltip, styled } from '@mui/material';
+import { usePathname, useSearchParams } from 'next/navigation';
+
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import DataTable from '@/components/DataTable';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
@@ -7,19 +12,16 @@ import { queryHandler } from '@/services';
 import { useCreateExploreMutation, useGetPromptPreviewMutation } from '@/store/api/etlApiSlice';
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
-import { getBaseRoute, isDataEmpty, isObjectEmpty } from '@/utils/lib';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import { TData, TPrompt } from '@/utils/typings.d';
-import { NextRouter, useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-
 import PromptFilter from '@/content/Prompts/PromptFilter';
-import { Container, MenuItem, Paper, Stack, TextField, Tooltip, styled } from '@mui/material';
 import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
-import { usePathname, useSearchParams } from 'next/navigation';
+
 import VButton from '@/components/VButton';
+import { redirectToExplores } from '@/utils/router-utils';
 
 const Sources = ({
   schemaID,
@@ -90,11 +92,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   const filters = searchParams.get('filters');
 
   const timeWindow = searchParams.get('timeWindow');
-
-  // console.log('PreviewTable....', {
-  //   timeWindow,
-  //   filters
-  // });
 
   useEffect(() => {
     if (schemaID) {
@@ -294,7 +291,14 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
             error={error}
             PageContent={
               <PageContent
-                prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
+                prompt={{
+                  data: data,
+                  handleSaveAsExplore: handleSaveAsExplore,
+                  isLoading: isLoading,
+                  status: status,
+                  router: router,
+                  wid: wid
+                }}
               />
             }
             displayComponent={!error && !isLoading && data}
@@ -332,9 +336,11 @@ const PageContent = ({
     status: FormStatus;
     data: TData;
     handleSaveAsExplore: () => void;
+    router: NextRouter;
+    wid: string;
   };
 }) => {
-  const { data, isLoading, handleSaveAsExplore, status } = prompt;
+  const { data, isLoading, handleSaveAsExplore, status, router, wid } = prompt;
 
   const renderComponent = () => {
     if (isDataEmpty(data)) {
@@ -343,7 +349,9 @@ const PageContent = ({
     return <DataTable data={data} />;
   };
 
-  const handleCancel = () => {};
+  const handleCancel = () => {
+    redirectToExplores({ router: router, wid: wid });
+  };
 
   return (
     <>
