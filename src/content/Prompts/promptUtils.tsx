@@ -103,7 +103,7 @@ export const schema = {
   }
 };
 
-type TimeWindowType = { label: string; range: { start: string; end: string } };
+export type TimeWindowType = { label: string; range: { start: string; end: string } };
 
 type TPayloadIn = {
   schema: TPromptSource[] | any;
