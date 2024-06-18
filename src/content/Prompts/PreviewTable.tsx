@@ -93,6 +93,8 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const timeWindow = searchParams.get('timeWindow');
 
+  const timeGrain = searchParams.get('timeGrain');
+
   useEffect(() => {
     if (schemaID) {
       const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
@@ -114,17 +116,20 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
   };
 
   useEffect(() => {
-    if (timeWindow || filters) {
+    if (timeWindow || filters || timeGrain) {
       const parsedFilters = filters ? transformFilters(JSON.parse(filters!), prompt.filters) : [];
       const parsedTimeWindow = timeWindow ? JSON.parse(timeWindow!) : {};
 
-      previewPrompt({
+      const previewPromptpayload: any = {
         schema_id: schemaID as string,
         time_window: parsedTimeWindow,
-        filters: parsedFilters
-      });
+        filters: parsedFilters,
+        time_grain: timeGrain || ''
+      };
+
+      previewPrompt(previewPromptpayload);
     }
-  }, [timeWindow, filters]);
+  }, [timeWindow, filters, timeGrain]);
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
@@ -209,6 +214,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  const applyTimeGrainFilters = ({ val }: { val: string }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('timeGrain', JSON.stringify(val.toLowerCase()));
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   const handleSourceChange = (val: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -268,9 +279,10 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
             filters={prompt.filters}
             operators={prompt.operators}
             timeGrainEnabled={prompt?.time_grain_enabled ?? false}
-            timeWindowEnabled={prompt?.time_window ?? false}
+            timeWindowEnabled={prompt?.time_window_enabled ?? false}
             applyFilters={applyFilters}
             applyTimeWindowFilters={applyTimeWindowFilters}
+            applyTimeGrainFilters={applyTimeGrainFilters}
             searchParams={{ filters: filters!, timeWindow: timeWindow! }}
             resetFilters={resetFilters}
           />

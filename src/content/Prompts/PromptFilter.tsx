@@ -37,6 +37,7 @@ interface PromptFilterProps {
   timeWindowEnabled?: boolean;
   applyFilters: any;
   applyTimeWindowFilters: any;
+  applyTimeGrainFilters: any;
   resetFilters: () => void;
   searchParams?: {
     filters: string;
@@ -51,6 +52,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   timeWindowEnabled = false,
   applyFilters,
   applyTimeWindowFilters,
+  applyTimeGrainFilters,
   resetFilters,
   searchParams
 }) => {
@@ -133,7 +135,7 @@ const PromptFilter: React.FC<PromptFilterProps> = ({
   };
 
   const handleTimeGrainChange = ({ val }: { val: string }) => {
-    console.log('handle time grain change', val);
+    applyTimeGrainFilters({ val: val });
   };
 
   const open = Boolean(anchorEl);
