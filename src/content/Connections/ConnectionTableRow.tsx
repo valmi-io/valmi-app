@@ -6,8 +6,9 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 import { TableCellComponent, TableCellWithImage } from '@components/Table/TableCellComponent';
 import { ImageSize } from '@components/ImageComponent';
-import { convertDurationToMinutesOrHours } from '@utils/lib';
+import { convertDurationToMinutesOrHours, getConnectorImageName } from '@utils/lib';
 import { ConnOnClickProps } from '@/content/Connections/ConnectionsTable';
+import { getValmiDataStoreName, getValmiLogoSrc } from '@/utils/app-utils';
 
 const ChipComponent = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]
@@ -37,32 +38,29 @@ const ConnectionTableRow = ({ conn, onClick, selected = false }: ConnTableRowPro
   const {
     id = '',
     name = '',
-    source: { name: sourceName = '' } = {},
-    destination: { name: destinationName = '' } = {},
+    source: { name: sourceName = '', credential: sourceCredentials = {} } = {},
+    destination: { name: destinationName = '', credential: destinationCredentials = {} } = {},
     status = '',
     schedule: { run_interval = '' } = {}
   } = conn ?? {};
 
-  const getConnectorName = (conn: any, connectionType: any) => {
-    return conn[connectionType].credential.connector_type.split('_')[1];
-  };
+  let sourceImage =
+    sourceName === getValmiDataStoreName()
+      ? getValmiLogoSrc()
+      : getConnectorImageName({ type: sourceCredentials?.connector_type });
+  let destImage =
+    destinationName === getValmiDataStoreName()
+      ? getValmiLogoSrc()
+      : getConnectorImageName({ type: destinationCredentials?.connector_type });
 
   return (
     <CustomizedTableRow hover key={id} onClick={() => onClick({ connId: id })} selected={selected}>
       <TableCellComponent text={name} />
-      <TableCellWithImage
-        title={sourceName}
-        size={ImageSize.small}
-        src={`/connectors/${getConnectorName(conn, 'source').toLowerCase()}.svg`}
-      />
+      <TableCellWithImage title={sourceName} size={ImageSize.small} src={sourceImage} />
       <TableCell>
         <ArrowForwardIcon style={{ fontSize: 18 }} />
       </TableCell>
-      <TableCellWithImage
-        size={ImageSize.small}
-        title={destinationName}
-        src={`/connectors/${getConnectorName(conn, 'destination').toLowerCase()}.svg`}
-      />
+      <TableCellWithImage size={ImageSize.small} title={destinationName} src={destImage} />
       <TableCellComponent text={convertDurationToMinutesOrHours(run_interval)} />
 
       <TableCell>

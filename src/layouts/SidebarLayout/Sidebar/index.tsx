@@ -21,6 +21,7 @@ const SidebarPaper = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
   width: theme.sidebar.width,
   height: '100%',
+  zIndex: 1,
   backgroundColor: theme.sidebar.background
 }));
 
