@@ -100,9 +100,9 @@ function DataTable({ data }: { data: TData }) {
   // );
 
   return (
-    <Paper sx={{ width: '100%', height: 400, overflow: 'hidden' }}>
+    <Paper sx={{ width: '100%', height: 400, overflow: 'hidden', my: 2 }} component={Paper} variant="outlined">
       <TableContainer sx={{ maxHeight: 500 }}>
-        <Table stickyHeader>
+        <Table stickyHeader sx={{ width: '1120px', display: 'flex', flexDirection: 'column' }}>
           <TableHead>
             <TableRow>
               {headers.map((header, index) => (

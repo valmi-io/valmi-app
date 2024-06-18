@@ -87,11 +87,15 @@ const StopSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, wo
       <Divider />
 
       <Box sx={{ m: 1, display: 'flex' }}>
-        <Button color="primary" fullWidth onClick={closePopover}>
-          <Typography variant="body1">NO</Typography>
+        <Button fullWidth onClick={closePopover}>
+          <Typography variant="body1" color="secondary">
+            NO
+          </Typography>
         </Button>
-        <Button color="primary" fullWidth onClick={stopSyncRun}>
-          <Typography variant="body1">{getPageButtonTitle(currentSyncRun, isPromisePending)}</Typography>
+        <Button fullWidth onClick={stopSyncRun}>
+          <Typography variant="body1" color="error">
+            {getPageButtonTitle(currentSyncRun, isPromisePending)}
+          </Typography>
         </Button>
       </Box>
     </>

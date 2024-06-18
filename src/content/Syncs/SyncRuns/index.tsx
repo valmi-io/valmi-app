@@ -122,18 +122,17 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    */
   const rootContextValue = useMemo(() => ({ updateLastSync, handleAlertDialog }), [updateLastSync]);
 
-  const currentSyncRun: any = useMemo(() => {
+  const currentSyncRun: any = () => {
     if (runs.ids.length > 0) {
       const currentId = runs.ids[0];
       //@ts-ignore
       return runs.entities[currentId];
     }
     return null;
-  }, [runs.ids.length]);
-
+  };
   return (
     <SyncRunRootContext.Provider value={rootContextValue}>
-      <SyncRunsHeader workspaceId={workspaceId} syncId={syncId} currentSyncRun={currentSyncRun} />
+      <SyncRunsHeader workspaceId={workspaceId} syncId={syncId} currentSyncRun={currentSyncRun()} />
 
       <AlertComponent
         key={`alert-${syncId}`}

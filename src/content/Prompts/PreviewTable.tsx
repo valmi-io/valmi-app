@@ -1,3 +1,8 @@
+import { useCallback, useEffect, useState } from 'react';
+import { NextRouter, useRouter } from 'next/router';
+import { Container, MenuItem, Paper, Stack, TextField, Tooltip, styled } from '@mui/material';
+import { usePathname, useSearchParams } from 'next/navigation';
+
 import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import DataTable from '@/components/DataTable';
 import ListEmptyComponent from '@/components/ListEmptyComponent';
@@ -7,18 +12,16 @@ import { queryHandler } from '@/services';
 import { useCreateExploreMutation, useGetPromptPreviewMutation } from '@/store/api/etlApiSlice';
 import { generateExplorePayload } from '@/utils/explore-utils';
 import { FormStatus } from '@/utils/form-utils';
-import { getBaseRoute, isDataEmpty, isObjectEmpty } from '@/utils/lib';
+import { getBaseRoute, isDataEmpty } from '@/utils/lib';
 import { TData, TPrompt } from '@/utils/typings.d';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-
 import PromptFilter from '@/content/Prompts/PromptFilter';
-import { Container, MenuItem, Paper, TextField, Tooltip } from '@mui/material';
 import { TPayloadOut, generateOnMountPreviewPayload } from '@/content/Prompts/promptUtils';
 import SubmitButton from '@/components/SubmitButton';
 import SaveModal from '@/content/Prompts/SaveModal';
 import { useUser } from '@/hooks/useUser';
+
+import VButton from '@/components/VButton';
+import { redirectToExplores } from '@/utils/router-utils';
 
 const Sources = ({
   schemaID,
@@ -44,7 +47,6 @@ const Sources = ({
         sx={{ width: '50%' }}
       >
         {schemas?.map(({ id, sources }: { id: string; sources: any }) => {
-          console.log('id:_', id);
           return (
             <MenuItem key={id} value={id}>
               {sources[0]?.name}
@@ -61,18 +63,20 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
+  const pathname = usePathname();
+
   // Mutation for creating stream
   const [preview, { isLoading, isSuccess, data, isError, error }] = useGetPromptPreviewMutation();
 
   const [createObject] = useCreateExploreMutation();
 
-  const { data: session } = useSession();
-  // const { user = {} } = session ?? {};
   const { user } = useUser();
 
   // form state - form can be in any of the states {FormStatus}
   const [status, setStatus] = useState<FormStatus>('empty');
-  const [schemaID, setSchemaID] = useState<string>('');
+  // const [schemaID, setSchemaID] = useState<string>('');
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [exploreName, setExploreName] = useState<string>('');
 
@@ -83,36 +87,58 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     type: 'empty'
   });
 
-  // useEffect(() => {
-  //   if (pid && schemaID) {
-  //     const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
+  const schemaID = searchParams.get('schemaID');
 
-  //     previewPrompt(payload);
-  //   }
-  // }, [pid, schemaID]);
+  const filters = searchParams.get('filters');
+
+  const timeWindow = searchParams.get('timeWindow');
+
+  const timeGrain = searchParams.get('timeGrain');
 
   useEffect(() => {
-    if (router.query && !isObjectEmpty(router.query)) {
-      console.log('router query.............', router.query);
-      if (query) {
-        let queryState = JSON.parse(query as string);
-        console.log('Schema id...........', queryState?.schemaId);
+    if (schemaID) {
+      const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
 
-        const newSchemaId = queryState?.schemaId ?? '';
-
-        setSchemaID(newSchemaId);
-
-        const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
-
-        preview({ workspaceId: wid, promptId: pid, prompt: payload });
-      }
+      previewPrompt(payload);
     }
-  }, [router.query]);
+  }, [schemaID]);
+
+  const transformFilters = (appliedFilters: any[], filters: any[]) => {
+    const combinedFilters = appliedFilters.map((filter) => {
+      const correspondingFilter = filters.find((f) => f.display_column === filter.column);
+      return {
+        ...filter,
+        column: correspondingFilter ? correspondingFilter.db_column : filter.column
+      };
+    });
+
+    return combinedFilters;
+  };
+
+  useEffect(() => {
+    if (timeWindow || filters || timeGrain) {
+      const parsedFilters = filters ? transformFilters(JSON.parse(filters!), prompt.filters) : [];
+      const parsedTimeWindow = timeWindow ? JSON.parse(timeWindow!) : {};
+
+      const previewPromptpayload: any = {
+        schema_id: schemaID as string,
+        time_window: parsedTimeWindow,
+        filters: parsedFilters
+      };
+
+      if (prompt.time_grain_enabled) {
+        previewPromptpayload.time_grain = JSON.parse(timeGrain!) || '';
+      }
+
+      previewPrompt(previewPromptpayload);
+    }
+  }, [timeWindow, filters, timeGrain]);
 
   const previewPrompt = useCallback(
     (payload: TPayloadOut) => {
-      console.log('payload', { workspaceId: wid, promptId: pid, prompt: payload });
-      preview({ workspaceId: wid, promptId: pid, prompt: payload });
+      if (schemaID) {
+        preview({ workspaceId: wid, promptId: pid, prompt: payload });
+      }
     },
     [schemaID]
   );
@@ -123,7 +149,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const handleSave = () => {
     setOpenModal(false);
-    const payload = generateExplorePayload(wid, pid, user, schemaID, exploreName, []);
+    const payload = generateExplorePayload(wid, pid, user, schemaID as string, exploreName, []);
     setStatus('submitting');
     createExploreHandler({ query: createObject, payload: payload });
   };
@@ -168,78 +194,78 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
     });
   };
 
-  const applyFilters = (payload: any, dateRange: string, start_date: any, end_date: any) => {
-    const { schemas = [] } = prompt;
-    previewPrompt({
-      schema_id: schemaID,
-      time_window: {
-        label: dateRange,
-        range: {
-          start: start_date,
-          end: end_date
-        }
-      },
-      filters: payload
-    });
+  const applyFilters = ({ filters = [] }: { filters: any[] }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('filters', JSON.stringify(filters));
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const handleOnChange = (val: string) => {
-    console.log('handle on change:_', val);
+  const applyTimeWindowFilters = ({
+    timeWindow
+  }: {
+    timeWindow: {
+      label: string;
+      range: {
+        start: string;
+        end: string;
+      };
+    };
+  }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('timeWindow', JSON.stringify(timeWindow));
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
-    let queryState = {};
+  const applyTimeGrainFilters = ({ val }: { val: string }) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('timeGrain', JSON.stringify(val.toLowerCase()));
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
-    if (query) {
-      queryState = JSON.parse(query as string);
+  const handleSourceChange = (val: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (val) {
+      params.set('schemaID', val);
+
+      const defaultTimeWindow = {
+        label: 'last 7 days',
+        range: {
+          start: "now() - INTERVAL '7 days'",
+          end: 'now()'
+        }
+      };
+      params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+      if (prompt.time_grain_enabled) {
+        params.set('timeGrain', JSON.stringify('day'));
+      }
+
+      params.delete('filters');
+    } else {
+      params.delete('schemaID');
     }
 
-    console.log('query state: val_', queryState?.schemaId);
-
-    queryState = {
-      schemaId: val
-    };
-
-    setSchemaID(val);
-
-    // if (type === 'bulker_batch.all') {
-    //   if (!queryState.viewState.bulker) {
-    //     queryState = {
-    //       ...queryState,
-    //       viewState: {
-    //         ...queryState.viewState,
-    //         bulker: {
-    //           actorId: ''
-    //         }
-    //       }
-    //     };
-    //   }
-    // } else if (type === 'incoming.all') {
-    //   if (!queryState.viewState.incoming) {
-    //     queryState = {
-    //       ...queryState,
-
-    //       viewState: {
-    //         ...queryState.viewState,
-    //         incoming: {
-    //           actorId: ''
-    //         }
-    //       }
-    //     };
-    //   }
-    // }
-
-    // queryState['activeView'] = type;
-
-    router.push(
-      {
-        pathname: `${getBaseRoute(wid)}/prompts/${pid}`,
-        query: { query: JSON.stringify(queryState) }
-      },
-      undefined,
-      { shallow: true }
-    );
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  console.log('prompt:_', prompt);
+  const resetFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    const defaultTimeWindow = {
+      label: 'last 7 days',
+      range: {
+        start: "now() - INTERVAL '7 days'",
+        end: 'now()'
+      }
+    };
+    params.set('timeWindow', JSON.stringify(defaultTimeWindow));
+    if (prompt.time_grain_enabled) {
+      params.set('timeGrain', JSON.stringify('day'));
+    }
+
+    params.delete('filters');
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <Paper variant="elevation">
@@ -251,17 +277,39 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       />
 
       {/* List of available sources to apply prompt on */}
-      <Sources schemaID={schemaID} schemas={prompt?.schemas ?? []} handleOnChange={handleOnChange} />
+      <Sources
+        schemaID={searchParams.get('schemaID')?.toString() ?? ''}
+        schemas={prompt?.schemas ?? []}
+        handleOnChange={handleSourceChange}
+      />
 
       {schemaID && (
         <Container>
-          <PromptFilter filters={prompt.filters} operators={prompt.operators} applyFilters={applyFilters} />
+          <PromptFilter
+            filters={prompt.filters}
+            operators={prompt.operators}
+            timeGrainEnabled={prompt?.time_grain_enabled ?? false}
+            timeGrain={prompt?.time_grain ?? null}
+            timeWindowEnabled={prompt?.time_window_enabled ?? false}
+            applyFilters={applyFilters}
+            applyTimeWindowFilters={applyTimeWindowFilters}
+            applyTimeGrainFilters={applyTimeGrainFilters}
+            searchParams={{ filters: filters!, timeWindow: timeWindow!, timeGrain: timeGrain! }}
+            resetFilters={resetFilters}
+          />
           <ContentLayout
             key={`PreviewPage`}
             error={error}
             PageContent={
               <PageContent
-                prompt={{ data: data, handleSaveAsExplore: handleSaveAsExplore, isLoading: isLoading, status: status }}
+                prompt={{
+                  data: data,
+                  handleSaveAsExplore: handleSaveAsExplore,
+                  isLoading: isLoading,
+                  status: status,
+                  router: router,
+                  wid: wid
+                }}
               />
             }
             displayComponent={!error && !isLoading && data}
@@ -285,6 +333,12 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
 export default PreviewTable;
 
+const FooterStack = styled(Stack)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end'
+}));
+
 const PageContent = ({
   prompt
 }: {
@@ -293,112 +347,46 @@ const PageContent = ({
     status: FormStatus;
     data: TData;
     handleSaveAsExplore: () => void;
+    router: NextRouter;
+    wid: string;
   };
 }) => {
-  const { data, isLoading, handleSaveAsExplore, status } = prompt;
+  const { data, isLoading, handleSaveAsExplore, status, router, wid } = prompt;
 
-    return (
-      <>
-      {
-        isDataEmpty(data) &&
-        <ListEmptyComponent description={'No data found for this prompt'} />
-      }
+  const renderComponent = () => {
+    if (isDataEmpty(data)) {
+      return <ListEmptyComponent description={'No data found for this prompt'} />;
+    }
+    return <DataTable data={data} />;
+  };
 
-      {
-        !isDataEmpty(data) &&
-        <DataTable data={data} />
-      }
-        <SubmitButton
-          buttonText={'Save as explore'}
-          data={status === 'success'}
-          isFetching={status === 'submitting'}
-          disabled={isLoading || status === 'submitting'}
-          onClick={handleSaveAsExplore}
-        />
-      </>
-    );
+  const handleCancel = () => {
+    redirectToExplores({ router: router, wid: wid });
+  };
 
+  return (
+    <>
+      {renderComponent()}
+      <FooterStack>
+        <Stack display={'flex'} direction={'row'} spacing={1}>
+          <VButton
+            buttonText={'CANCEL'}
+            buttonType="submit"
+            onClick={handleCancel}
+            size="small"
+            disabled={false}
+            variant="text"
+          />
+          <SubmitButton
+            buttonText={'SAVE AS EXPLORE'}
+            data={status === 'success'}
+            isFetching={status === 'submitting'}
+            disabled={isLoading || status === 'submitting'}
+            onClick={handleSaveAsExplore}
+            size="small"
+          />
+        </Stack>
+      </FooterStack>
+    </>
+  );
 };
-
-// import * as React from 'react';
-// import { DataGrid, GridColDef, GridFilterModel, GridToolbar } from '@mui/x-data-grid';
-// import { useDemoData } from '@mui/x-data-grid-generator';
-
-// const VISIBLE_FIELDS = ['name', 'rating', 'country', 'dateCreated', 'isAdmin'];
-
-// const PreviewTable = () => {
-//   const { data } = useDemoData({
-//     dataSet: 'Employee',
-//     visibleFields: VISIBLE_FIELDS,
-//     rowLength: 100
-//   });
-
-//   const [filterModel, setFilterModel] = React.useState<GridFilterModel>({
-//     items: [
-//       {
-//         field: 'rating',
-//         operator: '>',
-//         value: '2.5'
-//       }
-//     ]
-//   });
-
-//   const columns: GridColDef<typeof rows[number]>[] = [
-//     { field: 'id', headerName: 'ID', width: 90 },
-//     {
-//       field: 'firstName',
-//       headerName: 'First name',
-//       width: 150,
-//       editable: true
-//     },
-//     {
-//       field: 'lastName',
-//       headerName: 'Last name',
-//       width: 150,
-//       editable: true
-//     },
-//     {
-//       field: 'age',
-//       headerName: 'Age',
-//       type: 'number',
-//       width: 110,
-//       editable: true
-//     },
-//     {
-//       field: 'fullName',
-//       headerName: 'Full name',
-//       description: 'This column has a value getter and is not sortable.',
-//       sortable: false,
-//       width: 160,
-//       valueGetter: (value, row) => `${row.firstName || ''} ${row.lastName || ''}`
-//     }
-//   ];
-
-//   const rows = [
-//     { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
-//     { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
-//     { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
-//     { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
-//     { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-//     { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-//     { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-//     { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-//     { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 }
-//   ];
-
-//   return (
-// <div style={{ height: 400, width: '100%' }}>
-//   <DataGrid
-//     rows={rows}
-//     columns={columns}
-//     slots={{
-//       toolbar: GridToolbar
-//     }}
-//     // filterModel={filterModel}
-//     onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-//   />
-// </div>
-//   );
-// };
-
-// export default PreviewTable;

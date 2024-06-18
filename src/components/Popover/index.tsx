@@ -8,7 +8,7 @@ import { Paper, Popover } from '@mui/material';
 import React from 'react';
 
 type PopoverProps = {
-  onClose: () => void;
+  onClose: any;
   anchorEl: any;
   children: React.ReactNode;
 };

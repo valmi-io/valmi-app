@@ -18,8 +18,6 @@ const SyncRunsHeader = ({
   syncId: string;
   currentSyncRun: any;
 }) => {
-  console.log('Sync runs header is triggered', currentSyncRun);
-
   const router = useRouter();
   const url = router.pathname;
   const query = router.query;
@@ -72,4 +70,4 @@ const SyncRunsHeader = ({
   );
 };
 
-export default React.memo(SyncRunsHeader);
+export default SyncRunsHeader;

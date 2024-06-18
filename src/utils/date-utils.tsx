@@ -1,8 +1,14 @@
 import moment from 'moment';
 import 'moment-timezone';
 
+export const getCurrentDate = () => {
+  const date = moment(new Date());
+
+  return date.format('YYYY-MM-DD').toString();
+};
+
 export const getLastNthDate = (n: number) => {
-  return moment().subtract(n, 'days').format('DD-MM-YYYY');
+  return moment().subtract(n, 'days').format('YYYY-MM-DD').toString();
 };
 
 export const getTimeAt = (date: Date) => {

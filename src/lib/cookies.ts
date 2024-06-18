@@ -48,7 +48,6 @@ export function getAuthMetaCookie() {
 }
 
 export async function setAuthTokenCookie(authToken: string) {
-  console.log('[cookies.ts] storing auth token:_', authToken);
   const data = {
     accessToken: authToken ?? ''
   };
@@ -60,7 +59,6 @@ export async function setAuthTokenCookie(authToken: string) {
 }
 
 export async function setAuthMetaCookie(data: any) {
-  console.log('[cookies.ts] storing auth meta:_', data);
   const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? {};
   if (!meta) {
     setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));

@@ -31,6 +31,9 @@ export type TPrompt = {
   description: string;
   filters: TPromptFilter[];
   operators: TPromptOperator;
+  time_grain_enabled?: boolean;
+  time_window_enabled?: boolean;
+  time_grain?: null | string[];
 };
 
 // Interface for filter options

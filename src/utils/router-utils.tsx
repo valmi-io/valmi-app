@@ -103,3 +103,9 @@ export const redirectToPromptPreview = ({
     router.push(`${getBaseRoute(wid)}/prompts/${promptId}`);
   }
 };
+
+export const redirectToExplores = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/explores`);
+  }
+};
