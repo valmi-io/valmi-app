@@ -16,6 +16,7 @@ import SyncRunStatus from './SyncRunStatus';
 interface SyncRunTableRowProps {
   syncRun: any;
   displayError: any;
+  isRetlFlow: boolean;
   onLogClick: (syncRun: any, connection: any) => void;
 }
 
@@ -26,11 +27,8 @@ interface SyncRunTableRowProps {
  *
  */
 
-const SyncRunTableRow = ({
-  syncRun,
-  displayError,
-  onLogClick
-}: SyncRunTableRowProps) => {
+const SyncRunTableRow = ({ syncRun, displayError, onLogClick, isRetlFlow }: SyncRunTableRowProps) => {
+
   return (
     <TableRow hover>
       <TableCell>
@@ -39,6 +37,7 @@ const SyncRunTableRow = ({
           displayError={displayError}
           syncRun={syncRun}
           onLogClick={onLogClick}
+          isRetlFlow={isRetlFlow}
         />
       </TableCell>
 
@@ -51,6 +50,7 @@ const SyncRunTableRow = ({
           displayError={displayError}
           syncRun={syncRun}
           onLogClick={onLogClick}
+          isRetlFlow={isRetlFlow}
         />
       </TableCell>
       <TableCell>
@@ -59,7 +59,7 @@ const SyncRunTableRow = ({
         </Stack>
       </TableCell>
       <TableCell>
-        <SyncRunStatus syncRun={syncRun} displayError={displayError} />
+        <SyncRunStatus syncRun={syncRun} displayError={displayError} isRetlFlow={isRetlFlow} />
       </TableCell>
     </TableRow>
   );

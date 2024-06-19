@@ -25,6 +25,12 @@ module.exports = withBundleAnalyzer({
     BUGSNAG_APP_TYPE: process.env.BUGSNAG_APP_TYPE,
     BUGSNAG_APP_VERSION: process.env.BUGSNAG_APP_VERSION,
     BUGSNAG_AUTO_DETECT_ERRORS: process.env.BUGSNAG_AUTO_DETECT_ERRORS,
-    ENABLE_JITSU: process.env.ENABLE_JITSU
+    ENABLE_JITSU: process.env.ENABLE_JITSU,
+    // remove this after we have etl UI support.
+    AUTH_SHOPIFY_CLIENT_ID: process.env.AUTH_SHOPIFY_CLIENT_ID,
+    AUTH_SHOPIFY_CLIENT_SECRET: process.env.AUTH_SHOPIFY_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET
+    // NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET
   }
 });

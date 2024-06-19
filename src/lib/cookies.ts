@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
- * Created Date: Tuesday, January 30th 2024, 12:02:48 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import Cookies from 'react-cookies';
 
 // Type for the options object used in cookie operations
@@ -16,6 +10,10 @@ type CookieOptions = {
   httpOnly?: boolean;
   sameSite?: 'strict' | 'lax' | 'none';
 };
+
+const AUTH_TOKEN_COOKIE = 'auth';
+
+const AUTH_META_COOKIE = 'authMeta';
 
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
@@ -39,4 +37,30 @@ export function getCookie(name: string) {
 // Function to clear a cookie
 export function clearCookie(name: string, options: CookieOptions = {}): void {
   Cookies.remove(name, options);
+}
+
+export function getAuthTokenCookie() {
+  return AUTH_TOKEN_COOKIE;
+}
+
+export function getAuthMetaCookie() {
+  return AUTH_META_COOKIE;
+}
+
+export async function setAuthTokenCookie(authToken: string) {
+  const data = {
+    accessToken: authToken ?? ''
+  };
+  const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+  if (!accessToken) {
+    setCookie(getAuthTokenCookie(), JSON.stringify(data));
+  }
+}
+
+export async function setAuthMetaCookie(data: any) {
+  const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? {};
+  if (!meta) {
+    setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));
+  }
 }

@@ -15,6 +15,9 @@ const initialState = streamsAdapter.getInitialState();
 const destinationsAdapter: any = createEntityAdapter();
 const initialDestinationsState = destinationsAdapter.getInitialState();
 
+const analyticsDestinationsAdapter: any = createEntityAdapter();
+const initialAnalyticsDestinationsState = analyticsDestinationsAdapter.getInitialState();
+
 const linksAdapter: any = createEntityAdapter();
 const initialLinksState = linksAdapter.getInitialState();
 
@@ -76,6 +79,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       query: ({ workspaceId, type }) => `/streams/workspaces/${workspaceId}/api/schema/destination/${type}`
     }),
 
+    analyticsDestinationsSchema: builder.query({
+      query: ({ workspaceId, type }) => `/streams/workspaces/${workspaceId}/api/schema/analytics-destinations/${type}`
+    }),
+
     linkSchema: builder.query({
       query: ({ workspaceId, type }) => `/streams/workspaces/${workspaceId}/api/schema/link/${type}`
     }),
@@ -130,6 +137,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'Destination', id: arg.destinationId }]
     }),
+
 
     // get links
     getLinks: builder.query({
@@ -265,11 +273,15 @@ export const {
 
   useStreamSchemaQuery,
   useDestinationSchemaQuery,
+  useAnalyticsDestinationsSchemaQuery,
 
   useGetDestinationsQuery,
   useCreateDestinationMutation,
   useEditDestinationMutation,
   useDeleteDestinationMutation,
+
+  useGetAnalyticsDestinationsQuery,
+  useCreateAnalyticsDestinationMutation,
 
   useGetLinksQuery,
   useLinkSchemaQuery,
@@ -305,6 +317,17 @@ export const getDestinationSelectors = (workspaceId: string) => {
     destinationsAdapter.getSelectors((state) => getDestinationsData(state) ?? initialDestinationsState);
 
   return { selectAllDestinations, selectDestinationById };
+};
+export const getAnalyticsDestinationSelectors = (workspaceId: string) => {
+  const getAnalyticsDestinationsResult = extendedApiSlice.endpoints.getAnalyticsDestinations.select(workspaceId);
+
+  const getAnalyticsDestinationsData = createSelector(getAnalyticsDestinationsResult, (usersResult) => usersResult.data);
+
+  const { selectAll: selectAllAnalyticsDestinations, selectById: selectAnalyticsDestinationById } =
+    // @ts-ignore
+    analyticsDestinationsAdapter.getSelectors((state) => getAnalyticsDestinationsData(state) ?? initialAnalyticsDestinationsState);
+
+  return { selectAllAnalyticsDestinations, selectAnalyticsDestinationById };
 };
 
 export const getLinkSelectors = (workspaceId: string) => {

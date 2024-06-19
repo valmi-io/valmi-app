@@ -19,12 +19,18 @@ const constants = {
     PRIMARY_COLOR: 'red'
   },
   connections: {
+    CONFIGURE_SOURCE: 'Configure source',
+    SELECT_STREAMS: 'Select streams',
+    CONFIGURE_CONNECTION: 'Configure connection',
     CONNECTIONS_TITLE: 'Connections',
     CREATE_CONNECTION_TITLE: 'Create connection',
     SELECT_CONNECTOR_TITLE: 'Select',
-    CONFIGURE_CONNECTOR_TITLE: 'Configure',
+    CONFIGURE_CONNECTOR_TITLE: 'Configure connection',
     TEST_CONNECTOR_TITLE: 'Test',
     SELECT_CONNECTOR_LAYOUT_TITLE: 'Select connector'
+  },
+  catalog: {
+    CREATE_CONNECTION_TITLE: 'CATALOG'
   },
   docs: {
     syncs: 'https://www.valmi.io/docs/concepts/syncs',

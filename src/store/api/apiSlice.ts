@@ -6,22 +6,27 @@
  */
 
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 import constants from '@constants/index';
-import { getCookie, setCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
 import { signOutUser } from '@/utils/lib';
+
+const credentialsAdapter: any = createEntityAdapter();
+const initialCredentialsState = credentialsAdapter.getInitialState();
+
+const connectionsAdapter: any = createEntityAdapter();
+const initialConnectionsState = connectionsAdapter.getInitialState();
 
 const staggeredBaseQueryWithBailOut = retry(
   async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
       baseUrl: constants.urls.API_URL,
-      timeout: 60000, // 60 seconds
+      timeout: 60000, // 60 seconds,
       prepareHeaders: async (headers, { getState }) => {
-        const accessToken = (await getCookie('AUTH')?.accessToken) ?? '';
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (accessToken) {
-          headers.set('authorization', `Bearer ${accessToken}`);
-        }
+        headers.set('authorization', `Bearer ${accessToken}`);
 
         return headers;
       }
@@ -39,9 +44,23 @@ const staggeredBaseQueryWithBailOut = retry(
     maxRetries: 3
   }
 );
+
 // Define our single API slice object
 export const apiSlice = createApi({
-  tagTypes: ['Stream', 'Destination', 'Link', 'Log', 'OAuth'],
+  tagTypes: [
+    'Stream',
+    'Destination',
+    'Link',
+    'Log',
+    'OAuth',
+    'Analytics-Destination',
+    'Prompt',
+    'Preview',
+    'Explore',
+    'Package',
+    'Credential',
+    'Connection'
+  ],
 
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: 'api',
@@ -49,115 +68,16 @@ export const apiSlice = createApi({
   baseQuery: staggeredBaseQueryWithBailOut,
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
-    // The `getSpaces` endpoint is a "query" operation that returns data
-    fetchWorkSpaces: builder.query({
-      // The URL for the request is '/api/v1/spaces'
-      query: () => ({
-        url: '/spaces/'
-      })
-    }),
-
-    signupUser: builder.query({
-      // The URL for the request is '/api/v1/users/'
-      query: (arg) => {
+    logoutUser: builder.query({
+      query: () => {
         return {
-          url: '/users/',
-          method: 'POST',
-          body: arg
+          url: '/token/logout/',
+          method: 'POST'
         };
       }
     }),
 
-    activateUser: builder.query({
-      // The URL for the request is '/api/v1/users/activation/'
-      query: (arg) => {
-        return {
-          url: '/users/activation/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    resendActivationToken: builder.query({
-      // The URL for the request is '/api/v1/users/resend_activation/'
-      query: (arg) => {
-        return {
-          url: '/users/resend_activation/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    resetPassword: builder.query({
-      // The URL for the request is '/api/v1/users/reset_password//'
-      query: (arg) => {
-        return {
-          url: '/users/reset_password/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    confirmPasswordReset: builder.query({
-      // The URL for the request is '/api/v1/users/reset_password_confirm/'
-      query: (arg) => {
-        return {
-          url: '/users/reset_password_confirm/',
-          method: 'POST',
-          body: arg
-        };
-      }
-    }),
-
-    loginAndFetchWorkSpaces: builder.query({
-      async queryFn(arg, queryApi, extraOptions, baseQuery) {
-        const user = await baseQuery({
-          url: '/token/login',
-          method: 'POST',
-          body: arg,
-          prepareHeaders: (headers) => {
-            headers.set('Content-Type', 'multipart/form-data');
-            return headers;
-          }
-        });
-        if (user.error) return { error: user.error };
-        const accessToken = user.data.auth_token;
-
-        /**
-         * Set accesstoken in cookie
-         * */
-
-        const cookieObj = {
-          accessToken
-        };
-
-        const result = await setCookie('AUTH', JSON.stringify(cookieObj), {
-          maxAge: 60 * 60 * 24 * 7, // 1 week
-          // sameSite: 'none',
-          path: '/'
-        });
-
-        if (result.success) {
-          const result = await baseQuery('/spaces/');
-
-          if (result.error) {
-            if (result.error?.data?.detail === 'Unauthorized') {
-              // check if "AUTH" cookie exists
-              // destroy auth token
-              signOutUser();
-            }
-            return { error: result.error };
-          }
-          return result.data && { data: result.data };
-        }
-        return { error: 'Failed to set cookie' };
-      }
-    }),
-
-    fetchConnectorSpec: builder.query({
+    fetchIntegrationSpec: builder.query({
       query: (arg) => {
         const { type, workspaceId } = arg;
         return {
@@ -168,9 +88,9 @@ export const apiSlice = createApi({
 
     fetchConnectors: builder.query({
       // The URL for the request is '/api/v1/connectors'
-      query: () => {
+      query: ({ workspaceId }) => {
         return {
-          url: `/connectors/`
+          url: `${workspaceId}/connectors`
         };
       }
     }),
@@ -205,20 +125,48 @@ export const apiSlice = createApi({
       }
     }),
 
-    fetchCredentials: builder.query({
-      queryFn: async (arg, queryApi, extraOptions, baseQuery) => {
-        const { workspaceId, queryId } = arg;
-
+    createConnector: builder.query({
+      async queryFn(arg, queryApi, extraOptions, baseQuery) {
+        const { config, workspaceId, connectorType, queryId, createdValue } = arg;
         const result = await baseQuery({
-          url: `/workspaces/${workspaceId}/credentials/`
+          url: `/workspaces/${workspaceId}/connectors/${connectorType}/create`,
+          method: 'POST',
+          body: {
+            config
+          }
         });
-
         return result.data
           ? { data: { resultData: result.data, queryId: queryId } }
           : { error: { errorData: result.error, queryId: queryId } };
       }
     }),
 
+    // fetchCredentials: builder.query({
+    //   queryFn: async (arg, queryApi, extraOptions, baseQuery) => {
+    //     const { workspaceId, queryId } = arg;
+
+    //     const result = await baseQuery({
+    //       url: `/workspaces/${workspaceId}/credentials/`
+    //     });
+
+    //     return result.data
+    //       ? { data: { resultData: result.data, queryId: queryId } }
+    //       : { error: { errorData: result.error, queryId: queryId } };
+    //   }
+    // }),
+    fetchCredentials: builder.query({
+      query: ({ workspaceId }) => `/workspaces/${workspaceId}/credentials/`,
+      transformResponse: (responseData) => {
+        return credentialsAdapter.setAll(initialCredentialsState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Credential' as const, id })), { type: 'Credential' as const }]
+          : [{ type: 'Credential' as const }];
+
+        return tags;
+      }
+    }),
     addSync: builder.query({
       async queryFn(arg, queryApi, extraOptions, baseQuery) {
         const { src, dest, schedule, uiState, syncName, workspaceId } = arg;
@@ -306,7 +254,7 @@ export const apiSlice = createApi({
       }
     }),
 
-    toggleSync: builder.query({
+    updateDataFlowStatus: builder.query({
       query: (arg) => {
         const { workspaceId, enable, config } = arg;
         let url = `/workspaces/${workspaceId}/syncs/disable`;
@@ -323,11 +271,16 @@ export const apiSlice = createApi({
     }),
 
     getSyncById: builder.query({
-      query: (arg) => {
-        const { workspaceId, syncId } = arg;
-        return {
-          url: `/workspaces/${workspaceId}/syncs/${syncId}`
-        };
+      query: ({ workspaceId, syncId }) => `/workspaces/${workspaceId}/syncs/${syncId}`,
+      transformResponse: (responseData) => {
+        return connectionsAdapter.setOne(initialConnectionsState, responseData);
+      },
+      providesTags: (result, error) => {
+        const tags = result?.ids
+          ? [...result.ids.map((id: any) => ({ type: 'Connection' as const, id })), { type: 'Connection' as const }]
+          : [{ type: 'Connection' as const }];
+
+        return tags;
       }
     }),
 
@@ -389,27 +342,48 @@ export const apiSlice = createApi({
 });
 
 export const {
-  useLazyFetchWorkSpacesQuery,
-  useLazyLoginAndFetchWorkSpacesQuery,
-  useLazyFetchConnectorSpecQuery,
+  useLazyFetchIntegrationSpecQuery,
+  useFetchIntegrationSpecQuery,
   useFetchConnectorsQuery,
-  useLazySignupUserQuery,
-  useLazyActivateUserQuery,
-  useLazyResendActivationTokenQuery,
-  useLazyResetPasswordQuery,
-  useLazyConfirmPasswordResetQuery,
+  useLazyCreateConnectorQuery,
   useLazyDiscoverConnectorQuery,
   useFetchCredentialsQuery,
   useLazyFetchCredentialsQuery,
   useLazyAddSyncQuery,
   useLazyUpdateSyncQuery,
   useFetchSyncsQuery,
-  useLazyToggleSyncQuery,
+  useLazyUpdateDataFlowStatusQuery,
   useLazyCheckConnectorQuery,
   useLazyGetSyncRunsByIdQuery,
   useLazyGetSyncByIdQuery,
   useGetSyncByIdQuery,
   useLazyCreateNewSyncRunQuery,
   useLazyAbortSyncRunByIdQuery,
-  useLazyGetSyncRunLogsByIdQuery
+  useLazyGetSyncRunLogsByIdQuery,
+  useLazyLogoutUserQuery
 } = apiSlice;
+
+/* Getting selectors from the transformed response */
+export const getCredentialsSelectors = (workspaceId: string) => {
+  const getCredentialsResult = apiSlice.endpoints.fetchCredentials.select({ workspaceId });
+
+  const getCredentialsData = createSelector(getCredentialsResult, (usersResult) => usersResult.data);
+
+  const { selectAll: selectAllCredentials, selectById: selectCredentialById } =
+    // @ts-ignore
+    credentialsAdapter.getSelectors((state) => getCredentialsData(state) ?? initialCredentialsState);
+
+  return { selectAllCredentials, selectCredentialById };
+};
+
+export const getSyncDetails = (workspaceId: string, syncId: string) => {
+  const getSyncsResult = apiSlice.endpoints.getSyncById.select({ workspaceId, syncId });
+
+  const getSyncsData = createSelector(getSyncsResult, (syncResult) => syncResult.data);
+
+  const { selectById: selectSyncById } =
+    // @ts-ignore
+    connectionsAdapter.getSelectors((state) => getSyncsData(state) ?? initialConnectionsState);
+
+  return { selectSyncById };
+};

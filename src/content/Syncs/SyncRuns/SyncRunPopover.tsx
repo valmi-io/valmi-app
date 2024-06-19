@@ -11,25 +11,15 @@ import StopSyncPopoverComponent from './StopSyncPopoverComponent';
 import StartSyncPopoverComponent from './StartSyncPopoverComponent';
 
 const SyncRunPopover = (props: any) => {
-  const { syncRuns } = props;
+  const { currentSyncRun } = props;
   const router = useRouter();
   const url = router.pathname;
   const query = router.query;
 
-  return hasRunningSyncs(syncRuns) ? (
-    <StopSyncPopoverComponent
-      key={'stopSyncPopover'}
-      query={query}
-      url={url}
-      {...props}
-    />
+  return hasRunningSyncs(currentSyncRun) ? (
+    <StopSyncPopoverComponent key={'stopSyncPopover'} query={query} url={url} {...props} />
   ) : (
-    <StartSyncPopoverComponent
-      key={'startSyncPopover'}
-      query={query}
-      url={url}
-      {...props}
-    />
+    <StartSyncPopoverComponent key={'startSyncPopover'} query={query} url={url} {...props} />
   );
 };
 

@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Thursday, November 9th 2023, 6:38:53 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -15,7 +9,15 @@ import { getRouterPathname, isPublicSync } from '@utils/routes';
 import SyncRunPopover from './SyncRunPopover';
 import { SyncRunContext } from '@contexts/Contexts';
 
-const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
+const SyncRunsHeader = ({
+  workspaceId,
+  syncId,
+  currentSyncRun
+}: {
+  workspaceId: string;
+  syncId: string;
+  currentSyncRun: any;
+}) => {
   const router = useRouter();
   const url = router.pathname;
   const query = router.query;
@@ -40,14 +42,13 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
   return (
     <SyncRunContext.Provider value={contextValue}>
       <PageTitle
-        title={'Run History'}
+        title={'RUNS'}
         displayButton={true}
-        buttonTitle={getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), syncRuns, isPromisePending)}
+        buttonTitle={getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), currentSyncRun, isPromisePending)}
         disabled={isPromisePending}
         onClick={handlePopoverOpen}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        // linkurl={process.env.PUBLIC_SYNC_URL}
-        linkurl={'http://citus.mywavia.com:3001/'}
+        linkurl={process.env.PUBLIC_SYNC_URL}
         isFetching={isPromisePending}
         displayStartIcon={false}
       />
@@ -56,7 +57,13 @@ const SyncRunsHeader = ({ syncRuns, workspaceId, syncId }: any) => {
 
       {Boolean(anchorEl) && (
         <PopoverComponent anchorEl={anchorEl} onClose={handlePopoverClose}>
-          <SyncRunPopover syncRuns={syncRuns} isQueryPending={isPromisePending} workspaceId={workspaceId} syncId={syncId} closePopover={handlePopoverClose} />
+          <SyncRunPopover
+            currentSyncRun={currentSyncRun}
+            isQueryPending={isPromisePending}
+            workspaceId={workspaceId}
+            syncId={syncId}
+            closePopover={handlePopoverClose}
+          />
         </PopoverComponent>
       )}
     </SyncRunContext.Provider>

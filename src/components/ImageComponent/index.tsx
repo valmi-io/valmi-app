@@ -11,7 +11,10 @@ export enum ImageSize {
   small = '20',
   medium = '32',
   large = '48',
-  logo = '200'
+  connectorCard = '64',
+  logo = '200',
+  extralarge = '320',
+  syncDetailsCard = '24'
 }
 
 export interface ImageComponentProps {
@@ -19,10 +22,10 @@ export interface ImageComponentProps {
   size: ImageSize;
   alt?: string;
   title?: string;
-  style?: object;
+  style?: React.CSSProperties;
 }
 
-const BoxLayout = styled(Box)(({}) => ({
+const BoxLayout = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center'
 }));
@@ -47,11 +50,7 @@ const ImageComponent = (props: ImageComponentProps) => {
         style={style}
       />
       {title && (
-        <Typography
-          variant={getTypographyVariant(size)}
-          color="text.primary"
-          noWrap
-        >
+        <Typography variant={getTypographyVariant(size)} color="text.primary" noWrap>
           {title}
         </Typography>
       )}

@@ -9,7 +9,7 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, Icon, styled } from '@mui/material';
+import { Box, Typography, Icon, styled, Button, Link } from '@mui/material';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -17,10 +17,7 @@ import appIcons from '@/utils/icon-utils';
 
 const BackIcon = styled(Icon)(({ theme }) => ({
   display: 'flex',
-  marginRight: theme.spacing(1),
   color: blackColor,
-  cursor: 'pointer',
-  justifyContent: 'center',
   alignItems: 'center'
 }));
 
@@ -31,7 +28,51 @@ const HeaderTitle = () => {
   // query object
   const query = router.query;
 
-  const valuesAfterWid = url.split('/').slice(3);
+  const createQueryString = (queryParams: any) => {
+    let queryStringArray = [];
+
+    for (let key in queryParams) {
+      if (queryParams.hasOwnProperty(key) && key !== 'wid') {
+        queryStringArray.push(`${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`);
+      }
+    }
+
+    return queryStringArray.join('&');
+  };
+
+  let valuesAfterWid = url.split('/').slice(3);
+  const getQueryValue = (route: string, index: number) => {
+    let values = valuesAfterWid.map((item) => {
+      if (item.startsWith('[') && item.endsWith(']')) {
+        let path: any = item.split('');
+        path.shift();
+        path.pop();
+        path = path.join('');
+        if (query[path]) return query[path];
+      } else return item;
+    });
+    if (!!query && index === valuesAfterWid.length - 1) {
+      return `${values.join('/')}?${createQueryString(query)}`;
+    } else if (values.indexOf(route) !== 0) {
+      return values.join('/');
+    } else return route;
+  };
+
+  const getIconName = (name: string) => {
+    const routeName = name.replace(/-/g, '').toUpperCase();
+
+    switch (routeName) {
+      case 'DATAFLOWS':
+        return appIcons.DATA_FLOWS;
+      case 'OAUTHAPPS':
+        return appIcons.APPS;
+      case 'PROMPTS':
+        return appIcons.EXPLORES;
+      default:
+        //@ts-ignore
+        return appIcons[routeName] || null;
+    }
+  };
 
   /**
    *
@@ -54,23 +95,41 @@ const HeaderTitle = () => {
    * Executes window.history.back()
    * @returns {Function}
    */
-  const handleBack = () => {
-    router.back();
-  };
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <BackIcon onClick={handleBack}>
-        <CustomIcon icon={appIcons.ARROW_LEFT} />
+      <BackIcon>
+        <CustomIcon icon={getIconName(valuesAfterWid[0])} />
       </BackIcon>
       <Box>
-        <Breadcrumbs separator={'/'} aria-label="breadcrumb">
+        <Breadcrumbs separator={'>'} aria-label="breadcrumb">
           {valuesAfterWid.length > 0 &&
             valuesAfterWid.map((route, index) => {
               return (
-                <Typography key={`breadcrumb-${index}`} variant="body2">
-                  {filterRoute(route)}
-                </Typography>
+                <Link
+                  key={`breadcrumb-${index}`}
+                  sx={{
+                    padding: 0,
+                    textDecoration: 'none'
+                  }}
+                  href={
+                    valuesAfterWid.length > 1
+                      ? `/spaces/${query?.wid}/${getQueryValue(route, index)}`
+                      : `/spaces/${query?.wid}/${route}`
+                  }
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color:
+                        index !== valuesAfterWid.length - 1
+                          ? (theme) => theme.colors.alpha.black[50]
+                          : (theme) => theme.colors.alpha.black[100]
+                    }}
+                  >
+                    {filterRoute(route)}
+                  </Typography>
+                </Link>
               );
             })}
         </Breadcrumbs>

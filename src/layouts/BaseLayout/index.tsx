@@ -6,17 +6,25 @@
 
 import { FC, ReactNode } from 'react';
 import PropTypes from 'prop-types';
-import { Box, styled } from '@mui/material';
+import { Grid, Paper, Stack, styled } from '@mui/material';
+import GridLayout from '@/components/grid';
 
 interface BaseLayoutProps {
   children?: ReactNode;
 }
 
-const BoxContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.info.main,
+const BoxContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
-  flex: 1,
-  height: '100%'
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'relative',
+  gap: theme.spacing(2),
+  width: '100%',
+  minWidth: '1024px',
+  maxWidth: '1440px',
+  height: '100%',
+  padding: theme.spacing(0, 8)
 }));
 
 const BaseLayout: FC<BaseLayoutProps> = ({ children }) => {

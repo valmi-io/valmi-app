@@ -4,25 +4,16 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { isTrue } from './lib';
-
-export const publicRoutes = [
-  '/login',
-  '/signup',
-  '/activate',
-  '/activate/[uid]/[tid]',
-  '/reset_password',
-  '/reset_password/[uid]/[tid]'
-];
+export const publicRoutes = ['/login'];
 
 export const isPublicSync = (pathname: string): boolean => {
-  const publicSyncRun = `/spaces/${process.env.PUBLIC_WORKSPACE}/syncs/${process.env.PUBLIC_SYNC}/runs`;
+  const publicSyncRun = `/spaces/${process.env.PUBLIC_WORKSPACE}/data-flows/${process.env.PUBLIC_SYNC}/runs`;
   if (pathname === publicSyncRun) return true;
   return false;
 };
 
 export const isJitsuEnabled = () => {
-  return isTrue(process.env.ENABLE_JITSU);
+  return false;
 };
 
 export const filterRoute = (routerQueryObj: any, route: any) => {

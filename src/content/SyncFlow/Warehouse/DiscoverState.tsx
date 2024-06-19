@@ -6,22 +6,11 @@
  */
 
 import CatalogSelectionComponent from '@content/SyncFlow/CatalogSelectionComponent';
-import {
-  setSelectedValue,
-  setVarsinSubStep
-} from '@content/SyncFlow/stateManagement';
+import { setSelectedValue, setVarsinSubStep } from '@content/SyncFlow/stateManagement';
 
 import { useLazyDiscoverConnectorQuery } from '@store/api/apiSlice';
 
-export function DiscoverState(
-  refreshKey,
-  dispatch,
-  flowState,
-  otherState,
-  next,
-  step,
-  subStep
-) {
+export function DiscoverState(refreshKey, dispatch, flowState, otherState, next, step, subStep) {
   const { sourceConfig, destinationConfig } = flowState;
 
   const resultFilter = (results) => {
@@ -34,19 +23,15 @@ export function DiscoverState(
 
   const updatedFlowStateAfterQuery = (results) => {
     const updatedFlowState = setVarsinSubStep(flowState, step, subStep, {
-      more: results.catalog.more ? results.catalog.more : false,
-      type: results.catalog.type ? results.catalog.type : ''
+      more: results?.catalog?.more ? results.catalog.more : false,
+      type: results.catalog.type ? results.catalog.type : '',
+      allow_object_creation: results.catalog.allow_object_creation ? results.catalog.allow_object_creation : false
     });
     return updatedFlowState;
   };
 
   const onSelect = (flowState, result, displayFilter) => {
-    let updatedFlowState = setSelectedValue(
-      flowState,
-      step,
-      subStep,
-      displayValue(result)
-    );
+    let updatedFlowState = setSelectedValue(flowState, step, subStep, displayValue(result));
     next(updatedFlowState, subStep, result);
   };
 

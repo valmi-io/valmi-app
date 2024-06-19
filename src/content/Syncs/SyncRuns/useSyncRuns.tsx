@@ -34,32 +34,33 @@ export const useSyncRuns = ({ syncId, workspaceId }: UseSyncRunProps) => {
   const url = router.pathname;
   const query = router.query;
 
-  const [getSyncRuns, { data, isLoading, isError, error }] =
-    useLazyGetSyncRunsByIdQuery();
+  const [getSyncRuns, { data, isLoading, isError, error }] = useLazyGetSyncRunsByIdQuery();
 
   // sync run states
   const [lastSync, setLastSync] = useState(new Date().toISOString());
 
   useEffect(() => {
-    if (!router.isReady) return;
-    const fetchSyncRuns = () => {
-      const publicWorkspaceId = process.env.PUBLIC_WORKSPACE;
-      const publicSyncId = process.env.PUBLIC_SYNC;
+    if (router.isReady) {
+      const fetchSyncRuns = () => {
+        const publicWorkspaceId = process.env.PUBLIC_WORKSPACE;
+        const publicSyncId = process.env.PUBLIC_SYNC;
 
-      // extracting workspace id and syncid from router.pathname
-      const pathname = getRouterPathname(query, url);
+        // extracting workspace id and syncid from router.pathname
+        const pathname = getRouterPathname(query, url);
 
-      const payload = {
-        syncId: isPublicSync(pathname) ? publicSyncId : syncId,
-        workspaceId: isPublicSync(pathname) ? publicWorkspaceId : workspaceId,
-        before: lastSync,
-        limit: 25
+        const payload = {
+          syncId: isPublicSync(pathname) ? publicSyncId : syncId,
+          workspaceId: isPublicSync(pathname) ? publicWorkspaceId : workspaceId,
+          before: lastSync,
+          limit: 25
+        };
+
+        getSyncRuns(payload);
       };
 
-      getSyncRuns(payload);
-    };
-    fetchSyncRuns();
-  }, [lastSync, syncId, router.isReady]);
+      fetchSyncRuns();
+    }
+  }, [lastSync, syncId, router.isReady, workspaceId]);
 
   const updateLastSync = () => {
     setLastSync(new Date().toISOString());

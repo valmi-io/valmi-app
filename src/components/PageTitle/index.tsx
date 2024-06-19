@@ -8,6 +8,7 @@ import { FC } from 'react';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { Typography, Button, Grid, CircularProgress } from '@mui/material';
 import Link from 'next/link';
+import VButton from '@/components/VButton';
 
 interface PageTitleProps {
   title: string;
@@ -19,6 +20,7 @@ interface PageTitleProps {
   isFetching?: boolean;
   displayStartIcon?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  customContent?: JSX.Element;
 }
 
 const PageTitle: FC<PageTitleProps> = ({
@@ -31,6 +33,7 @@ const PageTitle: FC<PageTitleProps> = ({
   isFetching = false,
   displayStartIcon = true,
   disabled = false,
+  customContent,
   ...rest
 }) => {
   let endIcon = null;
@@ -48,40 +51,40 @@ const PageTitle: FC<PageTitleProps> = ({
       {...rest}
     >
       <Grid item>
-        <Typography variant="h4" component="h4" sx={{ mr: link ? 2 : 0 }}>
+        <Typography variant="h6" component="h6" sx={{ mr: link ? 2 : 0 }}>
           {title}
         </Typography>
       </Grid>
-      {displayButton && (
-        <Grid item>
-          {link ? (
-            <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
-              <Button
-                sx={{
-                  fontWeight: 'bold',
-                  fontSize: 14,
-                  color: 'black'
-                }}
-                variant="contained"
-                color="warning"
-              >
-                {buttonTitle.toUpperCase()}
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              endIcon={endIcon}
-              startIcon={startIcon}
-              disabled={disabled}
-              sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
-              variant="contained"
-              onClick={onClick}
-            >
-              {buttonTitle.toUpperCase()}
-            </Button>
+      {customContent
+        ? customContent
+        : displayButton && (
+            <Grid item>
+              {link ? (
+                <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
+                  <VButton
+                    buttonText={buttonTitle}
+                    buttonType="submit"
+                    endIcon={endIcon}
+                    startIcon={startIcon}
+                    size="small"
+                    disabled={disabled}
+                    variant="contained"
+                  />
+                </Link>
+              ) : (
+                <VButton
+                  buttonText={buttonTitle}
+                  buttonType="submit"
+                  endIcon={endIcon}
+                  startIcon={startIcon}
+                  onClick={onClick}
+                  size="small"
+                  disabled={disabled}
+                  variant="contained"
+                />
+              )}
+            </Grid>
           )}
-        </Grid>
-      )}
     </Grid>
   );
 };

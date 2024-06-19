@@ -4,9 +4,9 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { ControlProps, isDescriptionHidden } from '@jsonforms/core';
+import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { Card, FormControl, FormHelperText, Hidden, MenuItem, TextField } from '@mui/material';
+import { Card, FormControl, Hidden, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import { merge } from 'lodash';
 import { useDebouncedChange, useFocus } from '@jsonforms/material-renderers';
 
@@ -31,17 +31,9 @@ export const FormSelectControl = (props: ControlProps) => {
   const isValid = errors.length === 0;
   const appliedUiSchemaOptions = merge({}, config, uischema.options);
 
-  const showDescription = !isDescriptionHidden(
-    visible,
-    description,
-    focused,
-    appliedUiSchemaOptions.showUnfocusedDescription
-  );
-
   const eventToValue = (ev: any) => (ev.target.value === '' ? undefined : ev.target.value);
 
-  const firstFormHelperText = showDescription ? description : !isValid ? errors : null;
-  const secondFormHelperText = showDescription && !isValid ? errors : null;
+  const formErrorHelperText = !isValid ? errors : null;
 
   const [inputText, onChange, onClear] = useDebouncedChange(handleChange, '', data, path, eventToValue);
 
@@ -49,36 +41,40 @@ export const FormSelectControl = (props: ControlProps) => {
     <Hidden xsUp={!visible}>
       <Card sx={{ py: 2 }}>
         {visible && (
-          <FormControl
-            fullWidth={!appliedUiSchemaOptions.trim}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            id={id}
-            variant={'standard'}
-          >
-            <TextField
-              label={label}
-              select={true}
-              required={required}
-              disabled={!enabled}
-              value={inputText}
-              onChange={onChange}
-              InputLabelProps={{
-                shrink: true
-              }}
+          <Tooltip title={description ? description : ''} placement="top-start">
+            <FormControl
+              fullWidth={!appliedUiSchemaOptions.trim}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              id={id}
+              variant={'standard'}
             >
-              {schema.enum?.map((item: string) => {
-                return (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                );
-              })}
-            </TextField>
+              <TextField
+                size="small"
+                label={label}
+                select={true}
+                required={required}
+                disabled={!enabled}
+                value={inputText}
+                onChange={onChange}
+                InputLabelProps={{
+                  shrink: true
+                }}
+              >
+                {schema.enum?.map((item: string) => {
+                  return (
+                    <MenuItem key={item} value={item}>
+                      {item}
+                    </MenuItem>
+                  );
+                })}
+              </TextField>
 
-            <FormHelperText error={!isValid && !showDescription}>{firstFormHelperText}</FormHelperText>
-            <FormHelperText error={!isValid}>{secondFormHelperText}</FormHelperText>
-          </FormControl>
+              <Typography color={!isValid ? 'error.main' : 'primary.main'} variant="body2">
+                {formErrorHelperText?.toLowerCase() ?? ''}
+              </Typography>
+            </FormControl>
+          </Tooltip>
         )}
       </Card>
     </Hidden>

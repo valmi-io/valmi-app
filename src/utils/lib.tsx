@@ -5,8 +5,10 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { setCookie } from '@/lib/cookies';
+import { getAuthMetaCookie, getAuthTokenCookie, getCookie, setCookie } from '@/lib/cookies';
+import { queryHandler } from '@/services';
 import { HOUR, MIN } from '@content/SyncFlow/Schedule/scheduleManagement';
+import { signOut } from 'next-auth/react';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,7 +31,7 @@ export const convertDurationToMinutesOrHours = (milliseconds) => {
   const hours = Math.floor(minutes / 60);
 
   if (hours >= 1) {
-    return hours + ' ' + capitalizeFirstLetter(HOUR) + 's';
+    return hours + ' ' + capitalizeFirstLetter(HOUR) + (hours > 1 ? 's' : '');
   }
   return minutes + ' ' + capitalizeFirstLetter(MIN) + (minutes > 1 ? 's' : '');
 };
@@ -64,7 +66,7 @@ export const isObject = (value) => {
 };
 
 export const isObjectEmpty = (obj: Record<string, any>): boolean => {
-  return Object.keys(obj).length === 0;
+  return obj && Object.keys(obj).length === 0;
 };
 
 export const connectorTypes = {
@@ -78,17 +80,66 @@ export const getConnectorImage = (connectorType) => {
   return `/connectors/${connectorType.toLowerCase()}.svg`;
 };
 
-export const signOutUser = async (router) => {
-  try {
-    setCookie('AUTH', '', {
-      expires: new Date(0),
-      sameSite: 'strict',
-      path: '/'
+export const getConnectorImageName = ({ type = '' }: { type: string }) => {
+  if (type) {
+    const name = type.split('_')[1].toLowerCase();
+    return `/connectors/${name}.svg`;
+  } else return '';
+};
+
+export const signOutUser = async (router, dispatch, query) => {
+  // Get access_token from cookie
+  const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
+
+  // if access_token is in cookie, destroy token in the api backend
+  if (accessToken) {
+    await queryHandler({
+      query,
+      payload: {},
+      successCb: async () => {
+        removeAppState(router, dispatch).run();
+      },
+      errorCb: async () => {
+        removeAppState(router, dispatch).run();
+      }
     });
-  } catch (err) {
-  } finally {
-    router.replace('/login');
+  } else {
+    // clear redux store
+    removeReduxStore(dispatch);
+    // If no access_token, redirect to login
+    router.push('/login');
   }
+};
+
+const removeAppState = (router: any, dispatch: any) => {
+  return {
+    run: async () => {
+      await clearCookie();
+      removeReduxStore(dispatch);
+      router.push('/login');
+    }
+  };
+};
+
+const clearCookie = async () => {
+  // clear auth token
+  await setCookie(getAuthTokenCookie(), '', {
+    expires: new Date(0),
+    path: '/'
+  });
+
+  // clear auth meta cookie
+  await setCookie(getAuthMetaCookie(), '', {
+    expires: new Date(0),
+    path: '/'
+  });
+
+  // clear nextauth session
+  await signOut({ redirect: false, callbackUrl: '/login' });
+};
+
+const removeReduxStore = (dispatch) => {
+  dispatch({ type: 'RESET_STORE' });
 };
 
 export const splitNumberByCommas = (number) => {
@@ -118,6 +169,7 @@ export const getBrowserRoute = (path: string) => {
   if (widIndex !== -1) {
     return { route: route[widIndex + 1], subRoute: route[widIndex + 2] };
   }
+
   return { route: '', subRoute: '' };
 };
 
@@ -160,10 +212,20 @@ export function flattenObjectValuesToArray<T>(obj: Record<string, T[]>): T[] {
   return result;
 }
 
-// export function findIntersection(arr1: any[], arr2: any[], property: string) {
-//   return arr1.filter((item1) => arr2.some((item2) => item1[property] === item2));
-// }
+export const getCombinedConnectors = (data) => {
+  if (data && data.SRC && data.DEST) {
+    return [...data.SRC, ...data.DEST];
+  }
+};
 
-// export function findUniqueElements(arr1: any[], arr2: any[], property: string) {
-//   return arr1.filter((item1) => !arr2.some((item2) => item1[property] === item2));
-// }
+export function deepFlattenToObject(obj, prefix = '') {
+  return Object.keys(obj).reduce((acc, k) => {
+    const pre = prefix.length ? prefix + '_' : '';
+    if (typeof obj[k] === 'object' && obj[k] !== null) {
+      Object.assign(acc, deepFlattenToObject(obj[k], pre + k));
+    } else {
+      acc[pre + k] = obj[k];
+    }
+    return acc;
+  }, {});
+}

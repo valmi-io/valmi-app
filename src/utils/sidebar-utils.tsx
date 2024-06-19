@@ -30,78 +30,42 @@ export type TSidebarRoutePropsOut = TSidebarRoute[];
 
 export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn): TSidebarRoutePropsOut => {
   const routes: TSidebarRoute[] = [
-    jitsuEnabled && {
+    {
       id: 0,
-      path: `/spaces/${workspaceId}/events`,
+      path: `/spaces/${workspaceId}/explores`,
       sidebarProps: {
-        displayText: 'EVENTS',
-        icon: appIcons.TRACK
-      },
-      subRoutes: [2, 3, 4]
+        displayText: 'EXPLORES',
+        icon: appIcons.EXPLORES,
+        muiIcon: false
+      }
     },
     {
       id: 1,
-      path: `/spaces/${workspaceId}/syncs`,
+      path: `/spaces/${workspaceId}/data-flows`,
       sidebarProps: {
-        displayText: 'ACTIVATE',
-        icon: appIcons.SYNC
-      },
-      subRoutes: [5, 6]
+        displayText: 'DATA FLOWS',
+        icon: appIcons.DATA_FLOWS,
+        muiIcon: false
+      }
     },
 
     {
       id: 2,
-      path: `/spaces/${workspaceId}/events/connections`,
+      path: `/spaces/${workspaceId}/catalog`,
       sidebarProps: {
-        displayText: 'CONNECTIONS',
-        icon: appIcons.CONNECTION
-      },
-      subRoute: true
+        displayText: 'CATALOG',
+        icon: appIcons.CATALOG,
+        muiIcon: false
+      }
     },
-    jitsuEnabled && {
+
+    {
       id: 3,
-      path: `/spaces/${workspaceId}/streams`,
-      sidebarProps: {
-        displayText: 'STREAMS',
-        icon: appIcons.STREAM
-      },
-      subRoute: true
-    },
-    jitsuEnabled && {
-      id: 4,
-      path: `/spaces/${workspaceId}/destination-warehouses`,
-      sidebarProps: {
-        displayText: 'WAREHOUSES',
-        icon: appIcons.SRC
-      },
-      subRoute: true
-    },
-    {
-      id: 5,
-      path: `/spaces/${workspaceId}/connections/warehouses`,
-      sidebarProps: {
-        displayText: 'WAREHOUSES',
-        icon: appIcons.SRC
-      },
-      subRoute: true
-    },
-    {
-      // valmi
-      id: 6,
-      path: `/spaces/${workspaceId}/connections/destinations`,
-      sidebarProps: {
-        displayText: 'DESTINATIONS',
-        icon: appIcons.DEST
-      },
-      subRoute: true
-    },
-    {
-      id: 7,
       path: `/spaces/${workspaceId}/oauth-apps`,
       sidebarProps: {
         displayText: 'CONFIGURE APPS',
         icon: appIcons.APPS,
-        muiIcon: true
+        muiIcon: false
       }
     }
   ].filter(Boolean) as TSidebarRoute[];

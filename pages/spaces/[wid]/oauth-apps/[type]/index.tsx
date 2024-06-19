@@ -9,8 +9,6 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import PageLayout from '@layouts/PageLayout';
 import SidebarLayout from '@layouts/SidebarLayout';
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
-import { RootState } from '@store/reducers';
 import { useFetch } from '@/hooks/useFetch';
 import ContentLayout from '@/layouts/ContentLayout';
 import ConnectorLayout from '@/layouts/ConnectorLayout';
@@ -29,7 +27,7 @@ import {
 } from '@/store/api/oauthApiSlice';
 import OAuthInstructions from '@/content/OAuthApps/OAuthInstructions';
 import { TData } from '@/utils/typings.d';
-import { capitalize, upperCase } from 'lodash';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
 const CreateOAuthConfigurationLayout = () => {
   // Get type from router
@@ -58,8 +56,7 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
 
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
-  const { workspaceId = '' } = appState;
+  const { workspaceId = '' } = useWorkspaceId();
 
   // Getting schema for the object
   const {
@@ -96,9 +93,6 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
     show: false,
     type: 'empty'
   });
-
-  // customJsonRenderers
-  const customRenderers = getCustomRenderers({});
 
   useEffect(() => {
     if (isCreated || isEdited) {
@@ -147,54 +141,23 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
     });
   };
 
-  const PageContent = ({ initialData }: { initialData: any }) => {
-    const [data, setData] = useState(initialData);
-
-    const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-      setData(data);
-    };
-
-    const handleSubmit = () => {
-      setStatus('submitting');
-      const payload = {
-        workspaceId: workspaceId,
-        oauth: {
-          oauth_config: data,
-          type: connectorType
-        }
-      };
-
-      const { ids = [] } = keys ?? {};
-
-      if (ids.length > 0) {
-        editObject(payload);
-      } else {
-        createObject(payload);
+  const handleSubmit = (data: any) => {
+    setStatus('submitting');
+    const payload = {
+      workspaceId: workspaceId,
+      oauth: {
+        oauth_config: data,
+        type: connectorType
       }
     };
 
-    return (
-      <ConnectorLayout title={''}>
-        {/** Display Content */}
-        <FormLayout
-          formComp={
-            <FormControlComponent
-              key={`OAuthConfigurationFormControl`}
-              deleteTooltip=""
-              editing={false}
-              onDelete={() => {}}
-              onFormChange={handleFormChange}
-              onSubmitClick={handleSubmit}
-              isDeleting={false}
-              status={status}
-              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-              removeAdditionalFields={false}
-            />
-          }
-          instructionsComp={<OAuthInstructions key={`oAuth instructions`} data={schema} type={type} />}
-        />
-      </ConnectorLayout>
-    );
+    const { ids = [] } = keys ?? {};
+
+    if (ids.length > 0) {
+      editObject(payload);
+    } else {
+      createObject(payload);
+    }
   };
 
   return (
@@ -208,7 +171,15 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
       <ContentLayout
         key={`createOAuthConfiguration${type}`}
         error={error || keysError}
-        PageContent={<PageContent initialData={processData(keys ?? initialData)} />}
+        PageContent={
+          <PageContent
+            handleSubmit={handleSubmit}
+            initialData={processData(keys ?? initialData)}
+            schema={schema}
+            status={status}
+            type={type}
+          />
+        }
         displayComponent={(!error || !keysError) && (!isLoading || !isKeysLoading) && schema && keys}
         isLoading={isLoading && isKeysLoading}
         traceError={traceError || isKeysTraceError}
@@ -222,3 +193,48 @@ CreateOAuthConfigurationLayout.getLayout = function getLayout(page: ReactElement
 };
 
 export default CreateOAuthConfigurationLayout;
+
+const PageContent = ({
+  initialData,
+  handleSubmit,
+  status,
+  schema,
+  type
+}: {
+  initialData: any;
+  handleSubmit: any;
+  status: any;
+  schema: any;
+  type: any;
+}) => {
+  const [data, setData] = useState(initialData);
+
+  // customJsonRenderers
+  const customRenderers = getCustomRenderers({});
+
+  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setData(data);
+  };
+
+  return (
+    <ConnectorLayout title={''}>
+      <FormLayout
+        formComp={
+          <FormControlComponent
+            key={`OAuthConfigurationFormControl`}
+            deleteTooltip=""
+            editing={false}
+            onDelete={() => {}}
+            onFormChange={handleFormChange}
+            onSubmitClick={() => handleSubmit(data)}
+            isDeleting={false}
+            status={status}
+            jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+            removeAdditionalFields={false}
+          />
+        }
+        instructionsComp={<OAuthInstructions key={`oAuth instructions`} data={schema} type={type} />}
+      />
+    </ConnectorLayout>
+  );
+};

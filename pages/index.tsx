@@ -4,40 +4,98 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
 
 import Head from '@components/PageHead';
-import { RootState } from '@store/reducers';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { useSession } from 'next-auth/react';
+import { initialiseAppState } from '@/utils/login-utils';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { setAuthTokenCookie } from '@/lib/cookies';
+import { useUser } from '@/hooks/useUser';
+import { CircularProgress, Stack, Typography, styled } from '@mui/material';
+import BaseLayout from '@/layouts/BaseLayout';
+import { isObjectEmpty } from '@/utils/lib';
 
-const propTypes = {};
+const LoadingLayout = styled(Stack)(({}) => ({
+  width: '100%',
+  height: '100%',
+  justifyContent: 'center',
+  alignItems: 'center'
+}));
 
-const defaultProps = {};
+const Loading = () => {
+  return (
+    <LoadingLayout spacing={2}>
+      <CircularProgress color="success" />
+      <Typography variant="body1">Loading workspaces...</Typography>
+    </LoadingLayout>
+  );
+};
 
 const HomePage = () => {
   const router = useRouter();
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const { workspaceId = '' } = appState;
+  const { workspaceId = '' } = useWorkspaceId();
+
+  const { loginFlowState } = useUser();
+
+  const { data: session } = useSession();
+
+  // This effect checks if the user has initiated a login flow
+  // "DEFAULT" means not initiated.
 
   useEffect(() => {
-    if (workspaceId !== '') {
-      router.push(`/spaces/${workspaceId}/syncs`);
+    //@ts-ignore
+    if (isObjectEmpty(loginFlowState) || !loginFlowState || loginFlowState === 'DEFAULT') {
+      router.push('/login');
     }
-  }, []);
+  }, [loginFlowState]);
+
+  // If workspaceId exists, navigate to connections
+  useEffect(() => {
+    if (workspaceId && session) {
+      // This function will save the authToken returned from the api backend to make api calls if not found in cookie.
+      setAuthTokenCookie(session?.authToken ?? '');
+      router.push(`/spaces/${workspaceId}/data-flows`);
+    }
+  }, [workspaceId, session]);
+
+  // This function checks if session exists. If exists, saves session to redux store.
+  useEffect(() => {
+    if (session) {
+      if (session?.user && !workspaceId) {
+        const data = {
+          ...session.user,
+          workspaceId: session.workspaceId
+        };
+
+        // save session to redux store.
+        saveUserStateInStore(data);
+      }
+    }
+  }, [session, workspaceId]);
+
+  // stores user information in redux store
+  const saveUserStateInStore = (data: any) => {
+    initialiseAppState(dispatch, data);
+  };
 
   return (
     <>
       <Head />
+      {loginFlowState !== 'DEFAULT' && <Loading />}
     </>
   );
 };
 
-HomePage.propTypes = propTypes;
-
-HomePage.defaultProps = defaultProps;
+HomePage.getLayout = function getLayout(page: ReactElement) {
+  return <BaseLayout>{page}</BaseLayout>;
+};
 
 export default HomePage;

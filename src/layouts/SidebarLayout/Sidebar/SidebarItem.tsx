@@ -6,12 +6,44 @@
 
 import { memo } from 'react';
 
-import { Icon, ListItemButton, Typography, styled, useTheme } from '@mui/material';
+import { Icon, ListItemButton, Typography, styled, Box, ListItemText } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
 
-const Label = styled(Typography)(({ theme }) => ({
-  color: theme.colors.alpha.white[70]
+const ItemContainer = styled(ListItemButton)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  padding: theme.spacing(1, 2),
+  width: theme.sidebar.width,
+  height: 48,
+  flexGrow: 0
+}));
+
+const IconContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '0px',
+  minWidth: 56,
+  backgroundColor: 'transparent'
+}));
+
+const InnerIconBox = styled(Icon)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 24,
+  height: 24,
+  backgroundColor: 'transparent'
+}));
+
+const TextBox = styled(ListItemText)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '4px 0px'
 }));
 
 export type TSidebarItemProps = {
@@ -21,20 +53,20 @@ export type TSidebarItemProps = {
 };
 
 const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
-  const theme = useTheme();
-
   const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <ListItemButton onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
-      {icon &&
-        (muiIcon ? (
-          <Icon style={{ marginRight: theme.spacing(3) }}>{icon}</Icon>
-        ) : (
-          <CustomIcon icon={icon} style={{ marginRight: theme.spacing(3) }} />
-        ))}
-      <Label variant="h5">{displayText}</Label>
-    </ListItemButton>
+    <ItemContainer onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
+      <IconContainer>
+        <InnerIconBox>
+          {icon && (muiIcon ? <Icon sx={{ display: 'flex' }}>{icon}</Icon> : <CustomIcon icon={icon} />)}
+        </InnerIconBox>
+      </IconContainer>
+
+      <TextBox>
+        <Typography variant="button">{displayText}</Typography>
+      </TextBox>
+    </ItemContainer>
   );
 };
 

@@ -8,47 +8,65 @@ import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import { Stack } from '@mui/material';
+import { Box, Paper, styled } from '@mui/material';
 
 import { NextPageWithLayout } from '@/pages_app';
 
 import BaseLayout from '@layouts/BaseLayout';
 
 import AuthenticationLayout from '@content/Authentication/AuthenticationLayout';
-import { useAuthenticationForm } from '@content/Authentication/useAuthenticationForm';
-import AuthenticationFormFooter from '@content/Authentication/AuthenticationFormFooter';
-import AuthenticationForm from '@content/Authentication/AuthenticationForm';
-import {
-  generateAuthenticationPayload,
-  generateLoginFormFields
-} from '@content/Authentication/AuthenticationFormUtils';
 
 import Head from '@components/PageHead';
-import AlertComponent, { AlertStatus, AlertType } from '@components/Alert';
 
-import { useLazyLoginAndFetchWorkSpacesQuery } from '@store/api/apiSlice';
-import { AppDispatch } from '@store/store';
-import { setUserData } from '@store/reducers/user';
-import { setAppState } from '@store/reducers/appFlow';
-import { RootState } from '@store/reducers';
+import { signIn, useSession } from 'next-auth/react';
+import ImageComponent, { ImageSize } from '@/components/ImageComponent';
+import { signOutUser } from '@/utils/lib';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLazyLogoutUserQuery } from '@/store/api/apiSlice';
+import { useSearchParams } from 'next/navigation';
+import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
+import { Error, errorMap } from '@/components/Error/ErrorUtils';
+import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
+import { RootState } from '@/store/reducers';
 
-import { initialiseAppState } from '@utils/login-utils';
-import { signinValidationSchema } from '@utils/validation-schema';
-import { useLoginStatus } from '@hooks/useLoginStatus';
-import { signOutUser } from '@utils/lib';
-import { queryHandler } from '@/services';
+const ContainerWrapper = styled(Paper)(({ theme }) => ({
+  boxSizing: 'border-box',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'flex-start',
+  width: '100%',
+  minHeight: '364.25px',
+  gap: theme.spacing(2)
+}));
+
+const ImageBoxContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: theme.spacing(2),
+  width: '100%',
+  height: '100%',
+  minWidth: '440px',
+  maxWidth: '648px',
+  padding: '1px 0px'
+}));
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch<AppDispatch>();
+  const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
 
-  const appState = useSelector((state: RootState) => state.appFlow.appState);
+  const search = useSearchParams();
 
-  // sign in query
-  const [loginAndFetchWorkSpaces, { isFetching }] = useLazyLoginAndFetchWorkSpacesQuery();
+  const error = search.get('error') as Error;
+
+  const { data: session } = useSession();
+
+  // logout user query
+  const [logoutUser] = useLazyLogoutUserQuery();
 
   // alert state
   const [alertState, setAlertState] = useState<AlertType>({
@@ -57,50 +75,62 @@ const Login: NextPageWithLayout = () => {
     type: 'empty'
   });
 
-  const [loginData, setLoginData] = useState(null);
+  const [oauthError, setOauthError] = useState('');
 
-  const [userEmail, setUserEmail] = useState('');
-
-  const { control, handleSubmit } = useAuthenticationForm(signinValidationSchema);
-
-  const { isLoggedIn } = useLoginStatus();
+  /**
+   * Updates loginFlowState
+   */
+  useEffect(() => {
+    updateLoginFlowState();
+  }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      router.push('/');
-    } else {
-      dispatch({ type: 'RESET_STORE' });
-      signOutUser(router);
+    if (session?.error === 'RefreshAccessTokenError') {
+      console.error('[login.tsx]: refresh access token error');
+      signIn('google', { callbackUrl: '/' }); // Force sign in to hopefully resolve error
     }
-  }, [isLoggedIn]);
+  }, [session]);
 
-  const onSubmit = (values: any) => {
-    {
-      /** Generate login payload */
+  // This function handles both google oauth errors (next-auth errors)
+  // & api backend error caused while user logging in.
+  useEffect(() => {
+    if (error) {
+      if (!oauthError) {
+        setOauthError(session?.error ?? errorMap[error] ?? errorMap['Default']);
+      }
     }
-    const payload = generateAuthenticationPayload(values);
-    setUserEmail(values['email']);
-    loginHandler({ query: loginAndFetchWorkSpaces, payload: payload });
+  }, [error]);
+
+  useEffect(() => {
+    if (oauthError) {
+      oAuthErrorState({ error: oauthError }).run();
+    }
+  }, [oauthError]);
+
+  /**
+   * Dispatches a Redux action to update the `loginFlowState` in the app state
+   * with the value `'DEFAULT'`.
+   */
+  const updateLoginFlowState = () => {
+    dispatch(
+      setAppState({
+        ...appState,
+        loginFlowState: 'DEFAULT'
+      })
+    );
   };
 
-  const successCb = (data: any) => {
-    handleAlertOpen({ message: 'Signed in successfully', alertType: 'success' as AlertStatus });
-    setLoginData(data);
-    // store user data in redux.
-    dispatch(setUserData(data));
-
-    const workspaceID = data.organizations[0].workspaces[0].id;
-    // initialise appState
-    initialiseAppState(dispatch, workspaceID);
-    router.push(`/spaces/${workspaceID}/syncs`);
-  };
-
-  const errorCb = (error: any) => {
-    handleAlertOpen({ message: error, alertType: 'error' as AlertStatus });
-  };
-
-  const loginHandler = async ({ query, payload }: { query: any; payload: any }) => {
-    await queryHandler({ query, payload, successCb, errorCb });
+  const oAuthErrorState = ({ error }: { error: string }) => {
+    return {
+      run: () => {
+        // display error if not already shown.
+        if (!alertState.show) {
+          handleAlertOpen({ message: error, alertType: 'error' });
+          // clear session & access_token cookies if exists.
+          signOutUser(router, dispatch, logoutUser);
+        }
+      }
+    };
   };
 
   /**
@@ -125,57 +155,32 @@ const Login: NextPageWithLayout = () => {
     });
   };
 
-  const resendActivationLinkHandler = () => {
-    dispatch(
-      setAppState({
-        ...appState,
-        loginFlowState: {
-          isLoggedIn: false,
-          userEmail: userEmail,
-          emailSentDialog: false,
-          resendActivationLink: true
-        }
-      })
-    );
-    router.push('/activate');
-  };
-
   return (
     <>
       <Head title="Login" />
-
       <AlertComponent
         open={alertState.show}
         onClose={handleAlertClose}
         message={alertState.message}
         isError={alertState.type === 'error'}
-        displayButton={alertState.message === 'Unauthorized' ? true : false}
-        onButtonClick={resendActivationLinkHandler}
       />
 
-      {/** Page layout */}
-      <AuthenticationLayout>
-        {/** Display form */}
-        <AuthenticationForm
-          fields={generateLoginFormFields()}
-          control={control}
-          handleSubmit={handleSubmit}
-          onSubmit={onSubmit}
-          isFetching={isFetching}
-          data={loginData}
-          buttonText={'Sign in'}
-        />
-        <Stack sx={{ mt: 1 }}>
-          <Stack spacing={2}>
-            {/** Display footer */}
-            <AuthenticationFormFooter
-              isLoginPage={true}
-              href={'/signup'}
-              footerText={"Don't have an account? Sign up"}
-            />
-          </Stack>
-        </Stack>
-      </AuthenticationLayout>
+      {/* <GridLayout> */}
+      <ContainerWrapper variant="outlined">
+        <ImageBoxContainer
+          sx={{
+            display: {
+              xs: 'none',
+              sm: 'flex'
+            }
+          }}
+        >
+          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+        </ImageBoxContainer>
+
+        <AuthenticationLayout />
+      </ContainerWrapper>
+      {/* </GridLayout> */}
     </>
   );
 };

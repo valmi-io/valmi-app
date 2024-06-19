@@ -7,7 +7,6 @@
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import AbcIcon from '@mui/icons-material/Abc';
 import LanguageIcon from '@mui/icons-material/Language';
-import AppsIcon from '@mui/icons-material/Apps';
 
 import {
   faArrowRight,
@@ -27,8 +26,22 @@ import {
   faWater,
   faBolt,
   faArrowLeft,
-  faWaveSquare
+  faScrewdriver,
+  faCircleArrowRight,
+  faArrowsToDot,
+  faWaveSquare,
+  faCirclePlus,
+  faCircleDot,
+  faTriangleExclamation,
+  faCaretDown,
+  faTimeline,
+  faSliders,
+  faPlug,
+  faT
 } from '@fortawesome/free-solid-svg-icons';
+
+import { faWpexplorer } from '@fortawesome/free-brands-svg-icons';
+
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
 export interface IAppIcons {
@@ -55,8 +68,19 @@ export interface IAppIcons {
   STREAM: IconDefinition;
   LIVE_EVENTS: IconDefinition;
   ARROW_LEFT: IconDefinition;
+  ETL_ICON: IconDefinition;
+  SOURCE_ICON: IconDefinition;
+  DESTINATION_ICON: IconDefinition;
   BROWSER: React.ReactElement;
-  APPS: React.ReactElement;
+  APPS: IconDefinition;
+  CIRCLE_PLUS_OUTLINED: IconDefinition;
+  EXPLORES: IconDefinition;
+  CATALOG: IconDefinition;
+  DATA_FLOWS: IconDefinition;
+  CIRCLE_DOT: IconDefinition;
+  WARNING: IconDefinition;
+  CARET_DOWN: IconDefinition;
+  TITLE: IconDefinition;
 }
 
 const appIcons: IAppIcons = {
@@ -83,8 +107,19 @@ const appIcons: IAppIcons = {
   STREAM: { ...faWater },
   LIVE_EVENTS: { ...faWaveSquare },
   ARROW_LEFT: { ...faArrowLeft },
+  ETL_ICON: { ...faScrewdriver },
+  SOURCE_ICON: { ...faCircleArrowRight },
+  DESTINATION_ICON: { ...faArrowsToDot },
   BROWSER: <LanguageIcon />,
-  APPS: <AppsIcon />
+  APPS: { ...faPlug },
+  CIRCLE_PLUS_OUTLINED: { ...faCirclePlus },
+  EXPLORES: { ...faWpexplorer },
+  CATALOG: { ...faTimeline },
+  DATA_FLOWS: { ...faSliders },
+  CIRCLE_DOT: { ...faCircleDot },
+  WARNING: { ...faTriangleExclamation },
+  CARET_DOWN: { ...faCaretDown },
+  TITLE: { ...faT }
 };
 
 export default appIcons;

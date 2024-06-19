@@ -6,68 +6,77 @@
 
 import { useContext } from 'react';
 
-import { Box, Drawer, styled, Divider, useTheme } from '@mui/material';
+import { Box, Drawer, styled, Divider, useTheme, Paper, Stack } from '@mui/material';
 
-import SidebarMenu from '@layouts/SidebarLayout/Sidebar/SidebarMenu';
+import SidebarMenu from '@layouts/SidebarLayout/Sidebar/V2SidebarMenu';
 
 import { SidebarContext } from '@contexts/SidebarContext';
 
-import Logo from '@components/LogoSign';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../store/reducers';
+import { SidebarLogo } from '@components/LogoSign';
+import { useWorkspaceId } from '@/hooks/useWorkspaceId';
 
-const SidebarWrapper = styled(Box)(
-  ({ theme }) => `
-        width: ${theme.sidebar.width};
-        min-width: ${theme.sidebar.width};
-        color: ${theme.colors.alpha.trueWhite[70]};
-        position: relative;
-        z-index: 7;
-        height: 100%;
-        padding-bottom: 68px;
-`
-);
+const SidebarPaper = styled(Paper)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  width: theme.sidebar.width,
+  height: '100%',
+  zIndex: 10,
+  backgroundColor: theme.sidebar.background
+}));
+
+const ImageBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  width: theme.sidebar.width,
+  padding: theme.spacing(2),
+  gap: theme.spacing(2),
+  backgroundColor: theme.sidebar.background
+}));
+
+const SidebarDivider = styled(Divider)(({ theme }) => ({
+  display: 'flex',
+  width: theme.sidebar.width
+}));
+
+const SidebarPaperComponent = (workspaceId: any, sidebarToggle: boolean) => {
+  let displayProps: any = {
+    lg: 'flex'
+  };
+  if (!sidebarToggle) {
+    displayProps = {
+      xs: 'none',
+      lg: 'flex'
+    };
+  }
+  return (
+    <SidebarPaper
+      sx={{
+        position: 'fixed',
+        display: displayProps
+      }}
+    >
+      <ImageBox>
+        <SidebarLogo />
+      </ImageBox>
+      <SidebarDivider />
+      <SidebarMenu key={'SidebarDrawer'} workspaceId={workspaceId} />
+    </SidebarPaper>
+  );
+};
 
 const Sidebar = () => {
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
 
-  const workspaceId = useSelector((state: RootState) => state.appFlow.appState.workspaceId);
+  const { workspaceId = '' } = useWorkspaceId();
 
   const theme = useTheme();
 
   return (
     <>
-      <SidebarWrapper
-        sx={{
-          display: {
-            xs: 'none',
-            lg: 'inline-block'
-          },
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          background: theme.palette.mode === 'dark' ? theme.colors.alpha.white[100] : theme.colors.alpha.black[100],
-          boxShadow: theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
-        }}
-      >
-        <Box mt={2}>
-          <Box
-            sx={{
-              width: '100%'
-            }}
-          >
-            <Logo />
-          </Box>
-        </Box>
-        <Divider
-          sx={{
-            mt: theme.spacing(2),
-            mx: theme.spacing(2),
-            background: theme.colors.alpha.trueWhite[10]
-          }}
-        />
-        <SidebarMenu key={'SidebarMenu'} workspaceId={workspaceId} />
-      </SidebarWrapper>
+      {SidebarPaperComponent(workspaceId, false)}
       <Drawer
         sx={{
           boxShadow: `${theme.sidebar.boxShadow}`
@@ -78,30 +87,7 @@ const Sidebar = () => {
         variant="temporary"
         elevation={9}
       >
-        <SidebarWrapper
-          sx={{
-            background: theme.palette.mode === 'dark' ? theme.colors.alpha.white[100] : theme.colors.alpha.black[100]
-          }}
-        >
-          <Box mt={3}>
-            <Box
-              mx={2}
-              sx={{
-                width: 52
-              }}
-            >
-              <Logo />
-            </Box>
-          </Box>
-          <Divider
-            sx={{
-              mt: theme.spacing(3),
-              mx: theme.spacing(2),
-              background: theme.colors.alpha.trueWhite[10]
-            }}
-          />
-          <SidebarMenu key={'SidebarDrawer'} workspaceId={workspaceId} />
-        </SidebarWrapper>
+        {SidebarPaperComponent(workspaceId, true)}
       </Drawer>
     </>
   );

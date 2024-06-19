@@ -1,41 +1,43 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Thursday, May 4th 2023, 1:49:00 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { ReactNode } from 'react';
 
-import { Container } from '@mui/material';
+import { Paper, styled } from '@mui/material';
 
 import PageHead from '@components/PageHead';
 import PageTitle from '@components/PageTitle';
-import PageTitleWrapper from '@components/PageTitleWrapper';
 
 interface PageLayoutProps {
   pageHeadTitle: string;
-  title: string;
+  title?: string;
   buttonTitle?: string;
   handleButtonOnClick?: () => void;
   displayButton?: boolean;
   children: ReactNode;
 }
 
+const LayoutRoot = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  padding: theme.spacing(2)
+}));
+
+const ContentWrapper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(1)
+}));
+
 const PageLayout = (props: PageLayoutProps) => {
-  const { pageHeadTitle, title, displayButton, buttonTitle, handleButtonOnClick, children } = props;
+  const { pageHeadTitle, title = '', displayButton, buttonTitle, handleButtonOnClick, children } = props;
+
   return (
-    <>
+    <LayoutRoot variant="outlined">
       <PageHead title={pageHeadTitle} />
-      <PageTitleWrapper>
-        <PageTitle
-          title={title}
-          displayButton={displayButton}
-          buttonTitle={buttonTitle}
-          onClick={handleButtonOnClick}
-        />
-      </PageTitleWrapper>
-      <Container maxWidth="lg">{children}</Container>
-    </>
+
+      <PageTitle
+        title={title}
+        displayButton={displayButton}
+        buttonTitle={buttonTitle?.toUpperCase()}
+        onClick={handleButtonOnClick}
+      />
+      <ContentWrapper>{children}</ContentWrapper>
+    </LayoutRoot>
   );
 };
 

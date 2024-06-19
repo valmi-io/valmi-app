@@ -5,11 +5,11 @@
  */
 
 import ContentLayout from '@/layouts/ContentLayout';
-import { Stack } from '@mui/material';
-import ConnectorLayout from '@/layouts/ConnectorLayout';
+import { Grid, Stack } from '@mui/material';
 import PageTitle from '@/components/PageTitle';
 import { OAuthConnectorsState, OnConnectorClickProps } from '@/pagesspaces/[wid]/oauth-apps';
-import ConnectorsList from '@/content/ConnectionFlow/Connectors/ConnectorsList';
+import { TCatalog } from '@/utils/typings.d';
+import CatalogCard from '@/content/Catalog/CatalogCard';
 
 type LayoutState = {
   isLoading: boolean;
@@ -25,30 +25,39 @@ type OAuthAppProps = {
   connectorState: OAuthConnectorsState;
 };
 
+const PageContent = ({
+  connectorState,
+  catalogs,
+  handleItemOnClick
+}: {
+  connectorState: any;
+  catalogs: TCatalog[];
+  handleItemOnClick: (data: any) => void;
+}) => {
+  return (
+    <>
+      {/** Display page content */}
+
+      <Stack sx={{ display: 'flex' }} spacing={3}>
+        {/** connectors */}
+        {/* <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}> */}
+        {catalogs.map((catalog: TCatalog) => {
+          return (
+            <CatalogCard
+              key={catalog.type}
+              catalog={catalog}
+              handleCatalogOnClick={(item) => handleItemOnClick({ item, configured: false })}
+            />
+          );
+        })}
+        {/* </Grid> */}
+      </Stack>
+    </>
+  );
+};
+
 const OAuthApps = ({ state, handleItemOnClick, connectorState }: OAuthAppProps) => {
   const { data, error, isLoading, title, traceError } = state;
-
-  const PageContent = () => {
-    const { type } = connectorState;
-
-    return (
-      <>
-        <ConnectorLayout title="">
-          {/** Display page content */}
-
-          <Stack sx={{ display: 'flex' }} spacing={3}>
-            {/** connectors */}
-            <ConnectorsList
-              key={`oauthconnectorsList-${state.title}`}
-              data={data}
-              handleItemOnClick={(item) => handleItemOnClick({ item, configured: false })}
-              selectedType={type}
-            />
-          </Stack>
-        </ConnectorLayout>
-      </>
-    );
-  };
 
   return (
     <Stack sx={{ gap: 2 }}>
@@ -56,7 +65,9 @@ const OAuthApps = ({ state, handleItemOnClick, connectorState }: OAuthAppProps) 
       <ContentLayout
         key={`${title}`}
         error={error}
-        PageContent={<PageContent />}
+        PageContent={
+          <PageContent connectorState={connectorState} catalogs={data} handleItemOnClick={handleItemOnClick} />
+        }
         displayComponent={!error && !isLoading && data}
         isLoading={isLoading}
         traceError={traceError}

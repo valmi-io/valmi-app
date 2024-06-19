@@ -4,22 +4,18 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import { getCookie } from '@/lib/cookies';
+import { getAuthTokenCookie, getCookie } from '@/lib/cookies';
 import { useEffect, useState } from 'react';
 
 export const useLoginStatus = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const getLoginStatus = () => {
+    const getLoginStatus = async () => {
       try {
-        const accessToken = getCookie('AUTH')?.accessToken ?? '';
+        const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (accessToken) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
+        setIsLoggedIn(!!accessToken);
       } catch (error) {
         // Handle any errors here
         setIsLoggedIn(false);

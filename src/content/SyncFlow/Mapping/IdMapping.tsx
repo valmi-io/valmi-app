@@ -49,11 +49,7 @@ const IdMapping = () => {
   };
 
   const enableDropdown = () => {
-    if (
-      getSelectedSourceMode(flowState) !== '' &&
-      getSelectedDestinationMode(flowState) !== '' &&
-      !isEditableFlow
-    )
+    if (getSelectedSourceMode(flowState) !== '' && getSelectedDestinationMode(flowState) !== '' && !isEditableFlow)
       return true;
     return false;
   };
@@ -67,13 +63,7 @@ const IdMapping = () => {
             disabled={!enableDropdown()}
             value={getSourceIdKey(flowState)}
             onChange={(event, key) => {
-              saveToStore(
-                saveSourceIdKey(
-                  flowState,
-                  destinationCatalog,
-                  event.target.value
-                )
-              );
+              saveToStore(saveSourceIdKey(flowState, destinationCatalog, event.target.value));
             }}
           >
             {getSourceFields(sourceCatalog).map((key, index) => (
@@ -88,26 +78,20 @@ const IdMapping = () => {
         {isDestinationIdMappingRequired(flowState, destinationCatalog) && (
           <>
             {/* <CompareArrowsIcon /> */}
-            <ArrowForwardIcon
-              style={{ fontSize: 18, marginLeft: 2, marginRight: 2 }}
-            />
+            <ArrowForwardIcon style={{ fontSize: 18, marginLeft: 2, marginRight: 2 }} />
             <BoxLayout>
               <SelectDropdown
                 label={'Destination Id Key'}
                 value={getDestinationIdKey(flowState)}
                 onChange={(event, key) => {
-                  saveToStore(
-                    saveDestinationIdKey(flowState, event.target.value)
-                  );
+                  saveToStore(saveDestinationIdKey(flowState, event.target.value));
                 }}
               >
-                {getDestinationFields(flowState, destinationCatalog).map(
-                  (key, index) => (
-                    <MenuItem key={'_valkey' + index} value={key}>
-                      {key}
-                    </MenuItem>
-                  )
-                )}
+                {getDestinationFields(flowState, destinationCatalog).map((key, index) => (
+                  <MenuItem key={'_valkey' + index} value={key}>
+                    {key}
+                  </MenuItem>
+                ))}
               </SelectDropdown>
             </BoxLayout>
           </>

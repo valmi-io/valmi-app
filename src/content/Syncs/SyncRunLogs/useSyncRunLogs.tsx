@@ -28,7 +28,7 @@ interface UseSyncRunLogProps extends LogPayloadIn {}
 export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
   const { since, props: logProps } = props;
 
-  const { syncId, runId } = logProps;
+  const { syncId, runId, workspaceId } = logProps;
 
   const router = useRouter();
 
@@ -42,6 +42,7 @@ export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
   useEffect(() => {
     if (!router.isReady) return;
 
+    if (!workspaceId) return;
     // Fetch logs using the generated payload.
     const initialPayload = generateLogPayload({
       since: since,
@@ -51,7 +52,7 @@ export const useSyncRunLogs = (props: UseSyncRunLogProps) => {
     getSyncRunLogs(payload ?? initialPayload);
 
     // fetchLogs({ since: since, props: logProps });
-  }, [lastSync, syncId, runId, router.isReady]);
+  }, [lastSync, syncId, runId, router.isReady, workspaceId]);
 
   const fetchLogs = ({ since, props }: LogPayloadIn) => {
     const payload = generateLogPayload({ since: since, props: props });

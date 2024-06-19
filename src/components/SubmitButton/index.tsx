@@ -1,24 +1,11 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Monday, January 1st 2024, 12:35:15 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import React from 'react';
-
 import { CheckOutlined } from '@mui/icons-material';
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, SxProps } from '@mui/material';
+import VButton, { VButtonProps } from '@/components/VButton';
 
-interface SubmitButtonProps {
-  buttonText: string;
+interface SubmitButtonProps extends VButtonProps {
   isFetching: boolean;
   data: any;
-  ariaLabel?: string;
-  disabled?: boolean;
-  onClick?: () => void;
-  buttonType?: 'submit' | 'button' | 'reset';
-  fullWidth?: boolean;
-  color?: 'primary' | 'secondary' | 'error' | 'success';
 }
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({
@@ -30,29 +17,30 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
   onClick,
   buttonType = 'button',
   fullWidth = false,
-  color = 'primary'
+  color = 'primary',
+  styles,
+  size = 'large'
 }) => {
   let endIcon = null;
-  endIcon = isFetching && <CircularProgress size={16} sx={{ color: 'white' }} />;
+  endIcon = isFetching && <CircularProgress size={14} sx={{ color: 'white' }} />;
   if (data) {
     endIcon = <CheckOutlined fontSize="small" />;
   }
 
   return (
-    <Button
+    <VButton
       aria-label={ariaLabel}
       disabled={disabled}
-      type={buttonType}
+      buttonType={buttonType}
       fullWidth={fullWidth}
       variant="contained"
       color={color}
-      size="large"
+      size={size}
       endIcon={endIcon}
-      sx={{ mt: 2 }}
       onClick={onClick && onClick}
-    >
-      {buttonText}
-    </Button>
+      styles={styles}
+      buttonText={buttonText}
+    />
   );
 };
 

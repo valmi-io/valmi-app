@@ -12,10 +12,7 @@ export enum ConnectionType {
   DEST = 'DEST'
 }
 
-export type ConnectorType =
-  | 'Webhook'
-  | 'Google Sheets'
-  | 'Customer.io | Facebook Ads';
+export type ConnectorType = 'Webhook' | 'Google Sheets' | 'Customer.io | Facebook Ads';
 
 export enum ConnectionsPageTitle {
   SRC = 'Warehouses',
@@ -38,14 +35,26 @@ export interface ConnectorModel {
   display_name: string;
 }
 
-export const ConnectionSteps: Step[] = [
+export const EtlConnectionSteps: Step[] = [
   {
-    label: constants.connections.SELECT_CONNECTOR_TITLE
+    label: constants.connections.CONFIGURE_SOURCE
   },
   {
-    label: constants.connections.CONFIGURE_CONNECTOR_TITLE
+    label: constants.connections.SELECT_STREAMS
   },
   {
-    label: constants.connections.TEST_CONNECTOR_TITLE
+    label: constants.connections.CONFIGURE_CONNECTION
+  }
+];
+
+export const RetlConnectionSteps: Step[] = [
+  {
+    label: constants.connections.CONFIGURE_SOURCE
+  },
+  {
+    label: constants.connections.SELECT_STREAMS
+  },
+  {
+    label: constants.connections.CONFIGURE_CONNECTION
   }
 ];

@@ -4,6 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
+import { getAuthTokenCookie } from '@/lib/cookies';
 import cookie from 'cookie';
 
 export const configureCredentials = (data: any) => {
@@ -28,7 +29,7 @@ export const getBaseUrl = () => {
 
 export const getAccessTokenCookie = async (req: any) => {
   const cookies = cookie.parse(req.headers?.cookie ?? '');
-  const appCookie = cookies?.['AUTH'] ?? '';
+  const appCookie = cookies?.[getAuthTokenCookie()] ?? '';
   const parsedCookies = appCookie ? JSON.parse(appCookie) : {};
   const accessToken = parsedCookies?.accessToken ?? null;
   return accessToken;

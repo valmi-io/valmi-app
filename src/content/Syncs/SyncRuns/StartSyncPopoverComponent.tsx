@@ -4,14 +4,7 @@
  * Author: Nagendra S @ valmi.io
  */
 
-import {
-  Box,
-  Button,
-  Divider,
-  Switch,
-  Typography,
-  styled
-} from '@mui/material';
+import { Box, Button, Divider, Switch, Typography, styled } from '@mui/material';
 
 import { getRouterPathname, isPublicSync } from '@utils/routes';
 
@@ -36,19 +29,12 @@ type props = {
   closePopover: () => void;
   query: any;
   url: string;
-  syncRuns: any;
+  currentSyncRun: any;
   workspaceId: string;
   syncId: string;
 };
 
-const StartSyncPopoverComponent = ({
-  closePopover,
-  query,
-  url,
-  syncRuns,
-  workspaceId,
-  syncId
-}: props) => {
+const StartSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, workspaceId, syncId }: props) => {
   // Create a new sync run query
   const [createNewSyncRunQuery] = useLazyCreateNewSyncRunQuery();
 
@@ -58,10 +44,7 @@ const StartSyncPopoverComponent = ({
   const [fullRefresh, setFullRefresh] = useState(false);
 
   // full_refresh switch on change handler
-  const handleFullRefreshChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    val: any
-  ) => {
+  const handleFullRefreshChange = (e: React.ChangeEvent<HTMLInputElement>, val: any) => {
     e.stopPropagation();
     setFullRefresh(val);
   };
@@ -111,12 +94,7 @@ const StartSyncPopoverComponent = ({
     // generate start sync run payload
     const payload = generateStartSyncPayload(workspaceId, syncId, fullRefresh);
 
-    syncRunNetworkHandler(
-      createNewSyncRunQuery,
-      payload,
-      successHandler,
-      errorHandler
-    );
+    syncRunNetworkHandler(createNewSyncRunQuery, payload, successHandler, errorHandler);
   };
 
   return (
@@ -137,13 +115,9 @@ const StartSyncPopoverComponent = ({
       <Divider />
 
       <Box sx={{ m: 1 }}>
-        <Button color="primary" fullWidth onClick={startSyncRun}>
-          <Typography variant="body1">
-            {getPageButtonTitle(
-              isPublicSync(getRouterPathname(query, url)),
-              syncRuns,
-              isPromisePending
-            )}
+        <Button fullWidth onClick={startSyncRun}>
+          <Typography variant="body1" color="secondary">
+            {getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), currentSyncRun, isPromisePending)}
           </Typography>
         </Button>
       </Box>

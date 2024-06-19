@@ -8,18 +8,22 @@ import { Paper, Popover } from '@mui/material';
 import React from 'react';
 
 type PopoverProps = {
-  onClose: () => void;
+  onClose: any;
   anchorEl: any;
   children: React.ReactNode;
 };
 
 const PopoverComponent = (props: PopoverProps) => {
   const { onClose, anchorEl, children } = props;
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
     <Popover
+      id={id}
+      open={open}
       anchorEl={anchorEl}
       onClose={onClose}
-      open={Boolean(anchorEl)}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'right'

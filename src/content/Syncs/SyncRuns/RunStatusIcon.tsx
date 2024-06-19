@@ -14,20 +14,11 @@ interface RunStatusIconProps {
   onClick: any;
 }
 
-const RunStatusIcon = ({
-  status,
-  tooltipTitle,
-  onClick
-}: RunStatusIconProps) => {
+const RunStatusIcon = ({ status, tooltipTitle, onClick }: RunStatusIconProps) => {
   return (
     <>
       <Tooltip title={tooltipTitle}>
-        <IconButton
-          color={
-            status === 'failed' || status === 'terminated' ? 'error' : 'primary'
-          }
-          onClick={onClick}
-        >
+        <IconButton color={status === 'failed' || status === 'terminated' ? 'error' : 'success'} onClick={onClick}>
           {getIcon(status)}
         </IconButton>
       </Tooltip>

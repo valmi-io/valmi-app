@@ -6,22 +6,12 @@
  */
 
 import CatalogSelectionComponent from '@content/SyncFlow/CatalogSelectionComponent';
-import {
-  setSelectedValue,
-  setVarsinSubStep
-} from '@content/SyncFlow/stateManagement';
+import { setSelectedValue, setVarsinSubStep } from '@content/SyncFlow/stateManagement';
 
 import { useLazyFetchCredentialsQuery } from '@store/api/apiSlice';
 
-export function ConnectionSelectionState(
-  refreshKey,
-  dispatch,
-  flowState,
-  otherState,
-  next,
-  step,
-  subStep
-) {
+// get workspaceId from session object.
+export function ConnectionSelectionState(refreshKey, dispatch, flowState, otherState, next, step, subStep) {
   const resultsFilter = (results) => {
     if (step === 0) {
       return results.filter((x) => x.connector_type.startsWith('SRC_'));
@@ -39,12 +29,7 @@ export function ConnectionSelectionState(
   };
 
   const onSelect = (flowState, result, displayFilter) => {
-    let updatedFlowState = setSelectedValue(
-      flowState,
-      step,
-      subStep,
-      displayValue(result)
-    );
+    let updatedFlowState = setSelectedValue(flowState, step, subStep, displayValue(result));
 
     let config = {};
     if (step == 0) {
