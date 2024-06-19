@@ -80,9 +80,8 @@ function DataTable({ data }: { data: TData }) {
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden', my: 2 }} component={Paper} variant="outlined">
-      <TableContainer>
+      <TableContainer sx={{ width: '1100px' }}>
         <Table stickyHeader>
-
           <TableHead>
             <TableRow>
               {headers.map((header, index) => (
