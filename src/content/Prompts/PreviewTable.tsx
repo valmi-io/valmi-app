@@ -95,6 +95,8 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const timeGrain = searchParams.get('timeGrain');
 
+  const { time_grain_enabled = false, time_window_enabled = false } = prompt ?? {};
+
   useEffect(() => {
     if (schemaID) {
       const payload: TPayloadOut = generateOnMountPreviewPayload(schemaID);
@@ -117,8 +119,9 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   useEffect(() => {
     if (timeWindow || filters || timeGrain) {
+      const parsedTimeWindow = time_window_enabled ? (timeWindow ? JSON.parse(timeWindow) : {}) : {};
+      const parsedTimeGrain = timeGrain ? JSON.parse(timeGrain) : 'day';
       const parsedFilters = filters ? transformFilters(JSON.parse(filters!), prompt.filters) : [];
-      const parsedTimeWindow = timeWindow ? JSON.parse(timeWindow!) : {};
 
       const previewPromptpayload: any = {
         schema_id: schemaID as string,
@@ -126,9 +129,11 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
         filters: parsedFilters
       };
 
-      if (prompt.time_grain_enabled) {
-        previewPromptpayload.time_grain = JSON.parse(timeGrain!) || '';
+      if (time_grain_enabled) {
+        previewPromptpayload.time_grain = parsedTimeGrain;
       }
+
+      console.log('prompt preview payload: ', previewPromptpayload);
 
       previewPrompt(previewPromptpayload);
     }
@@ -160,6 +165,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       exploreName,
       prompt
     );
+
     setStatus('submitting');
     createExploreHandler({ query: createObject, payload: payload });
   };
