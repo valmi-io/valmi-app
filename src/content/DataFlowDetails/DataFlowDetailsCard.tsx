@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Paper, styled } from '@mui/material';
+import { Paper, Typography, styled } from '@mui/material';
 
 import appIcons from '@utils/icon-utils';
 import CustomIcon from '@components/Icon/CustomIcon';
@@ -13,6 +13,7 @@ type DataFlowDetailsCardProps = {
   data: TConnection;
   handleSwitchOnChange: (event: any, checked: boolean, data: any) => void;
   handleEditSync: (data: any) => void;
+  isPublicSync: boolean;
 };
 
 const CardWrapper = styled(Paper)(({ theme }) => ({
@@ -42,24 +43,39 @@ const DataFlowContainer = styled(Paper)(({ theme }) => ({
 
 const DataflowDetails = ({
   source,
-  destination
+  destination,
+  isPublicSync
 }: {
   source: { type: string; name: string };
   destination: {
     type: string;
     name: string;
   };
+  isPublicSync: boolean;
 }) => {
   return (
-    <DataFlowContainer>
-      <DataFlowCatalogCard type={source.type} name={source.name} />
-      <CustomIcon icon={appIcons.ARROW_RIGHT} />
-      <DataFlowCatalogCard type={destination.type} name={destination.name} />
-    </DataFlowContainer>
+    <>
+      <DataFlowContainer>
+        <DataFlowCatalogCard
+          type={isPublicSync ? 'SRC_POSTGRES' : source.type}
+          name={isPublicSync ? '"dvdrental"."public"."one_m_data"' : source.name}
+        />
+        <CustomIcon icon={appIcons.ARROW_RIGHT} />
+        <DataFlowCatalogCard
+          type={isPublicSync ? 'DEST_WEBHOOK' : destination.type}
+          name={isPublicSync ? process.env.PUBLIC_SYNC_URL : destination.name}
+        />
+      </DataFlowContainer>
+    </>
   );
 };
 
-const DataFlowDetailsCard = ({ data, handleSwitchOnChange, handleEditSync }: DataFlowDetailsCardProps) => {
+const DataFlowDetailsCard = ({
+  data,
+  handleSwitchOnChange,
+  handleEditSync,
+  isPublicSync = false
+}: DataFlowDetailsCardProps) => {
   const {
     schedule: { run_interval = 0 } = {},
     status = '',
@@ -76,10 +92,16 @@ const DataFlowDetailsCard = ({ data, handleSwitchOnChange, handleEditSync }: Dat
         <DataflowDetails
           source={{ name: sourceName, type: sourceConnectionType }}
           destination={{ name: destinationName, type: destinationConnectionType }}
+          isPublicSync={isPublicSync}
         />
-        <DataFlowStatusCard data={data} status={status} handleSwitchOnChange={handleSwitchOnChange} />
+        <DataFlowStatusCard
+          data={data}
+          status={status}
+          handleSwitchOnChange={handleSwitchOnChange}
+          isPublicSync={isPublicSync}
+        />
       </DetailsContainer>
-      <DataFlowScheduleCard run_interval={run_interval} />
+      <DataFlowScheduleCard run_interval={run_interval} isPublicSync={isPublicSync} />
     </CardWrapper>
   );
 };

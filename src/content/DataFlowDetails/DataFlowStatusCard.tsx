@@ -13,24 +13,28 @@ const DataFlowStatusContainer = styled(Paper)(({ theme }) => ({
 const DataFlowStatusCard = ({
   handleSwitchOnChange,
   data,
-  status
+  status,
+  isPublicSync
 }: {
   handleSwitchOnChange: (event: any, checked: boolean, data: any) => void;
   data: TConnection;
   status: string;
+  isPublicSync: boolean;
 }) => {
   return (
     <DataFlowStatusContainer>
       <Typography variant="body1" sx={{ color: (theme) => theme.colors.primary.main }}>
-        {status.toUpperCase()}
+        {isPublicSync ? 'ACTIVE' : status.toUpperCase()}
       </Typography>
-      <Switch
-        size="medium"
-        checked={!!(status === 'active')}
-        onChange={(event, checked) => {
-          handleSwitchOnChange(event, checked, data);
-        }}
-      />
+      {!isPublicSync && (
+        <Switch
+          size="medium"
+          checked={!!(status === 'active')}
+          onChange={(event, checked) => {
+            handleSwitchOnChange(event, checked, data);
+          }}
+        />
+      )}
     </DataFlowStatusContainer>
   );
 };

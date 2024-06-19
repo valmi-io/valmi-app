@@ -48,7 +48,8 @@ const SyncRunsHeader = ({
         disabled={isPromisePending}
         onClick={handlePopoverOpen}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        linkurl={'http://citus.mywavia.com:3001/'}
+        // linkurl={'http://citus.mywavia.com:3001/'}
+        linkurl={process.env.PUBLIC_SYNC_URL}
         isFetching={isPromisePending}
         displayStartIcon={false}
       />
