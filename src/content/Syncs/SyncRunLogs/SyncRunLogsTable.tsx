@@ -8,6 +8,7 @@ import { memo } from 'react';
 
 import {
   Chip,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -61,7 +62,7 @@ const SyncRunLogsTable = ({ data, onRowClick }: SyncRunLogsTableProps) => {
 
   return (
     <>
-      <TableContainer>
+      <TableContainer component={Paper} variant="outlined">
         <Table>
           {/* Logs Table Columns */}
           <TableHead>

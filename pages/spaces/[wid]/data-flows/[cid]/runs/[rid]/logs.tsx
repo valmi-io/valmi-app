@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, August 18th 2023, 6:47:31 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { ReactElement, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
@@ -68,10 +62,7 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
     props: logProps
   });
 
-  const [state, setState] = useState<{ ids: string[]; entities: any }>({
-    ids: [],
-    entities: {}
-  });
+  const [state, setState] = useState<{ ids: string[]; entities: any } | null>(null);
 
   const [rowState, setRowState] = useState<{ data: any; show: boolean; copied: boolean }>({
     data: null,
@@ -89,12 +80,14 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
    * Fetches sync run logs every 3 seconds
    */
   useEffect(() => {
-    if (state.ids.length > 0 && !error) {
-      const interval = 5000; // in milliseconds
-      const runInterval = setInterval(handleFetchMore, interval);
-      return () => {
-        clearInterval(runInterval);
-      };
+    if (state) {
+      if (state?.ids.length > 0 && !error) {
+        const interval = 5000; // in milliseconds
+        const runInterval = setInterval(handleFetchMore, interval);
+        return () => {
+          clearInterval(runInterval);
+        };
+      }
     }
   }, [state]);
 
@@ -119,12 +112,12 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
       fetchLogs({ since: beforeVal ?? -1, props: logProps });
     } else {
       // Append since, if not existed in existing sinces array.
-      const { ids, entities } = state;
+      const ids = state?.ids ?? [];
+      const entities = state?.entities ?? {};
 
       const existingId = isExistingId({ arr: ids, id: sinceVal });
 
       setState((state) => ({
-        ...state,
         ids: !existingId ? [...ids, sinceVal] : ids,
         entities: {
           ...entities,
@@ -184,37 +177,27 @@ const SyncRunLogsPage: NextPageWithLayout = () => {
     }));
   };
 
-  /**
-   * Responsible for displaying Logs Table.
-   * @returns Logs, and Empty Component based on data.
-   */
-  const PageContent = () => {
-    if (isDataEmpty(state)) {
-      return <ListEmptyComponent description={'No data.'} />;
-    }
-
-    return (
-      <>
-        <SyncRunLogsTable key={`syncRunsLogsTable-${workspaceId}`} onRowClick={handleRowOnClick} data={state} />
-        <EventsFooter isFetching={isFetching} />
-      </>
-    );
-  };
-
   return (
     <PageLayout
       pageHeadTitle={connection_type === 'src' ? 'Source Log History' : 'Destination Log History'}
-      title={connection_type === 'src' ? 'Source Log History' : 'Destination Log History'}
+      title={connection_type === 'src' ? 'SOURCE LOG HISTORY' : 'DESTINATION LOG HISTORY'}
       displayButton={false}
     >
       <ContentLayout
         key={`syncsLogsPage`}
         error={error}
-        PageContent={<PageContent />}
-        displayComponent={!error && !isLoading && logs}
+        PageContent={
+          <PageContent
+            handleRowOnClick={handleRowOnClick}
+            isFetching={isFetching}
+            state={state}
+            workspaceId={workspaceId}
+          />
+        }
+        displayComponent={!error && !isLoading && !!state}
         isLoading={isLoading}
         traceError={traceError}
-        cardStyles={{ marginTop: theme.spacing(4) }}
+        cardStyles={{ marginTop: theme.spacing(1) }}
       />
       <Modal
         title="Run Details"
@@ -234,3 +217,31 @@ SyncRunLogsPage.getLayout = function getLayout(page: ReactElement) {
 };
 
 export default SyncRunLogsPage;
+
+/**
+ * Responsible for displaying Logs Table.
+ * @returns Logs, and Empty Component based on data.
+ */
+const PageContent = ({
+  state,
+  handleRowOnClick,
+  isFetching,
+  workspaceId
+}: {
+  state: any;
+  handleRowOnClick: any;
+  isFetching: boolean;
+  workspaceId: string;
+}) => {
+  console.log('State:_', state);
+  if (isDataEmpty(state)) {
+    return <ListEmptyComponent description={'No data.'} />;
+  }
+
+  return (
+    <>
+      <SyncRunLogsTable key={`syncRunsLogsTable-${workspaceId}`} onRowClick={handleRowOnClick} data={state} />
+      <EventsFooter isFetching={isFetching} />
+    </>
+  );
+};
