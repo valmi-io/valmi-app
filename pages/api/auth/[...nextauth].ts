@@ -207,7 +207,7 @@ export default handler;
 
 const handleSocialLogin = async (payload, successCb, errorCb) => {
   try {
-    const response = await axios.post(`${getBaseUrl()}/api/auth/social/login`, payload);
+    const response = await axios.post(`${getBaseUrl()}/auth/social/login`, payload);
 
     const result = response?.data ?? {};
     if (hasErrorsInData(result)) {
