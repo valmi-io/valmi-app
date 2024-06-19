@@ -298,7 +298,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
       />
 
       {schemaID && (
-        <Container>
+        <Stack>
           <PromptFilter
             filters={prompt.filters}
             operators={prompt.operators}
@@ -330,7 +330,7 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
             isLoading={isLoading}
             traceError={false}
           />
-        </Container>
+        </Stack>
       )}
       <SaveModal
         Title={'Save Explore as'}
