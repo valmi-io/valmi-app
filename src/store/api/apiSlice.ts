@@ -26,9 +26,7 @@ const staggeredBaseQueryWithBailOut = retry(
       prepareHeaders: async (headers, { getState }) => {
         const { accessToken = '' } = (await getCookie(getAuthTokenCookie())) ?? '';
 
-        if (accessToken) {
-          headers.set('authorization', `Bearer ${accessToken}`);
-        }
+        headers.set('authorization', `Bearer ${accessToken}`);
 
         return headers;
       }
