@@ -22,8 +22,8 @@ const GOOGLE_AUTHORIZATION_URL =
  * returns the old token and an error property
  */
 async function refreshAccessToken(token) {
-  console.log('refreshing access token:.........');
-  console.log('[refreshAccessToken]: old token: ', token.access_token);
+  // console.log('refreshing access token:.........');
+  //console.log('[refreshAccessToken]: old token: ', token.access_token);
   try {
     const url =
       'https://oauth2.googleapis.com/token?' +
@@ -47,7 +47,7 @@ async function refreshAccessToken(token) {
       throw responseTokens;
     }
 
-    console.log('[refreshAccessToken]: new token: ', responseTokens.access_token);
+    // console.log('[refreshAccessToken]: new token: ', responseTokens.access_token);
 
     return {
       // Keep the previous token properties
@@ -125,7 +125,7 @@ export const nextAuthOptions = (req, res) => {
 
             let authMeta = getAuthMetaCookieFromReq(req);
 
-            console.log('[next-auth] authMeta:_', authMeta);
+            // console.log('[next-auth] authMeta:_', authMeta);
 
             let payload = {
               account: {
@@ -159,13 +159,13 @@ export const nextAuthOptions = (req, res) => {
                 token.workspaceId = workspaceId;
               },
               (error) => {
-                console.log('[nextauth api backend error]', error);
+                // console.log('[nextauth api backend error]', error);
                 token.error = error;
                 throw new Error(error);
               }
             );
 
-            console.log('[VALID] - returning token');
+            // console.log('[VALID] - returning token');
 
             return {
               ...token,
@@ -176,8 +176,8 @@ export const nextAuthOptions = (req, res) => {
             };
           }
         } else if (Date.now() < token.expires_at * 1000) {
-          console.log('[next-auth] - validating token.expired_at with current Date');
-          console.log('[VALID TOKEN]');
+          // console.log('[next-auth] - validating token.expired_at with current Date');
+          // console.log('[VALID TOKEN]');
           // Subsequent logins, if the `access_token` is still valid, return the JWT
           return token;
         }
