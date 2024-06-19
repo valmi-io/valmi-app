@@ -61,17 +61,16 @@ const PageTitle: FC<PageTitleProps> = ({
             <Grid item>
               {link ? (
                 <Link href={linkurl} target="_blank" passHref style={{ textDecoration: 'none' }}>
-                  <Button
-                    sx={{
-                      fontWeight: 'bold',
-                      fontSize: 14,
-                      color: 'black'
-                    }}
+                  <VButton
+                    buttonText={buttonTitle}
+                    buttonType="submit"
+                    endIcon={endIcon}
+                    startIcon={startIcon}
+                    onClick={onClick}
+                    size="small"
+                    disabled={disabled}
                     variant="contained"
-                    color="warning"
-                  >
-                    {buttonTitle}
-                  </Button>
+                  />
                 </Link>
               ) : (
                 <VButton
@@ -84,15 +83,6 @@ const PageTitle: FC<PageTitleProps> = ({
                   disabled={disabled}
                   variant="contained"
                 />
-                // <Button
-
-                //   disabled={disabled}
-                //   variant="contained"
-                //   onClick={onClick}
-                //   disableElevation
-                // >
-                //   {buttonTitle}
-                // </Button>
               )}
             </Grid>
           )}

@@ -7,7 +7,7 @@
 export const publicRoutes = ['/login'];
 
 export const isPublicSync = (pathname: string): boolean => {
-  const publicSyncRun = `/spaces/${process.env.PUBLIC_WORKSPACE}/syncs/${process.env.PUBLIC_SYNC}/runs`;
+  const publicSyncRun = `/spaces/${process.env.PUBLIC_WORKSPACE}/data-flows/${process.env.PUBLIC_SYNC}/runs`;
   if (pathname === publicSyncRun) return true;
   return false;
 };

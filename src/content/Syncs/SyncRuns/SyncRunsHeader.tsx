@@ -44,11 +44,10 @@ const SyncRunsHeader = ({
       <PageTitle
         title={'RUNS'}
         displayButton={true}
-        buttonTitle={getPageButtonTitle(currentSyncRun, isPromisePending)}
+        buttonTitle={getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), currentSyncRun, isPromisePending)}
         disabled={isPromisePending}
         onClick={handlePopoverOpen}
         link={isPublicSync(getRouterPathname(query, url)) ? true : false}
-        // linkurl={'http://citus.mywavia.com:3001/'}
         linkurl={process.env.PUBLIC_SYNC_URL}
         isFetching={isPromisePending}
         displayStartIcon={false}
