@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { publicRoutes } from '@utils/routes';
+import { publicRoutes, isPublicSync } from '@utils/routes';
 import { getAuthTokenCookie } from '@/lib/cookies';
 
 export async function middleware(request: NextRequest, response: NextResponse) {
@@ -17,16 +17,18 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 
   const isLoggedIn = !!accessToken;
 
-  if (isLoggedIn) {
-    // user is authenticated.
-    if (publicRoutes.includes(route) || route === '/spaces') {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-  } else {
-    // user is not authenticated
-    // checking if route is a protected route.
-    if (!publicRoutes.includes(route) && route !== '/') {
-      return NextResponse.redirect(new URL('/', request.url));
+  if (!isPublicSync(route)) {
+    if (isLoggedIn) {
+      // user is authenticated.
+      if (publicRoutes.includes(route) || route === '/spaces') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+    } else {
+      // user is not authenticated
+      // checking if route is a protected route.
+      if (!publicRoutes.includes(route) && route !== '/') {
+        return NextResponse.redirect(new URL('/', request.url));
+      }
     }
   }
 }
