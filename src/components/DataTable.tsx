@@ -73,32 +73,10 @@ function DataTable({ data }: { data: TData }) {
   const tableData = convertToTableFormat(data.entities[id]);
 
   // Output tableData to console
-  // console.log('table data', tableData);
 
-  // console.log('Object.keys(getHeaders(data)[0]', Object.keys(getHeaders(data)[0]));
   let headers = Object.keys(getHeaders(data)[0]);
 
-  // if (headers.length > 10) {
-  //   headers = headers.slice(0, 10);
-  // }
-
-  // console.log('headers1:_', headers);
-
   const arr = getHeaders(data);
-
-  // return (
-  //   <div style={{ height: 400, width: '100%' }}>
-  //     {/* <DataGrid
-  //       rows={[]}
-  //       columns={headers}
-  //       slots={{
-  //         toolbar: GridToolbar
-  //       }}
-  //       // filterModel={filterModel}
-  //       // onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-  //     /> */}
-  //   </div>
-  // );
 
   return (
     <Paper sx={{ width: '100%', height: 400, overflow: 'hidden', my: 2 }} component={Paper} variant="outlined">

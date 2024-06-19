@@ -17,7 +17,6 @@ const Container = styled(Grid)(({ theme }) => ({
 }));
 
 const PromptsList = ({ data }: { data: TData }) => {
-  console.log('PROMPT DAA:', data);
   const router = useRouter();
 
   const { workspaceId = '' } = useWorkspaceId();

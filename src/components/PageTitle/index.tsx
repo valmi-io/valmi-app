@@ -66,7 +66,6 @@ const PageTitle: FC<PageTitleProps> = ({
                     buttonType="submit"
                     endIcon={endIcon}
                     startIcon={startIcon}
-                    onClick={onClick}
                     size="small"
                     disabled={disabled}
                     variant="contained"

@@ -33,8 +33,6 @@ export const generateExplorePayload = (
     payload.explore.time_grain = parsedTimeGrain;
   }
 
-  console.log('Payload:_', payload);
-
   return payload;
 };
 

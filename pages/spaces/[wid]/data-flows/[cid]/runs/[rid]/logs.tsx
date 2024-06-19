@@ -233,7 +233,6 @@ const PageContent = ({
   isFetching: boolean;
   workspaceId: string;
 }) => {
-  console.log('State:_', state);
   if (isDataEmpty(state)) {
     return <ListEmptyComponent description={'No data.'} />;
   }

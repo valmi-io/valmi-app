@@ -133,8 +133,6 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
         previewPromptpayload.time_grain = parsedTimeGrain;
       }
 
-      console.log('prompt preview payload: ', previewPromptpayload);
-
       previewPrompt(previewPromptpayload);
     }
   }, [timeWindow, filters, timeGrain]);
