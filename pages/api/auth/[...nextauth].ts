@@ -6,6 +6,7 @@ import GoogleProviders from 'next-auth/providers/google';
 import { getErrorsInData, handleAxiosError, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { getAuthMetaCookie } from '@/lib/cookies';
+import { getBaseUrl } from '@/pagesapi/utils';
 
 const GOOGLE_AUTHORIZATION_URL =
   'https://accounts.google.com/o/oauth2/v2/auth?' +
@@ -206,7 +207,7 @@ export default handler;
 
 const handleSocialLogin = async (payload, successCb, errorCb) => {
   try {
-    const response = await axios.post('http://localhost:4000/api/auth/social/login', payload);
+    const response = await axios.post(`${getBaseUrl()}/api/auth/social/login`, payload);
 
     const result = response?.data ?? {};
     if (hasErrorsInData(result)) {
