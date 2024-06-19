@@ -1,32 +1,38 @@
 import { generateAccountPayload } from '@/utils/account-utils';
-import moment from 'moment';
+import { TPrompt } from '@/utils/typings.d';
 
 export const generateExplorePayload = (
   wid: string,
   pid: string,
   user: any,
   schemaID: string,
+  timeWindow: string,
+  timeGrain: string,
+  filters: string,
   exploreName: string,
-  filters: []
+  prompt: TPrompt
 ) => {
-  return {
+  const { time_grain_enabled = false, time_window_enabled = false } = prompt;
+  const parsedFilters = filters ? JSON.parse(filters) : [];
+  const parsedTimeWindow = time_window_enabled ? (timeWindow ? JSON.parse(timeWindow) : {}) : {};
+  const parsedTimeGrain = timeGrain ? JSON.parse(timeGrain) : 'day';
+
+  const payload: any = {
     workspaceId: wid,
     explore: {
       name: exploreName,
       prompt_id: pid,
       account: generateAccountPayload(user),
       schema_id: schemaID,
-      time_window: {
-        label: 'custom',
-        range: {
-          // 1 month range
-          start: moment().subtract(1, 'months').toISOString(),
-          end: moment().toISOString()
-        }
-      },
-      filters: filters || []
+      time_window: parsedTimeWindow,
+      filters: parsedFilters
     }
   };
+  if (time_grain_enabled) {
+    payload.time_grain = parsedTimeGrain;
+  }
+
+  return payload;
 };
 
 const promptFilters = [

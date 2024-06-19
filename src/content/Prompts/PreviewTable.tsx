@@ -149,7 +149,17 @@ const PreviewTable = ({ params, prompt }: { params: IPreviewPage; prompt: TPromp
 
   const handleSave = () => {
     setOpenModal(false);
-    const payload = generateExplorePayload(wid, pid, user, schemaID as string, exploreName, []);
+    const payload = generateExplorePayload(
+      wid,
+      pid,
+      user,
+      schemaID as string,
+      timeWindow as string,
+      timeGrain as string,
+      filters as string,
+      exploreName,
+      prompt
+    );
     setStatus('submitting');
     createExploreHandler({ query: createObject, payload: payload });
   };
