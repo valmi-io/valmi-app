@@ -28,9 +28,12 @@ export const generateExplorePayload = (
       filters: parsedFilters
     }
   };
+
   if (time_grain_enabled) {
-    payload.time_grain = parsedTimeGrain;
+    payload.explore.time_grain = parsedTimeGrain;
   }
+
+  console.log('Payload:_', payload);
 
   return payload;
 };

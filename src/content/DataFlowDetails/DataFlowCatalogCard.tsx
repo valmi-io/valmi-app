@@ -11,7 +11,7 @@ const Container = styled(Stack)(({}) => ({
   justifyContent: 'center'
 }));
 
-const DataFlowCatalogCard = ({ type, name }: { type: string; name: string }) => {
+const DataFlowCatalogCard = ({ type, name }: { type: string; name: string | any }) => {
   const theme = useTheme();
 
   let imageSrc = getConnectorImageName({ type: type });

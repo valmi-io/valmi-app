@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -25,10 +25,13 @@ import {
 import DataFlowDetailsCard from '@/content/DataFlowDetails/DataFlowDetailsCard';
 import { TConnection } from '@/utils/typings.d';
 import { useWorkspaceId } from '@/hooks/useWorkspaceId';
+import { getRouterPathname, isPublicSync } from '@/utils/routes';
 
 const DataflowDetails = ({ syncId }: { syncId: string }) => {
   const router = useRouter();
 
+  const url = router.pathname;
+  const query = router.query;
   const dispatch = useDispatch();
 
   const { workspaceId = '' } = useWorkspaceId();
@@ -40,20 +43,24 @@ const DataflowDetails = ({ syncId }: { syncId: string }) => {
 
   const [updateDataFlowStatus, { data: updateSyncData }] = useLazyUpdateDataFlowStatusQuery();
 
+  let publicSync = useMemo(() => isPublicSync(getRouterPathname(query, url)), [query, url]);
+
   useEffect(() => {
     if (updateSyncData) {
-      const payload = {
-        syncId: syncId,
-        workspaceId: workspaceId
-      };
-      getDataFlow(payload);
+      if (!isPublicSync(getRouterPathname(query, url))) {
+        const payload = {
+          syncId: syncId,
+          workspaceId: workspaceId
+        };
+        getDataFlow(payload);
+      }
     }
   }, [updateSyncData, workspaceId]);
 
   useEffect(() => {
     if (!router.isReady) return;
 
-    if (workspaceId) {
+    if (workspaceId && !publicSync) {
       const payload = {
         syncId: syncId,
         workspaceId: workspaceId
@@ -141,6 +148,17 @@ const DataflowDetails = ({ syncId }: { syncId: string }) => {
     router.push(pathname + '?' + params);
   };
 
+  const displayPageContent = (isPublicSync: boolean, dataFlowDetails: any) => {
+    return (
+      <DataFlowDetailsCard
+        data={dataFlowDetails}
+        handleSwitchOnChange={handleSwitchOnChange}
+        handleEditSync={handleEditSync}
+        isPublicSync={isPublicSync}
+      />
+    );
+  };
+
   return (
     <Card variant="outlined">
       {/** Display Errors */}
@@ -150,13 +168,9 @@ const DataflowDetails = ({ syncId }: { syncId: string }) => {
       {traceError && <ErrorStatusText>{traceError}</ErrorStatusText>}
 
       <SkeletonLoader loading={isLoading} />
-      {!error && !isLoading && dataFlowDetails && (
-        <DataFlowDetailsCard
-          data={dataFlowDetails}
-          handleSwitchOnChange={handleSwitchOnChange}
-          handleEditSync={handleEditSync}
-        />
-      )}
+      {publicSync
+        ? displayPageContent(publicSync, dataFlowDetails)
+        : !error && !isLoading && dataFlowDetails && displayPageContent(publicSync, dataFlowDetails)}
     </Card>
   );
 };

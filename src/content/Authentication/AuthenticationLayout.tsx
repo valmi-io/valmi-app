@@ -22,6 +22,8 @@ import AuthenticationForm from '@/content/Authentication/AuthenticationForm';
 import { loginFormSchema } from '@/utils/login-utils';
 import PrivacyPolicy from '@/content/Authentication/PrivacyPolicy';
 
+import { usePostHog } from 'posthog-js/react';
+
 const ContainerLayout = styled(Box)(({ theme }) => ({
   boxSizing: 'border-box',
   display: 'flex',
@@ -50,6 +52,7 @@ const DetailBox = styled(Box)(({ theme }) => ({
 }));
 
 const AuthenticationLayout = () => {
+  const posthog = usePostHog();
   const dispatch = useDispatch<AppDispatch>();
   const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
 
@@ -78,6 +81,8 @@ const AuthenticationLayout = () => {
    * and promotion selection (for new users) before triggering the login flow (`handleLogin`).
    */
   const handleLoginClick = () => {
+    posthog?.capture('clicked_log_in');
+
     if (!isUserNew) {
       handleLogin();
       return;

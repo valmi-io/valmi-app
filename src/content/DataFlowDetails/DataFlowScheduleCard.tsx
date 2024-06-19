@@ -12,11 +12,13 @@ const Container = styled(Paper)(({ theme }) => ({
   marginLeft: 3
 }));
 
-const DataFlowScheduleCard = ({ run_interval }: { run_interval: number }) => {
+const DataFlowScheduleCard = ({ run_interval, isPublicSync }: { run_interval: number; isPublicSync: boolean }) => {
   return (
     <Container>
       <CustomIcon icon={appIcons.SCHEDULE} />
-      <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(run_interval)}`}</Typography>
+      <Typography variant="body2">{`Every ${convertDurationToMinutesOrHours(
+        isPublicSync ? '18000000' : run_interval
+      )}`}</Typography>
 
       {/* {!isPublicSync && (
           <>
