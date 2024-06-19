@@ -373,7 +373,10 @@ const INCLUDE_SCOPES = [
   'products',
   'transactions',
   'order_line_items',
-  'orders_refunds_transactions'
+  'orders_refunds_transactions',
+  'customers',
+  'order_refunds',
+  'inventory_items'
 ];
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
