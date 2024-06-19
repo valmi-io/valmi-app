@@ -29,6 +29,7 @@ export type TPrompt = {
   schemas?: TPromptSchema[];
   type: string;
   description: string;
+  enabled?: boolean;
   filters: TPromptFilter[];
   operators: TPromptOperator;
   time_grain_enabled?: boolean;

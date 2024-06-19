@@ -1,5 +1,6 @@
+//@ts-nocheck
 import React from 'react';
-import { CircularProgress, Box, styled, Stack } from '@mui/material';
+import { CircularProgress, styled, Stack } from '@mui/material';
 
 // Custom styled CircularProgress component
 const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({

@@ -94,9 +94,6 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
     type: 'empty'
   });
 
-  // customJsonRenderers
-  const customRenderers = getCustomRenderers({});
-
   useEffect(() => {
     if (isCreated || isEdited) {
       setStatus('success');
@@ -144,54 +141,23 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
     });
   };
 
-  const renderContent = ({ initialData }: { initialData: any }) => {
-    const [data, setData] = useState(initialData);
-
-    const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
-      setData(data);
-    };
-
-    const handleSubmit = () => {
-      setStatus('submitting');
-      const payload = {
-        workspaceId: workspaceId,
-        oauth: {
-          oauth_config: data,
-          type: connectorType
-        }
-      };
-
-      const { ids = [] } = keys ?? {};
-
-      if (ids.length > 0) {
-        editObject(payload);
-      } else {
-        createObject(payload);
+  const handleSubmit = (data: any) => {
+    setStatus('submitting');
+    const payload = {
+      workspaceId: workspaceId,
+      oauth: {
+        oauth_config: data,
+        type: connectorType
       }
     };
 
-    return (
-      <ConnectorLayout title={''}>
-        {/** Display Content */}
-        <FormLayout
-          formComp={
-            <FormControlComponent
-              key={`OAuthConfigurationFormControl`}
-              deleteTooltip=""
-              editing={false}
-              onDelete={() => {}}
-              onFormChange={handleFormChange}
-              onSubmitClick={handleSubmit}
-              isDeleting={false}
-              status={status}
-              jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
-              removeAdditionalFields={false}
-            />
-          }
-          instructionsComp={<OAuthInstructions key={`oAuth instructions`} data={schema} type={type} />}
-        />
-      </ConnectorLayout>
-    );
+    const { ids = [] } = keys ?? {};
+
+    if (ids.length > 0) {
+      editObject(payload);
+    } else {
+      createObject(payload);
+    }
   };
 
   return (
@@ -205,7 +171,15 @@ const CreateOAuthConfiguration = ({ type = '', connector = '' }: any) => {
       <ContentLayout
         key={`createOAuthConfiguration${type}`}
         error={error || keysError}
-        PageContent={renderContent({ initialData: processData(keys ?? initialData) })}
+        PageContent={
+          <PageContent
+            handleSubmit={handleSubmit}
+            initialData={processData(keys ?? initialData)}
+            schema={schema}
+            status={status}
+            type={type}
+          />
+        }
         displayComponent={(!error || !keysError) && (!isLoading || !isKeysLoading) && schema && keys}
         isLoading={isLoading && isKeysLoading}
         traceError={traceError || isKeysTraceError}
@@ -219,3 +193,48 @@ CreateOAuthConfigurationLayout.getLayout = function getLayout(page: ReactElement
 };
 
 export default CreateOAuthConfigurationLayout;
+
+const PageContent = ({
+  initialData,
+  handleSubmit,
+  status,
+  schema,
+  type
+}: {
+  initialData: any;
+  handleSubmit: any;
+  status: any;
+  schema: any;
+  type: any;
+}) => {
+  const [data, setData] = useState(initialData);
+
+  // customJsonRenderers
+  const customRenderers = getCustomRenderers({});
+
+  const handleFormChange = ({ data }: Pick<JsonFormsCore, 'data' | 'errors'>) => {
+    setData(data);
+  };
+
+  return (
+    <ConnectorLayout title={''}>
+      <FormLayout
+        formComp={
+          <FormControlComponent
+            key={`OAuthConfigurationFormControl`}
+            deleteTooltip=""
+            editing={false}
+            onDelete={() => {}}
+            onFormChange={handleFormChange}
+            onSubmitClick={() => handleSubmit(data)}
+            isDeleting={false}
+            status={status}
+            jsonFormsProps={{ data: data, schema: schema, renderers: customRenderers }}
+            removeAdditionalFields={false}
+          />
+        }
+        instructionsComp={<OAuthInstructions key={`oAuth instructions`} data={schema} type={type} />}
+      />
+    </ConnectorLayout>
+  );
+};

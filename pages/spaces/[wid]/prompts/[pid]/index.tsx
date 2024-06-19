@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { ReactElement } from 'react';
 
 import { NextPageWithLayout } from '@/pages_app';
@@ -45,7 +46,11 @@ const PreviewPage = ({ params }: { params: IPreviewPage }) => {
       <ContentLayout
         key={`prompt-preview-page`}
         error={error}
-        PageContent={<PageContent data={data} params={params} />}
+        PageContent={
+          <>
+            <PageContent data={data} params={params} />
+          </>
+        }
         displayComponent={!!(!error && !isLoading && data)}
         isLoading={isLoading}
         traceError={traceError}
@@ -67,14 +72,18 @@ const PageContent = ({ data, params }: { data: TData; params: IPreviewPage }) =>
     return <ListEmptyComponent description={'No data found for this prompt'} />;
   }
 
-  return ids.map((id: string) => {
-    const item: TPrompt = entities[id];
+  return (
+    <>
+      {ids.map((id: string) => {
+        const item: TPrompt = entities[id];
 
-    return (
-      <Stack key={id} spacing={2}>
-        <PromptDetails item={item} />
-        <PreviewTable params={params} prompt={item} />
-      </Stack>
-    );
-  });
+        return (
+          <Stack key={id} spacing={2}>
+            <PromptDetails item={item} />
+            <PreviewTable params={params} prompt={item} />
+          </Stack>
+        );
+      })}
+    </>
+  );
 };

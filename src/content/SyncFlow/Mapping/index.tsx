@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Box, MenuItem, Stack, styled } from '@mui/material';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
 
-import ConnectionCard from '@content/Syncs/SyncDetails/ConnectionCard';
 import {
   getDestinationModes,
   getSelectedDestinationMode,
@@ -34,6 +33,7 @@ import { RootState } from '@store/reducers';
 import { setFlowState } from '@store/reducers/syncFlow';
 
 import appIcons from '@utils/icon-utils';
+import DataFlowCatalogCard from '@/content/DataFlowDetails/DataFlowCatalogCard';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   ...theme.typography.body2
@@ -65,12 +65,11 @@ const Mapping = () => {
       {isEditableFlow && (
         <Stack display="flex" direction="row" alignItems="flex-start" justifyContent="space-between">
           <Stack display="flex" direction="row" alignItems="center" spacing={3}>
-            <ConnectionCard connectionType={sourceConnectionType} connectionTitle={sourceTableName} />
-
+            <DataFlowCatalogCard type={sourceConnectionType} name={sourceTableName} />
             {/* right arrow icon */}
             <CustomIcon icon={appIcons.ARROW_RIGHT} />
 
-            <ConnectionCard connectionType={destinationConnectionType} connectionTitle={destinationObjectName} />
+            <DataFlowCatalogCard type={destinationConnectionType} name={destinationObjectName} />
           </Stack>
           {/** Schedule */}
         </Stack>

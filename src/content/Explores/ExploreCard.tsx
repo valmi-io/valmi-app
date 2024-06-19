@@ -147,6 +147,7 @@ const StatusIcon = ({
   onClick: () => void;
 }) => {
   const theme = useTheme();
+
   if (sync_state === 'RUNNING') {
     return <CircularProgress size={16} />;
   } else if (sync_state === 'IDLE' && last_sync_result === 'FAILED') {
@@ -158,7 +159,7 @@ const StatusIcon = ({
         />
       </Paper>
     );
-  }
+  } else return null;
 };
 
 const ExploreFooter = ({ disabled, onClick, item, handleIconOnClick }: TExploreFooterProps) => {

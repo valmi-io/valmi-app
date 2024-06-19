@@ -114,16 +114,20 @@ const DataFlowsConnectionLinks = ({
     return false;
   };
 
-  return getLines({ connections }).map((line, idx) => (
-    <LineArrow
-      key={`linearrow-${line.from + line.to + idx}`}
-      selected={isHighlighted(line.from, line.to)}
-      from={line.from}
-      to={line.to}
-      connId={line.connId}
-      handleLinkOnClick={handleLinkOnClick}
-    />
-  ));
+  return (
+    <>
+      {getLines({ connections }).map((line, idx) => (
+        <LineArrow
+          key={`linearrow-${line.from + line.to + idx}`}
+          selected={isHighlighted(line.from, line.to)}
+          from={line.from}
+          to={line.to}
+          connId={line.connId}
+          handleLinkOnClick={handleLinkOnClick}
+        />
+      ))}
+    </>
+  );
 };
 
 export default DataFlowsConnectionLinks;

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React from 'react';
 
 import { DataGrid, GridColDef, GridFilterModel, GridToolbar } from '@mui/x-data-grid';

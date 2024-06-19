@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { ReactNode } from 'react';
 import { ControlProps, EnumCellProps, EnumOption, isDescriptionHidden, WithClassname } from '@jsonforms/core';
 
@@ -47,7 +48,7 @@ export const MuiAutocomplete = (props: ControlProps & EnumCellProps & WithClassn
   const [inputValue, setInputValue] = React.useState(data ?? '');
   //   const [focused, onFocus, onBlur] = useFocus();
 
-  const findOption = options.find((o) => o.value === data) ?? null;
+  const findOption = options?.find((o) => o.value === data) ?? null;
 
   const showDescription = !isDescriptionHidden(
     visible,

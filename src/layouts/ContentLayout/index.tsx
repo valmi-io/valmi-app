@@ -8,13 +8,13 @@ import { ErrorStatusText } from '@/components/Error';
 import ErrorContainer from '@/components/Error/ErrorContainer';
 import SkeletonLoader from '@/components/SkeletonLoader';
 import { Grid, Card } from '@mui/material';
-import { CSSProperties } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface layoutProps {
   isLoading?: boolean;
   error?: any;
   traceError?: any;
-  PageContent: JSX.Element;
+  PageContent: ReactNode;
   displayComponent?: boolean;
   cardStyles?: CSSProperties;
   cardVariant?: boolean;
@@ -44,7 +44,7 @@ const ContentLayout = ({
           <SkeletonLoader loading={isLoading} />
 
           {/** Display page content */}
-          {displayComponent && PageContent && PageContent}
+          {displayComponent && PageContent}
         </Card>
       </Grid>
     </Grid>

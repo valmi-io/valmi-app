@@ -198,9 +198,11 @@ export const nextAuthOptions = (req, res) => {
   };
 };
 
-export default (req, res) => {
+const handler = (req, res) => {
   return NextAuth(req, res, nextAuthOptions(req, res));
 };
+
+export default handler;
 
 const handleSocialLogin = async (payload, successCb, errorCb) => {
   try {
