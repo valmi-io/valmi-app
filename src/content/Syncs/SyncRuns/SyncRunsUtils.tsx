@@ -135,7 +135,7 @@ export const syncRunNetworkHandler = async (query, payload, responseHandler, err
   }
 };
 
-export const getPageButtonTitle = (isPublicSync, currentSyncRun, isPromisePending) => {
+export const getPageButtonTitle = (isPublicSync = false, currentSyncRun, isPromisePending) => {
   if (isPublicSync) return 'LIVE DATA';
   return hasRunningSyncs(currentSyncRun)
     ? isPromisePending

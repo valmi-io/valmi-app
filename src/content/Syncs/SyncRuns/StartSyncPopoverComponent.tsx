@@ -117,7 +117,7 @@ const StartSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, w
       <Box sx={{ m: 1 }}>
         <Button fullWidth onClick={startSyncRun}>
           <Typography variant="body1" color="secondary">
-            {getPageButtonTitle(currentSyncRun, isPromisePending)}
+            {getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), currentSyncRun, isPromisePending)}
           </Typography>
         </Button>
       </Box>

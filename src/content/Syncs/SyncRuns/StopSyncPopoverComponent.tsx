@@ -94,7 +94,7 @@ const StopSyncPopoverComponent = ({ closePopover, query, url, currentSyncRun, wo
         </Button>
         <Button fullWidth onClick={stopSyncRun}>
           <Typography variant="body1" color="error">
-            {getPageButtonTitle(currentSyncRun, isPromisePending)}
+            {getPageButtonTitle(isPublicSync(getRouterPathname(query, url)), currentSyncRun, isPromisePending)}
           </Typography>
         </Button>
       </Box>
