@@ -162,7 +162,10 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
 const PageContent = ({ data, syncId, connectionData }: { data: TData; syncId: string; connectionData: any }) => {
   const isRetlFlow = useMemo(() => {
     if (connectionData) {
-      return connectionData?.source?.name === getValmiDataStoreName() ? true : false;
+      return connectionData?.source?.name === getValmiDataStoreName() &&
+        connectionData?.destination?.name === 'DEST_GOOGLE-SHEETS'
+        ? true
+        : false;
     }
   }, [connectionData]);
 
