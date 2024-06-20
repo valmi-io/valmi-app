@@ -28,6 +28,7 @@ import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { Error, errorMap } from '@/components/Error/ErrorUtils';
 import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
 import { RootState } from '@/store/reducers';
+import LogoCarousel from '@/pageslogin/LogoCarousel';
 
 const ContainerWrapper = styled(Paper)(({ theme }) => ({
   boxSizing: 'border-box',
@@ -175,7 +176,8 @@ const Login: NextPageWithLayout = () => {
             }
           }}
         >
-          <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} />
+          <LogoCarousel />
+          {/* <ImageComponent src={'/images/dropbox.jpg'} alt="Logo" size={ImageSize.extralarge} /> */}
         </ImageBoxContainer>
 
         <AuthenticationLayout />
