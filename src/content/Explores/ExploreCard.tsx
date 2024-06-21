@@ -68,7 +68,8 @@ const ExploreDescriptionContainer = styled(Stack)(({ theme }) => ({
   justifyContent: 'start',
   gap: theme.spacing(1),
   width: '100%',
-  overflow: 'hidden'
+  overflow: 'hidden',
+  paddingTop: 4
 }));
 
 const ExploreFooterContainer = styled(Stack)(({ theme }) => ({
