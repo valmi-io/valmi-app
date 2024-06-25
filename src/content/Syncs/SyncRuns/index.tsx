@@ -43,8 +43,6 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
    * @returns states needed to update the UI.
    */
 
-  console.log('Sync runs page.......');
-
   const {
     data: syncRuns,
     error,
@@ -55,8 +53,6 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
     syncId: syncId,
     workspaceId: workspaceId
   });
-
-  console.log('Sync runs.........', syncRuns);
 
   const { selectSyncById } = getSyncDetails(workspaceId, syncId);
   const connectionData = useSelector((state) => selectSyncById(state, syncId));
@@ -166,7 +162,10 @@ const SyncRuns = ({ syncId, workspaceId }: any) => {
 const PageContent = ({ data, syncId, connectionData }: { data: TData; syncId: string; connectionData: any }) => {
   const isRetlFlow = useMemo(() => {
     if (connectionData) {
-      return connectionData?.source?.name === getValmiDataStoreName() ? true : false;
+      return connectionData?.source?.name === getValmiDataStoreName() &&
+        connectionData?.destination?.name === 'DEST_GOOGLE-SHEETS'
+        ? true
+        : false;
     }
   }, [connectionData]);
 
