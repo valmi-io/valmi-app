@@ -6,9 +6,10 @@
 
 import { memo } from 'react';
 
-import { Icon, ListItemButton, Typography, styled, Box, ListItemText } from '@mui/material';
+import { Icon, ListItemButton, Typography, styled, Box, ListItemText, SxProps } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { TSidebarRoute } from '@utils/sidebar-utils';
+import { Theme } from '@mui/material/styles';
 
 const ItemContainer = styled(ListItemButton)(({ theme }) => ({
   display: 'flex',
@@ -50,13 +51,14 @@ export type TSidebarItemProps = {
   item: TSidebarRoute;
   currentRoute: any;
   onClick: (path: string) => void;
+  styles?: SxProps<Theme> | undefined;
 };
 
-const SidebarItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
+const SidebarItem = ({ item, currentRoute, onClick, styles }: TSidebarItemProps) => {
   const { id = '', path = '', sidebarProps: { icon = null, displayText = '', muiIcon = false } = {} } = item;
 
   return (
-    <ItemContainer onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
+    <ItemContainer sx={styles} onClick={() => onClick(path)} className={currentRoute === id ? 'active' : ''}>
       <IconContainer>
         <InnerIconBox>
           {icon && (muiIcon ? <Icon sx={{ display: 'flex' }}>{icon}</Icon> : <CustomIcon icon={icon} />)}

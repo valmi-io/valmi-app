@@ -10,8 +10,7 @@ export const ConnectionColumns: TableColumnProps[] = [
     id: '1',
     label: 'Name',
     minWidth: TABLE_COLUMN_SIZES[2],
-    icon: appIcons.NAME,
-    muiIcon: true
+    icon: appIcons.TITLE
   },
   {
     id: '2',

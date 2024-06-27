@@ -51,9 +51,8 @@ export const syncRunLogColumns: TableColumnProps[] = [
   {
     id: '2',
     label: 'Type',
-    icon: appIcons.NAME,
-    minWidth: TABLE_COLUMN_SIZES[2],
-    muiIcon: true
+    icon: appIcons.TITLE,
+    minWidth: TABLE_COLUMN_SIZES[2]
   },
   {
     id: '3',

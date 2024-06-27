@@ -109,3 +109,33 @@ export const redirectToExplores = ({ router, wid }: { router: NextRouter; wid: s
     router.push(`${getBaseRoute(wid)}/explores`);
   }
 };
+
+export const redirectToEvents = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/events`);
+  }
+};
+
+export const redirectToStreams = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/events/streams`);
+  }
+};
+
+export const redirectToCreateStream = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/events/streams/create`);
+  }
+};
+
+export const redirectToDestinationWarehouses = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/events/destination-warehouses`);
+  }
+};
+
+export const redirectToCreateDestinationWarehouse = ({ router, wid }: { router: NextRouter; wid: string }) => {
+  if (wid) {
+    router.push(`${getBaseRoute(wid)}/events/destination-warehouses/create`);
+  }
+};

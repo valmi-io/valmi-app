@@ -1,13 +1,8 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Wednesday, May 24th 2023, 5:15:49 pm
- * Author: Nagendra S @ valmi.io
- */
-
-import { Box, Button, Stack, Typography, styled } from '@mui/material';
+import { Box, Stack, Typography, styled } from '@mui/material';
 import CustomIcon from '@components/Icon/CustomIcon';
 import { faUnsplash } from '@fortawesome/free-brands-svg-icons';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
+import VButton from '@/components/VButton';
 
 const BoxLayout = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -36,15 +31,16 @@ const ListEmptyComponent = (props: ListEmptyComponentProps) => {
           {description}
         </Typography>
         {buttonTitle && (
-          <Button
+          <VButton
+            buttonText={buttonTitle}
+            buttonType="submit"
             startIcon={<AddTwoToneIcon fontSize="small" />}
-            disabled={buttonDisabled}
-            sx={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
-            variant="contained"
             onClick={onClick}
-          >
-            {buttonTitle.toUpperCase()}
-          </Button>
+            size="small"
+            styles={{ mt: { xs: 2, md: 0 }, fontWeight: 'bold', fontSize: 14 }}
+            disabled={buttonDisabled}
+            variant="contained"
+          />
         )}
       </Stack>
     </BoxLayout>

@@ -32,6 +32,46 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
   const routes: TSidebarRoute[] = [
     {
       id: 0,
+      path: `/spaces/${workspaceId}/events`,
+      sidebarProps: {
+        displayText: 'EVENTS',
+        icon: appIcons.TRACK,
+        muiIcon: false
+      },
+      subRoutes: [1, 2, 3]
+    },
+    {
+      id: 1,
+      path: `/spaces/${workspaceId}/events/streams`,
+      sidebarProps: {
+        displayText: 'STREAMS',
+        icon: appIcons.STREAM,
+        muiIcon: false
+      },
+      subRoute: true
+    },
+    {
+      id: 2,
+      path: `/spaces/${workspaceId}/events/destination-warehouses`,
+      sidebarProps: {
+        displayText: 'WAREHOUSES',
+        icon: appIcons.SRC,
+        muiIcon: false
+      },
+      subRoute: true
+    },
+    {
+      id: 3,
+      path: `/spaces/${workspaceId}/events/connections`,
+      sidebarProps: {
+        displayText: 'CONNECTIONS',
+        icon: appIcons.CONNECTION,
+        muiIcon: false
+      },
+      subRoute: true
+    },
+    {
+      id: 4,
       path: `/spaces/${workspaceId}/explores`,
       sidebarProps: {
         displayText: 'EXPLORES',
@@ -40,7 +80,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
       }
     },
     {
-      id: 1,
+      id: 5,
       path: `/spaces/${workspaceId}/data-flows`,
       sidebarProps: {
         displayText: 'DATA FLOWS',
@@ -50,7 +90,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
 
     {
-      id: 2,
+      id: 6,
       path: `/spaces/${workspaceId}/catalog`,
       sidebarProps: {
         displayText: 'CATALOG',
@@ -60,7 +100,7 @@ export const getSidebarRoutes = ({ workspaceId, jitsuEnabled }: TSidebarPropsIn)
     },
 
     {
-      id: 3,
+      id: 7,
       path: `/spaces/${workspaceId}/oauth-apps`,
       sidebarProps: {
         displayText: 'CONFIGURE APPS',

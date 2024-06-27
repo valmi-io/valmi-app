@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import React, { memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
@@ -19,6 +13,8 @@ import { SidebarContext } from '@contexts/SidebarContext';
 import { TSidebarRoute, getSidebarRoutes } from '@utils/sidebar-utils';
 import { isJitsuEnabled } from '@utils/routes';
 import { getBrowserRoute, getRoute } from '@/utils/lib';
+import SidebarNestedItem from '@/layouts/SidebarLayout/Sidebar/SidebarNestedItem';
+import SidebarItemCollapse from '@/layouts/SidebarLayout/Sidebar/SidebarItemCollapse';
 
 type TSidebarMenuProps = {
   workspaceId: any;
@@ -35,7 +31,7 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
   useEffect(() => {
     if (router.pathname) {
       const { route: browserRoute, subRoute: browserSubRoute } = getBrowserRoute(router.pathname as string);
-      setSelectedRoute(browserRoute);
+      setSelectedRoute(browserSubRoute ?? browserRoute);
     }
   }, [router.pathname]);
 
@@ -91,12 +87,54 @@ const SidebarMenu = ({ workspaceId }: TSidebarMenuProps) => {
     [dispatch]
   );
 
+  // const sidebarItems = sidebarRoutes.map((route) => {
+  //   if (!route) return null;
+
+  //   return (
+  //     <React.Fragment key={route.id}>
+  //       <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+  //     </React.Fragment>
+  //   );
+  // });
+
   const sidebarItems = sidebarRoutes.map((route) => {
     if (!route) return null;
 
     return (
       <React.Fragment key={route.id}>
-        <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+        {route.sidebarProps ? (
+          <>
+            {route.child ? (
+              <SidebarItemCollapse key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+            ) : (
+              <>
+                {route.subRoutes ? (
+                  <>
+                    <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+                    {route.subRoutes.map((routeId) => {
+                      const nestedRoute: any = sidebarRoutes.find((route) => Number(route.id) === Number(routeId));
+
+                      return (
+                        <SidebarNestedItem
+                          key={nestedRoute.id}
+                          item={nestedRoute}
+                          currentRoute={activeIndex}
+                          onClick={handleItemOnClick}
+                        />
+                      );
+                    })}
+                  </>
+                ) : (
+                  <>
+                    {!route.subRoute && (
+                      <SidebarItem key={route.id} item={route} currentRoute={activeIndex} onClick={handleItemOnClick} />
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        ) : null}
       </React.Fragment>
     );
   });

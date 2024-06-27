@@ -24,7 +24,7 @@ import Spinner from '@/components/Spinner';
 
 const Columns: TableColumnProps[] = [
   { id: '1', label: '', align: 'right', action: true, checkBox: true, minWidth: 100 },
-  { id: '2', label: 'Stream', minWidth: 300, icon: appIcons.NAME, muiIcon: true },
+  { id: '2', label: 'Stream', minWidth: 300, icon: appIcons.TITLE },
   { id: '3', label: 'Sync mode', minWidth: 300, icon: appIcons.SYNC },
   { id: '4', label: '', minWidth: 300, icon: appIcons.ETL_ICON }
 ];

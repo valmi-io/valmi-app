@@ -1,15 +1,9 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Wednesday, May 31st 2023, 11:56:23 am
- * Author: Nagendra S @ valmi.io
- */
-
 import * as React from 'react';
 
 import { useRouter } from 'next/router';
 
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import { Box, Typography, Icon, styled, Button, Link } from '@mui/material';
+import { Box, Typography, Icon, styled, Link } from '@mui/material';
 import { capitalizeFirstLetter } from '@utils/lib';
 import { blackColor } from '@theme/schemes/AppFlowyTheme';
 import CustomIcon from '@/components/Icon/CustomIcon';
@@ -68,6 +62,8 @@ const HeaderTitle = () => {
         return appIcons.APPS;
       case 'PROMPTS':
         return appIcons.EXPLORES;
+      case 'EVENTS':
+        return appIcons.TRACK;
       default:
         //@ts-ignore
         return appIcons[routeName] || null;

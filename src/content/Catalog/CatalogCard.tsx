@@ -10,8 +10,10 @@ import appIcons from '@/utils/icon-utils';
 import { TCatalog } from '@/utils/typings.d';
 
 interface CatalogCardProps {
-  catalog: TCatalog;
-  handleCatalogOnClick: (data: TCatalog) => void;
+  catalog: TCatalog | any;
+  handleCatalogOnClick: (data: TCatalog | any) => void;
+  src?: string;
+  displayName?: string;
 }
 
 const CardWrapper = styled(Paper)(({ theme }) => ({
@@ -55,8 +57,8 @@ const ConnectionCountChip = styled(Chip)(({ theme }) => ({
   color: theme.colors.alpha.white[100]
 }));
 
-const CatalogCard = ({ catalog, handleCatalogOnClick }: CatalogCardProps) => {
-  const { connections = 0, display_name: displayName = '' } = catalog;
+const CatalogCard = ({ catalog, handleCatalogOnClick, src = '', displayName = '' }: CatalogCardProps) => {
+  const { connections = 0, display_name: catalogDisplayName = '' } = catalog;
 
   const handleOnClick = useCallback(() => {
     handleCatalogOnClick(catalog);
@@ -70,9 +72,9 @@ const CatalogCard = ({ catalog, handleCatalogOnClick }: CatalogCardProps) => {
     <Grid item xs={'auto'}>
       <CardWrapper variant="outlined">
         <CatalogItem>
-          <ImageComponent src={catalogIconSource} alt="connector" size={ImageSize.connectorCard} />
+          <ImageComponent src={src || catalogIconSource} alt="connector" size={ImageSize.connectorCard} />
           <Typography variant="caption" textTransform={'uppercase'}>
-            {displayName}
+            {displayName || catalogDisplayName}
           </Typography>
           {!!connections && (
             <CardFooter>
