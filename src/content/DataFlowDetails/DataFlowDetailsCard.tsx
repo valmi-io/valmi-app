@@ -38,8 +38,7 @@ const DataFlowContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: theme.spacing(1.5),
-  width: '100%'
+  gap: theme.spacing(1.5)
 }));
 
 const DataflowDetails = ({

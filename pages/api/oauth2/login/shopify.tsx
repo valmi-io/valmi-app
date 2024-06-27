@@ -19,7 +19,7 @@ export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }
       clientID: client_id as string,
       clientSecret: client_secret as string,
       shop: shop as string,
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/shopify` // this is the endpoint you registered on shopify while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `http://localhost:3000/api/oauth2/redirect/shopify` // this is the endpoint you registered on shopify while creating your app. This endpoint would exist on your application for verifying the authentication
     },
     async (accessToken, refreshToken, profile: any, cb: any) => {
       try {
