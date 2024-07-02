@@ -4,7 +4,7 @@ import SidebarItem, { TSidebarItemProps } from '@/layouts/SidebarLayout/Sidebar/
 
 const SidebarNestedItem = ({ item, currentRoute, onClick }: TSidebarItemProps) => {
   return (
-    <SidebarItem key={currentRoute.id} styles={{ mx: 1 }} item={item} currentRoute={currentRoute} onClick={onClick} />
+    <SidebarItem key={currentRoute.id} styles={{ mx: 2 }} item={item} currentRoute={currentRoute} onClick={onClick} />
   );
 };
 

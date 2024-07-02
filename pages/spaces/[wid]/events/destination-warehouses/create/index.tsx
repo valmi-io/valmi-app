@@ -26,8 +26,8 @@ const CreateWarehousePage = () => {
 
   return (
     <PageLayout pageHeadTitle={'Select warehouse'} title={'CONNECT TO WAREHOUSE'} displayButton={false}>
-      <Paper variant="outlined">
-        <ConnectorLayout title={''} layoutStyles={{ margin: theme.spacing(3) }}>
+      <Paper>
+        <ConnectorLayout title={''}>
           {/** Display page content */}
           <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             {
