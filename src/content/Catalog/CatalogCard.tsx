@@ -73,7 +73,7 @@ const CatalogCard = ({ catalog, handleCatalogOnClick, src = '', displayName = ''
       <CardWrapper variant="outlined">
         <CatalogItem>
           <ImageComponent src={src || catalogIconSource} alt="connector" size={ImageSize.connectorCard} />
-          <Typography variant="caption" textTransform={'uppercase'}>
+          <Typography variant="caption" textTransform={'uppercase'} paddingX={1}>
             {displayName || catalogDisplayName}
           </Typography>
           {!!connections && (

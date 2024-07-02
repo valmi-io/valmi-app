@@ -361,7 +361,7 @@ export const getShopifyIntegrationType = () => {
   return 'SRC_SHOPIFY';
 };
 
-export const DEFAULT_INTEGRATION_TYPES = ['SRC_SHOPIFY', 'SRC_GOOGLE_ANALYTICS']
+export const DEFAULT_INTEGRATION_TYPES = ['SRC_SHOPIFY', 'SRC_GOOGLE-ANALYTICS'];
 
 export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
