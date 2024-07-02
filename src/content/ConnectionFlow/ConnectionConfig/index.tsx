@@ -24,7 +24,8 @@ import {
   filterStreamsBasedOnScope,
   initializeConnectionFlowState,
   generateConfigFromSpec,
-  generateCredentialPayload
+  generateCredentialPayload,
+  DEFAULT_INTEGRATION_TYPES
 } from '@/utils/connectionFlowUtils';
 import { isObjectEmpty } from '@/utils/lib';
 import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
@@ -325,7 +326,10 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   // STATE: Create Connection State - END
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
-    if (type === getShopifyIntegrationType()) {
+    console.log("type:_", type);
+    if(type && DEFAULT_INTEGRATION_TYPES.includes(type)) {
+
+// if (type === getShopifyIntegrationType() || type === "SRC_GOOGLE-ANALYTICS") {
       // TODO: handle update default warehouse connection
       return !isEditableFlow ? createDefaultWarehouseConnection : updateConnection;
     } else {

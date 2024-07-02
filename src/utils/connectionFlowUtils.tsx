@@ -116,7 +116,7 @@ export const generateConnectionPayload = ({
 
   const { name = '', run_interval = '' } = schedulePayload ?? {};
 
-  if (type === getShopifyIntegrationType() && !isEditableFlow) {
+  if (type && DEFAULT_INTEGRATION_TYPES.includes(type) && !isEditableFlow) {
     // TODO: handle for isEditableFlow=true
     const { name, ...config } = sourceCredentials;
     payload = {
@@ -360,6 +360,8 @@ export const getPremiuimPackageIds = () => {
 export const getShopifyIntegrationType = () => {
   return 'SRC_SHOPIFY';
 };
+
+export const DEFAULT_INTEGRATION_TYPES = ['SRC_SHOPIFY', 'SRC_GOOGLE_ANALYTICS']
 
 export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
   return !!(mode === 'etl' && type === getShopifyIntegrationType());
