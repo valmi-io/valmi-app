@@ -52,7 +52,6 @@ const DestinationsPage: NextPageWithLayout = () => {
   };
 
   const renderContent = () => {
-    console.log('Data:_', data);
     if (isDataEmpty(data)) {
       return <ListEmptyComponent description={'No destination warehouses found in this workspace'} />;
     }

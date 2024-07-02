@@ -97,7 +97,7 @@ const getTooltipTitle = ({
   requireConfiguration: boolean;
   isConfigured: boolean;
 }) => {
-  return requireConfiguration && !isConfigured ? 'This OAuth requires configuration' : '';
+  return <p>{requireConfiguration && !isConfigured ? 'This OAuth requires configuration' : ''}</p>;
 };
 
 const ConfiguredButton = styled(Button)(({ theme }) => ({
@@ -260,13 +260,15 @@ const ConnectionLoginButton = (props: any) => {
       />
 
       <Tooltip title={getTooltipTitle({ requireConfiguration, isConfigured })}>
-        <LoginContainer
-          onClick={onClick}
-          isConfigured={isConfigured}
-          formData={formData}
-          oAuthProvider={oAuthProvider}
-          requireConfiguration={requireConfiguration}
-        />
+        <>
+          <LoginContainer
+            onClick={onClick}
+            isConfigured={isConfigured}
+            formData={formData}
+            oAuthProvider={oAuthProvider}
+            requireConfiguration={requireConfiguration}
+          />
+        </>
       </Tooltip>
 
       <ErrorStatusText sx={{ ml: 1 }} variant="body1">

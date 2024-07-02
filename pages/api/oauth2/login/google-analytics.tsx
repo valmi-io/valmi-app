@@ -1,10 +1,6 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, May 19th 2023, 12:30:22 pm
- * Author: Nagendra S @ valmi.io
- */
-
 //@ts-nocheck
+
+//  Google Analytics 4 (GA4) Oauth passport strategy
 
 import { createRouter } from 'next-connect';
 
@@ -25,8 +21,7 @@ export const createStrategy = ({ client_id = '', client_secret = '' }) => {
     {
       clientID: client_id as string,
       clientSecret: client_secret as string,
-
-      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/google` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
+      callbackURL: `${process.env.WEB_URL}/api/oauth2/redirect/google-analytics` // this is the endpoint you registered on hubspot while creating your app. This endpoint would exist on your application for verifying the authentication
     },
     async (_accessToken, _refreshToken, profile: any, cb: any) => {
       try {
@@ -60,13 +55,13 @@ router
 
     if (oauth_keys === 'public') {
       credentials = {
-        client_id: process.env.AUTH_GOOGLE_CLIENT_ID,
-        client_secret: process.env.AUTH_GOOGLE_CLIENT_SECRET
+        client_id: process.env.AUTH_GOOGLE_ANALYTICS_CLIENT_ID,
+        client_secret: process.env.AUTH_GOOGLE_ANALYTICS_CLIENT_SECRET
       };
     } else {
       credentials = {
-        client_id: query_response['AUTH_GOOGLE_CLIENT_ID'],
-        client_secret: query_response['AUTH_GOOGLE_CLIENT_SECRET']
+        client_id: query_response['AUTH_GOOGLE_ANALYTICS_CLIENT_ID'],
+        client_secret: query_response['AUTH_GOOGLE_ANALYTICS_CLIENT_SECRET']
       };
     }
 
@@ -84,8 +79,7 @@ router
       scope: [
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/spreadsheets',
-        'https://www.googleapis.com/auth/adwords'
+        'https://www.googleapis.com/auth/analytics.readonly'
       ],
       session: false,
       accessType: 'offline',

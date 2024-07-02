@@ -229,3 +229,15 @@ export function deepFlattenToObject(obj, prefix = '') {
     return acc;
   }, {});
 }
+
+// Function to flatten nested objects
+export function flattenObject(obj: any, parentKey = '') {
+  return Object.keys(obj).reduce((acc, key) => {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      Object.assign(acc, flattenObject(obj[key], key));
+    } else {
+      acc[key] = obj[key];
+    }
+    return acc;
+  }, {});
+}

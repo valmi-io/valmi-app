@@ -28,7 +28,7 @@ import AlertComponent, { AlertStatus, AlertType } from '@/components/Alert';
 import { Error, errorMap } from '@/components/Error/ErrorUtils';
 import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
 import { RootState } from '@/store/reducers';
-import LogoCarousel from '@/pageslogin/LogoCarousel';
+import LogoCarousel from '@/content/Login/LogoCarousel';
 
 const ContainerWrapper = styled(Paper)(({ theme }) => ({
   boxSizing: 'border-box',

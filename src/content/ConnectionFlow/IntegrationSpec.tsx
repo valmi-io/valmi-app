@@ -6,7 +6,7 @@ import CatalogInstuctions from '@/content/Catalog/CatalogInstuctions';
 import { OAuthContext } from '@/contexts/OAuthContext';
 import FormLayout from '@/layouts/FormLayout';
 import { RootState } from '@/store/reducers';
-import { getSelectedConnectorKey, isConnectionAutomationFlow } from '@/utils/connectionFlowUtils';
+import { getSelectedConnectorKey, isETLFlow } from '@/utils/connectionFlowUtils';
 import { getCustomRenderers } from '@/utils/form-customRenderers';
 import { FormStatus, formValidationMode, jsonFormValidator } from '@/utils/form-utils';
 import { JsonFormsCore } from '@jsonforms/core';
@@ -35,7 +35,7 @@ const FormButton = ({
   onClick: () => void;
 }) => {
   const getButtonTitle = () => {
-    return isEditableFlow ? 'UPDATE' : isConnectionAutomationFlow({ mode, type }) ? 'CREATE' : 'CHECK';
+    return isEditableFlow ? 'UPDATE' : isETLFlow({ mode, type }) ? 'CREATE' : 'CHECK';
   };
 
   return (
@@ -120,7 +120,9 @@ const IntegrationForm = ({
    * Retrieves custom renderers for the JSONForms component based on the provided configuration
    * (e.g., hiding specific fields).
    */
-  const handleFormRenderers = getCustomRenderers({ invisibleFields: ['auth_method'] });
+  const handleFormRenderers = getCustomRenderers({
+    invisibleFields: ['auth_method', 'auth_type', 'custom_reports', 'window_in_days']
+  });
 
   /**
    * Validates the user-submitted data (`formData`) against the defined schema (`schema`)
@@ -141,6 +143,7 @@ const IntegrationForm = ({
       setFormValidationState('ValidateAndShow');
       return;
     }
+
     handleSubmit(formState);
   };
 

@@ -4,10 +4,12 @@ import { ReactNode, createContext, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/reducers';
 import {
+  AUTOMATE_INTEGRATION_DISCOVERY,
   getCredentialObjKey,
   getExtrasObjKey,
-  getSelectedConnectorKey,
-  getShopifyIntegrationType
+  getOAuthMethodDefaultValueFromType,
+  getOAuthMethodKeyFromType,
+  getSelectedConnectorKey
 } from '@/utils/connectionFlowUtils';
 import { getBaseRoute, isObjectEmpty } from '@/utils/lib';
 import { useSearchParams } from 'next/navigation';
@@ -55,10 +57,14 @@ function OAuthContextProvider({ children }: Props) {
 
   let initialData = {};
 
-  if (type === getShopifyIntegrationType() && !isEditableFlow) {
+  if (AUTOMATE_INTEGRATION_DISCOVERY.includes(type) && !isEditableFlow) {
+    const authMethodKey = getOAuthMethodKeyFromType(type);
+
+    const defaultAuthMethodValue = getOAuthMethodDefaultValueFromType(type);
+
     initialData = {
       credentials: {
-        auth_method: 'api_password'
+        [authMethodKey]: defaultAuthMethodValue
       }
     };
   }
@@ -83,6 +89,7 @@ function OAuthContextProvider({ children }: Props) {
     type = type.split('_')[1].toLowerCase(); // shopify | facebook
 
     const oAuthRoute = getOauthRoute({ oAuth: type });
+
     if (oAuthRoute) {
       let { type = '' } = selectedConnector;
 
@@ -104,21 +111,30 @@ function OAuthContextProvider({ children }: Props) {
 
       let state = encodeURIComponent(JSON.stringify(obj));
 
-      const entities = {
-        ...entitiesInStore,
-        [getSelectedConnectorKey()]: {
-          ...connectionDataFlow.entities[getSelectedConnectorKey()],
-          oauth_params: {},
-          oauth_error: '',
-          formValues: {
-            ...formState
-          }
-        }
-      };
-      dispatch(setEntities(entities));
+      storeFormStateInRedux(formState);
 
       router.push(`${oAuthRoute}?state=${state}`);
     }
+  };
+
+  /**
+   * Stores state consisting of current form state in redux store.
+   * @param currentFormState The current state of the form.
+   */
+  const storeFormStateInRedux = (currentFormState: any) => {
+    const entities = {
+      ...entitiesInStore,
+      [getSelectedConnectorKey()]: {
+        ...connectionDataFlow.entities[getSelectedConnectorKey()],
+        oauth_params: {},
+        oauth_error: '',
+        formValues: {
+          ...currentFormState
+        }
+      }
+    };
+
+    dispatch(setEntities(entities));
   };
 
   return (

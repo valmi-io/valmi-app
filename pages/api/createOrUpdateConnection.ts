@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next/types';
 import { sendErrorToBugsnag } from '@/lib/bugsnag';
 import { handleAxiosError } from '@/components/Error/ErrorUtils';
 
-const proxyApiRequestHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+const createOrUpdateConnection = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     // Process a POST request
     let { url, data } = req.body;
@@ -38,4 +38,4 @@ const proxyApiRequestHandler = async (req: NextApiRequest, res: NextApiResponse)
   }
 };
 
-export default proxyApiRequestHandler;
+export default createOrUpdateConnection;

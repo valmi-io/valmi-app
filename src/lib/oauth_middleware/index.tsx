@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2023 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, February 2nd 2024, 5:53:11 pm
- * Author: Nagendra S @ valmi.io
- */
 //@ts-nocheck
 
 import { getAccessTokenCookie, getBaseUrl } from '@/pagesapi/utils';
@@ -36,7 +31,6 @@ export const oauthKeys = async (req, res, next) => {
 
     req.credentials = response.data[0].oauth_config;
   } catch (error: any) {
-
   } finally {
     await next();
   }

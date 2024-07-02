@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Friday, April 28th 2023, 5:13:16 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { getConnectorImage, isObjectEmpty } from '@utils/lib';
 
 export const getConnectorDocumentationUrl = (data: any) => {
@@ -32,6 +26,7 @@ export const getOauthImage = ({ oAuth }: any) => {
     case 'facebook':
       return getConnectorImage('facebook');
     case 'google':
+    case 'google-sheets':
       return getConnectorImage('google');
     case 'slack':
       return getConnectorImage('slack');
@@ -49,6 +44,7 @@ export const getOauthColorCode = ({ oAuth }: any) => {
     case 'facebook':
       return '#5890FF';
     case 'google':
+    case 'google-sheets':
       return '#4285F4';
     case 'slack':
       return '#4A154B';
@@ -66,6 +62,7 @@ export const getOauthLoginText = ({ oAuth }: any) => {
     case 'facebook':
       return 'Login with Facebook';
     case 'google':
+    case 'google-sheets':
       return 'Sign in with Google';
     case 'slack':
       return 'Sign in with Slack';

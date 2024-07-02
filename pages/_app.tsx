@@ -59,13 +59,13 @@ type AppPropsWithLayout = AppProps & {
 
 // Check that PostHog is client-side (used to handle Next.js SSR)
 if (typeof window !== 'undefined') {
-  posthog.init(process.env.POSTHOG_KEY as string, {
-    api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
-    // Enable debug mode in development
-    loaded: (posthog) => {
-      if (process.env.NODE_ENV === 'development') posthog.debug();
-    }
-  });
+  // posthog.init(process.env.POSTHOG_KEY as string, {
+  //   api_host: process.env.POSTHOG_HOST || 'https://app.posthog.com',
+  //   // Enable debug mode in development
+  //   loaded: (posthog) => {
+  //     if (process.env.NODE_ENV === 'development') posthog.debug();
+  //   }
+  // });
 }
 
 // Bugsnag configuration
@@ -107,7 +107,7 @@ const MyApp: FC<AppPropsWithLayout> = ({
 
     // Track page views
     const handleRouteComplete = (url, { shallow }) => {
-      posthog?.capture('$pageview');
+      // posthog?.capture('$pageview');
       NProgress.done();
     };
     router.events.on('routeChangeComplete', handleRouteComplete);
@@ -138,7 +138,9 @@ const MyApp: FC<AppPropsWithLayout> = ({
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <CssBaseline />
 
-                  <PostHogProvider client={posthog}>{getLayout(<Component {...pageProps} />)}</PostHogProvider>
+                  {/* <PostHogProvider client={posthog}> */}
+                  {getLayout(<Component {...pageProps} />)}
+                  {/* </PostHogProvider> */}
                 </LocalizationProvider>
               </ThemeProviderWrapper>
             </SidebarProvider>

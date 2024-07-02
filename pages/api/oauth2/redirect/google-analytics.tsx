@@ -7,7 +7,7 @@
 //@ts-nocheck
 
 import { createRouter } from 'next-connect';
-import { createStrategy } from '@/pagesapi/oauth2/login/google';
+import { createStrategy } from '@/pagesapi/oauth2/login/google-analytics';
 import passport from 'passport';
 import { oauthKeys } from '@/lib/oauth_middleware';
 
@@ -32,13 +32,13 @@ router
 
     if (oauth_keys === 'public') {
       credentials = {
-        client_id: process.env.AUTH_GOOGLE_CLIENT_ID,
+        client_id: process.env.AUTH_GOOGLE_ANALYTICS_CLIENT_ID,
         client_secret: process.env.AUTH_GOOGLE_CLIENT_SECRET
       };
     } else {
       credentials = {
-        client_id: query_response['AUTH_GOOGLE_CLIENT_ID'],
-        client_secret: query_response['AUTH_GOOGLE_CLIENT_SECRET']
+        client_id: query_response['AUTH_GOOGLE_ANALYTICS_CLIENT_ID'],
+        client_secret: query_response['AUTH_GOOGLE_ANALYTICS_CLIENT_SECRET']
       };
     }
 
@@ -48,7 +48,7 @@ router
 
     return passport.authenticate(strategy, { session: 'false' }, async (err: any, user: any) => {
       const params = new URLSearchParams({
-        provider: user?.provider ?? 'google',
+        provider: 'google-analytics',
         access_token: user['_accessToken'],
         refresh_token: user?._refreshToken ?? '',
         id: user.id,

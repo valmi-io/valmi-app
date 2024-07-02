@@ -116,7 +116,7 @@ export const generateConnectionPayload = ({
 
   const { name = '', run_interval = '' } = schedulePayload ?? {};
 
-  if (type && DEFAULT_INTEGRATION_TYPES.includes(type) && !isEditableFlow) {
+  if (type && AUTOMATE_INTEGRATION_DISCOVERY.includes(type) && !isEditableFlow) {
     // TODO: handle for isEditableFlow=true
     const { name, ...config } = sourceCredentials;
     payload = {
@@ -361,15 +361,15 @@ export const getShopifyIntegrationType = () => {
   return 'SRC_SHOPIFY';
 };
 
-export const DEFAULT_INTEGRATION_TYPES = ['SRC_SHOPIFY', 'SRC_GOOGLE-ANALYTICS'];
+// Automate integration discovery for the following integration types.
+// HACK: do better.
+export const AUTOMATE_INTEGRATION_DISCOVERY = ['SRC_SHOPIFY', 'SRC_GOOGLE-ANALYTICS'];
 
-export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
-  return !!(mode === 'etl' && type === getShopifyIntegrationType());
+export const isETLFlow = ({ mode, type }: { mode: string; type: string }) => {
+  return !!(mode === 'etl' && AUTOMATE_INTEGRATION_DISCOVERY.includes(type));
 };
 
-const EXCLUDE_SCOPES = ['locations', 'shop', 'products_graph_ql'];
-
-const INCLUDE_SCOPES = [
+const REQUIRED_SHOPIFY_SCOPES = [
   'orders',
   'abandoned_checkouts',
   'products',
@@ -383,18 +383,19 @@ const INCLUDE_SCOPES = [
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
-  const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+  // these are the objects returned from the discover call.
+  const streams = results?.catalog?.streams ?? [];
 
-  const rows = results?.catalog?.streams ?? [];
+  // we are not currently using this information to filter scopes.
+  // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+  // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
 
-  const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
-
-  const streams = rows.filter(({ name }: { name: string }) => {
-    // HACK: return true if stream and namesInScopes are the same
-    if (INCLUDE_SCOPES.includes(name)) return true;
-  });
-
-  return streams;
+  if (type === getShopifyIntegrationType()) {
+    const filteredStreams = streams.filter(({ name }: { name: string }) => {
+      if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
+    });
+    return filteredStreams;
+  } else return streams;
 };
 
 export const initializeConnectionFlowState = ({
@@ -434,35 +435,39 @@ export const isIntegrationAuthorized = (oAuthParams: any, isEditableFlow: boolea
   return !!((oAuthParams && !isObjectEmpty(oAuthParams)) || isEditableFlow);
 };
 
-export const generateConfigFromSpec = (spec: any, values: any) => {
+export const generateFormStateFromSpec = (spec: any, values: any, type: string) => {
   return createJsonObject(
     spec.spec.connectionSpecification.required,
     spec.spec.connectionSpecification.properties,
-    values
+    values,
+    type
   );
 };
 
-const createJsonObject = (required: any, properties_def: any, values: any) => {
+const createJsonObject = (required: any, properties_def: any, values: any, type: string) => {
   let obj: any = {};
 
   if (required) {
     for (const field of required) {
       if (properties_def[field].oneOf) {
         // Determine which oneOf schema to use based on the auth_method value
-        const method = values?.credentials?.auth_method ?? '';
+
+        const authMethodKey = getOAuthMethodKeyFromType(type);
+
+        const authMethodValue = values?.[authMethodKey] ?? '';
+
         const selectedSchema = properties_def[field].oneOf.find(
-          (schema: any) => schema.properties.auth_method.const === method
+          (schema: any) => schema?.properties?.[authMethodKey]?.const === authMethodValue
         );
 
-        // Merge nested credentials from top-level values
-        const nestedValues = { ...values.credentials, ...extractNestedCredentials(values) };
-        obj[field] = createJsonObject(selectedSchema?.required, selectedSchema?.properties, nestedValues);
+        obj[field] = createJsonObject(selectedSchema?.required, selectedSchema?.properties, values, type);
       } else if (properties_def[field].type === 'object') {
         if (properties_def[field].required) {
           obj[field] = createJsonObject(
             properties_def[field].required,
             properties_def[field].properties,
-            values[field]
+            values[field],
+            type
           );
         } else {
           obj[field] = values[field];
@@ -476,10 +481,24 @@ const createJsonObject = (required: any, properties_def: any, values: any) => {
   return obj;
 };
 
-const extractNestedCredentials = (values: any) => {
-  return {
-    client_id: values.client_id,
-    client_secret: values.client_secret,
-    access_token: values.access_token
-  };
+export const getOAuthMethodKeyFromType = (type: string): string => {
+  switch (type) {
+    case getShopifyIntegrationType():
+      return 'auth_method';
+    case 'SRC_GOOGLE-ANALYTICS':
+      return 'auth_type';
+    default:
+      return '';
+  }
+};
+
+export const getOAuthMethodDefaultValueFromType = (type: string): string => {
+  switch (type) {
+    case getShopifyIntegrationType():
+      return 'api_password';
+    case 'SRC_GOOGLE-ANALYTICS':
+      return 'Client';
+    default:
+      return '';
+  }
 };

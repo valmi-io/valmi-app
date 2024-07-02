@@ -19,16 +19,19 @@ import {
   getFreePackageId,
   generateConnectionPayload,
   getShopifyIntegrationType,
-  isConnectionAutomationFlow,
+  isETLFlow,
   getExtrasObjKey,
   filterStreamsBasedOnScope,
   initializeConnectionFlowState,
-  generateConfigFromSpec,
+  generateFormStateFromSpec,
   generateCredentialPayload,
-  DEFAULT_INTEGRATION_TYPES
+  AUTOMATE_INTEGRATION_DISCOVERY
 } from '@/utils/connectionFlowUtils';
-import { isObjectEmpty } from '@/utils/lib';
-import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
+import { flattenObject, isObjectEmpty } from '@/utils/lib';
+import {
+  generateConfiguredStreams,
+  generateStreamObj
+} from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
   useLazyCreateConnectionQuery,
@@ -120,34 +123,34 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   useEffect(() => {
     if (oAuthParams && !isObjectEmpty(oAuthParams)) {
-      oAuthConfiguredState().run();
+      const currentFormState = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+      storeOAuthState(currentFormState, oAuthParams);
     }
   }, [oAuthParams]);
 
-  const oAuthConfiguredState = () => {
-    return {
-      run: () => {
-        const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
-        const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-        let combinedValues = {
-          ...formDataFromStore,
-          ...getOAuthParams(oAuthParams)
-        };
+  /**
+   * Stores state consisting of current form state and OAuth response in connectionForm context.
+   * @param currentFormState The current state of the form.
+   * @param oauthResponse The response received from OAuth.
+   */
+  const storeOAuthState = (currentFormState: any, oauthResponse: any) => {
+    const formAndOAuthState = flattenObject({
+      ...currentFormState,
+      ...getOAuthParams(oauthResponse)
+    });
 
-        let config = generateConfigFromSpec(spec, combinedValues);
+    const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
 
-        setFormState(config);
+    const updatedFormState = generateFormStateFromSpec(spec, formAndOAuthState, type);
 
-        return;
-      }
-    };
+    setFormState(updatedFormState);
   };
 
   // STATE: Trigger to get into Checking Credential State - BEGIN
   const handleSubmit = (data: any) => {
     setStatus('submitting');
 
-    const payload = {
+    const payload: any = {
       config: data
     };
 
@@ -171,6 +174,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
       handleAlertOpen({ message: message, alertType: 'error' });
     } else {
+      console.log('isEditable flow:_', isEditableFlow);
       if (isEditableFlow) {
         const userAccount = { ...user, id: account.id };
         const payload = generateCredentialPayload({
@@ -179,6 +183,8 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
           user: userAccount,
           isEditableFlow: isEditableFlow
         });
+
+        console.log('payload', payload);
 
         handleCredentialUpdate(wid, payload);
       } else {
@@ -196,7 +202,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
         dispatch(setEntities(entities));
 
-        if (!isConnectionAutomationFlow({ mode, type })) {
+        if (!isETLFlow({ mode, type })) {
           setStatus('success');
           nextStep();
         }
@@ -206,8 +212,9 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   const handleCredentialUpdate = async (workspaceId: string, payload: any) => {
     const credentialUpdateURL = `/workspaces/${workspaceId}/credentials/update`;
+    console.log('payload:_', payload);
     await httpPostRequestHandler({
-      route: apiRoutes['proxyURL'],
+      route: apiRoutes['connectionURL'],
       url: credentialUpdateURL,
       payload,
       errorCb: handleCredentialUpdateError,
@@ -261,20 +268,16 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
           query: fetchObjects,
           payload: payload,
           successCb: async (data) => {
+            // discover results
             const results = data?.resultData ?? {};
-            const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
-
-            let streams = [];
-
-            for (let i = 0; i < filteredStreams.length; i++) {
-              streams.push(generateStreamObj(filteredStreams[i], 'stream'));
-            }
-
-            await createConnectionState().run(streams);
+            // filtered discover objects based on the integration type & package scopes.
+            const streams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
+            // list of configured objects or streams
+            const configuredStreams = generateConfiguredStreams(streams);
+            await createConnectionState().run(configuredStreams);
           },
           errorCb: (err) => {
             setStatus('error');
-
             handleAlertOpen({ message: err, alertType: 'error' });
           }
         });
@@ -326,10 +329,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   // STATE: Create Connection State - END
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
-    console.log("type:_", type);
-    if(type && DEFAULT_INTEGRATION_TYPES.includes(type)) {
-
-// if (type === getShopifyIntegrationType() || type === "SRC_GOOGLE-ANALYTICS") {
+    if (type && AUTOMATE_INTEGRATION_DISCOVERY.includes(type)) {
       // TODO: handle update default warehouse connection
       return !isEditableFlow ? createDefaultWarehouseConnection : updateConnection;
     } else {

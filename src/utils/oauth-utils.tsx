@@ -11,6 +11,8 @@ export const getOAuthParams = (params: any) => {
       return getFacebookOAuthParams(oAuthParams);
     case 'google':
       return getGoogleOAuthParams(oAuthParams);
+    case 'google-analytics':
+      return getGoogleAnalyticsOAuthParams(oAuthParams);
     case 'hubspot':
       return getHubspotOAuthParams(oAuthParams);
     case 'slack':
@@ -44,6 +46,14 @@ const getGoogleOAuthParams = (oAuthParams: any) => {
     client_id: 'AUTH_GOOGLE_CLIENT_ID',
     client_secret: 'AUTH_GOOGLE_CLIENT_SECRET',
     developer_token: 'AUTH_GOOGLE_DEVELOPER_TOKEN'
+  };
+};
+
+const getGoogleAnalyticsOAuthParams = (oAuthParams: any) => {
+  return {
+    ...oAuthParams,
+    client_id: 'AUTH_GOOGLE_ANALYTICS_CLIENT_ID',
+    client_secret: 'AUTH_GOOGLE_ANALYTICS_CLIENT_SECRET'
   };
 };
 
