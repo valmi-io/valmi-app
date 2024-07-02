@@ -91,8 +91,7 @@ function OAuthContextProvider({ children }: Props) {
       if (type === 'SRC_SHOPIFY') {
         meta = {
           ...meta,
-          shop: formState?.shop || '',
-          scope: ['read_orders', 'read_products', 'write_products']
+          shop: formState?.shop || ''
         };
       }
 
