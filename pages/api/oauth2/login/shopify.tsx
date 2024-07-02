@@ -36,6 +36,27 @@ export const createStrategy = ({ client_id = '', client_secret = '', shop = '' }
   return strategy;
 };
 
+const scopes = [
+  'read_all_orders',
+  'read_orders',
+  'write_orders',
+  'read_assigned_fulfillment_orders',
+  'write_assigned_fulfillment_orders',
+  'read_merchant_managed_fulfillment_orders',
+  'write_merchant_managed_fulfillment_orders',
+  'read_draft_orders',
+  'write_draft_orders',
+  'read_products',
+  'write_products',
+  'read_store_credit_account_transactions',
+  'write_store_credit_account_transactions',
+  'write_payment_sessions',
+  'read_customers',
+  'write_customers',
+  'read_inventory',
+  'write_inventory'
+];
+
 const router = createRouter();
 
 router
@@ -46,7 +67,7 @@ router
 
     let json = JSON.parse(decodeURIComponent(state));
 
-    let { workspace = '', connector = '', oauth_keys = 'private', meta: { shop = '', scope = [] } = {} } = json;
+    let { workspace = '', connector = '', oauth_keys = 'private', meta: { shop = '' } = {} } = json;
 
     let credentials = {};
     let query_response = { ...(req.credentials ?? {}) };
@@ -77,7 +98,7 @@ router
     };
 
     passport.authenticate(strategy, {
-      scope: scope,
+      scope: scopes,
       session: false,
       state: encodeURIComponent(JSON.stringify(params))
     })(req, res, next);
