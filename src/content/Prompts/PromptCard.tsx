@@ -57,7 +57,7 @@ const PromptDescriptionContainer = styled(Stack)(({ theme }) => ({
   width: '100%',
   height: 72,
   overflow: 'hidden',
-  paddingTop: 4
+  paddingTop: 1
 }));
 
 const PromptFooterContainer = styled(Stack)(({ theme }) => ({
