@@ -16,7 +16,7 @@ export const apiRoutes = {
   checkURL: `/api/checkConnection`,
   defaultURL: `/`,
   fbTokenURL: '/api/getFbLongLivedToken',
-  proxyURL: `/api/proxyApiRequest`
+  connectionURL: `/api/connection`
 };
 
 export const redirectToHomePage = (wid: string, router: NextRouter) => {

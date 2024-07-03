@@ -38,8 +38,7 @@ const FormFieldText = (props: FormFieldTextProps) => {
     onChange
   } = props;
 
-  const inputProps =
-    type === 'number' ? { inputMode: 'numeric', pattern: '[0-9]*' } : {};
+  const inputProps = type === 'number' ? { inputMode: 'numeric', pattern: '[0-9]*' } : {};
 
   return (
     <Tooltip title={description ? description : ''} placement="top-start">

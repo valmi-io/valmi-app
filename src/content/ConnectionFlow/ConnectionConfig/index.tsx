@@ -23,10 +23,10 @@ import {
   getExtrasObjKey,
   filterStreamsBasedOnScope,
   initializeConnectionFlowState,
-  generateConfigFromSpec,
+  generateFormStateFromSpec,
   generateCredentialPayload
 } from '@/utils/connectionFlowUtils';
-import { isObjectEmpty } from '@/utils/lib';
+import { flattenObject, isObjectEmpty } from '@/utils/lib';
 import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
@@ -57,17 +57,11 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const {
-    type = '',
-    display_name: displayName = '',
-    oauth_keys: oauthKeys = '',
-    mode = '',
-    oauth_params: oAuthParams = {}
-  } = selectedConnector;
+  const { type = '', display_name: displayName = '', mode = '', oauth_params: oAuthParams = {} } = selectedConnector;
 
   const { config = {}, account = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
-  const { id: credentialId = '' } = config ?? {};
+  const { id: credentialId = '', name: credentialName = '' } = config ?? {};
 
   // Getting credential selectors for editing case specifically - not useful for create case
   const { selectCredentialById } = getCredentialsSelectors(wid as string);
@@ -119,27 +113,27 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   useEffect(() => {
     if (oAuthParams && !isObjectEmpty(oAuthParams)) {
-      oAuthConfiguredState().run();
+      const currentFormState = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
+      storeOAuthState(currentFormState, oAuthParams);
     }
   }, [oAuthParams]);
 
-  const oAuthConfiguredState = () => {
-    return {
-      run: () => {
-        const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
-        const formDataFromStore = connectionDataFlow.entities[getSelectedConnectorKey()]?.formValues || {};
-        let combinedValues = {
-          ...formDataFromStore,
-          ...getOAuthParams(oAuthParams)
-        };
+  /**
+   * Stores state consisting of current form state and OAuth response in connectionForm context.
+   * @param currentFormState The current state of the form.
+   * @param oauthResponse The response received from OAuth.
+   */
+  const storeOAuthState = (currentFormState: any, oauthResponse: any) => {
+    const formAndOAuthState = flattenObject({
+      ...currentFormState,
+      ...getOAuthParams(oauthResponse)
+    });
 
-        let config = generateConfigFromSpec(spec, combinedValues);
+    const { spec = null } = connectionDataFlow.entities[getCredentialObjKey(type)];
 
-        setFormState(config);
+    const updatedFormState = generateFormStateFromSpec(spec, formAndOAuthState, type);
 
-        return;
-      }
-    };
+    setFormState(updatedFormState);
   };
 
   // STATE: Trigger to get into Checking Credential State - BEGIN
@@ -172,8 +166,11 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
     } else {
       if (isEditableFlow) {
         const userAccount = { ...user, id: account.id };
+
+        const updatedFormState = { ...formState, id: credentialId, name: credentialName };
+
         const payload = generateCredentialPayload({
-          credentialConfig: formState,
+          credentialConfig: updatedFormState,
           type,
           user: userAccount,
           isEditableFlow: isEditableFlow
@@ -206,7 +203,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   const handleCredentialUpdate = async (workspaceId: string, payload: any) => {
     const credentialUpdateURL = `/workspaces/${workspaceId}/credentials/update`;
     await httpPostRequestHandler({
-      route: apiRoutes['proxyURL'],
+      route: apiRoutes['connectionURL'],
       url: credentialUpdateURL,
       payload,
       errorCb: handleCredentialUpdateError,

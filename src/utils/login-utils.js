@@ -23,12 +23,13 @@ export const loginFormSchema = {
       type: 'boolean',
       title: 'Check to receive latest product updates over email',
       const: true,
-      description: 'Select this checkbox to receive emails about new product features and announcements'
+      // description: 'Select this checkbox to receive emails about new product features and announcements'
+      description: ''
     },
     role: {
       type: 'string',
       title: 'You are part of',
-      enum: ['Engineering', 'Marketing', 'Other'],
+      enum: ['Engineering', 'Marketing', 'Finance', 'Sales', 'Operations', 'Other'],
       description: "Select your role from the dropdown menu. If your role isn't listed, choose 'Other'"
     }
   },

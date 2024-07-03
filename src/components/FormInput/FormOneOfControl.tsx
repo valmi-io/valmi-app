@@ -179,7 +179,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
         handleOnConfigureButtonClick={handleOnConfigureButtonClick}
         oAuthProvider={getOAuthProviderName(selectedConnector)}
         oauth_error={oauth_error}
-        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, false)}
+        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, isEditableFlow)}
         sx={{ mt: 2 }}
       />
     );

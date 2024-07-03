@@ -260,13 +260,15 @@ const ConnectionLoginButton = (props: any) => {
       />
 
       <Tooltip title={getTooltipTitle({ requireConfiguration, isConfigured })}>
-        <LoginContainer
-          onClick={onClick}
-          isConfigured={isConfigured}
-          formData={formData}
-          oAuthProvider={oAuthProvider}
-          requireConfiguration={requireConfiguration}
-        />
+        <>
+          <LoginContainer
+            onClick={onClick}
+            isConfigured={isConfigured}
+            formData={formData}
+            oAuthProvider={oAuthProvider}
+            requireConfiguration={requireConfiguration}
+          />
+        </>
       </Tooltip>
 
       <ErrorStatusText sx={{ ml: 1 }} variant="body1">

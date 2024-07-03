@@ -115,6 +115,7 @@ function OAuthContextProvider({ children }: Props) {
           }
         }
       };
+
       dispatch(setEntities(entities));
 
       router.push(`${oAuthRoute}?state=${state}`);

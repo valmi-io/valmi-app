@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2024 valmi.io <https://github.com/valmi-io>
- * Created Date: Thursday, May 25th 2023, 6:11:37 pm
- * Author: Nagendra S @ valmi.io
- */
-
 import { Box, Link, Typography, styled } from '@mui/material';
 
 const InstructionsBox = styled(Box)(({}) => ({
@@ -34,11 +28,11 @@ const Instructions = (props: InstructionsProps) => {
       </Typography>
 
       <InstructionsText variant="body1">
-        Refer to step-by-step instructions to setup a{' '}
+        Follow the step-by-step instructions to connect to{' '}
         <Link color="secondary" href={documentationUrl} target="_blank" rel="noreferrer" underline="always">
           {linkText}
         </Link>
-        {type && type === 'credential' && <> {'credential.'}</>}
+        {/* {type && type === 'credential' && <> {'credential.'}</>} */}
       </InstructionsText>
     </InstructionsBox>
   );
