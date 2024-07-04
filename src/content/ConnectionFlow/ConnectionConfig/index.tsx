@@ -71,7 +71,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   const { config = {}, account = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
-  const { id: credentialId = '' } = config ?? {};
+  const { id: credentialId = '', name: credentialName = '' } = config ?? {};
 
   // Getting credential selectors for editing case specifically - not useful for create case
   const { selectCredentialById } = getCredentialsSelectors(wid as string);
@@ -176,8 +176,10 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
     } else {
       if (isEditableFlow) {
         const userAccount = { ...user, id: account.id };
+        const updatedFormState = { ...formState, id: credentialId, name: credentialName };
+
         const payload = generateCredentialPayload({
-          credentialConfig: formState,
+          credentialConfig: updatedFormState,
           type,
           user: userAccount,
           isEditableFlow: isEditableFlow
