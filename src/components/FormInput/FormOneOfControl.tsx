@@ -18,7 +18,9 @@ import { RootState } from '@/store/reducers';
 import {
   getCredentialObjKey,
   getExtrasObjKey,
+  getOAuthMethodKeyFromType,
   getSelectedConnectorKey,
+  getShopifyIntegrationType,
   isIntegrationAuthorized,
   isIntegrationConfigured,
   isOAuthConfigurationRequired
@@ -90,10 +92,12 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
 
   useEffect(() => {
     if (isEditableFlow) {
-      const selectedAuthMethod = credentialConfig?.credentials?.auth_method ?? '';
+      const authMethodKey = getOAuthMethodKeyFromType(type);
+
+      const selectedAuthMethod = credentialConfig?.credentials?.[authMethodKey] ?? '';
 
       oAuthOptions.forEach((option: any, index: number) => {
-        if (selectedAuthMethod === option?.properties?.auth_method.const ?? '') {
+        if (selectedAuthMethod === option?.properties?.[authMethodKey].const ?? '') {
           setSelectedIndex(index);
         }
       });
@@ -131,15 +135,16 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
   };
 
   const confirm = useCallback(() => {
+    const authMethodKey = getOAuthMethodKeyFromType(type);
     const authMethodValue = !!(oAuthOptions[newSelectedIndex].title?.toLowerCase() === 'oauth2.0')
       ? 'oauth2.0'
-      : oAuthOptions[newSelectedIndex]?.properties?.auth_method?.const;
+      : oAuthOptions[newSelectedIndex]?.properties?.[authMethodKey]?.const;
 
-    // Updating auth_method in formState
+    // Updating authMethod in formState
     setFormState((formState) => ({
       ...formState,
       credentials: {
-        auth_method: authMethodValue
+        [authMethodKey]: authMethodValue
       }
     }));
 
@@ -179,7 +184,7 @@ const MaterialOneOfEnumControl = (props: CombinatorRendererProps) => {
         handleOnConfigureButtonClick={handleOnConfigureButtonClick}
         oAuthProvider={getOAuthProviderName(selectedConnector)}
         oauth_error={oauth_error}
-        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, isEditableFlow)}
+        hasOAuthAuthorized={isIntegrationAuthorized(oauth_params, false)}
         sx={{ mt: 2 }}
       />
     );

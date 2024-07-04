@@ -5,7 +5,7 @@
  */
 
 import ContentLayout from '@/layouts/ContentLayout';
-import { Grid, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import PageTitle from '@/components/PageTitle';
 import { OAuthConnectorsState, OnConnectorClickProps } from '@/pagesspaces/[wid]/oauth-apps';
 import { TCatalog } from '@/utils/typings.d';
@@ -35,24 +35,19 @@ const PageContent = ({
   handleItemOnClick: (data: any) => void;
 }) => {
   return (
-    <>
-      {/** Display page content */}
-
-      <Stack sx={{ display: 'flex' }} spacing={3}>
-        {/** connectors */}
-        {/* <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}> */}
-        {catalogs.map((catalog: TCatalog) => {
-          return (
-            <CatalogCard
-              key={catalog.type}
-              catalog={catalog}
-              handleCatalogOnClick={(item) => handleItemOnClick({ item, configured: false })}
-            />
-          );
-        })}
-        {/* </Grid> */}
-      </Stack>
-    </>
+    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+      {/** connectors */}
+      {catalogs.map((catalog: TCatalog) => {
+        return (
+          <CatalogCard
+            key={catalog.type}
+            catalog={catalog}
+            handleCatalogOnClick={(item) => handleItemOnClick({ item, configured: false })}
+          />
+        );
+      })}
+      {/* </Grid> */}
+    </Stack>
   );
 };
 

@@ -19,15 +19,19 @@ import {
   getFreePackageId,
   generateConnectionPayload,
   getShopifyIntegrationType,
-  isConnectionAutomationFlow,
+  isETLFlow,
   getExtrasObjKey,
   filterStreamsBasedOnScope,
   initializeConnectionFlowState,
   generateFormStateFromSpec,
-  generateCredentialPayload
+  generateCredentialPayload,
+  AUTOMATE_INTEGRATION_DISCOVERY
 } from '@/utils/connectionFlowUtils';
 import { flattenObject, isObjectEmpty } from '@/utils/lib';
-import { generateStreamObj } from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
+import {
+  generateConfiguredStreams,
+  generateStreamObj
+} from '@/content/ConnectionFlow/ConnectionDiscover/streamsReducer';
 import { useRouter } from 'next/router';
 import {
   useLazyCreateConnectionQuery,
@@ -57,11 +61,17 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   const selectedConnector = connectionDataFlow.entities[getSelectedConnectorKey()] ?? {};
 
-  const { type = '', display_name: displayName = '', mode = '', oauth_params: oAuthParams = {} } = selectedConnector;
+  const {
+    type = '',
+    display_name: displayName = '',
+    oauth_keys: oauthKeys = '',
+    mode = '',
+    oauth_params: oAuthParams = {}
+  } = selectedConnector;
 
   const { config = {}, account = {} } = connectionDataFlow.entities[getCredentialObjKey(type)] ?? {};
 
-  const { id: credentialId = '', name: credentialName = '' } = config ?? {};
+  const { id: credentialId = '' } = config ?? {};
 
   // Getting credential selectors for editing case specifically - not useful for create case
   const { selectCredentialById } = getCredentialsSelectors(wid as string);
@@ -140,7 +150,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
   const handleSubmit = (data: any) => {
     setStatus('submitting');
 
-    const payload = {
+    const payload: any = {
       config: data
     };
 
@@ -166,11 +176,8 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
     } else {
       if (isEditableFlow) {
         const userAccount = { ...user, id: account.id };
-
-        const updatedFormState = { ...formState, id: credentialId, name: credentialName };
-
         const payload = generateCredentialPayload({
-          credentialConfig: updatedFormState,
+          credentialConfig: formState,
           type,
           user: userAccount,
           isEditableFlow: isEditableFlow
@@ -192,7 +199,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
         dispatch(setEntities(entities));
 
-        if (!isConnectionAutomationFlow({ mode, type })) {
+        if (!isETLFlow({ mode, type })) {
           setStatus('success');
           nextStep();
         }
@@ -257,20 +264,16 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
           query: fetchObjects,
           payload: payload,
           successCb: async (data) => {
+            // discover results
             const results = data?.resultData ?? {};
-            const filteredStreams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
-
-            let streams = [];
-
-            for (let i = 0; i < filteredStreams.length; i++) {
-              streams.push(generateStreamObj(filteredStreams[i], 'stream'));
-            }
-
-            await createConnectionState().run(streams);
+            // filtered discover objects based on the integration type & package scopes.
+            const streams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
+            // list of configured objects or streams
+            const configuredStreams = generateConfiguredStreams(streams);
+            await createConnectionState().run(configuredStreams);
           },
           errorCb: (err) => {
             setStatus('error');
-
             handleAlertOpen({ message: err, alertType: 'error' });
           }
         });
@@ -322,7 +325,7 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
   // STATE: Create Connection State - END
   const getConnectionQuery = ({ isEditableFlow, type }: { isEditableFlow: boolean; type: string }) => {
-    if (type === getShopifyIntegrationType()) {
+    if (type && AUTOMATE_INTEGRATION_DISCOVERY.includes(type)) {
       // TODO: handle update default warehouse connection
       return !isEditableFlow ? createDefaultWarehouseConnection : updateConnection;
     } else {

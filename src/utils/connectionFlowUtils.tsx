@@ -5,7 +5,7 @@ import { setEntities } from '@/store/reducers/connectionDataFlow';
 import { AppDispatch } from '@/store/store';
 import { generateAccountPayload } from '@/utils/account-utils';
 import { isObjectEmpty } from '@/utils/lib';
-import { TAccount, TCatalog, TData } from '@/utils/typings.d';
+import { TCatalog, TData } from '@/utils/typings.d';
 
 export type TStream = {
   name: string;
@@ -116,7 +116,7 @@ export const generateConnectionPayload = ({
 
   const { name = '', run_interval = '' } = schedulePayload ?? {};
 
-  if (type === getShopifyIntegrationType() && !isEditableFlow) {
+  if (type && AUTOMATE_INTEGRATION_DISCOVERY.includes(type) && !isEditableFlow) {
     // TODO: handle for isEditableFlow=true
     const { name, ...config } = sourceCredentials;
     payload = {
@@ -361,13 +361,15 @@ export const getShopifyIntegrationType = () => {
   return 'SRC_SHOPIFY';
 };
 
-export const isConnectionAutomationFlow = ({ mode, type }: { mode: string; type: string }) => {
-  return !!(mode === 'etl' && type === getShopifyIntegrationType());
+// Automate integration discovery for the following integration types.
+// HACK: do better.
+export const AUTOMATE_INTEGRATION_DISCOVERY = ['SRC_SHOPIFY', 'SRC_GOOGLE-ANALYTICS'];
+
+export const isETLFlow = ({ mode, type }: { mode: string; type: string }) => {
+  return !!(mode === 'etl' && AUTOMATE_INTEGRATION_DISCOVERY.includes(type));
 };
 
-const EXCLUDE_SCOPES = ['locations', 'shop', 'products_graph_ql'];
-
-const INCLUDE_SCOPES = [
+const REQUIRED_SHOPIFY_SCOPES = [
   'orders',
   'abandoned_checkouts',
   'products',
@@ -381,18 +383,19 @@ const INCLUDE_SCOPES = [
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
-  const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+  // these are the objects returned from the discover call.
+  const streams = results?.catalog?.streams ?? [];
 
-  const rows = results?.catalog?.streams ?? [];
+  // we are not currently using this information to filter scopes.
+  // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+  // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
 
-  const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
-
-  const streams = rows.filter(({ name }: { name: string }) => {
-    // HACK: return true if stream and namesInScopes are the same
-    if (INCLUDE_SCOPES.includes(name)) return true;
-  });
-
-  return streams;
+  if (type === getShopifyIntegrationType()) {
+    const filteredStreams = streams.filter(({ name }: { name: string }) => {
+      if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
+    });
+    return filteredStreams;
+  } else return streams;
 };
 
 export const initializeConnectionFlowState = ({
@@ -482,6 +485,8 @@ export const getOAuthMethodKeyFromType = (type: string): string => {
   switch (type) {
     case getShopifyIntegrationType():
       return 'auth_method';
+    case 'SRC_GOOGLE-ANALYTICS':
+      return 'auth_type';
     default:
       return '';
   }
@@ -491,6 +496,8 @@ export const getOAuthMethodDefaultValueFromType = (type: string): string => {
   switch (type) {
     case getShopifyIntegrationType():
       return 'api_password';
+    case 'SRC_GOOGLE-ANALYTICS':
+      return 'Client';
     default:
       return '';
   }

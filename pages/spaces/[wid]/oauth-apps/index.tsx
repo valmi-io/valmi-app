@@ -50,7 +50,8 @@ const OAuthAppsPage: NextPageWithLayout = () => {
 
   const {
     data: configuredConnectors,
-    isLoading: isConfiguredConnectorsLoading,
+    isFetching: isConfiguredConnectorsLoading,
+
     traceError: configuredConnectorsTraceError,
     error: configuredConnectorsError
   } = useFetch({
@@ -59,7 +60,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
 
   const {
     data: notConfiguredConnectors,
-    isLoading: isNotConfiguredConnectorsLoading,
+    isFetching: isNotConfiguredConnectorsLoading,
     traceError: notConfiguredConnectorsTraceError,
     error: notConfiguredConnectorsError
   } = useFetch({
