@@ -25,7 +25,8 @@ import {
   initializeConnectionFlowState,
   generateFormStateFromSpec,
   generateCredentialPayload,
-  AUTOMATE_INTEGRATION_DISCOVERY
+  AUTOMATE_INTEGRATION_DISCOVERY,
+  REQUIRED_SHOPIFY_SCOPES
 } from '@/utils/connectionFlowUtils';
 import { flattenObject, isObjectEmpty } from '@/utils/lib';
 import {
@@ -174,7 +175,6 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
 
       handleAlertOpen({ message: message, alertType: 'error' });
     } else {
-      console.log('isEditable flow:_', isEditableFlow);
       if (isEditableFlow) {
         const userAccount = { ...user, id: account.id };
         const payload = generateCredentialPayload({
@@ -272,9 +272,20 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
             const results = data?.resultData ?? {};
             // filtered discover objects based on the integration type & package scopes.
             const streams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
-            // list of configured objects or streams
-            const configuredStreams = generateConfiguredStreams(streams);
-            await createConnectionState().run(configuredStreams);
+
+            if (streams?.isMissingScopes && Array.isArray(streams?.scopes)) {
+              // Handle missing scopes
+              setStatus('error');
+              handleAlertOpen({
+                message: `Connection creation failed. Missing required Shopify scopes for the folowing streams: ${streams?.scopes.join(
+                  ', '
+                )}`,
+                alertType: 'error'
+              });
+            } else {
+              const configuredStreams = generateConfiguredStreams(streams?.scopes);
+              await createConnectionState().run(configuredStreams);
+            }
           },
           errorCb: (err) => {
             setStatus('error');

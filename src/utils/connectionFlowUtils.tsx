@@ -369,33 +369,65 @@ export const isETLFlow = ({ mode, type }: { mode: string; type: string }) => {
   return !!(mode === 'etl' && AUTOMATE_INTEGRATION_DISCOVERY.includes(type));
 };
 
-const REQUIRED_SHOPIFY_SCOPES = [
+export const REQUIRED_SHOPIFY_SCOPES = [
   'orders',
   'abandoned_checkouts',
   'products',
   'transactions',
-  'order_line_items',
-  'orders_refunds_transactions',
+  // 'order_line_items',
+  // 'orders_refunds_transactions',
   'customers',
   'order_refunds',
   'inventory_items'
 ];
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
+// export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
+//   // these are the objects returned from the discover call.
+//   const streams = results?.catalog?.streams ?? [];
+
+//   // we are not currently using this information to filter scopes.
+//   // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+//   // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
+
+//   if (type === getShopifyIntegrationType()) {
+//     const filteredStreams = streams.filter(({ name }: { name: string }) => {
+//       if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
+//     });
+//     return filteredStreams;
+//   } else return streams;
+// };
+
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
-  // these are the objects returned from the discover call.
+  // These are the objects returned from the discover call.
   const streams = results?.catalog?.streams ?? [];
 
-  // we are not currently using this information to filter scopes.
-  // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
-  // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
-
   if (type === getShopifyIntegrationType()) {
-    const filteredStreams = streams.filter(({ name }: { name: string }) => {
-      if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
+    const missingScopes = REQUIRED_SHOPIFY_SCOPES.filter((scope) => {
+      return !streams.some((stream: any) => stream.name === scope);
     });
-    return filteredStreams;
-  } else return streams;
+
+    if (missingScopes.length > 0) {
+      let errorPayload = {
+        isMissingScopes: true,
+        scopes: missingScopes
+      };
+      return errorPayload;
+    }
+
+    let successPayload = {
+      isMissingScopes: false,
+      scopes: streams
+    };
+
+    return successPayload;
+  } else {
+    let successPayload = {
+      isMissingScopes: false,
+      scopes: streams
+    };
+    return successPayload;
+  }
 };
 
 export const initializeConnectionFlowState = ({
