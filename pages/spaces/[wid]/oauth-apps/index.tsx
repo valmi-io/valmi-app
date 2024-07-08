@@ -106,7 +106,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
               data: configured,
               error: configuredConnectorsError,
               isLoading: isConfiguredConnectorsLoading,
-              title: 'Configured Apps',
+              title: 'CONFIGURED APPS',
               traceError: configuredConnectorsTraceError
             }}
           />
@@ -123,7 +123,7 @@ const OAuthAppsPage: NextPageWithLayout = () => {
               data: notConfigured,
               error: notConfiguredConnectorsError,
               isLoading: isNotConfiguredConnectorsLoading,
-              title: 'Apps that require configuration',
+              title: 'APPS THAT REQUIRE CONFIGURATION',
               traceError: notConfiguredConnectorsTraceError
             }}
           />

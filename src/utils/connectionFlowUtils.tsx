@@ -408,25 +408,25 @@ export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any,
     });
 
     if (missingScopes.length > 0) {
-      let errorPayload = {
+      let errorStreams = {
         isMissingScopes: true,
         scopes: missingScopes
       };
-      return errorPayload;
+      return errorStreams;
     }
 
-    let successPayload = {
+    let successStreams = {
       isMissingScopes: false,
       scopes: streams
     };
 
-    return successPayload;
+    return successStreams;
   } else {
-    let successPayload = {
+    let successStreams = {
       isMissingScopes: false,
       scopes: streams
     };
-    return successPayload;
+    return successStreams;
   }
 };
 

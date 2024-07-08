@@ -38,9 +38,8 @@ const PageContent = ({
     <>
       {/** Display page content */}
 
-      <Stack sx={{ display: 'flex' }} spacing={3}>
+      <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
         {/** connectors */}
-        {/* <Grid container spacing={{ xs: 2, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}> */}
         {catalogs.map((catalog: TCatalog) => {
           return (
             <CatalogCard
@@ -50,7 +49,6 @@ const PageContent = ({
             />
           );
         })}
-        {/* </Grid> */}
       </Stack>
     </>
   );
@@ -60,7 +58,7 @@ const OAuthApps = ({ state, handleItemOnClick, connectorState }: OAuthAppProps) 
   const { data, error, isLoading, title, traceError } = state;
 
   return (
-    <Stack sx={{ gap: 2 }}>
+    <Stack sx={{ gap: 1 }}>
       <PageTitle title={title} displayButton={false} />
       <ContentLayout
         key={`${title}`}
