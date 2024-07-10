@@ -149,7 +149,7 @@ export const nextAuthOptions = (req, res) => {
               (data) => {
                 const { auth_token, organizations = [] } = data ?? {};
                 const workspaceId =
-                  organizations.length > 0 ? organizations[0]?.organizations[0]?.workspaces[0]?.id : '';
+                  organizations.length > 0 ? organizations[0]?.workspaces[0]?.id : '';
                 if (workspaceId) {
                 }
                 token.authToken = auth_token;
