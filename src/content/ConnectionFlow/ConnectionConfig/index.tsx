@@ -272,20 +272,9 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
             const results = data?.resultData ?? {};
             // filtered discover objects based on the integration type & package scopes.
             const streams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
-
-            if (streams?.isMissingScopes && Array.isArray(streams?.scopes)) {
-              // Handle missing scopes
-              setStatus('error');
-              handleAlertOpen({
-                message: `Connection creation failed. Missing required Shopify scopes for the folowing streams: ${streams?.scopes.join(
-                  ', '
-                )}`,
-                alertType: 'error'
-              });
-            } else {
-              const configuredStreams = generateConfiguredStreams(streams?.scopes);
-              await createConnectionState().run(configuredStreams);
-            }
+            // list of configured objects or streams
+            const configuredStreams = generateConfiguredStreams(streams);
+            await createConnectionState().run(configuredStreams);
           },
           errorCb: (err) => {
             setStatus('error');
@@ -295,6 +284,38 @@ const ConnectionConfig = ({ params, isEditableFlow = false }: TConnectionUpsertP
       }
     };
   };
+
+  //       await queryHandler({
+  //         query: fetchObjects,
+  //         payload: payload,
+  //         successCb: async (data) => {
+  //           // discover results
+  //           const results = data?.resultData ?? {};
+  //           // filtered discover objects based on the integration type & package scopes.
+  //           const streams = filterStreamsBasedOnScope(results, connectionDataFlow, type);
+
+  //           if (streams?.isMissingScopes && Array.isArray(streams?.scopes)) {
+  //             // Handle missing scopes
+  //             setStatus('error');
+  //             handleAlertOpen({
+  //               message: `Connection creation failed. Missing required Shopify scopes for the folowing streams: ${streams?.scopes.join(
+  //                 ', '
+  //               )}`,
+  //               alertType: 'error'
+  //             });
+  //           } else {
+  //             const configuredStreams = generateConfiguredStreams(streams?.scopes);
+  //             await createConnectionState().run(configuredStreams);
+  //           }
+  //         },
+  //         errorCb: (err) => {
+  //           setStatus('error');
+  //           handleAlertOpen({ message: err, alertType: 'error' });
+  //         }
+  //       });
+  //     }
+  //   };
+  // };
 
   // STATE: Discover State - END
 

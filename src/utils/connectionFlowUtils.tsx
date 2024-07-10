@@ -373,62 +373,62 @@ export const REQUIRED_SHOPIFY_SCOPES = [
   'orders',
   'abandoned_checkouts',
   'products',
-  'transactions',
+  // 'transactions',
   // 'order_line_items',
   // 'orders_refunds_transactions',
   'customers',
-  'order_refunds',
+  // 'order_refunds',
   'inventory_items'
 ];
 
 // filtering streams based on scopes from package and setting filtered streams and dispatching to reducer state
-// export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
-//   // these are the objects returned from the discover call.
-//   const streams = results?.catalog?.streams ?? [];
-
-//   // we are not currently using this information to filter scopes.
-//   // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
-//   // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
-
-//   if (type === getShopifyIntegrationType()) {
-//     const filteredStreams = streams.filter(({ name }: { name: string }) => {
-//       if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
-//     });
-//     return filteredStreams;
-//   } else return streams;
-// };
-
 export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
-  // These are the objects returned from the discover call.
+  // these are the objects returned from the discover call.
   const streams = results?.catalog?.streams ?? [];
 
+  // we are not currently using this information to filter scopes.
+  // const scopes = connectionDataFlow.entities[getCredentialObjKey(type)]?.package?.scopes;
+  // const namesInScopes = scopes?.map((item: string) => item.split('read_')[1]);
+
   if (type === getShopifyIntegrationType()) {
-    const missingScopes = REQUIRED_SHOPIFY_SCOPES.filter((scope) => {
-      return !streams.some((stream: any) => stream.name === scope);
+    const filteredStreams = streams.filter(({ name }: { name: string }) => {
+      if (REQUIRED_SHOPIFY_SCOPES.includes(name)) return true;
     });
-
-    if (missingScopes.length > 0) {
-      let errorStreams = {
-        isMissingScopes: true,
-        scopes: missingScopes
-      };
-      return errorStreams;
-    }
-
-    let successStreams = {
-      isMissingScopes: false,
-      scopes: streams
-    };
-
-    return successStreams;
-  } else {
-    let successStreams = {
-      isMissingScopes: false,
-      scopes: streams
-    };
-    return successStreams;
-  }
+    return filteredStreams;
+  } else return streams;
 };
+
+// export const filterStreamsBasedOnScope = (results: any, connectionDataFlow: any, type: string) => {
+//   // These are the objects returned from the discover call.
+//   const streams = results?.catalog?.streams ?? [];
+
+//   if (type === getShopifyIntegrationType()) {
+//     const missingScopes = REQUIRED_SHOPIFY_SCOPES.filter((scope) => {
+//       return !streams.some((stream: any) => stream.name === scope);
+//     });
+
+//     if (missingScopes.length > 0) {
+//       let errorStreams = {
+//         isMissingScopes: true,
+//         scopes: missingScopes
+//       };
+//       return errorStreams;
+//     }
+
+//     let successStreams = {
+//       isMissingScopes: false,
+//       scopes: streams
+//     };
+
+//     return successStreams;
+//   } else {
+//     let successStreams = {
+//       isMissingScopes: false,
+//       scopes: streams
+//     };
+//     return successStreams;
+//   }
+// };
 
 export const initializeConnectionFlowState = ({
   connectionDataFlow,
