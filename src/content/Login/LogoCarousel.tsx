@@ -11,7 +11,7 @@ const sources = [
   { id: 6, src: '/connectors/shopify.svg' },
   { id: 7, src: '/connectors/facebook.svg' },
   { id: 8, src: '/connectors/postgres.svg' },
-  { id: 4, src: '/connectors/snowflake.svg' }
+  { id: 9, src: '/connectors/snowflake.svg' }
 ];
 
 const destinations = [

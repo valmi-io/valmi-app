@@ -17,32 +17,36 @@ router
   .use(oauthKeys)
 
   .get(async (req, res, next) => {
-    const { state = '' } = req.query;
+    const { state = '', code = '', shop = '' } = req.query;
 
-    let json = JSON.parse(decodeURIComponent(state));
+    // let json = JSON.parse(decodeURIComponent(state));
 
-    if (typeof json === 'string') {
-      json = JSON.parse(json);
-    }
+    // if (typeof json === 'string') {
+    //   json = JSON.parse(json);
+    // }
 
-    let { oauth_keys = 'private', shop = '' } = json;
+    // let { oauth_keys = 'private', shop = '' } = json;
 
-    let credentials = {};
-    let query_response = { ...(req.credentials ?? {}) };
+    let credentials = {
+      client_id: process.env.AUTH_SHOPIFY_CLIENT_ID,
+      client_secret: process.env.AUTH_SHOPIFY_CLIENT_SECRET,
+      shop: shop
+    };
+    // // let query_response = { ...(req.credentials ?? {}) };
 
-    if (oauth_keys === 'public') {
-      credentials = {
-        client_id: process.env.AUTH_SHOPIFY_CLIENT_ID,
-        client_secret: process.env.AUTH_SHOPIFY_CLIENT_SECRET
-      };
-    } else {
-      credentials = {
-        client_id: query_response['AUTH_SHOPIFY_CLIENT_ID'],
-        client_secret: query_response['AUTH_SHOPIFY_CLIENT_SECRET']
-      };
-    }
+    // // if (oauth_keys === 'public') {
+    // //   credentials = {
+    // //     client_id: process.env.AUTH_SHOPIFY_CLIENT_ID,
+    // //     client_secret: process.env.AUTH_SHOPIFY_CLIENT_SECRET
+    // //   };
+    // // } else {
+    // //   credentials = {
+    // //     client_id: query_response['AUTH_SHOPIFY_CLIENT_ID'],
+    // //     client_secret: query_response['AUTH_SHOPIFY_CLIENT_SECRET']
+    // //   };
+    // // }
 
-    credentials['shop'] = shop;
+    // credentials['shop'] = shop;
 
     const query = { ...credentials };
 
@@ -59,8 +63,10 @@ router
         image: '',
         unique_id: user.emails[0].value
       });
+      console.log('PARAMS:', params);
+      console.log('USER:', user);
 
-      return res.redirect('/auth/callback?' + params.toString());
+      // return res.redirect('/auth/callback?' + params.toString());
     })(req, res, next);
   });
 

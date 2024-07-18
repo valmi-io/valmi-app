@@ -11,7 +11,7 @@ import { Box, styled, Stack, Button } from '@mui/material';
 import AuthenticationFormFooter from '@/content/Authentication/AuthenticationFormFooter';
 import { GoogleSignInButton } from '@/components/AuthButtons';
 import { formValidationMode, jsonFormValidator } from '@/utils/form-utils';
-import { setAuthMetaCookie } from '@/lib/cookies';
+import { getShopifyMetaCookie, setAuthMetaCookie } from '@/lib/cookies';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { AppFlowState, setAppState } from '@/store/reducers/appFlow';
@@ -23,6 +23,9 @@ import { loginFormSchema } from '@/utils/login-utils';
 import PrivacyPolicy from '@/content/Authentication/PrivacyPolicy';
 
 import { usePostHog } from 'posthog-js/react';
+import { ShopifySignInButton } from '@/components/AuthButtons/ShopifyOAuth';
+import { useRouter } from 'next/router';
+import { getOauthRoute } from '@/content/ConnectionFlow/ConnectionConfig/ConnectionConfigUtils';
 
 const ContainerLayout = styled(Box)(({ theme }) => ({
   boxSizing: 'border-box',
@@ -52,6 +55,7 @@ const DetailBox = styled(Box)(({ theme }) => ({
 }));
 
 const AuthenticationLayout = () => {
+  const router = useRouter();
   const posthog = usePostHog();
   const dispatch = useDispatch<AppDispatch>();
   const appState: AppFlowState = useSelector((state: RootState) => state.appFlow);
@@ -104,16 +108,47 @@ const AuthenticationLayout = () => {
    * updating the login flow state in Redux, and calling the `signIn` function from
    * `next-auth/react` to initiate user sign-in.
    */
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  const handleOAuthButtonClick = () => {
+    const oAuthRoute = getOauthRoute({ oAuth: 'shopify' });
+
+    if (oAuthRoute) {
+      let meta = {
+        shop: getCookie(getShopifyMetaCookie) || ''
+      };
+
+      let obj = {
+        connector: 'SRC_SHOPIFY',
+        workspace: '12345',
+        oauth_keys: 'private',
+        meta: meta
+      };
+
+      let state = encodeURIComponent(JSON.stringify(obj));
+
+      router.push(`${oAuthRoute}?state=${state}`);
+    }
+  };
+
   const handleLogin = async () => {
     try {
       await setAuthMetaCookie(formData);
       updateLoginFlowState();
 
-      signIn('google', {
+      // signIn('google', {
+      //   callbackUrl: '/'
+      // });
+      signIn('shopify', {
         callbackUrl: '/'
       });
     } catch (error) {
-      // console.error('Error during login:', error);
+      console.error('Error during login:', error);
     }
   };
 
@@ -162,7 +197,8 @@ const AuthenticationLayout = () => {
             width: '100%'
           }}
         >
-          <GoogleSignInButton onClick={handleLoginClick} />
+          {/* <GoogleSignInButton onClick={handleLoginClick} /> */}
+          <ShopifySignInButton onClick={handleLogin} />
           <Button onClick={handleLoginModes} sx={{ alignSelf: 'flex-end', padding: 1 }}>
             <AuthenticationFormFooter
               footerText={isUserNew ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}

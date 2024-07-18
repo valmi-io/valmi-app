@@ -5,7 +5,7 @@ import GoogleProviders from 'next-auth/providers/google';
 
 import { getErrorsInData, handleAxiosError, hasErrorsInData } from '@/components/Error/ErrorUtils';
 import { isObjectEmpty } from '@/utils/lib';
-import { getAuthMetaCookie } from '@/lib/cookies';
+import { getAuthMetaCookie, getShopifyMetaCookie } from '@/lib/cookies';
 import { getBaseUrl } from '@/pagesapi/utils';
 
 const GOOGLE_AUTHORIZATION_URL =
@@ -74,6 +74,9 @@ const SCOPES = [
 ];
 
 export const nextAuthOptions = (req, res) => {
+  let storeName = getShopifyMetaCookieFromReq(req);
+  storeName = storeName.split('.myshopify.com')[0];
+  const redirectUri = `https://localhost/api/oauth2/redirect/shopify`;
   return {
     providers: [
       GoogleProviders({
@@ -87,7 +90,25 @@ export const nextAuthOptions = (req, res) => {
             scope: SCOPES.join(' ')
           }
         }
-      })
+      }),
+      {
+        id: 'shopify',
+        name: 'Shopify',
+        type: 'oauth',
+        version: '2.0',
+        clientId: process.env.NEXTAUTH_SHOPIFY_CLIENT_ID as string,
+        clientSecret: process.env.NEXTAUTH_SHOPIFY_CLIENT_SECRET as string,
+        authorization: {
+          url: `https://${storeName}.myshopify.com/admin/oauth/authorize?client_id=${
+            process.env.NEXTAUTH_SHOPIFY_CLIENT_ID
+          }&redirect_uri=${encodeURIComponent(redirectUri)}`,
+          params: {
+            scope:
+              'openid, email, write_pixels,read_customer_events,read_customers,read_checkouts,read_orders,read_fulfillments,read_products',
+            redirect_uri: redirectUri
+          }
+        }
+      }
     ],
 
     authorizationUrl: GOOGLE_AUTHORIZATION_URL,
@@ -242,6 +263,33 @@ function getAuthMetaCookieFromReq(req) {
     const parsedCookie = JSON.parse(cookie);
     return parsedCookie?.meta ?? {}; // Extract and return meta property
   } catch (error) {
+    return {};
+  }
+}
+
+function getShopifyMetaCookieFromReq(req: any): object {
+  // Check for missing request object
+  if (!req) {
+    return {};
+  }
+
+  // Check for missing cookies
+  const cookies = req?.cookies ?? {};
+  if (isObjectEmpty(cookies)) {
+    return {};
+  }
+
+  // Get the cookie name from a utility function
+  const cookieName = getShopifyMetaCookie();
+  if (!cookieName) {
+    return {};
+  }
+
+  try {
+    const cookie = cookies[cookieName] ?? '{}';
+    return cookie ?? '';
+  } catch (error) {
+    console.error('Failed to fetch shopifyMeta cookie:', error);
     return {};
   }
 }

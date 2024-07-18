@@ -4,9 +4,20 @@ import type { NextRequest } from 'next/server';
 import { publicRoutes, isPublicSync } from '@utils/routes';
 import { getAuthTokenCookie } from '@/lib/cookies';
 
-export async function middleware(request: NextRequest, response: NextResponse) {
+export async function middleware(request: NextRequest) {
   let cookie = request.cookies.get(getAuthTokenCookie())?.value;
+  const url = request.nextUrl.href;
+  const parsedUrl = new URL(url);
+  const shop = parsedUrl.searchParams.get('shop') ?? '';
 
+  // Set shopifyMeta cookie
+  if (shop) {
+    const response = NextResponse.next();
+    response.cookies.set('shopifyMeta', shop);
+    return response;
+  }
+
+  // Get auth token
   let accessToken = '';
   if (cookie) {
     cookie = JSON.parse(cookie);
@@ -27,10 +38,17 @@ export async function middleware(request: NextRequest, response: NextResponse) {
       // user is not authenticated
       // checking if route is a protected route.
       if (!publicRoutes.includes(route) && route !== '/') {
-        return NextResponse.redirect(new URL('/', request.url));
+        const store = request.cookies.get('shopifyMeta')?.value || '';
+        if (store) {
+          return NextResponse.redirect(new URL('/', request.url));
+        } else {
+          return NextResponse.redirect(new URL('/', request.url));
+        }
       }
     }
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

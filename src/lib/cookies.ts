@@ -15,6 +15,8 @@ const AUTH_TOKEN_COOKIE = 'auth';
 
 const AUTH_META_COOKIE = 'authMeta';
 
+const SHOPIFY_META_COOKIE = 'shopifyMeta';
+
 // Function to set a cookie
 export async function setCookie(name: string, value: string, options: CookieOptions = {}) {
   try {
@@ -47,6 +49,10 @@ export function getAuthMetaCookie() {
   return AUTH_META_COOKIE;
 }
 
+export function getShopifyMetaCookie() {
+  return SHOPIFY_META_COOKIE;
+}
+
 export async function setAuthTokenCookie(authToken: string) {
   const data = {
     accessToken: authToken ?? ''
@@ -62,5 +68,15 @@ export async function setAuthMetaCookie(data: any) {
   const { meta = null } = (await getCookie(getAuthMetaCookie())) ?? {};
   if (!meta) {
     setCookie(getAuthMetaCookie(), JSON.stringify({ meta: { ...data } }));
+  }
+}
+
+export async function setShopifyMetaCookie(storeName: string) {
+  const data = {
+    shopifyStoreName: storeName ?? ''
+  };
+  const { shopifyStoreName = '' } = (await getCookie(getShopifyMetaCookie())) ?? '';
+  if (!shopifyStoreName) {
+    setCookie(getShopifyMetaCookie(), JSON.stringify(data));
   }
 }
